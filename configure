@@ -1,0 +1,19 @@
+#!/bin/bash
+echo .
+echo ============================================================
+echo EBImage USES cmake TO CONFIGURE AND MAKE...
+echo IF INSTALLATION FAILS, PLEASE CHECK IF cmake IS INSTALLED
+echo cmake of Kitware - www.cmake.org
+echo ------------------------------------------------------------
+echo Requires: libR, libMagick++ - www.imagemagick.org,
+echo           libpthread, libstdc++
+echo ------------------------------------------------------------
+echo Please ignore the warning showing that libs exists - it is
+echo non-standard configure script because of cmake usage
+echo ============================================================
+echo .
+export MAGICK_DIR=`Magick++-config --prefix`
+cmake ./inst/src
+make
+mkdir ./inst/libs
+cp libebimage.so ./inst/libs/ebimage.so
