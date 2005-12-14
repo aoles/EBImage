@@ -13,7 +13,7 @@ setMethod("write.image", signature(object = "Image2D", files = "character"),
             stop("single file/URL name must be supplied for images of class Image2D")
         if (class(object) == "Image3D" && length(files) != 1 && length(files) != dim(object)[[3]])
             stop("number of files/URL must match the stack size for a 3D images or a single file supporting stacks (TIFF) must be supplied")
-        invisible(.CallImagine("writeImages", object, files))
+        invisible(.CallEBImage("writeImages", object, files))
     }
 )
 # ============================================================================
@@ -31,7 +31,7 @@ read.image <- function(files, rgb = FALSE) {
 #        stop("file(s) not found")
 #    }
     rgb = as.logical(rgb)[[1]]
-    return(.CallImagine("readImages", files, rgb))
+    return(.CallEBImage("readImages", files, rgb))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ping.image <- function(files, show.comments = FALSE) {
@@ -45,7 +45,7 @@ ping.image <- function(files, show.comments = FALSE) {
         cat("\n")
         stop("file(s) not found")
     }
-    invisible(.CallImagine("pingImages", files, as.logical(show.comments)))
+    invisible(.CallEBImage("pingImages", files, as.logical(show.comments)))
 }
 # ============================================================================
 # INTERNALS

@@ -47,135 +47,135 @@ Image3D.CopyHeader <- function(x, data = array(0, c(2, 2, 2)), dim = NULL) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("normalize", signature(object = "Image3D"),
     function(object, from = 0, to = 65535) {
-        minmax = min.max(object)
+        minmax = minMax(object)
         if (minmax[[2]] - minmax[[1]] == 0)
             return(object)
         return(Image3D.CopyHeader(object, (object@.Data - minmax[[1]]) / (minmax[[2]] - minmax[[1]]) * (to - from) + from, dim(object)))
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("to.gray", signature(object = "Image3D"),
+setMethod("toGray", signature(object = "Image3D"),
     function(object) {
         if (!object@rgb)
             return(object)
         if (!is.integer(object)) {
             warning("image data of type double... use as.integer on your image to correct")
-            res = .CallImagine("toGray", as.integer(object))
+            res = .CallEBImage("toGray", as.integer(object))
         }
         else
-            res = .CallImagine("toGray", object)
+            res = .CallEBImage("toGray", object)
         res = Image3D.CopyHeader(object, res, dim(object))
         res@rgb = FALSE
         return(res)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("to.rgb", signature(object = "Image3D"),
+setMethod("toRGB", signature(object = "Image3D"),
     function(object) {
         if (object@rgb)
             return(object)
         if (!is.integer(object)) {
             warning("image data of type double... use as.integer on your image to correct")
-            res = .CallImagine("toRGB", as.integer(object))
+            res = .CallEBImage("toRGB", as.integer(object))
         }
         else
-            res = .CallImagine("toRGB", object)
+            res = .CallEBImage("toRGB", object)
         res = Image3D.CopyHeader(object, res, dim(object))
         res@rgb = TRUE
         return(res)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("to.red", signature(object = "Image3D"),
+setMethod("toRed", signature(object = "Image3D"),
     function(object) {
         if (object@rgb)
             stop("only grayscale images are supported")
         if (!is.integer(object)) {
             warning("image data of type double... use as.integer on your image to correct")
-            res = .CallImagine("asRed", as.integer(object))
+            res = .CallEBImage("asRed", as.integer(object))
         }
         else
-            res = .CallImagine("asRed", object)
+            res = .CallEBImage("asRed", object)
         res = Image3D.CopyHeader(object, res, dim(object))
         res@rgb = TRUE
         return(res)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("to.green", signature(object = "Image3D"),
+setMethod("toGreen", signature(object = "Image3D"),
     function(object) {
         if (object@rgb)
             stop("only grayscale images are supported")
         if (!is.integer(object)) {
             warning("image data of type double... use as.integer on your image to correct")
-            res = .CallImagine("asGreen", as.integer(object))
+            res = .CallEBImage("asGreen", as.integer(object))
         }
         else
-            res = .CallImagine("asGreen", object)
+            res = .CallEBImage("asGreen", object)
         res = Image3D.CopyHeader(object, res, dim(object))
         res@rgb = TRUE
         return(res)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("to.blue", signature(object = "Image3D"),
+setMethod("toBlue", signature(object = "Image3D"),
     function(object) {
         if (object@rgb)
             stop("only grayscale images are supported")
         if (!is.integer(object)) {
             warning("image data of type double... use as.integer on your image to correct")
-            res = .CallImagine("asBlue", as.integer(object))
+            res = .CallEBImage("asBlue", as.integer(object))
         }
         else
-            res = .CallImagine("asBlue", object)
+            res = .CallEBImage("asBlue", object)
         res = Image3D.CopyHeader(object, res, dim(object))
         res@rgb = TRUE
         return(res)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("get.red", signature(object = "Image3D"),
+setMethod("getRed", signature(object = "Image3D"),
     function(object) {
         if (!object@rgb)
             return(object)
         if (!is.integer(object)) {
             warning("image data of type double... use as.integer on your image to correct")
-            res = .CallImagine("getRed", as.integer(object))
+            res = .CallEBImage("getRed", as.integer(object))
         }
         else
-            res = .CallImagine("getRed", object)
+            res = .CallEBImage("getRed", object)
         res = Image3D.CopyHeader(object, res, dim(object))
         res@rgb = FALSE
         return(res)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("get.green", signature(object = "Image3D"),
+setMethod("getGreen", signature(object = "Image3D"),
     function(object) {
         if (!object@rgb)
             return(object)
         if (!is.integer(object)) {
             warning("image data of type double... use as.integer on your image to correct")
-            res = .CallImagine("getGreen", as.integer(object))
+            res = .CallEBImage("getGreen", as.integer(object))
         }
         else
-            res = .CallImagine("getGreen", object)
+            res = .CallEBImage("getGreen", object)
         res = Image3D.CopyHeader(object, res, dim(object))
         res@rgb = FALSE
         return(res)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("get.blue", signature(object = "Image3D"),
+setMethod("getBlue", signature(object = "Image3D"),
     function(object) {
         if (!object@rgb)
             return(object)
         if (!is.integer(object)) {
             warning("image data of type double... use as.integer on your image to correct")
-            res = .CallImagine("getBlue", as.integer(object))
+            res = .CallEBImage("getBlue", as.integer(object))
         }
         else
-            res = .CallImagine("getBlue", object)
+            res = .CallEBImage("getBlue", object)
         res = Image3D.CopyHeader(object, res, dim(object))
         res@rgb = FALSE
         return(res)

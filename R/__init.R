@@ -1,10 +1,12 @@
-.First.lib <- function(lib, pkg) {
-  library.dynam("ebimage", pkg, lib)
-  cat("\nWelcome to 'EBImage' - a part of 'Bioconductor.org' project\n\n")
-  cat("\tType 'help(EBImage)' to get started, or use\n")
-  cat("\t'openVignette()' from 'Biobase' to read the manual\n\n")
+# Package initialization routine
+.onLoad <- function(lib, pkg) {
+    # uses useDynLib("EBImage") in NAMESPACE instead
+    #library.dynam("EBImage", pkg, lib)
+    cat("* EBImage of Bioconductor.org: help(EBImage) to get started...\n")
+    require(methods)
 }
 
-.CallImagine <- function(name, ...) {
-    .Call(name, ..., PACKAGE = "imagine")
+# shortcut to call library functions for EBImage
+.CallEBImage <- function(name, ...) {
+    .Call(name, ..., PACKAGE = "EBImage")
 }

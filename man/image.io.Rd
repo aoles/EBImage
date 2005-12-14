@@ -63,11 +63,11 @@
 }
 
 \seealso{
-   \code{\link{Image2D}}
+   \code{\link{Image2D}}, \code{\link{Image3D}}
 }
 
 \source{
-    R sources in 'R/class-Image.R' and C++ sources in 'inst/src/io.cpp' of package 'imagine'.
+    R sources in 'R/class.Image2D.R' and C++ sources in 'inst/src/io.cpp' of package 'imagine'.
 }
 
 \references{

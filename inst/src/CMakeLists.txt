@@ -1,3 +1,7 @@
+# THIS file is not used for default compilation
+# might be used for windows version with cmake later - keep intact
+
+
 PROJECT(EBImage)
 
 INCLUDE_DIRECTORIES($ENV{R_HOME}/include)

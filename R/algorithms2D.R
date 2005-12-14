@@ -1,4 +1,4 @@
-indexcells <- function(x, ...) {
+indexCells <- function(x, ...) {
     .warnOnStack(x, ...)
     x = im.gaussian(im.distMap(x, ...), 4, 2, ...)
 
