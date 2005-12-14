@@ -1,4 +1,4 @@
-library(imagine)
+library(EBImage)
 # read a stack of 9 images (tiff file) from a remote server
 im = read.image("http://www.ebi.ac.uk/~osklyar/projects/imagine/examples/example.tif")
 # normalize all images independently

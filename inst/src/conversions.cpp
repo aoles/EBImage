@@ -15,8 +15,8 @@ SEXP stack2SEXP(MagickStack& stack, bool rgb) {
     try {
         /* get parameters of the first image to set 'data' size */
         MagickImage image = *stack.begin();
-        int dx = image.columns();
-        int dy = image.rows();
+        unsigned int dx = image.columns();
+        unsigned int dy = image.rows();
         if (dx * dy <= 0) {
             warning("first image in the stack is of size 0: returning NULL");
             return R_NilValue;
@@ -152,6 +152,10 @@ MagickImage  SEXP2Image(SEXP rimage) {
     catch(...) {
         error("unidentified problems during image converion in 'SEXP2Image' c++ routine");
     }
+    /* this should never happen, but it prevents warning: the function exits either on
+       previous return or on error - it should not happen that the control comes here
+    */
+    return MagickImage(Geometry(10, 10), "black");
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 SEXP toGray(SEXP rgb) {

@@ -86,8 +86,10 @@ SEXP displayImages(SEXP rimage, SEXP animate) {
         int ndim = LENGTH(GET_DIM(GET_SLOT(rimage, mkString(".Data"))));
         if (ndim < 2 || ndim > 3)
             error("max 'image' dimension for display is 3D, select a subset and try again");
+        /* FIXME This must be uncommented to force closing image before opening a new one!!!
         if (THREAD_ON)
             error("another image is currently displayed, close it first! Read help on 'display'");
+        */
         pthread_t res;
         if (is3D) {
             if (doanimate) {
@@ -100,7 +102,7 @@ SEXP displayImages(SEXP rimage, SEXP animate) {
         }
         if (is2D)
             if (pthread_create(&res, NULL, THREAD_FUN_displaySingle, (void *)rimage) != 0)
-                    error("pthread problem. Ccannot create display thread");
+                error("pthread problem. Ccannot create display thread");
     }
     catch(...) {
         error("unidentified problem in 'displayImages' c++ routine");

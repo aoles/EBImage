@@ -21,18 +21,18 @@ PRINT_DATA = FALSE
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setGeneric("display",   function(object, ...) standardGeneric("display"))
 setGeneric("channels",  function(object)      standardGeneric("channels"))
-setGeneric("to.gray",   function(object)      standardGeneric("to.gray"))
-setGeneric("to.rgb",    function(object)      standardGeneric("to.rgb"))
-setGeneric("to.red",    function(object)      standardGeneric("to.red"))
-setGeneric("to.green",  function(object)      standardGeneric("to.green"))
-setGeneric("to.blue",   function(object)      standardGeneric("to.blue"))
-setGeneric("get.red",   function(object)      standardGeneric("get.red"))
-setGeneric("get.green", function(object)      standardGeneric("get.green"))
-setGeneric("get.blue",  function(object)      standardGeneric("get.blue"))
+setGeneric("toGray",    function(object)      standardGeneric("toGray"))
+setGeneric("toRGB",     function(object)      standardGeneric("toRGB"))
+setGeneric("toRed",     function(object)      standardGeneric("toRed"))
+setGeneric("toGreen",   function(object)      standardGeneric("toGreen"))
+setGeneric("toBlue",    function(object)      standardGeneric("toBlue"))
+setGeneric("getRed",    function(object)      standardGeneric("getRed"))
+setGeneric("getGreen",  function(object)      standardGeneric("getGreen"))
+setGeneric("getBlue",   function(object)      standardGeneric("getBlue"))
 setGeneric("normalize", function(object, ...) standardGeneric("normalize"))
 setGeneric("to16bit",   function(object, ...) standardGeneric("to16bit"))
-setGeneric("min.max",   function(object)      standardGeneric("min.max"))
-setGeneric("as.integer", function(x, ...)     standardGeneric("as.integer"))
+setGeneric("minMax",    function(object)      standardGeneric("minMax"))
+setGeneric("as.integer",function(x, ...)      standardGeneric("as.integer"))
 setGeneric("as.array",  function(x)           standardGeneric("as.array"))
 setGeneric("summary",   function(object, ...) standardGeneric("summary"))
 # ============================================================================
@@ -76,10 +76,10 @@ setMethod("display", signature(object = "Image2D"),
     function(object) {
         if (!is.integer(object)) {
             warning("image data of type double... use as.integer on your image to correct")
-            invisible(.CallImagine("displayImages", as.integer(object), FALSE))
+            invisible(.CallEBImage("displayImages", as.integer(object), FALSE))
         }
         else
-            invisible(.CallImagine("displayImages", object, FALSE))
+            invisible(.CallEBImage("displayImages", object, FALSE))
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -93,128 +93,128 @@ setMethod("channels", signature(object = "Image2D"),
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("to.gray", signature(object = "Image2D"),
+setMethod("toGray", signature(object = "Image2D"),
     function(object) {
         if (!object@rgb)
             return(object)
         if (!is.integer(object)) {
             warning("image data of type double... use as.integer on your image to correct")
-            res = .CallImagine("toGray", as.integer(object))
+            res = .CallEBImage("toGray", as.integer(object))
         }
         else
-            res = .CallImagine("toGray", object)
+            res = .CallEBImage("toGray", object)
         res = Image2D.CopyHeader(object, res, dim(object))
         res@rgb = FALSE
         return(res)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("to.rgb", signature(object = "Image2D"),
+setMethod("toRGB", signature(object = "Image2D"),
     function(object) {
         if (object@rgb)
             return(object)
         if (!is.integer(object)) {
             warning("image data of type double... use as.integer on your image to correct")
-            res = .CallImagine("toRGB", as.integer(object))
+            res = .CallEBImage("toRGB", as.integer(object))
         }
         else
-            res = .CallImagine("toRGB", object)
+            res = .CallEBImage("toRGB", object)
         res = Image2D.CopyHeader(object, res, dim(object))
         res@rgb = TRUE
         return(res)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("to.red", signature(object = "Image2D"),
+setMethod("toRed", signature(object = "Image2D"),
     function(object) {
         if (object@rgb)
             stop("only grayscale images are supported")
         if (!is.integer(object)) {
             warning("image data of type double... use as.integer on your image to correct")
-            res = .CallImagine("asRed", as.integer(object))
+            res = .CallEBImage("asRed", as.integer(object))
         }
         else
-            res = .CallImagine("asRed", object)
+            res = .CallEBImage("asRed", object)
         res = Image2D.CopyHeader(object, res, dim(object))
         res@rgb = TRUE
         return(res)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("to.green", signature(object = "Image2D"),
+setMethod("toGreen", signature(object = "Image2D"),
     function(object) {
         if (object@rgb)
             stop("only grayscale images are supported")
         if (!is.integer(object)) {
             warning("image data of type double... use as.integer on your image to correct")
-            res = .CallImagine("asGreen", as.integer(object))
+            res = .CallEBImage("asGreen", as.integer(object))
         }
         else
-            res = .CallImagine("asGreen", object)
+            res = .CallEBImage("asGreen", object)
         res = Image2D.CopyHeader(object, res, dim(object))
         res@rgb = TRUE
         return(res)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("to.blue", signature(object = "Image2D"),
+setMethod("toBlue", signature(object = "Image2D"),
     function(object) {
         if (object@rgb)
             stop("only grayscale images are supported")
         if (!is.integer(object)) {
             warning("image data of type double... use as.integer on your image to correct")
-            res = .CallImagine("asBlue", as.integer(object))
+            res = .CallEBImage("asBlue", as.integer(object))
         }
         else
-            res = .CallImagine("asBlue", object)
+            res = .CallEBImage("asBlue", object)
         res = Image2D.CopyHeader(object, res, dim(object))
         res@rgb = TRUE
         return(res)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("get.red", signature(object = "Image2D"),
+setMethod("getRed", signature(object = "Image2D"),
     function(object) {
         if (!object@rgb)
             return(object)
         if (!is.integer(object)) {
             warning("image data of type double... use as.integer on your image to correct")
-            res = .CallImagine("getRed", as.integer(object))
+            res = .CallEBImage("getRed", as.integer(object))
         }
         else
-            res = .CallImagine("getRed", object)
+            res = .CallEBImage("getRed", object)
         res = Image2D.CopyHeader(object, res, dim(object))
         res@rgb = FALSE
         return(res)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("get.green", signature(object = "Image2D"),
+setMethod("getGreen", signature(object = "Image2D"),
     function(object) {
         if (!object@rgb)
             return(object)
         if (!is.integer(object)) {
             warning("image data of type double... use as.integer on your image to correct")
-            res = .CallImagine("getGreen", as.integer(object))
+            res = .CallEBImage("getGreen", as.integer(object))
         }
         else
-            res = .CallImagine("getGreen", object)
+            res = .CallEBImage("getGreen", object)
         res = Image2D.CopyHeader(object, res, dim(object))
         res@rgb = FALSE
         return(res)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("get.blue", signature(object = "Image2D"),
+setMethod("getBlue", signature(object = "Image2D"),
     function(object) {
         if (!object@rgb)
             return(object)
         if (!is.integer(object)) {
             warning("image data of type double... use as.integer on your image to correct")
-            res = .CallImagine("getBlue", as.integer(object))
+            res = .CallEBImage("getBlue", as.integer(object))
         }
         else
-            res = .CallImagine("getBlue", object)
+            res = .CallEBImage("getBlue", object)
         res = Image2D.CopyHeader(object, res, dim(object))
         res@rgb = FALSE
         return(res)
@@ -223,7 +223,7 @@ setMethod("get.blue", signature(object = "Image2D"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("normalize", signature(object = "Image2D"),
     function(object, from = 0, to = 65535) {
-        minmax = min.max(object)
+        minmax = minMax(object)
         if (minmax[[2]] - minmax[[1]] == 0)
             return(object)
         return(Image2D.CopyHeader(object, (object@.Data - minmax[[1]]) / (minmax[[2]] - minmax[[1]]) * (to - from) + from, dim(object)))
@@ -335,7 +335,7 @@ setMethod("show", signature(object = "Image2D"),
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("min.max", signature(object = "Image2D"),
+setMethod("minMax", signature(object = "Image2D"),
     function(object) {
         res = integer(2)
         res[[1]] = min(object@.Data)

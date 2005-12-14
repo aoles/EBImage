@@ -1,25 +1,24 @@
-\name{im.distMap}
-\alias{im.distMap}
+\name{distMap}
+\alias{distMap}
 \docType{function}
 
 \title{Distance Map Transformations}
 \description{Distance Map Transformations}
 
 \usage{
-im.distMap(x, alg = "Lotufo_Zampirolli", ...) 
+    distMap(x, alg = "Lotufo_Zampirolli")
 }
 \arguments{
-  \item{x}{An object of class \code{\link[class-rimage]{rimage}}. It is
-    interpreted as a binary image, where the regions of the image that
-    have the value 0 are considered the background, and the regions
-    with values greater than 0 are considered foreground. The distance
-    map is calculated for the foreground.}
+    \item{x}{An instance of class \code{\link{Image2D}} or \code{\link{Image3D}}. For 3D objects, filters
+        will be applied to every single image composed of first two dimensions.}
   \item{alg}{Character. Currently, only Lotufo\_Zampirolli is
     implemented.}
-  \item{...}{Further arguments that get passed on to
-    \code{\link{.warnOnStack}}}
 }
-\value{An object of class \code{\link[class-rimage]{rimage}}}
+
+\value{
+    New instance of class \code{\link{Image2D}} or \code{\link{Image3D}} with the same characteristics
+    as the original, but with filter applied (to every single 2D image if source is 3D).
+}
 
 
 \details{
@@ -27,7 +26,7 @@ im.distMap(x, alg = "Lotufo_Zampirolli", ...)
 }
 
 \seealso{
-  \code{\link{Filters 2D}}
+   \code{\link{Image2D}}, \code{\link{Image3D}}, \code{\link{Filters 2D}}
 }
 
 \source{
