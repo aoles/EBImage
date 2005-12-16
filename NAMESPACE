@@ -1,5 +1,4 @@
 useDynLib("EBImage")
-# hide: ".First.lib", "smartTresh"
 export(
     "Image2D", "Image2D.CopyHeader", "Image3D", "Image3D.CopyHeader",
 
@@ -10,8 +9,7 @@ export(
 
     "read.image", "ping.image",
 
-    "indexCells", "getCenters"
-
+    "objectCount", "displayObjectCount"
 )
 exportClasses(
     "array", "Image2D", "Image3D"

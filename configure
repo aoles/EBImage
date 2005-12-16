@@ -3,8 +3,8 @@
 # the compilation with -lMagick++ -lpthread and -lstdc++, otherwise R uses only -R switch
 # this is also the reason why all sources are in inst/src - I did not want to create 700 Kb
 # large configure script - this works just fine
-export CXXFLAGS="-c -g -O2 -I. -Isrc -I$R_HOME/include `Magick++-config --cppflags --cxxflags`"
-export LFLAGS="-shared -g -O2 -L$R_HOME/lib -lR -lstdc++ `Magick++-config --cxxflags --ldflags --libs`"
+export CXXFLAGS="-c -g -O2 -fPIC -I. -Isrc -I$R_HOME/include `Magick++-config --cppflags --cxxflags`"
+export LFLAGS="-shared -g -O2 -fPIC -L$R_HOME/lib -lR -lstdc++ `Magick++-config --cxxflags --ldflags --libs`"
 g++ $CXXFLAGS inst/src/*.cpp
 g++ $LFLAGS *.o -o EBImage.so
 mkdir ./inst/libs

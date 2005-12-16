@@ -4,8 +4,6 @@
 #include <R_ext/Error.h>
 #include <iostream>
 
-#define MAT_ELT(x, i, j, n) x[(i)+(j)*(n)]
-
 using namespace std;
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
