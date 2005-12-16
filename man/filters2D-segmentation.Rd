@@ -23,8 +23,8 @@
     segment(x, cluster = 1, smooth = 1.5)
     ffill(x, col, row, color)
     ffillEdge(x, col, row, color)
-    tresh(x, width = 20, height = 20, offset = 1000)
-    edge(x, radius = 0)
+    tresh(x, width = 20, height = 20, offset = 1000, preprocess = TRUE)
+    edge(x, radius = 1)
 }
 
 \arguments{
@@ -42,6 +42,7 @@
     \item{height}{y-pixel region to evaluate the mean.}
     \item{offset}{In order to remove residual noise from the background, the threshold may be adjusted
         by subtracting this constant from the mean to compute the threshold.}
+    \item{preprocess}{If \code{TRUE} \code{gaussFilter} with arguments 4, 2 is applied to the normalized image first.}
     \item{radius}{Specifies the radius of the neighborhood in \code{edge}, with a zero value leading to
         an automatic radius selection.}
 }

@@ -7,22 +7,13 @@
 # ============================================================================
 # IMAGE PROCESSING ROUTINES via ImageMagick
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-tresh <- function(x, width = 20, height = 20, offset = 1000) {
+tresh <- function(x, width = 20, height = 20, offset = 1000, preprocess = FALSE) {
     .notImageError(x)
-    if (missing(width) || missing(height))
-        stop("arguments 'width' and 'height' are essential")
     param = as.double(c(width, height, offset))
     filter = as.integer(1)
+    if (preprocess)
+        x = gaussFilter(normalize(x), 4, 2)
     return(.CallEBImage("stdFilter2D", x, filter, param))
-}
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-smartTresh <- function(x, width = 20, height = 20, offset = 1000) {
-    .notImageError(x)
-    if (x@rgb)
-        x = to.gray(x)
-    # normalize, smooth and segment
-    x = im.tresh(im.gaussian(normalize(x), 4, 2), width = width, height = height, offset = offset)
-    return(x)
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 blur <- function(x, radius = 1, sigma = 0.5) {
@@ -47,7 +38,7 @@ despeckle <- function(x) {
     return(.CallEBImage("stdFilter2D", x, filter, NULL))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-edge <- function(x, radius = 0) {
+edge <- function(x, radius = 1) {
     .notImageError(x)
     param = as.double(radius)
     filter = as.integer(5)
@@ -220,22 +211,4 @@ noise <- function(x, type = "gaussian") {
     )
     filter = as.integer(24)
     return(.CallEBImage("stdFilter2D", x, filter, param))
-}
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# TODO: add more algorithms in distmaps.cpp if necessary
-distMap <- function(x, alg = "Lotufo_Zampirolli") {
-    .notImageError(x)
-    # res value will be modified in call to distMap
-    if (is.integer(x))
-        res = x
-    else
-        res = as.integer(x)
-    res@rgb = FALSE
-    ialg = as.integer(grep(alg, c("Lotufo_Zampirolli")))
-    if(length(ialg)==0)
-      stop(sprintf("Invalid algorithm 'alg'=%s.", alg))
-    if(length(ialg)>1)
-      stop(sprintf("Specification of algorithm 'alg'=%s is ambiguous.", alg))
-
-    return(.CallEBImage("distMap", res, ialg))
 }

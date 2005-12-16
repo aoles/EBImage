@@ -9,7 +9,7 @@ INCLUDE_DIRECTORIES($ENV{MAGICK_DIR}/include)
 # Basic units
 SET(SRC conversions.cpp io.cpp display.cpp)
 # Magick++ 2D processing routines
-SET(SRC ${SRC} stdFilters.cpp distmaps.cpp)
+SET(SRC ${SRC} stdFilters.cpp distmaps.cpp objectcount.cpp)
 # Subscript operators
 #SET(SRC ${SRC} subscripts.cpp)
 # Main library file

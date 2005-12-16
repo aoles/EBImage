@@ -1,5 +1,6 @@
 \name{distMap}
 \alias{distMap}
+\alias{objectCount}
 \docType{function}
 
 \title{Distance Map Transformations}
@@ -7,6 +8,7 @@
 
 \usage{
     distMap(x, alg = "Lotufo_Zampirolli")
+    objectCount(x, minArea = 20, maxRadius = 100, tolerance = 3, maxObjects = 1000)
 }
 \arguments{
     \item{x}{An instance of class \code{\link{Image2D}} or \code{\link{Image3D}}. For 3D objects, filters

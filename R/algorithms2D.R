@@ -1,47 +1,47 @@
-indexCells <- function(x, ...) {
-    .warnOnStack(x, ...)
-    x = im.gaussian(im.distMap(x, ...), 4, 2, ...)
-
-    indexmax <- function(x) {
-        if (!is(x, "Image2D") || is(x, "Image3D"))
-            stop("argument to indexmax must be Image2D")
-        nc = ncol(x)
-        nr = nrow(x)
-        ind = rep(2:(nr - 1), nc - 2) + rep(1:(nc - 2), each = nr - 2) * nr
-        ## compare against maximum of the 8 neighbours
-        x = as.vector(x)
-        whMax = ind[  x[ind] > pmax(x[ind-1], x[ind+1], x[ind-nr], x[ind-nr-1], x[ind-nr+1], x[ind+nr], x[ind+nr-1], x[ind+nr+1]) ]
-
-        ## convert to x,y - but the scalar indexing is more efficient
-        ## cbind( 1+ (whMax-1)%%nr, 1+ (whMax-1)%/%nr )
-        return(whMax)
-    }
-
-    if (is(x, "Image3D")) {
-        res = list(dim(x)[[3]])
-        for (i in 1:dim(x)[[3]])
-            res[[i]] = indexmax(x[ , , i])
-    }
+# ============================================================================
+# Algorithms of image analysis
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Copyright: Oleg Sklyar, 2005
+#            European Bioinformatics Institute; Bioconductor.org
+# ============================================================================
+# TODO: add more algorithms in distmaps.cpp if necessary
+distMap <- function(x, alg = "Lotufo_Zampirolli") {
+    .notImageError(x)
+    # res value will be modified in call to distMap
+    if (is.integer(x))
+        res = x
     else
-        res = indexmax(x)
-    return(res)
+        res = as.integer(x)
+    res@rgb = FALSE
+    ialg = as.integer(grep(alg, c("Lotufo_Zampirolli")))
+    if(length(ialg)==0)
+      stop(sprintf("Invalid algorithm 'alg'=%s.", alg))
+    if(length(ialg)>1)
+      stop(sprintf("Specification of algorithm 'alg'=%s is ambiguous.", alg))
+
+    return(.CallEBImage("distMap", res, ialg))
 }
-
-getCenters <- function(x) {
-    if (class(x) != "Image2D")
-        stop("not supported for provided argument class")
-    dims = dim(x)
-    x = im.sample(x, dims[[1]]*2, dims[[2]]*2)
-    x = im.tresh(x, 40, 40, 1000)
-    x = im.segment(normalize(im.distMap(im.edge(normalize(im.distMap(x)), 1))))
-    x = im.sample(x, dims[[1]], dims[[2]])
-
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+objectCount <- function(x, minArea = 20, maxRadius = 100, tolerance = 3, maxObjects = 1000) {
+    .notImageError(x)
+    # res value will be modified in call to distMap
+    if (is.integer(x))
+        res = x
+    else
+        res = as.integer(x)
+    res@rgb = FALSE
+    param = c(minArea, maxRadius, tolerance, maxObjects)
+    return(.CallEBImage("objectCount", res, as.double(param)))
 }
-
-im.log <- function(x, m = exp(1)) {
-    return( normalize( log(x / 65535 * (m - 1) + 1) ) )
-}
-
-im.sqrt <- function(x) {
-    return( normalize( sqrt(x / 65535)    )   )
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+displayObjectCount <- function(x, objects) {
+    .notImageError(x)
+    if (is(x, "Image3D"))
+        stop("This function is defined for Image2D only")
+    res = toRGB(x)
+    radii = sqrt(objects[2,] / 3.14159)
+    res[objects[1,] - radii] = as.integer(65535)
+    res[objects[1,] + radii] = as.integer(65535)
+    res[objects[1,]] = as.integer(255)
+    display(res)
 }
