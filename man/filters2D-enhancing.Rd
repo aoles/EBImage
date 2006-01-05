@@ -27,19 +27,19 @@
 }
 
 \usage{
-    sharpen(x, radius = 1, sigma = 0.5)
-    unsharpMask(x, radius = 2, sigma = 0.5, amount = 5, threshold = 2)
+    sharpen(x, radius = 1, sigma = 0.5, modify = FALSE)
+    unsharpMask(x, radius = 2, sigma = 0.5, amount = 5, threshold = 2, modify = FALSE)
 
-    enhance(x)
-    despeckle(x)
-    redNoise(x, order = NULL)
+    enhance(x, modify = FALSE)
+    despeckle(x, modify = FALSE)
+    redNoise(x, order = NULL, modify = FALSE)
 
-    blur(x, radius = 1, sigma = 0.5)
-    medianFilter(x, radius = 2)
-    gaussFilter(x, width = 1, sigma = 0.5)
+    blur(x, radius = 1, sigma = 0.5, modify = FALSE)
+    medianFilter(x, radius = 2, modify = FALSE)
+    gaussFilter(x, width = 1, sigma = 0.5, modify = FALSE)
 
-    spread(x, amount = 3)
-    noise(x, type = "gaussian")
+    spread(x, amount = 3, modify = FALSE)
+    noise(x, type = "gaussian", modify = FALSE)
 }
 
 \arguments{
@@ -50,6 +50,7 @@
         for which the median is to be calculated.}
     \item{sigma}{Specifies the standard deviation, in pixel, of Laplacian for \code{sharpen} and
         \code{blur} and of Gaussian for \code{unsharpMask} and \code{gaussFilter}.}
+    \item{modify}{if set to TRUE original image will be modified (non-standard R behaviour)!}
     \item{amount}{For \code{unsharpMask}, specifies the percentage of the difference between the
         original and the blur image that is added back to the original; for \code{spread} - the
         amount by which pixels are spread within the image.}
@@ -63,8 +64,11 @@
 }
 
 \value{
-    New instance of class \code{\link{Image2D}} or \code{\link{Image3D}} with the same characteristics
-    as the original, but with filter applied (to every single 2D image if source is 3D).
+    If \code{modify==FALSE}, a new instance of class \code{\link{Image2D}} or \code{\link{Image3D}}
+    with the same characteristics as the original, but with filter applied (to every single 2D
+    image if source is 3D).
+
+    If \code{modify==TRUE}, invisible original image after modification!
 }
 
 \details{

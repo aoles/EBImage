@@ -2,8 +2,8 @@
 \alias{Segmentation 2D Filters}
 
 \alias{segment}
-\alias{ffill}
-\alias{ffillEdge}
+%\alias{ffill}
+%\alias{ffillEdge}
 \alias{tresh}
 \alias{edge}
 
@@ -20,11 +20,11 @@
 }
 
 \usage{
-    segment(x, cluster = 1, smooth = 1.5)
-    ffill(x, col, row, color)
-    ffillEdge(x, col, row, color)
-    tresh(x, width = 20, height = 20, offset = 1000, preprocess = TRUE)
-    edge(x, radius = 1)
+    segment(x, cluster = 1, smooth = 1.5, modify = FALSE)
+%    ffill(x, col, row, color)
+%    ffillEdge(x, col, row, color)
+    tresh(x, width = 20, height = 20, offset = 1000, preprocess = FALSE, modify = FALSE)
+    edge(x, radius = 1, modify = FALSE)
 }
 
 \arguments{
@@ -34,10 +34,11 @@
         for the cluster to be considered valid.}
     \item{smooth}{Smoothing threshold to eliminate noise in the second derivative of the histogram.
         A larger value results in a smoother second derivative.}
-    \item{col}{x-position of the target pixel.}
-    \item{row}{y-position of the target pixel.}
-    \item{color}{For \code{ffill} the color to replace with, for \code{ffillEdge} the color
-        of the border until which the flood fill will spread.}
+    \item{modify}{if set to TRUE original image will be modified (non-standard R behaviour)!}
+%    \item{col}{x-position of the target pixel.}
+%    \item{row}{y-position of the target pixel.}
+%    \item{color}{For \code{ffill} the color to replace with, for \code{ffillEdge} the color
+%        of the border until which the flood fill will spread.}
     \item{width}{x-pixel region to evaluate the mean.}
     \item{height}{y-pixel region to evaluate the mean.}
     \item{offset}{In order to remove residual noise from the background, the threshold may be adjusted
@@ -48,8 +49,11 @@
 }
 
 \value{
-    New instance of class \code{\link{Image2D}} or \code{\link{Image3D}} with the same characteristics
-    as the original, but with filter applied (to every single 2D image if source is 3D).
+    If \code{modify==FALSE}, a new instance of class \code{\link{Image2D}} or \code{\link{Image3D}}
+    with the same characteristics as the original, but with filter applied (to every single 2D
+    image if source is 3D).
+
+    If \code{modify==TRUE}, invisible original image after modification!
 }
 
 \details{

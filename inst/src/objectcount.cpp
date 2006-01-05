@@ -19,6 +19,7 @@ end
 */
 #include "conversions.h"
 #include <R_ext/Error.h>
+/* #include <cmath> */
 #include <vector>
 #include <iostream>
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -36,9 +37,9 @@ struct ColRow {
 };
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef vector<int> VectorInt;
-const int BACKGROUND = 0;
+const double BACKGROUND = 0;
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void object_count(int* data, ColRow& size, double* param, VectorInt& indexes, VectorInt& areas);
+void object_count(double * data, ColRow& size, double* param, VectorInt& indexes, VectorInt& areas);
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 SEXP objectCount(SEXP rimage, SEXP params) {
     try {
@@ -48,7 +49,7 @@ SEXP objectCount(SEXP rimage, SEXP params) {
         int nimages = 1;
         if (ndim > 2)
             nimages = dim[2];
-        int * data;
+        double * data;
         SEXP res = R_NilValue;
         /* for a stack we return a list, otherwise a single matrix */
         if (nimages > 1)
@@ -69,7 +70,7 @@ SEXP objectCount(SEXP rimage, SEXP params) {
                otherwise run the next line
                calc_dist_map(data, ncol, nrow, algorithm);
             */
-            data = &(INTEGER(rimage)[i * size.col * size.row]);
+            data = &(REAL(rimage)[i * size.col * size.row]);
             /* indexes and sizes of objects within one image are returned in vectors */
             object_count(data, size, par, indexes, areas);
             /* copy all returned values to the list element */
@@ -107,7 +108,7 @@ SEXP objectCount(SEXP rimage, SEXP params) {
     return R_NilValue;
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-inline ColRow getMaxIndex(int * data, ColRow& size) {
+inline ColRow getMaxIndex(double * data, ColRow& size) {
     ColRow res(0, 0), counter(0, 0);
     for (counter.col = 0; counter.col < size.col; counter.col++)
         for (counter.row = 0; counter.row < size.row; counter.row++)
@@ -117,11 +118,11 @@ inline ColRow getMaxIndex(int * data, ColRow& size) {
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 inline double dist(ColRow& pt1, ColRow& pt2) {
-    return sqrt((pt1.col - pt2.col) * (pt1.col - pt2.col) + (pt1.row - pt2.row) * (pt1.row - pt2.row));
+    return sqrt((long double)((pt1.col - pt2.col) * (pt1.col - pt2.col) + (pt1.row - pt2.row) * (pt1.row - pt2.row)));
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* this function is recursive!!! */
-void ffill(int * data, int col, int row, ColRow& start, ColRow& size, int value, double* param, int& area, bool& error) {
+void ffill(double * data, int col, int row, ColRow& start, ColRow& size, double value, double* param, int& area, bool& error) {
     /* check if there were any errors in previous recursive calls */
     if (error) return;
     /* check if point outside of the image */
@@ -131,7 +132,7 @@ void ffill(int * data, int col, int row, ColRow& start, ColRow& size, int value,
         error = true;
         return;
     }
-    int newvalue = data[INDEX(col, row, size.col)];
+    double newvalue = data[INDEX(col, row, size.col)];
     /* check if current point already on background */
     if (newvalue == BACKGROUND) return;
     /* check if we do not enter another maximum area with a given tolerance - another object */
@@ -152,7 +153,7 @@ void ffill(int * data, int col, int row, ColRow& start, ColRow& size, int value,
     ffill(data, col + 1, row - 1, start, size, newvalue, param, area, error);
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void object_count(int * data, ColRow& size, double* param, VectorInt & indexes, VectorInt & areas) {
+void object_count(double * data, ColRow& size, double* param, VectorInt & indexes, VectorInt & areas) {
     /* get the first maximum-value point */
     ColRow max(getMaxIndex(data, size));
     /* convert col and row into index - this is what we store */

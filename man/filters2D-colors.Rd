@@ -21,18 +21,19 @@
 }
 
 \usage{
-    contrast(x, sharpen)
-    equalize(x)
-    colorGamma(x, level)
-    mod(x, brightness = 1, saturation = 1, hue = 1)
-    shade(x, azimuth = 30, elevation = 30, shading = FALSE)
-    solarize(x, factor = 50)
+    contrast(x, sharpen, modify = FALSE)
+    equalize(x, modify = FALSE)
+    colorGamma(x, level, modify = FALSE)
+    mod(x, brightness = 1, saturation = 1, hue = 1, modify = FALSE)
+    shade(x, azimuth = 30, elevation = 30, shading = FALSE, modify = FALSE)
+    solarize(x, factor = 50, modify = FALSE)
 }
 
 \arguments{
     \item{x}{An instance of class \code{\link{Image2D}} or \code{\link{Image3D}}. For 3D objects, filters
         will be applied to every single image composed of first two dimensions.}
     \item{sharpen}{A measure of intensity differences for \code{contrast}.}
+    \item{modify}{if set to TRUE original image will be modified (non-standard R behaviour)!}
     \item{level}{Uniform gamma level.}
     \item{brightness}{Ratio of the current brightness value to adjust, 1.0 to keep the value.}
     \item{saturation}{Ratio of the current saturation value to adjust, 1.0 to keep the value.}
@@ -47,8 +48,11 @@
 }
 
 \value{
-    New instance of class \code{\link{Image2D}} or \code{\link{Image3D}} with the same characteristics
-    as the original, but with filter applied (to every single 2D image if source is 3D).
+    If \code{modify==FALSE}, a new instance of class \code{\link{Image2D}} or \code{\link{Image3D}}
+    with the same characteristics as the original, but with filter applied (to every single 2D
+    image if source is 3D).
+
+    If \code{modify==TRUE}, invisible original image after modification!
 }
 
 \details{

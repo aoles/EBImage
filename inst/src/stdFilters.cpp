@@ -7,6 +7,7 @@
 using namespace std;
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* THIS FUNCTION MODIFIES ITS rimage ARGUMENT, COPY BEFORE IF REQUIRED */
 SEXP stdFilter2D(SEXP rimage, SEXP filterNo, SEXP param) {
     /* parse param here */
     double * _param = NULL;
@@ -33,16 +34,13 @@ SEXP stdFilter2D(SEXP rimage, SEXP filterNo, SEXP param) {
         error("Caught unknown error when parsing function arguments in c++");
         return R_NilValue;
     }
-    /* convert R image to a stack */
-    MagickStack stack;
-    if (strcmp(CHAR(asChar(GET_CLASS(rimage))), "Image3D") == 0)
-        stack = SEXP2Stack(rimage);
-    else
-        stack.push_back(SEXP2Image(rimage));
-    MagickStack newStack;
-    for (MagickStack::iterator it = stack.begin(); it != stack.end(); it++) {
-        MagickImage image = *it;
+    SEXP dim = GET_DIM(rimage);
+    int nimages = 1;
+    if (LENGTH(dim) > 2)
+            nimages = INTEGER(dim)[2];
+    for (int i = 0; i < nimages; i++) {
         /* apply operation to a single image */
+        MagickImage image = pullImageData(rimage, i);
         try {
             switch(_filterNo) {
                 /* adaptive threshold */
@@ -217,11 +215,59 @@ SEXP stdFilter2D(SEXP rimage, SEXP filterNo, SEXP param) {
         catch(...) {
             cout << "Caught unknown error: result may be affected. Continuing..." << endl;
         }
-        /* add modified image to a new stack */
-        newStack.push_back(image);
+        /* push modified image back */
+        pushImageData(image, rimage, i);
     }
     if (_param != NULL)
         delete[] _param;
-    /* convert new stack to R image and return it */
-    return(stack2SEXP(newStack, isRGB));
+    /* return modified image */
+    return(rimage);
 }
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void normalizeDataset(double * data, double * range, int length) {
+    if (data == NULL || range == NULL || length <= 0) return;
+    double max = data[0];
+    double min = data[0];
+    double value;
+    for (int i = 0; i < length; i++) {
+        value = data[i];
+        if (value < min) min = value;
+        if (value > max) max = value;
+    }
+    if (min == max) return;
+    double factor = (range[1] - range[0]) / (max - min);
+    for (int i = 0; i < length; i++)
+        data[i] = (data[i] - min) * factor + range[0];
+}
+
+/* this function modifies the object - must be copied before if required! */
+SEXP normalizeImages(SEXP rimage, SEXP range, SEXP independent) {
+    try {
+        int * dim = INTEGER(GET_DIM(rimage));
+        int ndim = LENGTH(GET_DIM(rimage));
+        int ncol = dim[0];
+        int nrow = dim[1];
+        int nimages = 1;
+        if (ndim > 2)
+            nimages = dim[2];
+        /* grayscale images assumed of the type double */
+        double * data;
+        switch (LOGICAL(independent)[0]) {
+            case true: {
+                for (int i = 0; i < nimages; i++) {
+                    data = &(REAL(rimage)[i * ncol * nrow]);
+                    normalizeDataset(data, &(REAL(range)[0]), ncol * nrow);
+                }
+            }; break;
+            default: {
+                data = &(REAL(rimage)[0]);
+                normalizeDataset(data, &(REAL(range)[0]), ncol * nrow * nimages);
+            }
+        }
+    }
+    catch(...) {
+        error("exception within normalizeImages c++ routine");
+    }
+    return rimage;
+}
+

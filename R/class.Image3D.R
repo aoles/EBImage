@@ -19,168 +19,65 @@ Image3D <- function(data = array(0, c(2, 2, 2)), dim = NULL, rgb = FALSE) {
             warning("only three first elements of 'dim' will be used to create image matrix")
     res = new("Image3D", rgb = rgb)
     if (is.array(data) && is.null(dim))
-        res@.Data = data
-    else
+        dim = dim(data)
+    res = new("Image2D", rgb = rgb)
+    if (rgb)
         res@.Data = array(as.integer(data), dim[1:3])
+    else
+        res@.Data = array(as.double(data), dim[1:3])
     return(res)
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Image3D.CopyHeader <- function(x, data = array(0, c(2, 2, 2)), dim = NULL) {
-    if (!is(x, "Image3D"))
-        stop("x must be of type 'Image3D'")
-    if (!is.array(data) && is.null(dim))
-        stop("'data' argument must be array or 'dim' argument must be specified")
-    if (!is.null(dim))
-        if (length(dim) > 3)
-            warning("only three first elements of 'dim' will be used to create image matrix")
-    # copy all fields here except data
-    res = new("Image3D", rgb = x@rgb)
-    # create data here
-    if (is.array(data) && is.null(dim))
-        res@.Data = data
-    else
-        res@.Data = array(as.integer(data), dim[1:3])
-    return(res)
-}
+# DEPRECATED: copyImageHeader instead fully defined in Image2D
+#Image3D.CopyHeader <- function(x, data = array(0, c(2, 2, 2)), dim = NULL) {
+#    if (!is(x, "Image3D"))
+#        stop("x must be of type 'Image3D'")
+#    if (!is.array(data) && is.null(dim))
+#        stop("'data' argument must be array or 'dim' argument must be specified")
+#    if (!is.null(dim))
+#        if (length(dim) > 3)
+#            warning("only three first elements of 'dim' will be used to create image matrix")
+#    if (is.array(data) && is.null(dim))
+#        dim = dim(data)
+#    # copy all fields here except data
+#    res = new("Image3D", rgb = x@rgb)
+#    # create data here
+#    if (x@rgb)
+#        res@.Data = array(as.integer(data), dim[1:3])
+#    else
+#        res@.Data = array(as.double(data), dim[1:3])
+#    return(res)
+#}
 # ============================================================================
 # METHODS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("normalize", signature(object = "Image3D"),
-    function(object, from = 0, to = 65535) {
-        minmax = minMax(object)
-        if (minmax[[2]] - minmax[[1]] == 0)
-            return(object)
-        return(Image3D.CopyHeader(object, (object@.Data - minmax[[1]]) / (minmax[[2]] - minmax[[1]]) * (to - from) + from, dim(object)))
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("toGray", signature(object = "Image3D"),
-    function(object) {
-        if (!object@rgb)
-            return(object)
-        if (!is.integer(object)) {
-            warning("image data of type double... use as.integer on your image to correct")
-            res = .CallEBImage("toGray", as.integer(object))
-        }
-        else
-            res = .CallEBImage("toGray", object)
-        res = Image3D.CopyHeader(object, res, dim(object))
-        res@rgb = FALSE
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("toRGB", signature(object = "Image3D"),
-    function(object) {
-        if (object@rgb)
-            return(object)
-        if (!is.integer(object)) {
-            warning("image data of type double... use as.integer on your image to correct")
-            res = .CallEBImage("toRGB", as.integer(object))
-        }
-        else
-            res = .CallEBImage("toRGB", object)
-        res = Image3D.CopyHeader(object, res, dim(object))
-        res@rgb = TRUE
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("toRed", signature(object = "Image3D"),
-    function(object) {
-        if (object@rgb)
-            stop("only grayscale images are supported")
-        if (!is.integer(object)) {
-            warning("image data of type double... use as.integer on your image to correct")
-            res = .CallEBImage("asRed", as.integer(object))
-        }
-        else
-            res = .CallEBImage("asRed", object)
-        res = Image3D.CopyHeader(object, res, dim(object))
-        res@rgb = TRUE
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("toGreen", signature(object = "Image3D"),
-    function(object) {
-        if (object@rgb)
-            stop("only grayscale images are supported")
-        if (!is.integer(object)) {
-            warning("image data of type double... use as.integer on your image to correct")
-            res = .CallEBImage("asGreen", as.integer(object))
-        }
-        else
-            res = .CallEBImage("asGreen", object)
-        res = Image3D.CopyHeader(object, res, dim(object))
-        res@rgb = TRUE
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("toBlue", signature(object = "Image3D"),
-    function(object) {
-        if (object@rgb)
-            stop("only grayscale images are supported")
-        if (!is.integer(object)) {
-            warning("image data of type double... use as.integer on your image to correct")
-            res = .CallEBImage("asBlue", as.integer(object))
-        }
-        else
-            res = .CallEBImage("asBlue", object)
-        res = Image3D.CopyHeader(object, res, dim(object))
-        res@rgb = TRUE
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("getRed", signature(object = "Image3D"),
-    function(object) {
-        if (!object@rgb)
-            return(object)
-        if (!is.integer(object)) {
-            warning("image data of type double... use as.integer on your image to correct")
-            res = .CallEBImage("getRed", as.integer(object))
-        }
-        else
-            res = .CallEBImage("getRed", object)
-        res = Image3D.CopyHeader(object, res, dim(object))
-        res@rgb = FALSE
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("getGreen", signature(object = "Image3D"),
-    function(object) {
-        if (!object@rgb)
-            return(object)
-        if (!is.integer(object)) {
-            warning("image data of type double... use as.integer on your image to correct")
-            res = .CallEBImage("getGreen", as.integer(object))
-        }
-        else
-            res = .CallEBImage("getGreen", object)
-        res = Image3D.CopyHeader(object, res, dim(object))
-        res@rgb = FALSE
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("getBlue", signature(object = "Image3D"),
-    function(object) {
-        if (!object@rgb)
-            return(object)
-        if (!is.integer(object)) {
-            warning("image data of type double... use as.integer on your image to correct")
-            res = .CallEBImage("getBlue", as.integer(object))
-        }
-        else
-            res = .CallEBImage("getBlue", object)
-        res = Image3D.CopyHeader(object, res, dim(object))
-        res@rgb = FALSE
-        return(res)
-    }
-)
+# Image2D implementation is sufficient
+#setMethod("normalize", signature(object = "Image3D"),
+#    function(object, from = 0, to = 1.0, this = FALSE, independent = FALSE) {
+#        if (object@rgb)
+#            stop("only grayscale images supported so far")
+#        if (this == FALSE) {
+#            if (!independent) {
+#                minmax = minMax(object)
+#                if (minmax[[2]] - minmax[[1]] == 0)
+#                    return(object)
+#                res = copyImageHeader(object, "Image3D", FALSE)
+#                res@.Data = (object@.Data - minmax[[1]]) / (minmax[[2]] - minmax[[1]]) * (to - from) + from
+#                return(res)
+#            }
+#            else {
+#                res = object
+#                nimages = dim(object)[[3]]
+#                for (i in 1:nimages)
+#                    res[,,i] = normalize(res[,,i]) # should invoke normalize for Image2D
+#                return(res)
+#            }
+#        }
+#        else {
+#            invisible(.CallEBImage("normalizeImages", object, as.double(c(from, to)), independent))
+#        }
+#    }
+#)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("[", signature(x = "Image3D", i = "missing", j = "missing"),
     function(x, i, j, k, ..., drop) {
@@ -190,9 +87,11 @@ setMethod("[", signature(x = "Image3D", i = "missing", j = "missing"),
         tmp = x@.Data[ , , k]
         if(is.array(tmp)) {
             if (length(dim(tmp)) == 2)
-                return(Image2D.CopyHeader(x, tmp))
+                res = copyImageHeader(x, rgb = x@rgb)
             else
-                return(Image3D.CopyHeader(x, tmp))
+                res = copyImageHeader(x, "Image3D", x@rgb)
+            res@.Data = tmp
+            return(res)
         }
         else
             return(tmp)
@@ -213,9 +112,11 @@ setMethod("[", signature(x = "Image3D", i = "numeric", j = "missing"),
         }
         if(is.array(tmp)) {
             if (length(dim(tmp)) == 2)
-                return(Image2D.CopyHeader(x, tmp))
+                res = copyImageHeader(x, rgb = x@rgb)
             else
-                return(Image3D.CopyHeader(x, tmp))
+                res = copyImageHeader(x, "Image3D", x@rgb)
+            res@.Data = tmp
+            return(res)
         }
         else
             return(tmp)
@@ -232,9 +133,11 @@ setMethod("[", signature(x = "Image3D", i = "missing", j = "numeric"),
         tmp = x@.Data[ , j, k]
         if(is.array(tmp)) {
             if (length(dim(tmp)) == 2)
-                return(Image2D.CopyHeader(x, tmp))
+                res = copyImageHeader(x, rgb = x@rgb)
             else
-                return(Image3D.CopyHeader(x, tmp))
+                res = copyImageHeader(x, "Image3D", x@rgb)
+            res@.Data = tmp
+            return(res)
         }
         else
             return(tmp)
@@ -250,9 +153,11 @@ setMethod("[", signature(x = "Image3D", i = "numeric", j = "numeric"),
         tmp = x@.Data[i, j, k]
         if(is.array(tmp)) {
             if (length(dim(tmp)) == 2)
-                return(Image2D.CopyHeader(x, tmp))
+                res = copyImageHeader(x, rgb = x@rgb)
             else
-                return(Image3D.CopyHeader(x, tmp))
+                res = copyImageHeader(x, "Image3D", x@rgb)
+            res@.Data = tmp
+            return(res)
         }
         else
             return(tmp)
@@ -266,38 +171,37 @@ setMethod("show", signature(object = "Image3D"),
         if (object@rgb)
             cat("\tType: RGB, 8-bit per color\n")
         else
-            cat(paste("\tType: grayscale 16 bit with white level 65535\n"))
-#        if (!PRINT_FULL_DATA) {
-#            partial = FALSE
-#            if (.dim[[1]] > 10) {
-#                .dim[[1]] = 10
-#                partial = TRUE
-#            }
-#            if (.dim[[2]] > 10) {
-#                .dim[[2]] = 10
-#                partial = TRUE
-#            }
-#            if (.dim[[3]] > 2) {
-#                .dim[[3]] = 2
-#                partial = TRUE
-#            }
-#            if (partial)
-#                cat("\tImage is too large, printing only max 10x10 data matrix.\n\tSet PRINT_FULL_DATA=TRUE to enable 'show' to print all data\n")
-#        }
-#        print(object@.Data[1:.dim[[1]], 1:.dim[[2]], 1:.dim[[3]]])
-        if (!object@rgb)
-            print(summary(as.numeric(object@.Data)))
-        if (PRINT_DATA)
-            print(object@.Data)
+            cat(paste("\tType: grayscale, doubles in the range [0..1]\n"))
+        if (!PRINT_ALL_DATA) {
+            partial = FALSE
+            if (.dim[[1]] > 10) {
+                .dim[[1]] = 10
+                partial = TRUE
+            }
+            if (.dim[[2]] > 10) {
+                .dim[[2]] = 10
+                partial = TRUE
+            }
+            if (.dim[[3]] > 2) {
+                .dim[[3]] = 2
+                partial = TRUE
+            }
+            if (partial)
+                cat("\tImage is too large, printing only max 10x10 data matrix.\n\tSet PRINT_ALL_DATA=TRUE to enable 'show' to print all data\n")
+        }
+        print(object@.Data[1:.dim[[1]], 1:.dim[[2]], 1:.dim[[3]]])
+#        if (!object@rgb)
+#            print(summary(as.numeric(object@.Data)))
         invisible(NULL)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("as.integer", signature(x = "Image3D"),
-    function(x, ...) {
-        if (is.integer(x))
-            return(x)
-        else
-            return(Image3D.CopyHeader(x, as.integer(x@.Data), dim(x)))
-    }
-)
+# Current Image2D implementation should be sufficient
+#setMethod("as.integer", signature(x = "Image3D"),
+#    function(x, ...) {
+#        if (is.integer(x))
+#            return(x)
+#        else
+#            return(Image3D.CopyHeader(x, as.integer(x@.Data), dim(x)))
+#    }
+#)

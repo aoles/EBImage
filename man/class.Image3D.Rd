@@ -26,13 +26,6 @@
         \item{\code{Image3D(data, dim, rgb)}:}{Default constructor. Executed with no parameters,
             an empty (black) 2D grayscale image stack of 2x2x2 pixels is created. If \code{data} is an
             array of 2x2x2, \code{dim} can be omitted.}
-        \item{\code{Image3D.CopyHeader(x, data, dim)}:}{Copies all source image parameters into the
-            new one except the data. The data is taken from \code{data} variable. Used mostly
-            to create new images with the same parameters as a given one, but nil data. This
-            method is prefered over simple assignment of one image instance to a new variable if
-            the data of the target image is to be smaller than those of the original one. It is also
-            possible to copy the headers from one image, \code{object} and assign it data,
-            \code{ext.data} that can be coersed to an array of size \code{ext.dim} in one call.}
     }
 }
 
