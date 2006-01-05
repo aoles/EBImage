@@ -13,6 +13,8 @@ setMethod("write.image", signature(object = "Image2D", files = "character"),
             stop("single file/URL name must be supplied for images of class Image2D")
         if (class(object) == "Image3D" && length(files) != 1 && length(files) != dim(object)[[3]])
             stop("number of files/URL must match the stack size for a 3D images or a single file supporting stacks (TIFF) must be supplied")
+        if (!isCorrectType(object))
+            object = correctType(object)
         invisible(.CallEBImage("writeImages", object, files))
     }
 )
@@ -47,11 +49,4 @@ ping.image <- function(files, show.comments = FALSE) {
     }
     invisible(.CallEBImage("pingImages", files, as.logical(show.comments)))
 }
-# ============================================================================
-# INTERNALS
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-.notImageError <- function(x) {
-    if (!is(x, "Image2D"))
-        stop("argument must be of class 'Image2D' or 'Image3D'")
-    invisible(TRUE)
-}
+

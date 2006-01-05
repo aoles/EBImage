@@ -1,21 +1,23 @@
 useDynLib("EBImage")
 export(
-    "Image2D", "Image2D.CopyHeader", "Image3D", "Image3D.CopyHeader",
+    "Image2D", "Image3D", "copyImageHeader", "copyImage",
 
-    "tresh", "blur", "contrast", "despeckle", "edge", "enhance", "equalize", "ffill",
-    "ffillEdge", "colorGamma", "gaussFilter", "medianFilter", "mod", "redNoise",
+    "tresh", "blur", "contrast", "despeckle", "edge", "enhance", "equalize",
+#"ffill", "ffillEdge",
+    "colorGamma", "gaussFilter", "medianFilter", "mod", "redNoise",
     "rotate", "sampleImage", "scaleImage", "segment", "shade", "sharpen", "solarize",
     "spread", "unsharpMask", "noise", "distMap",
 
     "read.image", "ping.image",
 
-    "objectCount", "displayObjectCount"
+    "objectCount"
 )
 exportClasses(
     "array", "Image2D", "Image3D"
 )
 exportMethods(
     "write.image", "display", "channels", "toGray", "toRGB", "toRed", "toGreen",
-    "toBlue", "getRed", "getGreen", "getBlue", "normalize", "to16bit", "minMax",
-    "as.integer", "as.array", "summary", "[", "show"
+    "toBlue", "getRed", "getGreen", "getBlue", "normalize", "minMax",
+    "as.integer", "as.double", "as.array", "summary", "[", "show",
+    "correctType", "isCorrectType"
 )

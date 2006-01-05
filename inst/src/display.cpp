@@ -87,9 +87,10 @@ SEXP displayImages(SEXP rimage, SEXP animate) {
         if (ndim < 2 || ndim > 3)
             error("max 'image' dimension for display is 3D, select a subset and try again");
         /* FIXME This must be uncommented to force closing image before opening a new one!!!
+        */
         if (THREAD_ON)
             error("another image is currently displayed, close it first! Read help on 'display'");
-        */
+
         pthread_t res;
         if (is3D) {
             if (doanimate) {

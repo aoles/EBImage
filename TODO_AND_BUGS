@@ -1,0 +1,39 @@
++ 060103-01 - BUG - PROBLEM IDENTIFIED - MEMORY! See COMMENT 2 below
+    object count routine fails on some images in a stack, which are
+    analyzed correctly if independent On lobster repeatedly happens after image No. 85
+    until the end in a sequence of 100 - memory problems? Trying second 50 of the 100 sequence
+    separately - if works - then it's not algorithms, but probably memory problems! It worked on 50!
+    COMMENT: probably too many copy operations for images - every time a filter is applied
+    image data are copied back and forward between R and ImageMagick! It also may happen
+    that data are copied when the data type must be corrected - double/integer problem!
+    COMMENT 2: after implementing 060105-01 100 images could be processed without any problem with
+    modify = TRUE!!!
+=============================================================================================
+- 060103-02 - BUG
+    write.image fails on binaries!!! For binaries stored as grayscales (black - 0,
+    white - 65535) colors are inverted in saved images. the same routine is used to
+    convert between R and ImageMagick for display and saving, displayed - fine, saved wrong
+    Apparently this seems to be a range problem - if 65535 is substituted with 65534 -
+    everything is saved correctly! - this looks more like "unsigned short" problem, but
+    I do not habe a solution now
+=============================================================================================
++ 060103-03 - DONE in REVISION past 514 (group svn)
+    Gayscale type is double!
+    Didn't work as bug correction! Still the same effect - binaries inverted. WHY?
+    Intended bug correction for 060103-02 - store grayscales as doubles as originally planned!
+    More memory but less conversions and faster floating point operations (which are most) and
+    more convenient in mathematical functions!
+=============================================================================================
++ 060105-01 - DONE in REVISION past 521
+    Add possibility to apply all filters and algorithms on "this" object!
+    REASON: to count objects currently one needs to store 6 images: original, normalized, segmented
+    (add 2 more if preprocessing - blurring etc is required), distance map. Ideally one would need
+    only 1 changing each time and then to display the results it is much more memory and time
+    effective to load all images new than to store the originals in memory.
+    The following commands should support operations on this in first instance:
+    + normalize (for 2D and 3D in one c function)
+    + distMap
+    + all standard 2D filters!
+=============================================================================================
+- 060105-02 - TODO
+    objectCount is slow - maybe recursive fill can be exchanged with something faster

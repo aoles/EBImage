@@ -3,8 +3,10 @@
 \docType{class}
 
 \alias{Image2D}
+\alias{EBImage}
 %\alias{Class Image2D}
-\alias{Image2D.CopyHeader}
+\alias{copyImageHeader}
+\alias{copyImage}
 \alias{display}
 \alias{channels}
 \alias{toGray}
@@ -15,9 +17,10 @@
 \alias{getRed}
 \alias{getGreen}
 \alias{getBlue}
-\alias{to16bit}
 \alias{minMax}
 \alias{normalize}
+\alias{isCorrectType}
+\alias{correctType}
 
 \concept{image representation}
 \concept{image analysis}
@@ -31,12 +34,12 @@
     A class to work with 2D images in R. This is the basic class to hold image
     data and parameters. The class is directly derived from \code{array}, which ensures
     fast operations with image data (including subsetting etc). Data is stored in \code{integer}
-    format for both RGB and grayscale images. RGB images are 8-bit-based per channel, whereas
-    grayscale images are 16-bit in the range 0..65535. User must take care that the internal
-    data type of the \code{Image2D} array stays \code{integer}, if \code{is.integer} returns
-    FALSE, it is recommended to run the overrriden \code{as.integer} on the image to turn image
-    data to the correct representation. \code{as.integer} is used automatically wherever necessary
-    (e.g. in calls to C++ routines).
+    format for RGB and in double grayscale images. RGB images are 8-bit-based per channel, whereas
+    grayscale images are in the range 0..1. User must take care that the internal
+    data type of the \code{Image2D} array stays correct\code{integer}, otherwise it is recommended
+    to run the \code{correctType} or overrriden \code{as.integer} and \code{as.double} to turn image
+    data into the correct representation. \code{correctType} is used automatically wherever necessary
+    (e.g. in calls to C++ routines if argument is copied!).
 }
 
 \section{Creating Objects}{
@@ -44,13 +47,15 @@
         \item{\code{Image2D(data, dim, rgb)}:}{Default constructor. Executed with no parameters,
             an empty (black) 2D grayscale image of 2x2 pixels is created. If \code{data} is an
             array of 2x2, \code{dim} can be omitted.}
-        \item{\code{Image2D.CopyHeader(x, data, dim)}:}{Copies all source image parameters into the
-            new one except the data. The data is taken from \code{data} variable. Used mostly
-            to create new images with the same parameters as a given one, but nil data. This
-            method is prefered over simple assignment of one image instance to a new variable if
-            the data of the target image is to be smaller than those of the original one. It is also
-            possible to copy the headers from one image, \code{object} and assign it data,
-            \code{ext.data} that can be coersed to an array of size \code{ext.dim} in one call.}
+        \item{\code{copyImage(x)}:}{Ensures that object data is copied into a new variable and not
+            just a pointer is associated to a new variable, as in case of a=b. Adviseable to do
+            a = copyImage(b)}
+        \item{\code{copyImageHeader(x, newClass = "Image2D", rgb = FALSE)}:}{Copies all source image
+            parameters into the new one except the data. The data can be copied by issuing
+            myNewImage@.Data = myOldImage@.Data. Used mostly to create new images with the same
+            parameters as a given one, but nil data. This method is prefered over simple assignment of one
+            image instance to a new variable if the data of the target image is to be smaller than
+            those of the original one.}
     }
 }
 
@@ -96,20 +101,26 @@
         \item{\code{write.image(Image2D, files)}, \code{read.image(files)} and \code{ping.image(files)}:
             }{Enable I/O operations for images in all formats supported by ImageMagick. See
             \code{\link{Image IO}} for details.}
-        \item{\code{min.max(Image2D)}:}{Returns a numeric vector of two elements with the minimum and maximum
+        \item{\code{minMax(Image2D)}:}{Returns a numeric vector of two elements with the minimum and maximum
             values of the image data.}
-        \item{\code{normalize(Image2D, from = 0, to = 65535)}:}{Returns a new image (reasonable only for
-            grayscales) normalized to the given range. For internal calculations, values up to 15 Mln. are
-            supported, but only first two bytes are used on all operations requiring ImageMagick calls.}
+        \item{\code{normalize(Image2D, from = 0, to = 1.0, independent = FALSE, modify =
+            FALSE)}:}{Normalizes the image to the given range (grayscales only). \code{independent}
+            argument is used only for 3D images to indicate that every image in a stack must be
+            normalized independently. Set \code{modify} to TRUE to modify the original image (without a
+            need for reassignment).}
         \item{\code{as.integer(Image2D, ...)}:}{Returns a new image, with all data in correct integer
-            representationon. All other attributes are copied.}
-        \item{\code{to16bit(Image2D, bits=12)}:}{Scales integer grayscale data to 16-bit range [0..65535)
-            assuming that original data were obtained with \code{bits}-bit camera.}
+            representation for RGB. All other attributes are copied.}
+        \item{\code{as.double(Image2D, ...)}:}{Returns a new image, with all data in correct double
+            representation for grayscale. All other attributes are copied.}
+        \item{\code{isCorrectType(Image2D)}:}{Checks if the internal represantation of data is correct -
+            double for grayscales and integer for RGBs.}
+        \item{\code{correctType(Image2D)}:}{Corrects the internal represantation of data to
+            double for grayscales and integer for RGBs.}
     }
 }
 
 \details{
-    Grayscales should be normalised in the range between 0 (black) and 65535 (white or full single-channel
+    Grayscales should be normalised in the range between 0 (black) and 1.0 (white or full single-channel
     color). RGB images are hold as integers with 3 significant bytes for red, green and
     blue respectively. The fourth byte is not used and must be kept zero to allow for correct
     channel decomposition.

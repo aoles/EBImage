@@ -14,6 +14,12 @@
 \alias{as.array,Image2D-method}
 \alias{as.integer,Image2D-method}
 \alias{as.integer,Image3D-method}
+\alias{as.double,Image2D-method}
+\alias{as.double,Image3D-method}
+\alias{isCorrectType,Image2D-method}
+\alias{correctType,Image2D-method}
+\alias{isCorrectType,Image3D-method}
+\alias{correctType,Image3D-method}
 \alias{[,Image2D,missing,missing-method}
 \alias{[,Image2D,missing,numeric-method}
 \alias{[,Image2D,numeric,missing-method}
@@ -38,7 +44,6 @@
 \alias{show,Image2D-method}
 \alias{show,Image3D-method}
 \alias{summary,Image2D-method}
-\alias{to16bit,Image2D-method}
 \alias{toBlue,Image2D-method}
 \alias{toBlue,Image3D-method}
 \alias{toGray,Image2D-method}
@@ -50,8 +55,6 @@
 \alias{toRGB,Image2D-method}
 \alias{toRGB,Image3D-method}
 \alias{write.image,Image2D,character-method}
-\alias{indexCells}
-\alias{getCenters}
 
 \title{
     Internals

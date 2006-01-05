@@ -21,7 +21,10 @@ SEXP stack2SEXP(MagickStack& stack, bool rgb) {
             warning("first image in the stack is of size 0: returning NULL");
             return R_NilValue;
         }
-        PROTECT(rimage = allocVector(INTSXP, dx * dy * nimages));
+        if (rgb)
+            PROTECT(rimage = allocVector(INTSXP, dx * dy * nimages));
+        else
+            PROTECT(rimage = allocVector(REALSXP, dx * dy * nimages));
         nProt++;
         int i = 0;
         void * dest;
@@ -29,7 +32,10 @@ SEXP stack2SEXP(MagickStack& stack, bool rgb) {
             image = *it;
             int idx = (image.columns() < dx)?image.columns():dx;
             int idy = (image.rows() < dy)?image.rows():dy;
-            dest = &(INTEGER(rimage)[i * dx * dy]);
+            if (rgb)
+                dest = &(INTEGER(rimage)[i * dx * dy]);
+            else
+                dest = &(REAL(rimage)[i * dx * dy]);
             switch (rgb) {
                 case true: {
                     image.type(TrueColorType);
@@ -42,8 +48,7 @@ SEXP stack2SEXP(MagickStack& stack, bool rgb) {
                 default: {
                     image.type(GrayscaleType);
                     image.opacity(OpaqueOpacity);
-                    image.write(0, 0, idx, idy, "IO", ShortPixel, dest);
-
+                    image.write(0, 0, idx, idy, "I", DoublePixel, dest);
                 }
             }
             i++;
@@ -94,7 +99,7 @@ MagickStack SEXP2Stack(SEXP rimage) {
         if (ndim != 3)
             error("only 3D images can be converted to stacks. Select a subset and try again.");
         int nimages = 1;
-        if (ndim == 3)
+        if (ndim > 2)
             nimages = INTEGER(dim)[2];
         int dx = INTEGER(dim)[0];
         int dy = INTEGER(dim)[1];
@@ -103,14 +108,19 @@ MagickStack SEXP2Stack(SEXP rimage) {
         MagickImage image(geom, "black");
         void * src;
         for (int i = 0; i < nimages; i++) {
-            src = &(INTEGER(rimage)[i * dx * dy]);
+            if (rgb)
+                src = &(INTEGER(rimage)[i * dx * dy]);
+            else
+                src = &(REAL(rimage)[i * dx * dy]);
             switch(rgb) {
                 case true: {
-                    image.read(dx, dy, "RGBp", CharPixel, src);
+                    image.type(TrueColorType);
+                    image.read(dx, dy, "RGBO", CharPixel, src);
                     image.opacity(OpaqueOpacity);
                 }; break;
                 default: {
-                    image.read(dx, dy, "Ip", ShortPixel, src);
+                    image.type(GrayscaleType);
+                    image.read(dx, dy, "I", DoublePixel, src);
                     image.opacity(OpaqueOpacity);
                 }
             }
@@ -136,14 +146,20 @@ MagickImage  SEXP2Image(SEXP rimage) {
         bool rgb = LOGICAL(GET_SLOT(rimage, mkString("rgb")))[0];
         Geometry geom(dx, dy);
         MagickImage image(geom, "black");
-        void * src = &(INTEGER(rimage)[0]);
+        void * src;
+        if (rgb)
+            src = &(INTEGER(rimage)[0]);
+        else
+            src = &(REAL(rimage)[0]);
         switch(rgb) {
             case true: {
-                image.read(dx, dy, "RGBp", CharPixel, src);
+                image.type(TrueColorType);
+                image.read(dx, dy, "RGBO", CharPixel, src);
                 image.opacity(OpaqueOpacity);
             }; break;
             default: {
-                image.read(dx, dy, "Ip", ShortPixel, src);
+                image.type(GrayscaleType);
+                image.read(dx, dy, "I", DoublePixel, src);
                 image.opacity(OpaqueOpacity);
             }
         }
@@ -158,6 +174,85 @@ MagickImage  SEXP2Image(SEXP rimage) {
     return MagickImage(Geometry(10, 10), "black");
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+MagickImage pullImageData(SEXP rimage, int index) {
+    try {
+        SEXP dim = GET_DIM(rimage);
+        int ndim = LENGTH(dim);
+        int nimage = 1;
+        int dx = INTEGER(dim)[0];
+        int dy = INTEGER(dim)[1];
+        if (ndim > 2)
+            nimage = INTEGER(dim)[2];
+        bool rgb = LOGICAL(GET_SLOT(rimage, mkString("rgb")))[0];
+        Geometry geom(dx, dy);
+        MagickImage image(geom, "black");
+        void * src;
+        int i = index;
+        if (i >= nimage)
+            i = nimage - 1;
+        if (rgb)
+            src = &(INTEGER(rimage)[i * dx * dy]);
+        else
+            src = &(REAL(rimage)[i * dx * dy]);
+        switch(rgb) {
+            case true: {
+                image.type(TrueColorType);
+                image.read(dx, dy, "RGBO", CharPixel, src);
+                image.opacity(OpaqueOpacity);
+            }; break;
+            default: {
+                image.type(GrayscaleType);
+                image.read(dx, dy, "I", DoublePixel, src);
+                image.opacity(OpaqueOpacity);
+            }
+        }
+        return image;
+    }
+    catch(...) {
+        error("unidentified problems during image converion in 'pullImageData' c++ routine");
+    }
+    /* this should never happen, but it prevents warning: the function exits either on
+       previous return or on error - it should not happen that the control comes here
+    */
+    return MagickImage(Geometry(10, 10), "black");
+}
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void pushImageData(MagickImage& image, SEXP rimage, int index) {
+    try {
+        SEXP dim = GET_DIM(rimage);
+        int ndim = LENGTH(dim);
+        int nimage = 1;
+        int dx = INTEGER(dim)[0];
+        int dy = INTEGER(dim)[1];
+        if (ndim > 2)
+            nimage = INTEGER(dim)[2];
+        bool rgb = LOGICAL(GET_SLOT(rimage, mkString("rgb")))[0];
+        void * dest;
+        int i = index;
+        if (i >= nimage)
+            i = nimage - 1;
+        if (rgb)
+            dest = &(INTEGER(rimage)[i * dx * dy]);
+        else
+            dest = &(REAL(rimage)[i * dx * dy]);
+        switch(rgb) {
+            case true: {
+                image.type(TrueColorType);
+                image.opacity(OpaqueOpacity);
+                image.write(0, 0, dx, dy, "RGBO", CharPixel, dest);
+            }; break;
+            default: {
+                image.type(GrayscaleType);
+                image.opacity(OpaqueOpacity);
+                image.write(0, 0, dx, dy, "I", DoublePixel, dest);
+            }
+        }
+    }
+    catch(...) {
+        error("unidentified problems during image converion in 'pullImageData' c++ routine");
+    }
+}
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 SEXP toGray(SEXP rgb) {
     int nval = LENGTH(rgb);
     try {
@@ -166,11 +261,11 @@ SEXP toGray(SEXP rgb) {
         void * src = &(INTEGER(rgb)[0]);
         image.read(nval, 1, "RGBp", CharPixel, src);
         SEXP res;
-        PROTECT(res = allocVector(INTSXP, nval));
-        src = &(INTEGER(res)[0]);
+        PROTECT(res = allocVector(REALSXP, nval));
+        void * dest = &(REAL(res)[0]);
         image.opacity(OpaqueOpacity);
         image.type(GrayscaleType);
-        image.write(0, 0, nval, 1, "IO", ShortPixel, src);
+        image.write(0, 0, nval, 1, "I", DoublePixel, dest);
         UNPROTECT(1);
         return res;
     }
@@ -185,14 +280,14 @@ SEXP toRGB(SEXP gray) {
     try {
         Geometry geom(nval, 1);
         MagickImage image(geom, "black");
-        void * src = &(INTEGER(gray)[0]);
-        image.read(nval, 1, "IO", ShortPixel, src);
+        void * src = &(REAL(gray)[0]);
+        image.read(nval, 1, "I", DoublePixel, src);
         SEXP res;
         PROTECT(res = allocVector(INTSXP, nval));
-        src = &(INTEGER(res)[0]);
+        void * dest = &(INTEGER(res)[0]);
         image.opacity(OpaqueOpacity);
         image.type(TrueColorType);
-        image.write(0, 0, nval, 1, "RGBO", CharPixel, src);
+        image.write(0, 0, nval, 1, "RGBO", CharPixel, dest);
         UNPROTECT(1);
         return res;
     }
@@ -211,10 +306,10 @@ SEXP getRed(SEXP rgb) {
         image.read(nval, 1, "RGBp", CharPixel, src);
         SEXP res;
         PROTECT(res = allocVector(INTSXP, nval));
-        src = &(INTEGER(res)[0]);
+        void * dest = &(REAL(res)[0]);
         image.opacity(OpaqueOpacity);
         //image.type(GrayscaleType);
-        image.write(0, 0, nval, 1, "RO", ShortPixel, src);
+        image.write(0, 0, nval, 1, "R", DoublePixel, dest);
         UNPROTECT(1);
         return res;
     }
@@ -233,10 +328,10 @@ SEXP getGreen(SEXP rgb) {
         image.read(nval, 1, "RGBp", CharPixel, src);
         SEXP res;
         PROTECT(res = allocVector(INTSXP, nval));
-        src = &(INTEGER(res)[0]);
+        void * dest = &(REAL(res)[0]);
         image.opacity(OpaqueOpacity);
         //image.type(GrayscaleType);
-        image.write(0, 0, nval, 1, "GO", ShortPixel, src);
+        image.write(0, 0, nval, 1, "G", DoublePixel, dest);
         UNPROTECT(1);
         return res;
     }
@@ -255,10 +350,10 @@ SEXP getBlue(SEXP rgb) {
         image.read(nval, 1, "RGBp", CharPixel, src);
         SEXP res;
         PROTECT(res = allocVector(INTSXP, nval));
-        src = &(INTEGER(res)[0]);
+        void * dest = &(REAL(res)[0]);
         image.opacity(OpaqueOpacity);
         //image.type(GrayscaleType);
-        image.write(0, 0, nval, 1, "BO", ShortPixel, src);
+        image.write(0, 0, nval, 1, "B", DoublePixel, dest);
         UNPROTECT(1);
         return res;
     }
@@ -273,14 +368,14 @@ SEXP asRed(SEXP gray) {
     try {
         Geometry geom(nval, 1);
         MagickImage image(geom, "black");
-        void * src = &(INTEGER(gray)[0]);
-        image.read(nval, 1, "IO", ShortPixel, src);
+        void * src = &(REAL(gray)[0]);
+        image.read(nval, 1, "I", DoublePixel, src);
         SEXP res;
         PROTECT(res = allocVector(INTSXP, nval));
-        src = &(INTEGER(res)[0]);
+        void * dest = &(INTEGER(res)[0]);
         image.opacity(OpaqueOpacity);
         image.type(TrueColorType);
-        image.write(0, 0, nval, 1, "ROOO", CharPixel, src);
+        image.write(0, 0, nval, 1, "ROOO", CharPixel, dest);
         UNPROTECT(1);
         return res;
     }
@@ -295,14 +390,14 @@ SEXP asGreen(SEXP gray) {
     try {
         Geometry geom(nval, 1);
         MagickImage image(geom, "black");
-        void * src = &(INTEGER(gray)[0]);
-        image.read(nval, 1, "IO", ShortPixel, src);
+        void * src = &(REAL(gray)[0]);
+        image.read(nval, 1, "I", DoublePixel, src);
         SEXP res;
         PROTECT(res = allocVector(INTSXP, nval));
-        src = &(INTEGER(res)[0]);
+        void * dest = &(INTEGER(res)[0]);
         image.opacity(OpaqueOpacity);
         image.type(TrueColorType);
-        image.write(0, 0, nval, 1, "OGOO", CharPixel, src);
+        image.write(0, 0, nval, 1, "OGOO", CharPixel, dest);
         UNPROTECT(1);
         return res;
     }
@@ -317,14 +412,14 @@ SEXP asBlue(SEXP gray) {
     try {
         Geometry geom(nval, 1);
         MagickImage image(geom, "black");
-        void * src = &(INTEGER(gray)[0]);
-        image.read(nval, 1, "IO", ShortPixel, src);
+        void * src = &(REAL(gray)[0]);
+        image.read(nval, 1, "I", DoublePixel, src);
         SEXP res;
         PROTECT(res = allocVector(INTSXP, nval));
-        src = &(INTEGER(res)[0]);
+        void * dest = &(INTEGER(res)[0]);
         image.opacity(OpaqueOpacity);
         image.type(TrueColorType);
-        image.write(0, 0, nval, 1, "OOBO", CharPixel, src);
+        image.write(0, 0, nval, 1, "OOBO", CharPixel, dest);
         UNPROTECT(1);
         return res;
     }
