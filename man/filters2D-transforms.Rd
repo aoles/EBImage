@@ -17,9 +17,9 @@
 }
 
 \usage{
-    rotate(x, degrees = 90, modify = FALSE)
-    sampleImage(x, dx, dy, modify = FALSE)
-    scaleImage(x, dx, dy, modify = FALSE)
+    rotate(x, degrees = 90)
+    sampleImage(x, dx, dy)
+    scaleImage(x, dx, dy)
 }
 
 \arguments{
@@ -32,14 +32,15 @@
 }
 
 \value{
-    If \code{modify==FALSE}, a new instance of class \code{\link{Image2D}} or \code{\link{Image3D}}
+    A new instance of class \code{\link{Image2D}} or \code{\link{Image3D}}
     with the same characteristics as the original, but with filter applied (to every single 2D
     image if source is 3D).
-
-    If \code{modify==TRUE}, invisible original image after modification!
 }
 
 \details{
+    Transformation filters do not support argument \code{modify} and always generate a copy of the
+    original image because image size changes.
+
     \code{rotate} rotates images counter-clockwise.
 
     \code{sampleImage} uses sampling algorithm to resize images, whereas \code{scaleImage} uses

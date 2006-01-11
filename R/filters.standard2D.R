@@ -202,44 +202,29 @@ redNoise <- function(x, order = NULL, modify = FALSE) {
         invisible(.CallEBImage("stdFilter2D", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-rotate <- function(x, degrees = 90, modify = FALSE) {
+rotate <- function(x, degrees = 90) {
     .notImageError(x)
     param = as.double(degrees)
     filter = as.integer(15)
-    if (!modify) {
-        x = copyImage(x)
-        return(.CallEBImage("stdFilter2D", x, filter, param))
-    }
-    else # original data modified
-        invisible(.CallEBImage("stdFilter2D", x, filter, param))
+    return(.CallEBImage("stdFilter2DRedim", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-sampleImage <- function(x, dx, dy, modify = FALSE) {
+sampleImage <- function(x, dx, dy) {
     .notImageError(x)
     if (missing(dx) || missing(dy))
         stop("arguments 'dx' and 'dy' are essential")
     param = as.double(c(dx, dy))
     filter = as.integer(16)
-    if (!modify) {
-        x = copyImage(x)
-        return(.CallEBImage("stdFilter2D", x, filter, param))
-    }
-    else # original data modified
-        invisible(.CallEBImage("stdFilter2D", x, filter, param))
+    return(.CallEBImage("stdFilter2DRedim", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-scaleImage <- function(x, dx, dy, modify = FALSE) {
+scaleImage <- function(x, dx, dy) {
     .notImageError(x)
     if (missing(dx) || missing(dy))
         stop("arguments 'dx' and 'dy' are essential")
     param = as.double(c(dx, dy))
     filter = as.integer(17)
-    if (!modify) {
-        x = copyImage(x)
-        return(.CallEBImage("stdFilter2D", x, filter, param))
-    }
-    else # original data modified
-        invisible(.CallEBImage("stdFilter2D", x, filter, param))
+    return(.CallEBImage("stdFilter2DRedim", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 segment <- function(x, cluster = 1, smooth = 1.5, modify = FALSE) {
