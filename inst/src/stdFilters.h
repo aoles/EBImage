@@ -10,6 +10,7 @@
 
 extern "C" {
     SEXP stdFilter2D(SEXP rimage, SEXP filterNo, SEXP param);
+    SEXP stdFilter2DRedim(SEXP rimage, SEXP filterNo, SEXP param);
     SEXP normalizeImages(SEXP rimage, SEXP range, SEXP independent);
 };
 

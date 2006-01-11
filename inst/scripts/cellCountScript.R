@@ -1,14 +1,16 @@
 library(EBImage)
 
 # get file list to load
-files = paste("HT01-C02/", dir("HT01-C02"), sep = '')
+path = "060109.screens/HT20-C04"
+files = paste(path, dir(path), sep = '/')
 nfiles = length(files)
+
 files = files[(1:(nfiles / 3)) * 3 - 2]
 nfiles = length(files)
 
 # reset nfiles: MEMORY
 filestart = 1
-nfiles = 100
+nfiles = 10
 
 # load nfiles images
 im = read.image(files[filestart:(filestart + nfiles - 1)])
@@ -64,13 +66,7 @@ rgb[index] = 255
 counts = integer()
 for (i in 1:nfiles) counts = c(counts, length(res[[i]][1,]))
 hist(counts)
-
-print("small count indexes")
-print(which(counts < 100))
-print("large count indexes")
-print(which(counts > 600))
-print("display(rgb[,,which(counts < 100)])")
-print("display(rgb[,,which(counts < 100)])")
+#display(rgb[,,which(counts < 100)])
 
 
 

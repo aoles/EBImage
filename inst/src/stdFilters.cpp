@@ -126,26 +126,6 @@ SEXP stdFilter2D(SEXP rimage, SEXP filterNo, SEXP param) {
                     else
                         image.reduceNoise(_param[0]);
                 }; break;
-                /* rotate */
-                case 15: {
-                    if (npar < 1)
-                        error("wrong number of parameters in call to 'rotate'");
-                    image.rotate(_param[0]);
-                }; break;
-                /* sample */
-                case 16: {
-                    if (npar < 2)
-                        error("wrong number of parameters in call to 'sample'");
-                        Geometry geom((unsigned int)_param[0], (unsigned int)_param[1]);
-                    image.sample(geom);
-                }; break;
-                /* scale */
-                case 17: {
-                    if (npar < 2)
-                        error("wrong number of parameters in call to 'scale'");
-                        Geometry geom((unsigned int)_param[0], (unsigned int)_param[1]);
-                    image.scale(geom);
-                }; break;
                 /* segment */
                 case 18: {
                     if (npar < 2)
@@ -199,7 +179,7 @@ SEXP stdFilter2D(SEXP rimage, SEXP filterNo, SEXP param) {
                         default: image.addNoise(GaussianNoise);
                     }
                 }; break;
-                default: error("wrong image processing filter in 'filter2D' c++ routine");
+                default: error("wrong image processing filter in 'stdFilter2D' c++ routine");
             }
         }
         catch(WarningUndefined &magickWarning) {
@@ -222,6 +202,86 @@ SEXP stdFilter2D(SEXP rimage, SEXP filterNo, SEXP param) {
         delete[] _param;
     /* return modified image */
     return(rimage);
+}
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* This function changes image size and generates a new image! */
+SEXP stdFilter2DRedim(SEXP rimage, SEXP filterNo, SEXP param) {
+    /* parse param here */
+    double * _param = NULL;
+    int npar = 0;
+    int _filterNo = 0;
+    bool isRGB = false;
+    try {
+        _filterNo = INTEGER(filterNo)[0];
+        isRGB = LOGICAL(GET_SLOT(rimage, mkString("rgb")))[0];
+        if (param != R_NilValue) {
+            npar = LENGTH(param);
+            if (npar > 0) {
+                _param = new double[npar];
+                for (int i = 0; i < npar; i++)
+                    _param[i] = REAL(param)[i];
+            }
+        }
+    }
+    catch(exception &cerror) {
+        cout << "Caught c++ exception: " << cerror.what() << " when parsing function arguments in c++" << endl;
+        error("Arguments passed to the function are wrong");
+    }
+    catch(...) {
+        error("Caught unknown error when parsing function arguments in c++");
+        return R_NilValue;
+    }
+    MagickStack stack = SEXP2Stack(rimage);
+    MagickStack resStack;
+    MagickImage image;
+    for (MagickStack::iterator it = stack.begin(); it != stack.end(); it++) {
+        image = *it;
+        /* apply operation to a single image */
+        try {
+            switch(_filterNo) {
+                /* rotate */
+                case 15: {
+                    if (npar < 1)
+                        error("wrong number of parameters in call to 'rotate'");
+                    image.rotate(_param[0]);
+                }; break;
+                /* sample */
+                case 16: {
+                    if (npar < 2)
+                        error("wrong number of parameters in call to 'sample'");
+                        Geometry geom((unsigned int)_param[0], (unsigned int)_param[1]);
+                    image.sample(geom);
+                }; break;
+                /* scale */
+                case 17: {
+                    if (npar < 2)
+                        error("wrong number of parameters in call to 'scale'");
+                        Geometry geom((unsigned int)_param[0], (unsigned int)_param[1]);
+                    image.scale(geom);
+                }; break;
+                default: error("wrong image processing filter in 'stdFilter2DRedim' c++ routine");
+            }
+        }
+        catch(WarningUndefined &magickWarning) {
+            cout << "Caught Magick++ warning: " << magickWarning.what() << "... should not affect the result. Continuing..." << endl;
+        }
+        catch(ErrorUndefined &magickError) {
+            cout << "Caught Magick++ error: " << magickError.what() << "... result will be affected" << endl;
+            error("Caught Magick++ error that would definitely affect the result");
+        }
+        catch(exception &error) {
+            cout << "Caught c++ error: " << error.what() << "... result may be affected. Continuing..." << endl;
+        }
+        catch(...) {
+            cout << "Caught unknown error: result may be affected. Continuing..." << endl;
+        }
+        /* push modified image back */
+        resStack.push_back(image);
+    }
+    if (_param != NULL)
+        delete[] _param;
+    /* return modified image */
+    return(stack2SEXP(resStack, isRGB));
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void normalizeDataset(double * data, double * range, int length) {
