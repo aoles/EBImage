@@ -10,6 +10,6 @@
 
 extern "C" {
      SEXP objectCount(SEXP rimage, SEXP rOrigImage, SEXP params);
-     SEXP nn(SEXP x);
+/*     SEXP nn(SEXP x);*/
 };
 
