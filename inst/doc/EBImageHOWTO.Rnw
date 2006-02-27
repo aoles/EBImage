@@ -30,6 +30,13 @@ pagecolor=darkblue,raiselinks,plainpages,pdftex]{hyperref}
 
 %------------------------------------------------------------
 \title{EBImage - Image Processing Toolkit For R}
+
+\begin{figure}[tp]
+    \begin{center}
+        \includegraphics[width=60mm]{logo.jpg}
+    \end{center}
+\end{figure}
+
 %------------------------------------------------------------
 \author{Oleg Sklyar}
 \maketitle
@@ -79,11 +86,9 @@ file = "/~osklyar/projects/EBImage/examples/example.tif"
 ping.image(paste(server, file, sep=""))
 @
 
-Images can be loaded with \code{read.image}. The function automatically discovers image types for every individual file in the \code{files} argument, calculates number of images and returns an \image\ or \code{Image3D} object as result. \ebimage\ is mainly designed to work with grayscale images, therefore, if not specified otherwise \code{read.image} converts all data to grayscale on load. For instance, an example image from \ebimage\ examples can be loaded from the web by issuing
+Images can be loaded with \code{read.image}. The function automatically discovers image types for every individual file in the \code{files} argument, calculates number of images and returns an \image\ or \code{Image3D} object as result. \ebimage\ is mainly designed to work with grayscale images, therefore, if not specified otherwise \code{read.image} converts all data to grayscale on load. For instance, to load an example image from \ebimage\ project page one can issue
 
 <<>>=
-# server = "http://www.ebi.ac.uk"
-# file = "/~osklyar/projects/EBImage/examples/example.tif"
 im = read.image(paste(server, file, sep=""))
 im[1:5,1:5,1:2]
 @
@@ -91,24 +96,26 @@ im[1:5,1:5,1:2]
 If the same image is loaded as RGB, the following output will be generated
 
 <<>>=
-im = read.image(paste(server, file, sep=""), rgb = TRUE)
-im[1:5,1:5,1:2]
+imRGB = read.image(paste(server, file, sep=""), rgb = TRUE)
+imRGB[1:5,1:5,1:2]
 @
 
 Images can be saved using \code{write.image} function of \ebimage. If the source image is of class \code{Image3D}, the number of files specified can be either one if the target format supports image stacks or must exactly correspond to the number of images. For example, to save a small section of the image (printed above) into a single TIFF file, one needs to issue
 
 <<>>=
 write.image(im[1:5,1:5,1:2], "testOutput.tif")
-# write control
+@
+<<echo=false>>=
 dir(pattern=".tif")
 @
 
-Alternatively, to save two images into separate JPG (or any other format) files
+Alternatively, to save two images into separate JPG files (or any other format)
 
 <<>>=
 outputFiles = c("testOutput01.jpg", "testOutput02.jpg")
 write.image(im[1:5,1:5,1:2], outputFiles)
-# write control
+@
+<<echo=false>>=
 dir(pattern=".jpg")
 @
 
@@ -117,7 +124,46 @@ There is no difference if the original imahe is RGB or grayscale, output file fo
 %--------------------------------------------------
 \section{Simple Image Data Manipulation and Image Arithmetics}
 %--------------------------------------------------
+As indicated in the previous section, \image\ and \code{Image3D} support all operations defined for arrays. Object \code{im} that was created in the previous section contains in fact 9 images, but for demonstration purposes we only want to work with one of those showing cell nuclei. One can easily obtain \image\ of interest from this \code{Image3D} in exactly the same manner as one would subscript arrays
 
+<<>>=
+im1 = im[,,3]
+@
+<<echo=false,results=hide>>=
+write.image(im[,,3], "testCells-gray.png")
+@
+\includegraphics[width=90mm]{testCells-gray.png}
+
+Let us consider we want manually treshold this image without turning to complex filters. First, one might need to determine the range of image data if they were not normalized beforehand
+
+<<>>=
+range = minMax(im1)
+range
+treshold = (range[2] + range[1]) / 2
+@
+
+Simple tresholding can be realized simply by substituting values smaller than the treshold by 0 and larger than the treshold by 0.99 (there is a know bug that inverts binary images if they are defined with 0 and 1 only)
+
+<<>>=
+
+im2 = im1
+im2[im2 < treshold] = 0
+im2[im2 >= treshold] = 0.99
+@
+<<echo=false,results=hide>>=
+write.image(im2, "simpleTreshold.png")
+@
+\includegraphics[width=90mm]{simpleTreshold.png}
+
+In a similar manner images can be easily cropped to the required size. Suppose we only need a central part of \code{im1} of the size 200x200
+
+<<>>=
+im2 = im1[51:250, 51:250]
+@
+<<echo=false,results=hide>>=
+write.image(im2, "imageCrop.png")
+@
+\includegraphics[width=60mm]{imageCrop.png}
 
 
 \end{document}

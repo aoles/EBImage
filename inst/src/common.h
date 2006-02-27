@@ -11,3 +11,9 @@ using namespace Magick;
 typedef         list<Image>    MagickStack;
 typedef         Image          MagickImage;
 
+extern bool verbose;
+
+extern "C" {
+    SEXP setVerbose(SEXP);
+};
+

@@ -23,17 +23,20 @@ SEXP readImages(SEXP files, SEXP rgb) {
                 readImages(&pushstack, CHAR(STRING_ELT(files, i)));
             }
             catch(WarningFileOpen &magickOpenWarning) {
-                cout << "\tImageMagick file I/O warning: " << magickOpenWarning.what() << endl;
+                if (verbose)
+                    cout << "\tImageMagick file I/O warning: " << magickOpenWarning.what() << endl;
             }
             catch(WarningUndefined &magickWarning) {
-                cout << "\tImageMagick warning: " << magickWarning.what() << endl;
+                if (verbose)
+                    cout << "\tImageMagick warning: " << magickWarning.what() << endl;
             }
             catch (ErrorUndefined &magickError) {
                 cout << "\tCaught ImageMagick error: " << magickError.what() << "... skipping file!" << endl;
                 continue;
             }
             catch (exception &cerror) {
-                cout << "\tCaught c++ error/warning: " << cerror.what() << "... trying to process the file!" << endl;
+                if (verbose)
+                    cout << "\tCaught c++ error/warning: " << cerror.what() << "... trying to process the file!" << endl;
             }
             catch (...) {
                 cout << "\tUnidentified error/warning... trying to process the file!" << endl;
@@ -88,16 +91,19 @@ SEXP writeImages(SEXP rimage, SEXP files) {
         return R_NilValue;
     }
     catch(WarningUndefined &magickWarning) {
-        cout << "\tImageMagick warning: " << magickWarning.what() << endl;
+        if (verbose)
+            cout << "\tImageMagick warning: " << magickWarning.what() << endl;
     }
     catch (ErrorUndefined &magickError) {
         cout << "\tCaught ImageMagick error: " << magickError.what() << endl;
     }
     catch (exception &cerror) {
-        cout << "\tCaught c++ error/warning: " << cerror.what() << endl;
+        if (verbose)
+            cout << "\tCaught c++ error/warning: " << cerror.what() << endl;
     }
     catch (...) {
-        cout << "\tUnidentified error/warning..." << endl;
+        if (verbose)
+            cout << "\tUnidentified error/warning..." << endl;
     }
     return R_NilValue;
 }
@@ -114,20 +120,24 @@ SEXP pingImages(SEXP files, SEXP showComments) {
             image.ping(CHAR(STRING_ELT(files, i)));
         }
         catch(WarningFileOpen &magickOpenWarning) {
-            cout << "\tImageMagick file I/O warning: " << magickOpenWarning.what() << endl;
+            if (verbose)
+                cout << "\tImageMagick file I/O warning: " << magickOpenWarning.what() << endl;
         }
         catch(WarningUndefined &magickWarning) {
-            cout << "\tImageMagick warning: " << magickWarning.what() << endl;
+            if (verbose)
+                cout << "\tImageMagick warning: " << magickWarning.what() << endl;
         }
         catch (ErrorUndefined &magickError) {
             cout << "\tCaught ImageMagick error: " << magickError.what() << "... skipping file!" << endl;
             continue;
         }
         catch (exception &cerror) {
-            cout << "\tCaught c++ error/warning: " << cerror.what() << "... trying to process the file!" << endl;
+            if (verbose)
+                cout << "\tCaught c++ error/warning: " << cerror.what() << "... trying to process the file!" << endl;
         }
         catch (...) {
-            cout << "\tUnidentified error/warning... trying to process the file!" << endl;
+            if (verbose)
+                cout << "\tUnidentified error/warning... trying to process the file!" << endl;
         }
         try {
             cout << "File: " << CHAR(STRING_ELT(files, i)) << endl;

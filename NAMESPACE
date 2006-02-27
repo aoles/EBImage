@@ -8,9 +8,10 @@ export(
     "rotate", "sampleImage", "scaleImage", "segment", "shade", "sharpen", "solarize",
     "spread", "unsharpMask", "noise", "distMap",
 
-    "read.image", "ping.image",
+    "read.image", "ping.image", "verboseEBImage",
 
     "objectCount"
+#, "paintObjectCountMap", "nn"
 )
 exportClasses(
     "array", "Image2D", "Image3D"

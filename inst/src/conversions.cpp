@@ -7,7 +7,8 @@
 SEXP stack2SEXP(MagickStack& stack, bool rgb) {
     int nimages = stack.size();
     if (nimages < 1) {
-        warning("image stack empty: returning NULL");
+        if (verbose)
+            warning("image stack empty: returning NULL");
         return R_NilValue;
     }
     int nProt = 0;
@@ -18,7 +19,8 @@ SEXP stack2SEXP(MagickStack& stack, bool rgb) {
         unsigned int dx = image.columns();
         unsigned int dy = image.rows();
         if (dx * dy <= 0) {
-            warning("first image in the stack is of size 0: returning NULL");
+            if (verbose)
+                warning("first image in the stack is of size 0: returning NULL");
             return R_NilValue;
         }
         if (rgb)
@@ -84,7 +86,8 @@ SEXP stack2SEXP(MagickStack& stack, bool rgb) {
         rimage = R_NilValue;
         if (nProt > 0)
             UNPROTECT(nProt);
-        warning("problems loading stack (crash): returning NULL");
+        if (verbose)
+            warning("problems loading stack (crash): returning NULL");
     }
     return rimage;
 }

@@ -14,7 +14,7 @@
 }
 
 \usage{
-    objectCount(x, minArea = 20, maxRadius = 100, tolerance = 1, maxObjects = 1000)
+    objectCount(x, minArea = 20, maxRadius = 100, tolerance = 1, maxObjects = 1000, modify = FALSE)
 }
 \arguments{
     \item{x}{An instance of class \code{\link{Image2D}} or \code{\link{Image3D}} being a Distance Map.
@@ -27,6 +27,7 @@
         larger algorithm terminates in that direction.}
     \item{maxObjects}{Maximum number of objects - no more objects are added as soon as this value is
         reached and algorithm terminates.}
+    \item{modify}{Whether the original image should be modify to show the object false-color map or kep intact.}
 }
 
 \value{

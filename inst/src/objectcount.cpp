@@ -37,57 +37,84 @@ struct ColRow {
 };
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 typedef vector<int> VectorInt;
+typedef vector<double> VectorDouble;
 const double BACKGROUND = 0;
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void object_count(double * data, ColRow& size, double* param, VectorInt& indexes, VectorInt& areas);
+void object_count(double* data, double* origData, ColRow& imsize, double* param, VectorDouble& x, VectorDouble& y, VectorDouble& size, VectorDouble& intensity);
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-SEXP objectCount(SEXP rimage, SEXP params) {
+SEXP objectCount(SEXP rimage, SEXP rOrigImage, SEXP params) {
     try {
         int * dim = INTEGER(GET_DIM(rimage));
         int ndim = LENGTH(GET_DIM(rimage));
-        ColRow size(dim[0], dim[1]);
+        ColRow imsize(dim[0], dim[1]);
         int nimages = 1;
         if (ndim > 2)
             nimages = dim[2];
         double * data;
+        double * origData;
         SEXP res = R_NilValue;
-        /* for a stack we return a list, otherwise a single matrix */
+        // for a stack we return a list, otherwise a single matrix
         if (nimages > 1)
             PROTECT(res = allocVector(VECSXP, nimages));
         SEXP * items = new SEXP[nimages];
         SEXP * dims  = new SEXP[nimages];
         for (int i = 0; i < nimages; i++)
             items[i] = R_NilValue;
-        VectorInt indexes, areas;
+        VectorDouble id, x, y, size, intensity;
         double par[4];
         for (int i = 0; i < 4; i++)
             par[i] = REAL(params)[i]; // 0 -min size, 1 - max size, 2 - tolerance, 3 - max objects
 //        cout << maxsize << endl;
         for (int i = 0; i < nimages; i++) {
-            indexes.clear();
-            areas.clear();
-            /* it is assumed that rimage is alread a distMap!!!
-               otherwise run the next line
-               calc_dist_map(data, ncol, nrow, algorithm);
-            */
-            data = &(REAL(rimage)[i * size.col * size.row]);
-            /* indexes and sizes of objects within one image are returned in vectors */
-            object_count(data, size, par, indexes, areas);
-            /* copy all returned values to the list element */
-            int nobjects = indexes.size();
-            PROTECT(items[i] = allocVector(INTSXP, nobjects * 2));
+            id.clear();
+            x.clear();
+            y.clear();
+            size.clear();
+            intensity.clear();
+            // it is assumed that rimage is alread a distMap!!!
+            // otherwise run the next line
+            // calc_dist_map(data, ncol, nrow, algorithm);
+            data = &(REAL(rimage)[i * imsize.col * imsize.row]);
+            if (rOrigImage != R_NilValue)
+                origData = &(REAL(rOrigImage)[i * imsize.col * imsize.row]);
+            else
+                origData = NULL;
+            // indexes and sizes of objects within one image are returned in vectors
+            object_count(data, origData, imsize, par, x, y, size, intensity);
+            // copy all returned values to the list element
+            int nobjects = x.size();
+            for (int j = 0; j < nobjects; j++)
+                id.push_back(i);
+            PROTECT(items[i] = allocVector(REALSXP, nobjects * 5));
             PROTECT(dims[i] = allocVector(INTSXP, 2));
             if (nobjects > 0) {
-                INTEGER(dims[i])[0] = 2;
-                INTEGER(dims[i])[1] = nobjects;
+                INTEGER(dims[i])[1] = 5;
+                INTEGER(dims[i])[0] = nobjects;
                 SET_DIM(items[i], dims[i]);
             }
             for (int j = 0; j < nobjects; j++) {
-                INTEGER(items[i])[j * 2] = indexes[j];
-                INTEGER(items[i])[j * 2 + 1] = areas[j];
+                REAL(items[i])[j]     = id[j];
+                REAL(items[i])[j + nobjects] = x[j];
+                REAL(items[i])[j + 2 * nobjects] = y[j];
+                REAL(items[i])[j + 3 * nobjects] = size[j];
+                if (size[j] != 0)
+                    REAL(items[i])[j + 4 * nobjects] = intensity[j] / size[j];
+                else
+                    REAL(items[i])[j + 4 * nobjects] = intensity[j];
+
+/*
+                REAL(items[i])[j * 5]     = id[j];
+                REAL(items[i])[j * 5 + 1] = x[j];
+                REAL(items[i])[j * 5 + 2] = y[j];
+                REAL(items[i])[j * 5 + 3] = size[j];
+                if (size[j] != 0)
+                    REAL(items[i])[j * 5 + 4] = intensity[j] / size[j];
+                else
+                    REAL(items[i])[j * 5 + 4] = intensity[j];
+*/
             }
         }
-        /* add all list elements to the list */
+        // add all list elements to the list
         if (nimages > 1)
             for (int i = nimages - 1; i >= 0; i--) {
                 SET_VECTOR_ELT(res, i, items[i]);
@@ -104,15 +131,15 @@ SEXP objectCount(SEXP rimage, SEXP params) {
     catch(...) {
         error("exception within distMap c++ routine");
     }
-    /* if it comes to this point I will be surprised */
+    // if it comes to this point I will be surprised
     return R_NilValue;
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-inline ColRow getMaxIndex(double * data, ColRow& size) {
+inline ColRow getMaxIndex(double * data, ColRow& imsize) {
     ColRow res(0, 0), counter(0, 0);
-    for (counter.col = 0; counter.col < size.col; counter.col++)
-        for (counter.row = 0; counter.row < size.row; counter.row++)
-            if (data[INDEX(counter.col, counter.row, size.col)] > data[INDEX(res.col, res.row, size.col)])
+    for (counter.col = 0; counter.col < imsize.col; counter.col++)
+        for (counter.row = 0; counter.row < imsize.row; counter.row++)
+            if (data[INDEX(counter.col, counter.row, imsize.col)] > data[INDEX(res.col, res.row, imsize.col)])
                 res = counter;
     return res;
 }
@@ -122,58 +149,109 @@ inline double dist(ColRow& pt1, ColRow& pt2) {
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* this function is recursive!!! */
-void ffill(double * data, int col, int row, ColRow& start, ColRow& size, double value, double* param, int& area, bool& error) {
+/* counter also defines the number of the object filled in the image with negative sign - 1
+   (-1) reserved for borders */
+void ffill(double* data, double* origData, int col, int row, ColRow& start, ColRow& imsize, double value, double* param, double& area, double& intens, bool& error, int& counter) {
     /* check if there were any errors in previous recursive calls */
     if (error) return;
     /* check if point outside of the image */
     if (col < 0 || row < 0) return;
     /* if additionally it is bottom or right border, do not count object!!! */
-    if (col >= size.col || row >= size.row) {
+    if (col >= imsize.col || row >= imsize.row) {
         error = true;
         return;
     }
-    double newvalue = data[INDEX(col, row, size.col)];
+    double newvalue = data[INDEX(col, row, imsize.col)];
     /* check if current point already on background */
-    if (newvalue == BACKGROUND) return;
+    if (newvalue <= BACKGROUND)  return;
     /* check if we do not enter another maximum area with a given tolerance - another object */
-    if (newvalue > value + param[2]) return;
+    if (newvalue >= value + param[2]) return;
     ColRow pt(col, row);
     /* check if we are still within the 1.5x max object radius (factor because start can be non-cetral) */
     if (dist(pt, start) > 2.0 * param[1]) return;
-    /* add this point and reset this to BG first, otherwise this recursive thing will be infinite!!! */
+    /* reset this to BG first */
+    data[INDEX(col, row, imsize.col)] = -(counter + 1.0);
+    /* update intensity if original data present */
+    if (origData != NULL)
+        intens += origData[INDEX(col, row, imsize.col)];
+    /* add this point, otherwise this recursive thing will be infinite!!! */
     area++;
-    data[INDEX(col, row, size.col)] = 0;
-    ffill(data, col + 1, row    , start, size, newvalue, param, area, error);
-    ffill(data, col - 1, row    , start, size, newvalue, param, area, error);
-    ffill(data, col    , row + 1, start, size, newvalue, param, area, error);
-    ffill(data, col    , row - 1, start, size, newvalue, param, area, error);
-    ffill(data, col + 1, row + 1, start, size, newvalue, param, area, error);
-    ffill(data, col - 1, row - 1, start, size, newvalue, param, area, error);
-    ffill(data, col - 1, row + 1, start, size, newvalue, param, area, error);
-    ffill(data, col + 1, row - 1, start, size, newvalue, param, area, error);
+    ffill(data, origData, col + 1, row    , start, imsize, newvalue, param, area, intens, error, counter);
+    ffill(data, origData, col - 1, row    , start, imsize, newvalue, param, area, intens, error, counter);
+    ffill(data, origData, col    , row + 1, start, imsize, newvalue, param, area, intens, error, counter);
+    ffill(data, origData, col    , row - 1, start, imsize, newvalue, param, area, intens, error, counter);
+    ffill(data, origData, col + 1, row + 1, start, imsize, newvalue, param, area, intens, error, counter);
+    ffill(data, origData, col - 1, row - 1, start, imsize, newvalue, param, area, intens, error, counter);
+    ffill(data, origData, col - 1, row + 1, start, imsize, newvalue, param, area, intens, error, counter);
+    ffill(data, origData, col + 1, row - 1, start, imsize, newvalue, param, area, intens, error, counter);
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void object_count(double * data, ColRow& size, double* param, VectorInt & indexes, VectorInt & areas) {
+void object_count(double* data, double* origData, ColRow& imsize, double* param, VectorDouble& x, VectorDouble& y, VectorDouble& size, VectorDouble& intensity) {
     /* get the first maximum-value point */
-    ColRow max(getMaxIndex(data, size));
+    ColRow max(getMaxIndex(data, imsize));
     /* convert col and row into index - this is what we store */
-    int index = INDEX(max.col, max.row, size.col);
-    int area, counter = 0;
+    int index = INDEX(max.col, max.row, imsize.col);
+    int indexold = -1;
+    int counter = 0;
+    double area, intens;
     bool error;
     /* repeat the thing until our next max value is background or we reached the maximum number of objects */
-    while(data[index] > BACKGROUND && counter < param[3]) {
+    while(data[index] > BACKGROUND + param[2] && counter < param[3] && index != indexold) {
         counter++;
         area = 0;
+        intens = 0;
         error = false;
         /* fill the surrounding area and get the size of the filling */
-        ffill(data, max.col, max.row, max, size, data[index], param, area, error);
+        ffill(data, origData, max.col, max.row, max, imsize, data[index], param, area, intens, error, counter);
         /* add this object to the list if it is large enough */
         if (area >= param[0] && !error) {
-            indexes.push_back(index);
-            areas.push_back(area);
+            x.push_back(max.col);
+            y.push_back(max.row);
+            size.push_back(area);
+            intensity.push_back(intens);
         }
         /* before exit try to find the next object - the next maximum */
-        max = getMaxIndex(data, size);
-        index = INDEX(max.col, max.row, size.col);
+        indexold = index;
+        max = getMaxIndex(data, imsize);
+        index = INDEX(max.col, max.row, imsize.col);
     }
 }
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* claculates nearest neighbours */
+/* moved in extended version to Biobase as matchpt
+SEXP nn(SEXP x) {
+    int * dim = INTEGER(GET_DIM(x));
+    int nrow = dim[0];
+    int ncol = dim[1];
+    SEXP res;
+    PROTECT(res = allocVector(REALSXP, dim[0] * 2));
+    double dist, mdist, tmp;
+    for (int i = 0; i < dim[0]; i++) {
+        int index = i;
+        mdist = DBL_MAX;
+        for (int j = 0; j < dim[0]; j++) {
+            if (i == j) continue;
+            dist = 0;
+            for (int k = 0; k < ncol; k++) {
+                tmp = REAL(x)[INDEX(i, k, nrow)] - REAL(x)[INDEX(j, k, nrow)];
+                dist += tmp * tmp;
+            }
+            dist = sqrt(dist);
+            if (dist < mdist) {
+                index = j;
+                mdist = dist;
+            }
+        }
+        REAL(res)[INDEX(i, 0, nrow)] = index + 1;
+        REAL(res)[INDEX(i, 1, nrow)] = mdist;
+    }
+    SEXP newDim;
+    PROTECT(newDim = allocVector(INTSXP, 2));
+    INTEGER(newDim)[0] = dim[0];
+    INTEGER(newDim)[1] = 2;
+    SET_DIM(res, newDim);
+    UNPROTECT(2);
+    return res;
+}
+
+*/
