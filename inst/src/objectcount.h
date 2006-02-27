@@ -9,6 +9,7 @@
 #include "common.h"
 
 extern "C" {
-     SEXP objectCount(SEXP rimage, SEXP param);
+     SEXP objectCount(SEXP rimage, SEXP rOrigImage, SEXP params);
+     SEXP nn(SEXP x);
 };
 

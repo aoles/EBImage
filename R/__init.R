@@ -10,3 +10,8 @@
 .CallEBImage <- function(name, ...) {
     .Call(name, ..., PACKAGE = "EBImage")
 }
+
+verboseEBImage <- function(verbose = TRUE) {
+    .CallEBImage("setVerbose", as.logical(verbose))
+    invisible(FALSE)
+}
