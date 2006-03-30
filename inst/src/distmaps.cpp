@@ -9,6 +9,7 @@ using namespace std;
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 inline void calc_dist_map(double * data, int& ncol, int& nrow, int& alg);
 inline void lz_dist_map(double * data, int& ncol, int& nrow);
+inline void os_dist_map(double * data, int& ncol, int& nrow);
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* THIS FUNCTION MODIFIES rimage - COPY BEFORE IF REQUIRED */
 SEXP distMap(SEXP rimage, SEXP alg) {
@@ -35,10 +36,83 @@ SEXP distMap(SEXP rimage, SEXP alg) {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 inline void calc_dist_map(double * data, int& ncol, int& nrow, int& alg) {
     switch(alg) {
-        default:
-            lz_dist_map(data, ncol, nrow);
+        case 2: lz_dist_map(data, ncol, nrow); break;
+        default: os_dist_map(data, ncol, nrow);
     };
 }
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* macros for the use in the function below */
+#define LEFTRIGHT() ( \
+  { d = sqrt(dx * dx + (y - row) * (y - row)); \
+    if (data[index] <= d) { done = true; continue; } \
+    if (col - dx >= 0) if (data[col - dx + y * ncol] == 0) done = true; \
+    if (col + dx < ncol) if (data[col + dx + y * ncol] == 0) done = true; \
+    if (done && d < data[index] ) data[index] = d; \
+  } )
+
+#define TOPBOTTOM() ( \
+  { d = sqrt(dx * dx + (x - col) * (x - col)); \
+    if (data[index] <= d) { done = true; continue; } \
+    if (row - dx >= 0) if (data[x + (row - dx) * ncol] == 0) done = true; \
+    if (row + dx < nrow) if (data[x + (row + dx) * ncol] == 0) done = true; \
+    if (done && d < data[index]) data[index] = d; \
+  } )
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* EBImage distance map algorithm - returns real distances: for every pixel that
+   is not background an extending square around the pixel is drawn until a background
+   point is hit which is closer that the half-side of a square or until the square exceeds the image*/
+/* Author: Oleg Sklyar, EBImage, 2006 */
+inline void os_dist_map(double * data, int& ncol, int& nrow) {
+    /* segmented image is assumed on input. Background must be 0, foreground
+       must be 1 */
+    int index, x, y, edge1, edge2;
+    int maxsize = (ncol > nrow)?ncol:nrow;
+    double d;
+    bool done, found;
+    for (int col = 0; col < ncol; col++)
+        for (int row = 0; row < nrow; row++) {
+            index = col + row * ncol;
+            /* do not do anything with the point if it is background */
+            if (data[index] == 0)
+                continue;
+            else
+                data[index] = maxsize + 1;
+            found = false;
+            /* draw extending square around the point until background is reached or end of image hit */
+            for (int dx = 1; dx < maxsize && !found; dx++) {
+                /* if the point is already assigned a value that is closer than any in
+                   this or next round - stop
+                */
+                if (data[index] <= dx) {
+                    found = true;
+                    continue;
+                }
+                /* check right and left */
+                if (col - dx >= 0 || col + dx < ncol) {
+                    edge1 = (row - dx >= 0)?(row - dx):0;
+                    edge2 = (row + dx < nrow - 1)?(row + dx):(nrow - 1);
+                    done = false;
+                    for (y = row; y >= edge1 && !done; y--)
+                        LEFTRIGHT();
+                    done = false;
+                    for (y = row + 1; y <= edge2 && !done; y++)
+                        LEFTRIGHT();
+                }
+                /* check top-bottom */
+                if (row - dx >= 0 || row + dx < nrow) {
+                    edge1 = (col - dx >= 0)?(col - dx):0;
+                    edge2 = (col + dx < ncol - 1)?(col + dx):(ncol - 1);
+                    done = false;
+                    for (x = col; x >= edge1 && !done; x--)
+                        TOPBOTTOM();
+                    done = false;
+                    for (x = col + 1; x <= edge2 && !done; x++)
+                        TOPBOTTOM();
+                }
+            }
+        }
+}
+
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   adapted from Animal Package by Rocardo Fabbri:: distmap-lz.c
   algorithm: R. Lotufo, F. Zampirolli, SIBGRAPI 2001, 100-105, 2001
@@ -120,7 +194,7 @@ inline void lz_dist_map(double * data, int& ncol, int& nrow) {
                 eqEnd = eq2End;
                 wqIni = 0;
                 eqIni = 0;
-                inc += 2;
+                inc += 1; // TODO 2;
             }
             ptr += ncol;
         }
