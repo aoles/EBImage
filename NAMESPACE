@@ -2,13 +2,13 @@ useDynLib("EBImage")
 export(
     "Image2D", "Image3D", "copyImageHeader", "copyImage",
 
-    "tresh", "blur", "contrast", "despeckle", "edge", "enhance", "equalize",
+    "adaptThresh", "blur", "contrast", "despeckle", "edge", "enhance", "equalize",
 #"ffill", "ffillEdge",
     "colorGamma", "gaussFilter", "medianFilter", "mod", "redNoise",
     "rotate", "sampleImage", "scaleImage", "segment", "shade", "sharpen", "solarize",
-    "spread", "unsharpMask", "noise", "distMap",
+    "spread", "unsharpMask", "noise", "distMap", "thresh",
 
-    "read.image", "ping.image", "verboseEBImage",
+    "read.image", "ping.image", 
 
     "objectCount"
 #, "paintObjectCountMap", "nn"

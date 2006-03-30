@@ -40,7 +40,7 @@ void * THREAD_FUN_display(void * ptr) {
         else {
             MagickStack::iterator it = stack.begin();
             MagickImage image = *it;
-            it = NULL;
+            //it = NULL; // FC5 error
             image.display();
         }
     }
@@ -60,7 +60,7 @@ void * THREAD_FUN_animate(void * ptr) {
         else {
             MagickStack::iterator it = stack.begin();
             MagickImage image = *it;
-            it = NULL;
+            //it = NULL; // FC5 error
             image.display();
         }
     }

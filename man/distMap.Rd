@@ -13,12 +13,14 @@
 }
 
 \usage{
-    distMap(x, alg = "Lotufo_Zampirolli", modify = FALSE)
+    distMap(x, alg = "EBImage", modify = FALSE)
 }
 \arguments{
     \item{x}{An instance of class \code{\link{Image2D}} or \code{\link{Image3D}}. For 3D objects,
         the algorithm will be applied to every single image composed of first two dimensions.}
-    \item{alg}{Character for the algorithm to use. Currently, only Lotufo\_Zampirolli is implemented.}
+    \item{alg}{Character for the algorithm to use. Default value is for algorithm designed
+        specifically for EBImage. Currently, the only alternative is Lotufo\_Zampirolli
+        which does not return real distances to the background though.}
     \item{modify}{If \code{TRUE}, original image will be modified without copying the data!}
 }
 

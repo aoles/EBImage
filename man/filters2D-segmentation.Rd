@@ -4,7 +4,7 @@
 \alias{segment}
 %\alias{ffill}
 %\alias{ffillEdge}
-\alias{tresh}
+\alias{adaptThresh}
 \alias{edge}
 
 \concept{image segmentation}
@@ -23,7 +23,7 @@
     segment(x, cluster = 1, smooth = 1.5, modify = FALSE)
 %    ffill(x, col, row, color)
 %    ffillEdge(x, col, row, color)
-    tresh(x, width = 20, height = 20, offset = 1000, preprocess = FALSE, modify = FALSE)
+    adaptThresh(x, width = 20, height = 20, offset = 1000, preprocess = FALSE, modify = FALSE)
     edge(x, radius = 1, modify = FALSE)
 }
 
@@ -60,7 +60,7 @@
     \code{segment} coalesces similar image components by analyzing histograms of the color
     components and identifying units that are homogeneous with the fuzzy c-means technique.
 
-    \code{tresh} applies adaptive thresholding to the image. It is useful if the
+    \code{adaptThresh} applies adaptive thresholding to the image. It is useful if the
     ideal threshold level is not known in advance, or if the illumination gradient is not constant
     across the image. Adaptive thresholding works by evaluating the mean of a pixel region and using the
     mean as the thresholding level.

@@ -30,7 +30,7 @@
             \code{despeckle}, \code{enhance}, \code{gaussFilter},
             \code{medianFilter}, \code{redNoise}, \code{sharpen},
             \code{spread}, \code{unsharpMask}}
-        \item{\code{\link{Segmentation 2D Filters}}:}{\code{tresh}, \code{edge},
+        \item{\code{\link{Segmentation 2D Filters}}:}{\code{adaptThresh}, \code{edge},
             \code{segment}, \code{ffill}, \code{ffillEdge}}
         \item{\code{\link{Color 2D Filters}}:}{\code{contrast}, \code{equalize},
             \code{colorGamma}, \code{mod}, \code{shade},

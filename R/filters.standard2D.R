@@ -7,7 +7,7 @@
 # ============================================================================
 # IMAGE PROCESSING ROUTINES via ImageMagick
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-tresh <- function(x, width = 20, height = 20, offset = 1000, preprocess = FALSE, modify = FALSE) {
+adaptThresh <- function(x, width = 20, height = 20, offset = 1000, preprocess = FALSE, modify = FALSE) {
     .notImageError(x)
     param = as.double(c(width, height, offset))
     filter = as.integer(1)
@@ -19,8 +19,10 @@ tresh <- function(x, width = 20, height = 20, offset = 1000, preprocess = FALSE,
         return(.CallEBImage("stdFilter2D", x, filter, param))
     }
     else { # original data modified
-        normalize(x, modify = TRUE)
-        gaussFilter(x, 4, 2, modify = TRUE)
+        if (preprocess) {
+            normalize(x, modify = TRUE)
+            gaussFilter(x, 4, 2, modify = TRUE)
+        }
         invisible(.CallEBImage("stdFilter2D", x, filter, param))
     }
 }
