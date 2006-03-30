@@ -1,4 +1,4 @@
-AC_INIT([EBImage], 0.1.10) dnl package name, version
+AC_INIT([EBImage], 1.0.1) dnl package name, version
 
 AC_CHECK_PROG(magickfound, [Magick++-config --version], yes, no)
 if test "$magickfound" = "yes"; then
