@@ -271,7 +271,7 @@ PACKAGE_VERSION='1.0.1'
 PACKAGE_STRING='EBImage 1.0.1'
 PACKAGE_BUGREPORT=''
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS magickfound CXXFLAGS CPPFLAGS LFLAGS LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS magickfound magickincludes CXXFLAGS LFLAGS LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1263,13 +1263,57 @@ echo "${ECHO_T}no" >&6
 fi
 
 if test "$magickfound" = "yes"; then
-    CXXFLAGS="`Magick++-config --cppflags`"
-    CXXFLAGS="${CXXFLAGS} `Magick++-config --cxxflags`"
-    LIBS="`Magick++-config --ldflags`"
-    LIBS="${LIBS} `Magick++-config --libs`"
+    echo ImageMagick version $magickfound found
+    # Extract the first word of "Magick++-config --cppflags", so it can be a program name with args.
+set dummy Magick++-config --cppflags; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_magickincludes+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-    { { echo "$as_me:$LINENO: error: \"Cannot find ImageMagick++-devel (Magick++)\"" >&5
-echo "$as_me: error: \"Cannot find ImageMagick++-devel (Magick++)\"" >&2;}
+  if test -n "$magickincludes"; then
+  ac_cv_prog_magickincludes="$magickincludes" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_magickincludes="yes"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_prog_magickincludes" && ac_cv_prog_magickincludes="no"
+fi
+fi
+magickincludes=$ac_cv_prog_magickincludes
+if test -n "$magickincludes"; then
+  echo "$as_me:$LINENO: result: $magickincludes" >&5
+echo "${ECHO_T}$magickincludes" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+    if test "$magickincludes" = "yes"; then
+        echo ImageMagick++ includes located in $magickincludes
+        CXXFLAGS="`Magick++-config --cppflags`"
+        CXXFLAGS="${CXXFLAGS} `Magick++-config --cxxflags`"
+        LIBS="`Magick++-config --ldflags`"
+        LIBS="${LIBS} `Magick++-config --libs`"
+    else
+        { { echo "$as_me:$LINENO: error: \"Cannot find ImageMagick++-devel (Magick++-devel)\"" >&5
+echo "$as_me: error: \"Cannot find ImageMagick++-devel (Magick++-devel)\"" >&2;}
+   { (exit 1); exit 1; }; }
+    fi
+else
+    { { echo "$as_me:$LINENO: error: \"Cannot find ImageMagick (Magick++)\"" >&5
+echo "$as_me: error: \"Cannot find ImageMagick (Magick++)\"" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
@@ -1283,13 +1327,10 @@ fi
 RCONF="${R_HOME}/bin/R CMD config"
 echo R found in: ${R_HOME}
 CXX="`${RCONF} CXX`"
-CC="`${RCONF} CC`"
 
-CXXFLAGS="-c -g -fPIC -I. -Isrc -I${R_HOME}/include ${CXXFLAGS}"
-CPPFLAGS=${CXXFLAGS}
+CXXFLAGS="-I. -Isrc -I${R_HOME}/include ${CXXFLAGS}"
 LIBS="-shared -g -fPIC -L${R_HOME}/lib -lR ${LIBS}"
 LFLAGS=${LIBS}
-
 
 
 
@@ -1931,8 +1972,8 @@ s,@ECHO_N@,$ECHO_N,;t t
 s,@ECHO_T@,$ECHO_T,;t t
 s,@LIBS@,$LIBS,;t t
 s,@magickfound@,$magickfound,;t t
+s,@magickincludes@,$magickincludes,;t t
 s,@CXXFLAGS@,$CXXFLAGS,;t t
-s,@CPPFLAGS@,$CPPFLAGS,;t t
 s,@LFLAGS@,$LFLAGS,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
@@ -2198,3 +2239,4 @@ if test "$no_create" != yes; then
   # would make configure fail if this is the last instruction.
   $ac_cs_success || { (exit 1); exit 1; }
 fi
+
