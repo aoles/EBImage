@@ -43,7 +43,7 @@ inline void calc_dist_map(double * data, int& ncol, int& nrow, int& alg) {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* macros for the use in the function below */
 #define LEFTRIGHT() ( \
-  { d = sqrt(dx * dx + (y - row) * (y - row)); \
+  { d = sqrt((long double)(dx * dx + (y - row) * (y - row))); \
     if (data[index] <= d) { done = true; continue; } \
     if (col - dx >= 0) if (data[col - dx + y * ncol] == 0) done = true; \
     if (col + dx < ncol) if (data[col + dx + y * ncol] == 0) done = true; \
@@ -51,7 +51,7 @@ inline void calc_dist_map(double * data, int& ncol, int& nrow, int& alg) {
   } )
 
 #define TOPBOTTOM() ( \
-  { d = sqrt(dx * dx + (x - col) * (x - col)); \
+  { d = sqrt((long double)(dx * dx + (x - col) * (x - col))); \
     if (data[index] <= d) { done = true; continue; } \
     if (row - dx >= 0) if (data[x + (row - dx) * ncol] == 0) done = true; \
     if (row + dx < nrow) if (data[x + (row + dx) * ncol] == 0) done = true; \
