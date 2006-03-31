@@ -2,7 +2,8 @@ AC_INIT([EBImage], 1.0.1) dnl package name, version
 
 AC_CHECK_PROG(magickfound, [Magick++-config --version], yes, no)
 if test "$magickfound" = "yes"; then
-    CXXFLAGS="`Magick++-config --cxxflags`"
+    CXXFLAGS="`Magick++-config --cppflags`"
+    CXXFLAGS="${CXXFLAGS} `Magick++-config --cxxflags`"
     LIBS="`Magick++-config --ldflags`"
     LIBS="${LIBS} `Magick++-config --libs`"
 else
