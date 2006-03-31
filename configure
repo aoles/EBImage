@@ -1263,7 +1263,8 @@ echo "${ECHO_T}no" >&6
 fi
 
 if test "$magickfound" = "yes"; then
-    CXXFLAGS="`Magick++-config --cxxflags`"
+    CXXFLAGS="`Magick++-config --cppflags`"
+    CXXFLAGS="${CXXFLAGS} `Magick++-config --cxxflags`"
     LIBS="`Magick++-config --ldflags`"
     LIBS="${LIBS} `Magick++-config --libs`"
 else
