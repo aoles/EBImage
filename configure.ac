@@ -17,7 +17,7 @@ else
     AC_MSG_ERROR("Cannot find ImageMagick (Magick++)")
 fi
 
-: ${R_HOME=`R RHOME`}
+dnl : ${R_HOME=`R RHOME`}
 
 if test -z "${R_HOME}"; then
 dnl echo "could not determine R_HOME"
@@ -30,7 +30,7 @@ CXX="`${RCONF} CXX`"
 
 CXXFLAGS="-I. -Isrc -I${R_HOME}/include ${CXXFLAGS}"
 dnl CXXFLAGS="-c -g -fPIC -I. -Isrc -I${R_HOME}/include ${CXXFLAGS}"
-LIBS="-shared -g -fPIC -L${R_HOME}/lib -lR ${LIBS}"
+dnl LIBS="-shared -g -fPIC -L${R_HOME}/lib -lR ${LIBS}"
 LFLAGS=${LIBS}
 
 dnl substitute CXXFLAGS and LIBS
