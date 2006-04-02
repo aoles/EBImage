@@ -28,9 +28,10 @@ RCONF="${R_HOME}/bin/R CMD config"
 echo R found in: ${R_HOME}
 CXX="`${RCONF} CXX`"
 
-CXXFLAGS="-I. -Isrc -I${R_HOME}/include ${CXXFLAGS}"
+dnl CXXFLAGS="-I. -Isrc -I${R_HOME}/include ${CXXFLAGS}"
 dnl CXXFLAGS="-c -g -fPIC -I. -Isrc -I${R_HOME}/include ${CXXFLAGS}"
 dnl LIBS="-shared -g -fPIC -L${R_HOME}/lib -lR ${LIBS}"
+
 LFLAGS=${LIBS}
 
 dnl substitute CXXFLAGS and LIBS

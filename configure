@@ -1327,7 +1327,7 @@ RCONF="${R_HOME}/bin/R CMD config"
 echo R found in: ${R_HOME}
 CXX="`${RCONF} CXX`"
 
-CXXFLAGS="-I. -Isrc -I${R_HOME}/include ${CXXFLAGS}"
+
 LFLAGS=${LIBS}
 
 
