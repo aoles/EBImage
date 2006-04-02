@@ -1317,7 +1317,6 @@ echo "$as_me: error: \"Cannot find ImageMagick (Magick++)\"" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
-: ${R_HOME=`R RHOME`}
 
 if test -z "${R_HOME}"; then
     { { echo "$as_me:$LINENO: error: \"Cannot determine R_HOME...\"" >&5
@@ -1329,7 +1328,6 @@ echo R found in: ${R_HOME}
 CXX="`${RCONF} CXX`"
 
 CXXFLAGS="-I. -Isrc -I${R_HOME}/include ${CXXFLAGS}"
-LIBS="-shared -g -fPIC -L${R_HOME}/lib -lR ${LIBS}"
 LFLAGS=${LIBS}
 
 
