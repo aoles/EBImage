@@ -14,12 +14,14 @@
 }
 
 \usage{
-    objectCount(x, minArea = 20, maxRadius = 100, tolerance = 1, maxObjects = 1000, modify = FALSE)
+    objectCount(x, ref = NULL, minArea = 20, maxRadius = 100, tolerance = 1, maxObjects = 1000, modify = FALSE)
 }
 \arguments{
     \item{x}{An instance of class \code{\link{Image2D}} or \code{\link{Image3D}} being a Distance Map.
         For 3D objects,  the algorithm will be applied to every single image composed of first two
         dimensions.}
+    \item{ref}{An optiona original (not segmented) image (from which segmented x was obtained) to enable
+        evaluation of object intensities.}
     \item{minArea}{Objects with area smaller than this (in pixel) will be omitted.}
     \item{maxRadius}{Maximum radius of detected objects. If the algorithm spreads behind this value,
         pixel is considered outside of object automatically.}

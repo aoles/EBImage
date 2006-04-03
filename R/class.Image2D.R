@@ -30,7 +30,6 @@ setGeneric("getRed",      function(object)      standardGeneric("getRed"))
 setGeneric("getGreen",    function(object)      standardGeneric("getGreen"))
 setGeneric("getBlue",     function(object)      standardGeneric("getBlue"))
 setGeneric("normalize",   function(object, ...) standardGeneric("normalize"))
-#setGeneric("to16bit",     function(object, ...) standardGeneric("to16bit"))
 setGeneric("minMax",      function(object)      standardGeneric("minMax"))
 setGeneric("as.integer",  function(x, ...)      standardGeneric("as.integer"))
 setGeneric("as.double",   function(x, ...)      standardGeneric("as.double"))
@@ -224,47 +223,15 @@ setMethod("normalize", signature(object = "Image2D"),
             invisible(.CallEBImage("normalizeImages", object, as.double(c(from, to)), independent))
     }
 )
-# OLD implementation
-#setMethod("normalize", signature(object = "Image2D"),
-#    function(object, from = 0, to = 1.0, this = FALSE) {
-#        if (object@rgb)
-#            stop("only grayscale images supported so far")
-#        if (this == FALSE) {
-#            minmax = minMax(object)
-#            if (minmax[[2]] - minmax[[1]] == 0)
-#                return(object)
-#            res = copyImageHeader(object, class(object), FALSE)
-#            res@.Data = (object@.Data - minmax[[1]]) / (minmax[[2]] - minmax[[1]]) * (to - from) + from
-#            return(res)
-#        }
-#        else {
-#            invisible(.CallEBImage("normalizeImages", object, as.double(c(from, to)), FALSE))
-#        }
-#    }
-#)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# DEPRECATED - no use if grayscales are stored as doubles
-#setMethod("to16bit", signature(object = "Image2D"),
-#    function(object, bits = 12, ...) {
-#        if (object@rgb)
-#            stop("to16bit can be used on grayscale objects only")
-#        if (missing(bits))
-#            bits = 12
-#        factor = 2 ^ (16 - bits)
-#        return(as.integer((object + 1) * factor - 1))
-#    }
-#)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("[", signature(x = "Image2D", i = "missing", j = "missing"),
     function(x, i, j, ..., drop) {
-        #print("DEBUG: 2D missing missing")
         return(x)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("[", signature(x = "Image2D", i = "numeric", j = "missing"),
     function(x, i, j, ..., drop) {
-        #print("DEBUG: 2D num missing")
         warning("subscripts [int, ] and [int] cannot be distinguished! [int] is used. Use [int,1:dim(x)[[2]]] instead of [int,]")
         tmp = callGeneric(x@.Data, i)
         if(is.array(tmp)) {
@@ -279,7 +246,6 @@ setMethod("[", signature(x = "Image2D", i = "numeric", j = "missing"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("[", signature(x = "Image2D", i = "missing", j = "numeric"),
     function(x, i, j, ..., drop) {
-        #print("DEBUG: 2D missing num")
         i = 1:(dim(x@.Data)[[1]])
         tmp = callGeneric(x@.Data, i, j)
         if(is.array(tmp)) {
@@ -294,7 +260,6 @@ setMethod("[", signature(x = "Image2D", i = "missing", j = "numeric"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("[", signature(x = "Image2D", i = "array", j = "missing"),
     function(x, i, j, ..., drop) {
-        #print("DEBUG: 2D array missing")
         tmp = callGeneric(x@.Data, i)
         if(is.array(tmp)) {
             res = copyImageHeader(x, class(x), x@rgb)
@@ -308,7 +273,6 @@ setMethod("[", signature(x = "Image2D", i = "array", j = "missing"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("[", signature(x = "Image2D", i = "logical", j = "missing"),
     function(x, i, j, ..., drop) {
-        #print("DEBUG: 2D logical missing")
         tmp = callGeneric(x@.Data, i)
         if(is.array(tmp)) {
             res = copyImageHeader(x, class(x), x@rgb)
@@ -322,7 +286,6 @@ setMethod("[", signature(x = "Image2D", i = "logical", j = "missing"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("[", signature(x = "Image2D", i = "numeric", j = "numeric"),
     function(x, i, j, ..., drop) {
-        #print("DEBUG: 2D numeric numeric")
         tmp = callGeneric(x@.Data, i, j)
         if(is.array(tmp)) {
             res = copyImageHeader(x, class(x), x@rgb)
@@ -353,7 +316,7 @@ setMethod("show", signature(object = "Image2D"),
                 partial = TRUE
             }
             if (partial)
-                cat("\tImage is too large, printing only max 10x10 data matrix.\n\tSet PRINT_ALL_DATA=TRUE to enable 'show' to print all data\n")
+                cat("\tPrinting only max 10x10 data matrix, image too large\n")
         }
         print(object@.Data[1:.dim[[1]], 1:.dim[[2]]])
 #        if (!object@rgb)
@@ -378,7 +341,6 @@ setMethod("as.integer", signature(x = "Image2D"),
         if (!x@rgb)
             stop("as.integer cannot be used on grayscale images")
         if (!is.integer(x))
-            #return(Image2D.CopyHeader(x, as.integer(x@.Data), dim(x)))
             x@.Data = array(as.integer(x@.Data), dim(x@.Data))
         return(x)
     }
@@ -389,7 +351,6 @@ setMethod("as.double", signature(x = "Image2D"),
         if (x@rgb)
             stop("as.double cannot be used on RGB images")
         if (!is.double(x))
-            #return(Image2D.CopyHeader(x, as.double(x@.Data), dim(x)))
             x@.Data = array(as.double(x@.Data), dim(x@.Data))
         return(x)
     }

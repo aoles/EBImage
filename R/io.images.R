@@ -25,13 +25,6 @@ read.image <- function(files, rgb = FALSE) {
     files = as.character(files)
     if (length(files) < 1)
         stop("at least one file/URL must be supplied")
-#    error = file.exists(files)
-#    if(length(error[error == FALSE]) > 0) {
-#        cat("the following files were not found: ")
-#        cat(paste(files[error == FALSE], " ", sep = ''))
-#        cat("\n")
-#        stop("file(s) not found")
-#    }
     rgb = as.logical(rgb)[[1]]
     return(.CallEBImage("readImages", files, rgb))
 }

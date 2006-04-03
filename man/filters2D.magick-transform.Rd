@@ -26,7 +26,6 @@
     \item{x}{An instance of class \code{\link{Image2D}} or \code{\link{Image3D}}. For 3D objects, filters
         will be applied to every single image composed of first two dimensions.}
     \item{degrees}{Angle in degrees for counter-clockwise rotation of the image.}
-    \item{modify}{if set to TRUE original image will be modified (non-standard R behaviour)!}
     \item{dx}{New image width.}
     \item{dy}{New image height.}
 }
