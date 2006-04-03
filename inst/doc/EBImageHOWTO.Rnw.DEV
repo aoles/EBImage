@@ -44,22 +44,18 @@ pagecolor=darkblue,raiselinks,plainpages,pdftex]{hyperref}
 %--------------------------------------------------
 \section{Foreword}
 %--------------------------------------------------
-\ebimage\ is an image processing and manipulation package for \R. The core of \ebimage\ is based on \magick\ C++ library (\pack{Magick++}), which provides all I/O operations as well as some filter routines. On top of \magick\ further routines and algorithms are implemented to support \emph{distance maps}, object counting and other algorithms.
+\ebimage\ is image processing and analysis package for \R. The primary goal of the package is to enable automated or semiautomated analysis of large sets of images, e.g. results of automated microscopy screens.
 
-At the same time \ebimage\ is not a wrapper for \magick. First, in contrast to \magick\ its purpose is to enable straightforward way to manipulate and analyse large image datasets. Images are represented as \R\ objects that are directly derived from \R\ arrays. This on one hand enables flexibility in data manipulation and analysis and on the other provides a way to apply different image processing routines to the data. Second, \ebimage\ does not cover all the routines of \magick\ and is limited to those that are essential and usefull for data analysis. In this way, it is not intended for image enhancing, restoration and similar. Furthermore, further in the development many \magick\ routines will be substituted with native C++ code working directly with \R\ data structures to reduce performance losses that occur during conversions between \R\ and \magick\ data structures.
+Many of \ebimage\ routines are based on \magick\ C++ library (\pack{Magick++}) that provides all I/O operations as well as some filter routines. On top of \magick\ further routines and algorithms are implemented to support \emph{distance maps}, \emph{thresholding}, \emph{object counting} and other.
+
+\ebimage\ is not a wrapper for \magick. First, in contrast to \magick\ its purpose is to enable straightforward way to manipulate and analyse large image datasets. Images are represented as \R\ objects that are directly derived from \R\ arrays. This on one hand enables flexibility in data manipulation and analysis and on the other provides a way to apply different image processing routines to the data. Second, \ebimage\ does not cover all the routines of \magick\ and is limited to those that are essential and usefull for data analysis. In this way, it is not intended for image enhancing, restoration and similar. Furthermore, further in the development many \magick\ routines will be substituted with native C++ code working directly with \R\ data structures to reduce performance losses that occur during conversions between \R\ and \magick\ data structures.
 
 %--------------------------------------------------
-\section{System Requirements and Installation}
+\section{System Requirements}
 %--------------------------------------------------
-\ebimage\ as any image processing software is memory and CPU intensive. There are no formal limitations on system parameters, but it works with unpacked images, therefore sufficient memory is required to keep and process them. Some operations in \ebimage\ require copies of loaded image to be produced and \R\ in addition automatically creates copies of its objects during function calls etc. As an example for memory usage, a single image of 800x600 pixel will need about 3.8Mb of memory just to store it and double as much will be needed to load it because there are two copies of the same unpacked image during loading, saving and displaying.
+\ebimage\ like any image processing software is memory and CPU intensive. There are no formal limitations on system parameters, but it works with unpacked images, therefore sufficient memory is required to keep and process them. Some operations in \ebimage\ require copies of loaded image to be produced and \R\ automatically creates copies of its objects during function calls etc. As an example for memory usage, a single image of 800x600 pixel will need about 3.8Mb of memory just to store it and double as much will be needed to load it because there are two copies of the same unpacked image during loading, saving and displaying.
 
-At the current developmen stage \ebimage\ was designed and tested on Linux and Unix machines only. Both 32-bit and 64-bit platforms are supported. Installation of \ebimage\ requires that development versions of \magick\ and {\it Magick++} are installed on the system. Additional requirements include POSIX threads and Standard Template Library (STL), which are normally a part of any standard Linux installation. Provided the above libraries are present, \ebimage\ can be installed as any other \R\ package by issuing
-\\
-\\
-\file{R CMD INSTALL EBImage}
-\\
-\\
-After installing \ebimage\ and starting \R, the package can be loaded by issuing
+At the current developmen stage \ebimage\ was designed and tested on Linux and Unix machines only. Both 32-bit and 64-bit platforms are supported. Installation of \ebimage\ requires that development versions of \magick\ and {\it Magick++} are installed on the system. Additional requirements include POSIX threads and Standard Template Library (STL), which are normally parts of any standard Linux installation.
 
 <<>>=
 library("EBImage")
@@ -68,13 +64,13 @@ library("EBImage")
 %--------------------------------------------------
 \section{Data Structures and Image I/O}
 %--------------------------------------------------
-Images in \ebimage\ are stored in objects of class \image\ for single 2D images and \code{Image3D} for image stacks (like TIFF files) or 3D images. \image\ class is directly derived from \R\ \code{array} class, thus it supports all operations that are defined for arrays. Most of standard operations were redefined in a way that the result of the operation is again \image. This inheritance also ensures that subscript operations applied to images are optimized for performance because those for \code{array} class are implemented in native C. Several additional methods are defined for \image\ over \code{array} to enable image IO, color mode conversions, data normalization etc.
+Images in \ebimage\ are stored in objects of class \image\ for 2D images and \code{Image3D} for image stacks (like TIFF files) or 3D images. \image\ class is derived directly from \R\ \code{array}, thus it supports all operations that are defined for arrays. Most of standard operations were redefined in a way that the result of the operation is again \image. This inheritance also ensures that subscript operations applied to images are optimized for performance because those for \code{array} class are implemented in native C. Several additional methods are defined for \image\ over \code{array} to enable image IO, color mode conversions, data normalization etc.
 
 Information about the color mode of the image can be accessed via its slot \code{rgb}.
 
-It is advisable to use methods defined for \image\ to operate with image data, however using the inherited slot \code{.Data} will give direct access to the array.
+It is advisable to use methods defined for \image\ to operate with image data, however using the inherited slot \code{.Data} will give a direct access to the data array!
 
-Image data are stored as double values that should be normalized to the range [0..1] for grayscale or binary images. Colored (RGB) images are stored as signed integer values, in byte-per-color representation. The highest byte must always be kept 0 in order to enable correct opacity transformations between \R\ and \magick. Whereas all mathematical operations are perfectly correct on grayscale images, RGB data is meaningless for many such operations. In some cases arithmetic operations of + and - are useful though also for RGB images as well.
+Image data are stored as double values that should be normalized to the range [0..1] for grayscale or binary images. Colored (RGB) images are stored as integer values, in byte-per-color representation. The highest byte must always be kept 0 in order to enable correct opacity transformations between \R\ and \magick. Whereas all mathematical operations are perfectly correct on grayscale images, RGB data is meaningless for many such operations. In some cases arithmetic operations of + and - are useful though also for RGB images as well.
 
 \ebimage\ can work with both locally stored images and those located on remote servers. Protocols supported include FTP, HTTP and all other supported by \magick.
 
@@ -83,7 +79,7 @@ Image data are stored as double values that should be normalized to the range [0
 <<>>=
 server = "http://www.ebi.ac.uk"
 file = "/~osklyar/projects/EBImage/examples/example.tif"
-ping.image(paste(server, file, sep=""))
+#ping.image(paste(server, file, sep=""))
 @
 
 Images can be loaded with \code{read.image}. The function automatically discovers image types for every individual file in the \code{files} argument, calculates number of images and returns an \image\ or \code{Image3D} object as result. \ebimage\ is mainly designed to work with grayscale images, therefore, if not specified otherwise \code{read.image} converts all data to grayscale on load. For instance, to load an example image from \ebimage\ project page one can issue
@@ -165,6 +161,15 @@ write.image(im2, "imageCrop.png")
 @
 \includegraphics[width=60mm]{imageCrop.png}
 
+...
+\emph{to be continued...}
+
+%--------------------------------------------------
+\section{Simple Image Data Manipulation and Image Arithmetics}
+%--------------------------------------------------
+
+Vignette is under development! Please check the package web page for updates of the manual:
+\url{http://www.ebi.ac.uk/~osklyar/projects/EBImage}
 
 \end{document}
 
