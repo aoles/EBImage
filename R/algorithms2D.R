@@ -20,16 +20,3 @@ objectCount <- function(x, ref = NULL, minArea = 20, maxRadius = 100, tolerance 
     param = c(minArea, maxRadius, tolerance, maxObjects)
     return(.CallEBImage("objectCount", x, ref, as.double(param)))
 }
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#paintObjectCountMap <- function(x) {
-#    .notImageError(x)
-#    y = toRGB(-x)
-#    nlevels = range(-x)[[2]]
-#    for (i in 1:nlevels) {
-#        cols = as.integer(runif(3,100,255))
-#        color = cols[[1]] + cols[[2]] * 255 + cols[[3]] * 65535
-#        y[x == - i] = color
-#    }
-#    return(y)
-#}
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
