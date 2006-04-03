@@ -33,9 +33,7 @@
 }
 
 \value{
-    For 2D images returns a matrix with two values for every object found - its index and its size in pixel.
-
-    For 3D images a list of such matrices is returned, one for each 2D image.
+    A matrix with five values for every object found: ID of the image (0 for \code{Image2D}, image index fo \code{Image3D}), x coordinate, y coordinate of the object, object size, intensity/size (if size is non-zero) or just intensity valu (meaningful only if \code{ref} argument is not NULL.)
 }
 
 \seealso{
@@ -60,11 +58,6 @@
     dm = distMap(im)
     # get object count and object indexes
     objects = objectCount(dm)
-    index = objects[1,]
-    # display object centers as red dots on the segmented image
-    im = toRGB(im)
-    im[index] = 255
-    # run this: display(im)
 }
 
 \keyword{dplot}
