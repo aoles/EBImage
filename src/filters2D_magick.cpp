@@ -1,4 +1,4 @@
-#include "stdFilters.h"
+#include "filters2D_magick.h"
 #include "conversions.h"
 
 #include <R_ext/Error.h>

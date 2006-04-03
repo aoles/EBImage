@@ -19,7 +19,6 @@ end
 */
 #include "conversions.h"
 #include <R_ext/Error.h>
-/* #include <cmath> */
 #include <vector>
 #include <iostream>
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -53,7 +52,7 @@ SEXP objectCount(SEXP rimage, SEXP rOrigImage, SEXP params) {
         double * data;
         double * origData;
         SEXP res = R_NilValue;
-        // for a stack we return a list, otherwise a single matrix
+        /* for a stack we return a list, otherwise a single matrix */
         if (nimages > 1)
             PROTECT(res = allocVector(VECSXP, nimages));
         SEXP * items = new SEXP[nimages];
@@ -63,25 +62,24 @@ SEXP objectCount(SEXP rimage, SEXP rOrigImage, SEXP params) {
         VectorDouble id, x, y, size, intensity;
         double par[4];
         for (int i = 0; i < 4; i++)
-            par[i] = REAL(params)[i]; // 0 -min size, 1 - max size, 2 - tolerance, 3 - max objects
-//        cout << maxsize << endl;
+            par[i] = REAL(params)[i]; /* 0 -min size, 1 - max size, 2 - tolerance, 3 - max objects */
         for (int i = 0; i < nimages; i++) {
             id.clear();
             x.clear();
             y.clear();
             size.clear();
             intensity.clear();
-            // it is assumed that rimage is alread a distMap!!!
-            // otherwise run the next line
-            // calc_dist_map(data, ncol, nrow, algorithm);
+            /* it is assumed that rimage is alread a distMap!!!
+               otherwise run the next line
+               calc_dist_map(data, ncol, nrow, algorithm); */
             data = &(REAL(rimage)[i * imsize.col * imsize.row]);
             if (rOrigImage != R_NilValue)
                 origData = &(REAL(rOrigImage)[i * imsize.col * imsize.row]);
             else
                 origData = NULL;
-            // indexes and sizes of objects within one image are returned in vectors
+            /* indexes and sizes of objects within one image are returned in vectors */
             object_count(data, origData, imsize, par, x, y, size, intensity);
-            // copy all returned values to the list element
+            /*  copy all returned values to the list element*/
             int nobjects = x.size();
             for (int j = 0; j < nobjects; j++)
                 id.push_back(i);
@@ -101,20 +99,9 @@ SEXP objectCount(SEXP rimage, SEXP rOrigImage, SEXP params) {
                     REAL(items[i])[j + 4 * nobjects] = intensity[j] / size[j];
                 else
                     REAL(items[i])[j + 4 * nobjects] = intensity[j];
-
-/*
-                REAL(items[i])[j * 5]     = id[j];
-                REAL(items[i])[j * 5 + 1] = x[j];
-                REAL(items[i])[j * 5 + 2] = y[j];
-                REAL(items[i])[j * 5 + 3] = size[j];
-                if (size[j] != 0)
-                    REAL(items[i])[j * 5 + 4] = intensity[j] / size[j];
-                else
-                    REAL(items[i])[j * 5 + 4] = intensity[j];
-*/
             }
         }
-        // add all list elements to the list
+        /* add all list elements to the list */
         if (nimages > 1)
             for (int i = nimages - 1; i >= 0; i--) {
                 SET_VECTOR_ELT(res, i, items[i]);
@@ -123,15 +110,15 @@ SEXP objectCount(SEXP rimage, SEXP rOrigImage, SEXP params) {
             res = items[0];
         delete[] items;
         delete[] dims;
-        UNPROTECT(2 * nimages); // items[] and dims[]
+        UNPROTECT(2 * nimages); /* items[] and dims[] */
         if (nimages > 1)
-            UNPROTECT(1); // res
+            UNPROTECT(1); /* res */
         return res;
     }
     catch(...) {
         error("exception within distMap c++ routine");
     }
-    // if it comes to this point I will be surprised
+    /* if it comes to this point I will be surprised */
     return R_NilValue;
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -217,41 +204,3 @@ void object_count(double* data, double* origData, ColRow& imsize, double* param,
     }
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-/* claculates nearest neighbours */
-/* moved in extended version to Biobase as matchpt
-SEXP nn(SEXP x) {
-    int * dim = INTEGER(GET_DIM(x));
-    int nrow = dim[0];
-    int ncol = dim[1];
-    SEXP res;
-    PROTECT(res = allocVector(REALSXP, dim[0] * 2));
-    double dist, mdist, tmp;
-    for (int i = 0; i < dim[0]; i++) {
-        int index = i;
-        mdist = DBL_MAX;
-        for (int j = 0; j < dim[0]; j++) {
-            if (i == j) continue;
-            dist = 0;
-            for (int k = 0; k < ncol; k++) {
-                tmp = REAL(x)[INDEX(i, k, nrow)] - REAL(x)[INDEX(j, k, nrow)];
-                dist += tmp * tmp;
-            }
-            dist = sqrt(dist);
-            if (dist < mdist) {
-                index = j;
-                mdist = dist;
-            }
-        }
-        REAL(res)[INDEX(i, 0, nrow)] = index + 1;
-        REAL(res)[INDEX(i, 1, nrow)] = mdist;
-    }
-    SEXP newDim;
-    PROTECT(newDim = allocVector(INTSXP, 2));
-    INTEGER(newDim)[0] = dim[0];
-    INTEGER(newDim)[1] = 2;
-    SET_DIM(res, newDim);
-    UNPROTECT(2);
-    return res;
-}
-
-*/

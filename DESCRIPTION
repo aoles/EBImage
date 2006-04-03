@@ -1,11 +1,11 @@
 Package: EBImage
-Version: 1.0.2
-Date: 31 Mar 2006
+Version: 1.0.3
+Date: 03 Apr 2006
 Title: EBImage: R image processing toolkit
 Author: Oleg Sklyar <osklyar@ebi.ac.uk>, Wolfgang Huber <huber@ebi.ac.uk>
 Maintainer: Oleg Sklyar <osklyar@ebi.ac.uk>
 Depends: R (>= 2.0.0)
-Description: Image processing toolkit for R (image IO, conversion, display, processing). Requires: Magick++ of ImageMagick. Early development stage.
+Description: Image processing and analysis toolkit for R (image IO, conversion, display, processing). Requires: Magick++ of ImageMagick.
 License: LPGL
 URL: http://www.ebi.ac.uk/~osklyar/projects/EBImage/
 SaveImage: yes

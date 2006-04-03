@@ -75,7 +75,7 @@ SEXP stack2SEXP(MagickStack& stack, bool rgb) {
         nProt++;
         LOGICAL(isrgb)[0] = rgb;
         SET_SLOT(rimage, mkString("rgb"), isrgb);
-// TODO MUST CREATE ALL SLOTS HERE OTHERWISE THEY WILL BE MISSING
+/* TODO MUST CREATE ALL SLOTS HERE OTHERWISE THEY WILL BE MISSING: no slots defined at the moment */
         if (nProt > 0) {
             int nUnprotect = nProt;
             nProt = 0;
@@ -311,7 +311,7 @@ SEXP getRed(SEXP rgb) {
         PROTECT(res = allocVector(INTSXP, nval));
         void * dest = &(REAL(res)[0]);
         image.opacity(OpaqueOpacity);
-        //image.type(GrayscaleType);
+        /* image.type(GrayscaleType); */
         image.write(0, 0, nval, 1, "R", DoublePixel, dest);
         UNPROTECT(1);
         return res;
@@ -333,7 +333,7 @@ SEXP getGreen(SEXP rgb) {
         PROTECT(res = allocVector(INTSXP, nval));
         void * dest = &(REAL(res)[0]);
         image.opacity(OpaqueOpacity);
-        //image.type(GrayscaleType);
+        /* image.type(GrayscaleType); */
         image.write(0, 0, nval, 1, "G", DoublePixel, dest);
         UNPROTECT(1);
         return res;
@@ -355,7 +355,7 @@ SEXP getBlue(SEXP rgb) {
         PROTECT(res = allocVector(INTSXP, nval));
         void * dest = &(REAL(res)[0]);
         image.opacity(OpaqueOpacity);
-        //image.type(GrayscaleType);
+        /* image.type(GrayscaleType); */
         image.write(0, 0, nval, 1, "B", DoublePixel, dest);
         UNPROTECT(1);
         return res;

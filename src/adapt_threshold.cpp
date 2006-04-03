@@ -4,7 +4,6 @@
 #include <R_ext/Error.h>
 #include <R_ext/Memory.h>
 #include <string>
-/* #include <iostream> */
 
 using namespace std;
 
