@@ -4,9 +4,9 @@
 
 \docType{function}
 
-\title{Image Distance Maps}
+\title{Internal Adeptive Threshold Algorithm}
 \description{
-    \code{thresh} is the \code{EBImage} implementation of the adaptive threshold. It uses
+    \code{thresh} is the \code{EBImage} implementation of adaptive threshold. It uses
     a moving frame of \code{width} and \code{height} given as arguments to the function
     to estimate the intensity mean values and calculate the threshold. The function is
     implemented to substitute the \code{ImageMagick} \code{\link{adaptThresh}} function
