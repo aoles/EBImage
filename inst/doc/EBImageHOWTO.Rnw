@@ -169,7 +169,7 @@ write.image(im2, "imageCrop.png")
 %--------------------------------------------------
 
 Vignette is under development! Please check the package web page for updates of the manual:
-\url{http://www.ebi.ac.uk/~osklyar/projects/EBImage}
+http://www.ebi.ac.uk/\~osklyar/projects/EBImage.
 
 \end{document}
 
