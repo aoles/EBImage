@@ -1,18 +1,4 @@
-/*
-idea: how to count objects based on original distance maps
---------------------------------------------------
-while (maxValue of the array > 0)
-    - get index of the first occurance of the max value. one of our objects
-    - values at points about this one are not larger - add them to the selection
-      until we hit background or the neighbouring value will be larger than at the current
-      point or we reach the maximum radius (= max object diameter)
-    - the size of the selection - somehow proportional to the object size (think of it)
-      as well as the value at the max point is proportional to the object size
-    - reset the selection to the background to exclude from consequent runs!
-end
-*/
-
-#include "objectcount.h"
+#include "algorithms2D.h"
 /* this one is not needed as input is considered to be the result of distmap
    but if this changes uncomment it
 #include "distmaps.h"
@@ -38,6 +24,19 @@ struct ColRow {
 typedef vector<int> VectorInt;
 typedef vector<double> VectorDouble;
 const double BACKGROUND = 0;
+/*
+Object count idea: how to count objects based on original distance maps
+--------------------------------------------------
+while (maxValue of the array > 0)
+    - get index of the first occurance of the max value. one of our objects
+    - values at points about this one are not larger - add them to the selection
+      until we hit background or the neighbouring value will be larger than at the current
+      point or we reach the maximum radius (= max object diameter)
+    - the size of the selection - somehow proportional to the object size (think of it)
+      as well as the value at the max point is proportional to the object size
+    - reset the selection to the background to exclude from consequent runs!
+end
+*/
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void object_count(double* data, double* origData, ColRow& imsize, double* param, VectorDouble& x, VectorDouble& y, VectorDouble& size, VectorDouble& intensity);
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
