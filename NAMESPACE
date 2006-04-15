@@ -3,7 +3,7 @@ export(
     "Image2D", "Image3D", "copyImageHeader", "copyImage",
 
     "adaptThresh", "blur", "contrast", "despeckle", "edge", "enhance", "equalize",
-    "colorGamma", "gaussFilter", "medianFilter", "mod", "redNoise",
+    "colorGamma", "gaussFilter", "medianFilter", "mod", "reduceNoise",
     "rotate", "sampleImage", "scaleImage", "segment", "shade", "sharpen", "solarize",
     "spread", "unsharpMask", "noise", "distMap", "thresh",
 

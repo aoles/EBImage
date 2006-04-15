@@ -40,22 +40,19 @@ setGeneric("isCorrectType", function(object)    standardGeneric("isCorrectType")
 # ============================================================================
 # CONSTRUCTORS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Image2D <- function(data = array(0, c(2, 2)), dim = NULL, rgb = FALSE) {
-    if (!is.array(data) && is.null(dim))
-        stop("'data' argument must be array or 'dim' argument must be specified")
-    if (!is.null(dim))
-        if (length(dim) > 2)
-            warning("only two first elements of 'dim' will be used to create image matrix")
-    if (is.array(data) && is.null(dim))
-        dim = dim(data)
-    res = new("Image2D", rgb = rgb)
-    if (rgb)
-        res@.Data = array(as.integer(data), dim[1:2])
-    else
-        res@.Data = array(as.double(data), dim[1:2])
-    return(res)
+Image2D <- function(data = array(0, c(2, 2)), dim, rgb = FALSE) {
+  if (!missing(dim)) {
+    if (length(dim) != 2)
+      stop("'dim' must be vector of length 2.")
+  } else {
+    if (!is.array(data))
+      stop("If 'dim' is not specified, 'data' must be an array.")
+    dim = dim(data)
+  }
+  new("Image2D", rgb = rgb, .Data =
+      array(if (rgb) as.integer(data) else as.double(data), dim))
 }
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 copyImageHeader <- function(x, newClass = "Image2D", rgb = FALSE) {
     .notImageError(x)
     if (rgb)
@@ -232,7 +229,7 @@ setMethod("[", signature(x = "Image2D", i = "missing", j = "missing"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("[", signature(x = "Image2D", i = "numeric", j = "missing"),
     function(x, i, j, ..., drop) {
-        warning("subscripts [int, ] and [int] cannot be distinguished! [int] is used. Use [int,1:dim(x)[[2]]] instead of [int,]")
+        warning("subscripts [int, ] and [int] cannot be distinguished! [int] is used. Use [int,1:dim(x)[2]] instead of [int,]")
         tmp = callGeneric(x@.Data, i)
         if(is.array(tmp)) {
             res = copyImageHeader(x, class(x), x@rgb)
@@ -246,7 +243,7 @@ setMethod("[", signature(x = "Image2D", i = "numeric", j = "missing"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("[", signature(x = "Image2D", i = "missing", j = "numeric"),
     function(x, i, j, ..., drop) {
-        i = 1:(dim(x@.Data)[[1]])
+        i = 1:(dim(x@.Data)[1])
         tmp = callGeneric(x@.Data, i, j)
         if(is.array(tmp)) {
             res = copyImageHeader(x, class(x), x@rgb)
@@ -299,26 +296,23 @@ setMethod("[", signature(x = "Image2D", i = "numeric", j = "numeric"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("show", signature(object = "Image2D"),
     function(object) {
-        .dim = dim(object)
-        cat(paste("Image2D: ", .dim[[1]], "x", .dim[[2]], "\n", sep =""))
+        d = dim(object)
+        cat(paste("Image2D: ", d[1], "x", d[2], "\n", sep =""))
         if (object@rgb)
             cat("\tType: RGB, 8-bit per color\n")
         else
-            cat(paste("\tType: grayscale, doubles in the range [0..1]\n"))
+            cat(paste("\tType: grayscale, double precision\n"))
         if (!PRINT_ALL_DATA) {
-            partial = FALSE
-            if (.dim[[1]] > 10) {
-                .dim[[1]] = 10
-                partial = TRUE
-            }
-            if (.dim[[2]] > 10) {
-                .dim[[2]] = 10
-                partial = TRUE
-            }
-            if (partial)
-                cat("\tPrinting only max 10x10 data matrix, image too large\n")
+            partial = rep(FALSE, 2)
+            for(j in 1:2)
+              if (d[j] > 10) {
+                d[j] = 10
+                partial[j] = TRUE
+              }
+            if (any(partial))
+                cat(sprintf("\tShowing rows 1:%d and columns 1:%d\n", d[1], d[2]))
         }
-        print(object@.Data[1:.dim[[1]], 1:.dim[[2]]])
+        print(object@.Data[1:d[1], 1:d[2]])
 #        if (!object@rgb)
 #            print(summary(as.numeric(object@.Data)))
         invisible(NULL)
@@ -329,10 +323,7 @@ setMethod("minMax", signature(object = "Image2D"),
     function(object) {
         if (object@rgb)
             stop("only grayscale images supported so far")
-        res = integer(2)
-        res[[1]] = min(object@.Data)
-        res[[2]] = max(object@.Data)
-        return(res)
+        return(c(min(object@.Data), max(object@.Data)))
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

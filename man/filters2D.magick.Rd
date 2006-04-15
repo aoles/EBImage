@@ -28,7 +28,7 @@
     \describe{
         \item{\code{\link{Enhancing 2D Filters}}:}{\code{noise}, \code{blur},
             \code{despeckle}, \code{enhance}, \code{gaussFilter},
-            \code{medianFilter}, \code{redNoise}, \code{sharpen},
+            \code{medianFilter}, \code{reduceNoise}, \code{sharpen},
             \code{spread}, \code{unsharpMask}}
         \item{\code{\link{Segmentation 2D Filters}}:}{\code{adaptThresh}, \code{edge},
             \code{segment}, \code{ffill}, \code{ffillEdge}}
