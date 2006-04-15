@@ -31,22 +31,32 @@
 }
 
 \description{
-    A class to work with 2D images in R. This is the basic class to hold image
-    data and parameters. The class is directly derived from \code{array}, which ensures
-    fast operations with image data (including subsetting etc). Data is stored in \code{integer}
-    format for RGB and in double grayscale images. RGB images are 8-bit-based per channel, whereas
-    grayscale images are in the range 0..1. User must take care that the internal
-    data type of the \code{Image2D} array stays correct\code{integer}, otherwise it is recommended
-    to run the \code{correctType} or overrriden \code{as.integer} and \code{as.double} to turn image
-    data into the correct representation. \code{correctType} is used automatically wherever necessary
-    (e.g. in calls to C++ routines if argument is copied!).
+A class to work with 2D images in R. This is the basic class to hold image
+data and parameters. The class is directly derived from \code{\link{array}}, which permits
+efficient operations on image data (including subsetting, arithmetic etc).
+
+RGB images are coded by 8 bits per channel, 24 bits per pixel, stored in
+an R \code{integer} array.
+Grayscale images are coded by 8 Byte (\code{double} precision floating
+point) per pixel.
+
+%% Fixme: I am not sure whether this is the right place to explain this.
+%% Better would be a separate man page for 'correctType'. Do the users
+%% really always need to worry about such "low-level" stuff, or just if
+%% they do wild things? Also, the next sentence cannot be parsed as English :)
+%
+% User must take care that the internal
+% data type of the \code{Image2D} array stays correct\code{integer}, otherwise it is recommended
+% to run the \code{correctType} or overrriden \code{as.integer} and \code{as.double} to turn image
+% data into the correct representation. \code{correctType} is used automatically wherever necessary
+% (e.g. in calls to C++ routines if argument is copied!).
 }
 
 \section{Creating Objects}{
     \describe{
         \item{\code{Image2D(data, dim, rgb)}:}{Default constructor. Executed with no parameters,
-            an empty (black) 2D grayscale image of 2x2 pixels is created. If \code{data} is an
-            array of 2x2, \code{dim} can be omitted.}
+            a 2D grayscale image is created with 2x2 pixels whose values are 0. If \code{data} is a
+            two-dimensional array, \code{dim} can be omitted.}
         \item{\code{copyImage(x)}:}{Ensures that object data is copied into a new variable and not
             just a pointer is associated to a new variable, as in case of a=b. Adviseable to do
             a = copyImage(b)}

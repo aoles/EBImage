@@ -11,12 +11,11 @@
 \concept{image processing}
 
 \title{
-    Filters that Add Some Segmentation Capabilities for 2D Images and Image Stacks
+2D segmentation filters for images and image stacks
 }
 
 \description{
-    Filters to start with image segmentation. Operate on both grayscale and RGB
-    images.
+Image segmentation filters, operating on both grayscale and RGB images.
 }
 
 \usage{
@@ -29,36 +28,40 @@
 
 \arguments{
     \item{x}{An instance of class \code{\link{Image2D}} or \code{\link{Image3D}}. For 3D objects, filters
-        will be applied to every single image composed of first two dimensions.}
-    \item{cluster}{Specifies the cluster threashold, as the number of pixels each cluster must exceed
-        for the cluster to be considered valid.}
-    \item{smooth}{Smoothing threshold to eliminate noise in the second derivative of the histogram.
+        will be applied separately to each 2D slice corresponding to the first two dimensions.}
+    \item{cluster}{Numeric scalar specifying the cluster threshold, that
+      is the number of pixels a cluster must exceed for it to be considered valid.}
+    \item{smooth}{Numeric scalar specifying the smoothing parameter
+      which is used to eliminate noise in the second derivative of the histogram.
         A larger value results in a smoother second derivative.}
-    \item{modify}{if set to TRUE original image will be modified (non-standard R behaviour)!}
+    \item{modify}{Logical scalar, if TRUE, \code{x} will be
+      modified in place (for performance and contrary to usual R pass-by-value semantics; see vignette)}
 %    \item{col}{x-position of the target pixel.}
 %    \item{row}{y-position of the target pixel.}
 %    \item{color}{For \code{ffill} the color to replace with, for \code{ffillEdge} the color
 %        of the border until which the flood fill will spread.}
-    \item{width}{x-pixel region to evaluate the mean.}
-    \item{height}{y-pixel region to evaluate the mean.}
-    \item{offset}{In order to remove residual noise from the background, the threshold may be adjusted
-        by subtracting this constant from the mean to compute the threshold.}
-    \item{preprocess}{If \code{TRUE} \code{gaussFilter} with arguments 4, 2 is applied to the normalized image first.}
-    \item{radius}{Specifies the radius of the neighborhood in \code{edge}, with a zero value leading to
+    \item{width}{Numeric scalar, window size in \emph{x}-direction.}
+    \item{height}{Numeric scalar, window size in \emph{y}-direction.}
+    \item{offset}{Numeric scalar, in order to remove noise from
+      the background, the threshold may be adjusted
+      by subtracting this constant from the mean to compute the threshold.}
+    \item{preprocess}{Logical scalar, if \code{TRUE}, the image is
+      normalized and a \code{gaussFilter} with arguments \code{width=4},
+      \code{sigma=2} is applied before calling the adaptive thresholding.}
+    \item{radius}{Numeric scalar, the  neighborhood radius. A value of zero leads to
         an automatic radius selection.}
 }
 
 \value{
-    If \code{modify==FALSE}, a new instance of class \code{\link{Image2D}} or \code{\link{Image3D}}
-    with the same characteristics as the original, but with filter applied (to every single 2D
-    image if source is 3D).
+If \code{modify} is \code{FALSE}, a new instance of class \code{\link{Image2D}} or \code{\link{Image3D}}
+with the same dimensions as \code{x}, but with filter(s) applied.
 
-    If \code{modify==TRUE}, invisible original image after modification!
+If \code{modify} is \code{TRUE}, the invisible modified \code{x}.
 }
 
 \details{
     \code{segment} coalesces similar image components by analyzing histograms of the color
-    components and identifying units that are homogeneous with the fuzzy c-means technique.
+    components and identifying units that are homogeneous by fuzzy c-means clustering.
 
     \code{adaptThresh} applies adaptive thresholding to the image. It is useful if the
     ideal threshold level is not known in advance, or if the illumination gradient is not constant
@@ -67,7 +70,7 @@
 
     \code{edge} edges the image.
 
-    \code{ffill} and \code{ffillEdge} not implemented yet!
+%    \code{ffill} and \code{ffillEdge} not implemented yet!
 }
 
 \seealso{

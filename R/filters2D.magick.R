@@ -190,7 +190,7 @@ mod <- function(x, brightness = 1, saturation = 1, hue = 1, modify = FALSE) {
         invisible(.CallEBImage("stdFilter2D", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-redNoise <- function(x, order = NULL, modify = FALSE) {
+reduceNoise <- function(x, order = NULL, modify = FALSE) {
     .notImageError(x)
     if (is.null(order))
         order = -1
