@@ -8,22 +8,23 @@
 }
 
 \description{
-    So far \code{EBImage} features 24 image filters available from ImageMagick that
-    operate on 2D images or on image stacks (\code{Image3D}). It is important to
-    understand that for these filters every single 2D image in a 3D stack is considered
-    as independent, therefore if for example \code{\link{blur}} is applied, it
-    is sequentially applied to every 2D image in a stack without blurring in the third
-    dimension.
+Image filters operate on 2D images or on image stacks (\code{Image3D}).
+Many of them are from the ImageMagick library.
+When applied to a 3D image stack, filters are run separately and
+independently on each 2D image.
 }
 
 \details{
-    All functions accept an object of class \code{\link{Image2D}} or \code{\link{Image3D}} plus
-    arguments specific for that filter.
+ The functions accept an object of class \code{\link{Image2D}} or \code{\link{Image3D}} plus
+ further filter-specific arguments.
 }
 
 \seealso{
     \code{\link{Image2D}}, \code{\link{Image3D}}
-
+% FIXME:
+% why so much redundancy in the documentation - this will be tedious to
+% maintain when things evolve. Here just link to the "segment", "enhance"
+% etc. and provide further details (e.g. function names) there.
     ImageMagick-based filters:
     \describe{
         \item{\code{\link{Enhancing 2D Filters}}:}{\code{noise}, \code{blur},
@@ -40,12 +41,8 @@
     }
 }
 
-\source{
-    R sources in 'R/filters.standard2D.R' and C++ sources in 'inst/src/stdFilters.cpp' of package 'EBImage'.
-}
-
 \references{
-    \emph{ImageMagick}: \url{http://www.imagemagick.org}.
+  \emph{ImageMagick}: \url{http://www.imagemagick.org}.
 }
 
 \author{
@@ -54,6 +51,7 @@
 
 \examples{
     # FIXME: load image, increase brightness, save image
+% FIXME: this does not really look like an example for filters
     \dontrun{im = read.image("test.tif")}
     \dontrun{im = im + 1000}
     \dontrun{write.image(im, "test1.tif")}

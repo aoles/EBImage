@@ -10,7 +10,8 @@
     a moving frame of \code{width} and \code{height} given as arguments to the function
     to estimate the intensity mean values and calculate the threshold. The function is
     implemented to substitute the \code{ImageMagick} \code{\link{adaptThresh}} function
-    and prevent converting data from \code{R} to \code{ImageMagick} format.
+    and prevent converting data from \code{R} to \code{ImageMagick}
+    format.
 }
 
 \usage{
@@ -27,10 +28,10 @@
 }
 
 \value{
-    If \code{modify==FALSE} a new instance of class \code{\link{Image2D}} or \code{\link{Image3D}}
-    with the same characteristics as the original, but with filter applied.
+If \code{modify} is \code{FALSE}, a new instance of class \code{\link{Image2D}} or \code{\link{Image3D}}
+with the same dimensions as \code{x}, but with filter(s) applied.
 
-    If \code{modify==TRUE} invisible original image, modified by the function.
+If \code{modify} is \code{TRUE}, the invisible modified \code{x}.
 }
 
 \seealso{
