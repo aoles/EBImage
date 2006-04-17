@@ -24,7 +24,7 @@
 
 \arguments{
     \item{x}{An instance of class \code{\link{Image2D}} or \code{\link{Image3D}}. For 3D objects, filters
-        will be applied to every single image composed of first two dimensions.}
+        will be applied separately to each 2D slice corresponding to the first two dimensions.}
     \item{degrees}{Angle in degrees for counter-clockwise rotation of the image.}
     \item{dx}{New image width.}
     \item{dy}{New image height.}
@@ -32,8 +32,7 @@
 
 \value{
     A new instance of class \code{\link{Image2D}} or \code{\link{Image3D}}
-    with the same characteristics as the original, but with filter applied (to every single 2D
-    image if source is 3D).
+    with the same characteristics as the original, but with filter applied.
 }
 
 \details{

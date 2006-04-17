@@ -6,10 +6,12 @@
 
 \title{Image Distance Maps}
 \description{
-    \code{distMap} operates on grayscale or binary images calculating for every pixel in an
-    image distance to the closest background pixel (black). The result is an image itself, in which
-    each pixel carries the distance of the original pixel to background. Distance Maps are used as
-    input for \code{\link{objectCount}} algorithm.
+\code{distMap} operates on grayscale images that are interpreted as
+binary, with two classes of pixels: those with a value of 0 are
+considerd "background", all others are considered "foreground".
+For every pixel the function calculates the distance to the nearest
+background pixel. Distance maps are useful for segmentation if objects
+overlap, and for deriving object size and shape descriptors.
 }
 
 \usage{
@@ -18,17 +20,22 @@
 \arguments{
     \item{x}{An instance of class \code{\link{Image2D}} or \code{\link{Image3D}}. For 3D objects,
         the algorithm will be applied to every single image composed of first two dimensions.}
-    \item{alg}{Character for the algorithm to use. Default value is for algorithm designed
-        specifically for EBImage. Currently, the only alternative is Lotufo\_Zampirolli
-        which does not return real distances to the background though.}
-    \item{modify}{If \code{TRUE}, original image will be modified without copying the data!}
+    \item{alg}{Character scalar, the algorithm to use. The default value
+      is exact, simple and slow. Currently, the only alternative is \code{Lotufo\_Zampirolli}
+      which does not return real distances to the background though.}
+% FIXME - can you please explain, what do you mean by "real" and if it
+% does not work, we should not support it (but I suppose it does work,
+% we just need to understand and document it properly)
+    \item{modify}{Logical scalar, if TRUE, \code{x} will be
+      modified in place (for performance and contrary to usual R pass-by-value semantics; see vignette)}
 }
 
 \value{
-    If \code{modify==FALSE} a new instance of class \code{\link{Image2D}} or \code{\link{Image3D}}
-    with the same characteristics as the original, but with filter applied.
-
-    If \code{modify==TRUE} invisible original image, modified by the function.
+If \code{modify} is \code{FALSE}, a new instance of class
+\code{\link{Image2D}} or \code{\link{Image3D}} with the same dimensions
+as \code{x}. If \code{modify} is \code{TRUE}, the invisible modified
+\code{x}.  It contains the distances of the foreground pixels of
+\code{x} to the background.
 }
 
 \seealso{
@@ -36,11 +43,11 @@
 }
 
 \source{
-    The C code for this function was adapted from the \code{animal} imaging library by Ricardo Fabbri.
+The C code for the Lotufo-Zampirolli algorithm was adapted from the \code{animal} imaging library by Ricardo Fabbri.
 }
 
 \references{
-    The algorithm \code{Lotufo\_Zampirolli} is from R. Lotufo, F. Zampirolli, SIBGRAPI 2001, 100-105, 2001.
+The algorithm \code{Lotufo\_Zampirolli} is from R. Lotufo, F. Zampirolli, SIBGRAPI 2001, 100-105, 2001.
 }
 
 \author{
@@ -56,6 +63,15 @@
     # calculate distance map from the originally copied image
     dm = distMap(imCopy)
     # compare original image, im, with dm or run objectCount for im or dm
+
+
+x=Image2D(numeric(100), dim=c(10,10))
+for(j in 2:9) x[2:9, j]=1
+
+d1 = distMap(x, "Lotufo_Zampirolli")
+d2 = distMap(x)
+identical(sqrt(d1),  d2)
+
 }
 
 \keyword{dplot}
