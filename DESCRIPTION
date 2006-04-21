@@ -9,3 +9,4 @@ Description: Image processing and analysis toolkit for R (image IO, conversion, 
 License: LPGL
 URL: http://www.ebi.ac.uk/~osklyar/projects/EBImage/
 SaveImage: yes
+biocViews: Visualization
