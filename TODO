@@ -8,7 +8,7 @@ Classes
 1.) I am wondering whether it would not be possible to unify the
 classes Image3D and Image2D, to something called e.g. "Image", which
 is essentially what is now Image3D, with the current Image2D as a
-special case of size = 1 in the 3rd dimension. The current duplication
+special case of size=1 in the 3rd dimension. The current duplication
 of code and documentation is inelegant and tedious to keep in sync and
 maintain.
 To ensure a smooth transition from legacy code, "Image2D" and
@@ -20,35 +20,37 @@ behavior of matrix(), array() or new("exprSet"). How about 1x1(x1)?
 
 3.) I think the methods "as.integer" and "as.double" for Image2D
 object are misnomers (see details in the FIXME notes in
-man/class.Image2D.Rd
-
+man/class.Image2D.Rd)
 
 modify
 -------
 1.) The "modify" option occurs over and over. This should be carefully
-explained in the vignette (including why), and then in the man page
-only a short reference to that (I have already tried to do the second,
-but not the first).
+explained in the vignette (including why we need it?), and then in the 
+man page only a short reference to that (I have already tried to do 
+the second, but not the first).
 
 2.) I am not sure whether we really need and want this. It is contrary
 to the usual pass-by-value semantics of R and will lead to endless
 confusion and headache when people start using this and get crashes,
 segfaults, and strange behaviour.
 
-3.) In particular, I get the following weirdness - calling a function
-on x2 modifies x1!
+3.) In particular, one gets the following weirdness - calling a function
+on x2 modifies x1 ...
 
->  x = read.image(filenames)
->  x1 = x2 = normalize(x[,,1])
-> display(x1)
-> display(x2)
-> adaptThresh(x1, width=20, height=20, offset=400, preprocess=TRUE, modify = TRUE)
-> table(x1)
+x = read.image(filenames)
+x1 = x2 = normalize(x[,,1])
+display(x1)
+display(x2)
+adaptThresh(x1, width=20, height=20, offset=400, preprocess=TRUE, modify = TRUE)
+table(x1)
+
 x1
      0      1
 340538  21382
-> thresh(x2, width=20, height=20, offset=400, preprocess=TRUE, modify = TRUE)
-> table(x1)
+
+thresh(x2, width=20, height=20, offset=400, preprocess=TRUE, modify = TRUE)
+table(x1)
+
 x1
      0
 361920
@@ -56,18 +58,39 @@ x1
 
 thresh
 ------
-I don't yet understand why we need the separate function "thresh"
-and how it differs to the one from ImageMagick with respect to 
-(1) what it returns and 
-(2) its performance.
+I don't yet understand why we need the separate function "thresh" and
+how it differs to ImageMagick's "adaptThresh" with respect to what it
+returns. I am much less worried about CPU time than about getting it
+right.
+
+Why are x1 and x2 different in the code example below? How have you
+tested "thresh" to make sure it produces correct results?
+
+x = read.image(filenames)
+x1 = normalize(x[,,1])
+x2 = normalize(x[,,1])
+adaptThresh(x1, width=20, height=20, offset=400, preprocess=TRUE, modify = TRUE)
+thresh(x2, width=20, height=20, offset=400, preprocess=TRUE, modify = TRUE)
+table(x1)
+
+x1
+     0      1
+340538  21382
+
+table(x2)
+x2
+     0
+361920
 
 
 distMap 
 ------- 
-1.) What is the difference between the two algorithms in distMap? You need
-to explain this in the man page. Why do you think that
-Lotufo-Zampirolli does not return "real" distances? We need to talk
-about this. Consider this example code:
+
+1.) It appears that the two algorithms "EBImage" and
+"Lotufo-Zampirolli" produce identical results, but yours is (much)
+slower. So why do we need it? 
+
+Consider this example code:
 
 n  = 200
 x  = Image2D(numeric(n*n), dim=c(n,n))
@@ -83,22 +106,28 @@ identical(sqrt(d1),  d2)
 
 From a quick glance at your code it seems that is runs in time
 proportional to n^4! For n=1000, which is not unrealistic, it never
-even terminated.
+even terminated when I tried. Also, on "real" images from Florian I
+found that the results exactly agree, but yours is slower (see
+huber/projects/iScreens/iScreens/R/anawh.R). Please, please, read the
+documentation, and the literature, and let's talk about things more,
+we don't want to be reinventing the wheel, and in particular not
+inferior wheels than those that already exist.
 
-2.) "Default value is for algorithm designed specifically for EBImage"
-is not very helpful, this statement has information content
-zero. Other people WILL read this, such a description needs to be
-reasonably precise as in any other good R package; or if that is not
-possible, don't write anything and say "undocumented" and refer people
-to the source code. 
+2.) A man page saying "Default value is for algorithm designed
+specifically for EBImage" is not very helpful, this statement has
+information content zero. Other people WILL read this, such a
+description needs to be reasonably precise as in any other good R
+package; or if that is not possible, don't write anything and say
+"undocumented" and refer people to the source code.
 
 General
 --------
-1.) The package should produced (at least) one example image, which is
-then used in the examples of the man pages. This could be either a file (e.g.
-TIFF) or an object that can be loaded by "data()".
 
-2.) Why is it necessary to export the class "array"? 
+1.) The package should contain (at least) one example image, which is
+then used in the examples of the man pages. This could be either a
+file (e.g.  TIFF) or an object that can be loaded by "data()".
+
+2.) NAMESPACE: Why is it necessary to export the class "array"? 
 
 3.) There are several additional "FIXME" notes in the man pages, and in 
 the vignette, see 
@@ -114,10 +143,10 @@ Caught c++ error/warning: ImageMagick: unable to open image
 `/home/huber/iScreens/data.main/HT10-C04/HT10-C04_A01_s1_w1.TIF': No
 such file or directory... trying to process the file!
 
-a) What does your program try to process the file if it doesn't even find it?
+a) Why does the program try to process the file if it doesn't even find it?
 b) "Caught c++ error/warning:" what is a C++ error? The user does not care 
-what language you wrote this in, all they want know is what went wrong (in which 
-function?) and what to do to fix it! 
+what language we wrote this in, all they want know is what went wrong (in which 
+function?) and what they need to do to fix it! 
 
 2.) > read.image(filenames)
 "Caught c++ error/warning: ImageMagick:
@@ -125,8 +154,8 @@ function?) and what to do to fix it!
 unknown field with tag 33628 (0x835c)
 encountered. `TIFFReadDirectory'... trying to process the file!"
 
-a) I am not sure that this unknow TAG is so important that you need to
-dump the screen full this warning ... can you have this verbosity
+a) I am not sure that this unknow TAG is so important that we need to
+dump the screen full this warning ... can this verbosity be
 switched off by default, only to switch on for those that really care?
 b) "... trying to process the file!" is a somewhat useless message
 from the user perspective, and why has it an exclamation mark? I think
