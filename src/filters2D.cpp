@@ -97,6 +97,7 @@ SEXP adaptiveThreshold(SEXP rimage, SEXP param) {
         UNPROTECT(1);
     }
     catch(...) {
+      /* FIXME (wh 23.4.06) - does this error message make sense? */
         error("exception within normalizeImages c++ routine");
     }
     return rimage;
