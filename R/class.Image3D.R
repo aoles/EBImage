@@ -106,29 +106,28 @@ setMethod("[", signature(x = "Image3D", i = "numeric", j = "numeric"),
 setMethod("show", signature(object = "Image3D"),
     function(object) {
         d = dim(object)
-        cat(paste("Image3D: ", d[3], " images of ", d[1], "x", d[2], "\n", sep =""))
+        cat(paste("Image3D: ", d[3], " images of size ", d[1], "x", d[2], "\n", sep =""))
         if (object@rgb)
             cat("\tType: RGB, 8-bit per color\n")
         else
             cat(paste("\tType: grayscale, double precision\n"))
-        if (!PRINT_ALL_DATA) {
-          partial = rep(FALSE, 3)
-          dmax = c(10, 10, 2)
-          for(j in 1:3)
-            if (d[j] > dmax[j]) {
-              d[j] = dmax[j]
-              partial[j] = TRUE
-            }
-          if(any(partial))
-            cat("\tShowing ")
-          if(any(partial[1:2]))
-            cat(sprintf("rows 1:%d and columns 1:%d of ", d[1], d[2]))
-          if(partial[3])
-            cat(sprintf("images 1:%d\n", d[3]))
-          if(any(partial))
-            cat("\n")
-        }
-        print(object@.Data[1:d[1], 1:d[2], 1:d[3]])
+        partial = rep(FALSE, 3)
+        dmax = c(10, 10, 2)
+        for(j in 1:3)
+          if (d[j] > dmax[j]) {
+            d[j] = dmax[j]
+            partial[j] = TRUE
+          }
+        if(any(partial))
+          cat("\tShowing ")
+        if(any(partial[1:2]))
+          cat(sprintf("rows 1:%d and columns 1:%d of ", d[1], d[2]))
+        if(partial[3])
+          cat(sprintf("images 1:%d\n", d[3]))
+        if(any(partial))
+          cat("\n")
+
+        print(object@.Data[1:d[1], 1:d[2], 1:d[3]], digits=3)
 #        if (!object@rgb)
 #            print(summary(as.numeric(object@.Data)))
         invisible(NULL)

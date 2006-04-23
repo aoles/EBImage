@@ -15,7 +15,6 @@ setClass("Image2D",
     contains = "array"
 )
 # ============================================================================
-PRINT_ALL_DATA = FALSE
 # ============================================================================
 # NON-STANDARD GENERICS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -302,17 +301,16 @@ setMethod("show", signature(object = "Image2D"),
             cat("\tType: RGB, 8-bit per color\n")
         else
             cat(paste("\tType: grayscale, double precision\n"))
-        if (!PRINT_ALL_DATA) {
-            partial = rep(FALSE, 2)
-            for(j in 1:2)
-              if (d[j] > 10) {
-                d[j] = 10
-                partial[j] = TRUE
-              }
-            if (any(partial))
-                cat(sprintf("\tShowing rows 1:%d and columns 1:%d\n", d[1], d[2]))
-        }
-        print(object@.Data[1:d[1], 1:d[2]])
+        partial = rep(FALSE, 2)
+        for(j in 1:2)
+          if (d[j] > 10) {
+            d[j] = 10
+            partial[j] = TRUE
+          }
+        if (any(partial))
+          cat(sprintf("\tShowing rows 1:%d and columns 1:%d\n", d[1], d[2]))
+        
+        print(object@.Data[1:d[1], 1:d[2]], digits=3)
 #        if (!object@rgb)
 #            print(summary(as.numeric(object@.Data)))
         invisible(NULL)
