@@ -8,9 +8,10 @@ Classes
 1.) I am wondering whether it would not be possible to unify the
 classes Image3D and Image2D, to something called e.g. "Image", which
 is essentially what is now Image3D, with the current Image2D as a
-special case of size=1 in the 3rd dimension. The current duplication
-of code and documentation is inelegant and tedious to keep in sync and
-maintain.
+special case of size=1 in the 3rd dimension. The validity function 
+of the class could make sure that always length(dim)==3.
+The current duplication of code and documentation is inelegant 
+and tedious to keep in sync and maintain.
 To ensure a smooth transition from legacy code, "Image2D" and
 "Image3D" could simply be aliases for the new "Image" class.
 
@@ -25,6 +26,12 @@ man/class.Image2D.Rd)
 4.) Instead of the logical flag "rgb" can we have a factor with
 levels "rgb", "grayscale", this would be more extendable in case we
 ever need additional image types
+
+5.) Instead of EBImage:::.notImageError, it would be cleaner and more
+generic to use S4's method dispatching and validity checking
+infrastructure to make sure that the method is only called of Image
+objects, and that these are valid.
+
 
 modify
 -------
