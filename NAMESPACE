@@ -12,7 +12,7 @@ export(
     "objectCount",
 
     # DEPRECATE
-    "copyImage", "adaptThresh",
+    "Image2D", "Image3D", "copyImage", "adaptThresh",
 
     # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
     "copyImageHeader",
