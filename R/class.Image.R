@@ -279,7 +279,8 @@ setMethod("[", signature(x = "Image", i = "numeric", j = "missing"),
     function(x, i, j, k, ..., drop) {
         if (missing(k)) {
             warning("Undistinguishable [int, , ANY] and [int], using [int]. Use [int,1:dim(x)[2],ANY] for [int, , ANY]")
-            tmp = callGeneric(x@.Data, i, drop = FALSE)
+            #tmp = callGeneric(x@.Data, i, drop = FALSE)
+            tmp = x@.Data[i, drop = FALSE]
         }
         else {
             tmp = x@.Data[i, , k, drop = FALSE]
@@ -351,7 +352,8 @@ setMethod("[", signature(x = "Image", i = "numeric", j = "numeric"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("[", signature(x = "Image", i = "array", j = "missing"),
     function(x, i, j, ..., drop) {
-        tmp = callGeneric(x@.Data, i, drop = FALSE)
+        #tmp = callGeneric(x@.Data, i, drop = FALSE)
+        tmp = x@.Data[i, drop = FALSE]
         if(is.array(tmp)) {
             res = copyImageHeader(x, class(x), x@rgb)
             res@.Data = tmp
@@ -364,7 +366,8 @@ setMethod("[", signature(x = "Image", i = "array", j = "missing"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("[", signature(x = "Image", i = "logical", j = "missing"),
     function(x, i, j, ..., drop) {
-        tmp = callGeneric(x@.Data, i, drop = FALSE)
+        #tmp = callGeneric(x@.Data, i, drop = FALSE)
+        tmp = x@.Data[i, drop = FALSE]
         if(is.array(tmp)) {
             res = copyImageHeader(x, class(x), x@rgb)
             res@.Data = tmp
