@@ -24,8 +24,8 @@ void * THREAD_FUN_displaySingle(void * ptr) {
         MagickImage image = SEXP2Image((SEXP)ptr);
         image.display();
     }
-    catch(exception &error) {
-        cout << "Caught exception in display thread: " << error.what() << endl;
+    catch(exception &error_) {
+        error(error_.what());
     }
     THREAD_ON = false;
     return NULL;
@@ -44,8 +44,8 @@ void * THREAD_FUN_display(void * ptr) {
             image.display();
         }
     }
-    catch(exception &error) {
-        cout << "Caught exception in display thread: " << error.what() << endl;
+    catch(exception &error_) {
+        error(error_.what());
     }
     THREAD_ON = false;
     return NULL;
@@ -64,49 +64,40 @@ void * THREAD_FUN_animate(void * ptr) {
             image.display();
         }
     }
-    catch(exception &error) {
-        cout << "Caught exception in display thread: " << error.what() << endl;
+    catch(exception &error_) {
+        error(error_.what());
     }
     THREAD_ON = false;
     return NULL;
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 SEXP displayImages(SEXP rimage, SEXP animate) {
-    if (rimage == R_NilValue) {
-        warning("nothing to display and animate: exiting");
-        return R_NilValue;
-    }
+    if (!assertImage(rimage))
+        error("Wrong argument class, Image expected");
     try {
-        bool is2D = (strcmp(CHAR(asChar(GET_CLASS(rimage))), "Image2D") == 0);
-        bool is3D = (strcmp(CHAR(asChar(GET_CLASS(rimage))), "Image3D") == 0);
-        if (!is2D && !is3D)
-            error("'image' argument is expected to be of class 'Image2D' or 'Image3D'");
         bool doanimate = LOGICAL(animate)[0];
         /* test dimensionality: 2D and 3D only can be displayed */
-        int ndim = LENGTH(GET_DIM(GET_SLOT(rimage, mkString(".Data"))));
-        if (ndim < 2 || ndim > 3)
-            error("max 'image' dimension for display is 3D, select a subset and try again");
         /* FIXME This must be uncommented to force closing image before opening a new one!!!
         */
         if (THREAD_ON)
-            error("another image is currently displayed, close it first! Read help on 'display'");
-
+            error("Close currently displayed image first");
         pthread_t res;
-        if (is3D) {
+        if (assertImage2D(rimage)) {
+            if (pthread_create(&res, NULL, THREAD_FUN_displaySingle, (void *)rimage) != 0)
+                error("Cannot create display thread");
+        }
+        else {
             if (doanimate) {
                 if (pthread_create(&res, NULL, THREAD_FUN_animate, (void *)rimage) != 0)
-                    error("pthread problem. Ccannot create display thread");
+                    error("Cannot create display thread");
             }
             else
                 if (pthread_create(&res, NULL, THREAD_FUN_display, (void *)rimage) != 0)
-                    error("pthread problem. Cannot create display thread");
+                    error("Cannot create display thread");
         }
-        if (is2D)
-            if (pthread_create(&res, NULL, THREAD_FUN_displaySingle, (void *)rimage) != 0)
-                error("pthread problem. Ccannot create display thread");
     }
-    catch(...) {
-        error("unidentified problem in 'displayImages' c++ routine");
+    catch(exception &error_) {
+        error(error_.what());
     }
     return R_NilValue;
 }

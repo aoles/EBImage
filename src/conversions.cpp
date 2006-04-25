@@ -8,7 +8,7 @@ SEXP stack2SEXP(MagickStack& stack, bool rgb) {
     int nimages = stack.size();
     if (nimages < 1) {
         if (verbose)
-            warning("image stack empty: returning NULL");
+            warning("Stack empty, returning NULL");
         return R_NilValue;
     }
     int nProt = 0;
@@ -20,7 +20,7 @@ SEXP stack2SEXP(MagickStack& stack, bool rgb) {
         unsigned int dy = image.rows();
         if (dx * dy <= 0) {
             if (verbose)
-                warning("first image in the stack is of size 0: returning NULL");
+                warning("First image in stack is of size 0, returning NULL");
             return R_NilValue;
         }
         if (rgb)
@@ -56,20 +56,13 @@ SEXP stack2SEXP(MagickStack& stack, bool rgb) {
             i++;
         }
         SEXP dim;
-        if (nimages > 1)
-            PROTECT(dim = allocVector(INTSXP, 3));
-        else
-            PROTECT(dim = allocVector(INTSXP, 2));
+        PROTECT(dim = allocVector(INTSXP, 3));
         nProt++;
         INTEGER(dim)[0] = dx;
         INTEGER(dim)[1] = dy;
-        if (nimages > 1)
-            INTEGER(dim)[2] = nimages;
+        INTEGER(dim)[2] = nimages;
         SET_DIM(rimage, dim);
-        if (nimages > 1)
-            SET_CLASS(rimage, mkString("Image3D"));
-        else
-            SET_CLASS(rimage, mkString("Image2D"));
+        SET_CLASS(rimage, mkString("Image"));
         SEXP isrgb;
         PROTECT(isrgb = allocVector(LGLSXP, 1));
         nProt++;
@@ -82,12 +75,14 @@ SEXP stack2SEXP(MagickStack& stack, bool rgb) {
             UNPROTECT(nUnprotect);
         }
     }
-    catch(...) {
+    catch(exception &error_) {
         rimage = R_NilValue;
         if (nProt > 0)
             UNPROTECT(nProt);
-        if (verbose)
-            warning("problems loading stack (crash): returning NULL");
+        if (verbose) {
+            warning(error_.what());
+            warning("Returning NULL");
+        }
     }
     return rimage;
 }
@@ -95,17 +90,12 @@ SEXP stack2SEXP(MagickStack& stack, bool rgb) {
 MagickStack SEXP2Stack(SEXP rimage) {
     MagickStack stack;
     try {
-        if (strcmp(CHAR(asChar(GET_CLASS(rimage))), "Image3D") != 0)
-            error("'image' argument is expected to be of class 'Image3D'");
+        if (!assertImage(rimage))
+            error("Wrong argument class, class Image expected");
         SEXP dim = GET_DIM(rimage);
-        int ndim = LENGTH(dim);
-        if (ndim != 3)
-            error("only 3D images can be converted to stacks. Select a subset and try again.");
-        int nimages = 1;
-        if (ndim > 2)
-            nimages = INTEGER(dim)[2];
         int dx = INTEGER(dim)[0];
         int dy = INTEGER(dim)[1];
+        int nimages = INTEGER(dim)[2];
         bool rgb = LOGICAL(GET_SLOT(rimage, mkString("rgb")))[0];
         Geometry geom(dx, dy);
         MagickImage image(geom, "black");
@@ -130,20 +120,17 @@ MagickStack SEXP2Stack(SEXP rimage) {
             stack.push_back(image);
         }
     }
-    catch(...) {
-        error("unidentified problems during image converion in 'SEXP2Stack' c++ routine");
+    catch(exception &error_) {
+        error(error_.what());
     }
     return stack;
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 MagickImage  SEXP2Image(SEXP rimage) {
     try {
-        if (strcmp(CHAR(asChar(GET_CLASS(rimage))), "Image2D") != 0)
-            error("'image' argument is expected to be of class 'Image2D'");
+        if (!assertImage2D(rimage))
+            error("Wrong argument type, class Image with dim(Image)[[3]] = 1 expected");
         SEXP dim = GET_DIM(rimage);
-        int ndim = LENGTH(dim);
-        if (ndim != 2)
-            error("only 2D R-images can be converted to ImageMagick images");
         int dx = INTEGER(dim)[0];
         int dy = INTEGER(dim)[1];
         bool rgb = LOGICAL(GET_SLOT(rimage, mkString("rgb")))[0];
@@ -168,8 +155,8 @@ MagickImage  SEXP2Image(SEXP rimage) {
         }
         return image;
     }
-    catch(...) {
-        error("unidentified problems during image converion in 'SEXP2Image' c++ routine");
+    catch(exception &error_) {
+        error(error_.what());
     }
     /* this should never happen, but it prevents warning: the function exits either on
        previous return or on error - it should not happen that the control comes here
@@ -179,13 +166,12 @@ MagickImage  SEXP2Image(SEXP rimage) {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 MagickImage pullImageData(SEXP rimage, int index) {
     try {
+        if (!assertImage(rimage))
+            error("Wrong argument type, class Image expected");
         SEXP dim = GET_DIM(rimage);
-        int ndim = LENGTH(dim);
-        int nimage = 1;
         int dx = INTEGER(dim)[0];
         int dy = INTEGER(dim)[1];
-        if (ndim > 2)
-            nimage = INTEGER(dim)[2];
+        int nimage = INTEGER(dim)[2];
         bool rgb = LOGICAL(GET_SLOT(rimage, mkString("rgb")))[0];
         Geometry geom(dx, dy);
         MagickImage image(geom, "black");
@@ -211,8 +197,8 @@ MagickImage pullImageData(SEXP rimage, int index) {
         }
         return image;
     }
-    catch(...) {
-        error("unidentified problems during image converion in 'pullImageData' c++ routine");
+    catch(exception &error_) {
+        error(error_.what());
     }
     /* this should never happen, but it prevents warning: the function exits either on
        previous return or on error - it should not happen that the control comes here
@@ -222,13 +208,12 @@ MagickImage pullImageData(SEXP rimage, int index) {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void pushImageData(MagickImage& image, SEXP rimage, int index) {
     try {
+        if (!assertImage(rimage))
+            error("Wrong argument type, class Image expected");
         SEXP dim = GET_DIM(rimage);
-        int ndim = LENGTH(dim);
-        int nimage = 1;
         int dx = INTEGER(dim)[0];
         int dy = INTEGER(dim)[1];
-        if (ndim > 2)
-            nimage = INTEGER(dim)[2];
+        int nimage = INTEGER(dim)[2];
         bool rgb = LOGICAL(GET_SLOT(rimage, mkString("rgb")))[0];
         void * dest;
         int i = index;
@@ -251,8 +236,8 @@ void pushImageData(MagickImage& image, SEXP rimage, int index) {
             }
         }
     }
-    catch(...) {
-        error("unidentified problems during image converion in 'pullImageData' c++ routine");
+    catch(exception &error_) {
+        error(error_.what());
     }
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -272,8 +257,8 @@ SEXP toGray(SEXP rgb) {
         UNPROTECT(1);
         return res;
     }
-    catch(...) {
-        error("memory allocation problems in 'toGray' c++ routine");
+    catch(exception &error_) {
+        error(error_.what());
     }
     return R_NilValue;
 }
@@ -294,8 +279,8 @@ SEXP toRGB(SEXP gray) {
         UNPROTECT(1);
         return res;
     }
-    catch(...) {
-        error("memory allocation problems in 'toRGB' c++ routine");
+    catch(exception &error_) {
+        error(error_.what());
     }
     return R_NilValue;
 }
@@ -316,8 +301,8 @@ SEXP getRed(SEXP rgb) {
         UNPROTECT(1);
         return res;
     }
-    catch(...) {
-        error("memory allocation problems in 'getRed' c++ routine");
+    catch(exception &error_) {
+        error(error_.what());
     }
     return R_NilValue;
 }
@@ -338,8 +323,8 @@ SEXP getGreen(SEXP rgb) {
         UNPROTECT(1);
         return res;
     }
-    catch(...) {
-        error("memory allocation problems in 'getGreen' c++ routine");
+    catch(exception &error_) {
+        error(error_.what());
     }
     return R_NilValue;
 }
@@ -360,8 +345,8 @@ SEXP getBlue(SEXP rgb) {
         UNPROTECT(1);
         return res;
     }
-    catch(...) {
-        error("memory allocation problems in 'getBlue' c++ routine");
+    catch(exception &error_) {
+        error(error_.what());
     }
     return R_NilValue;
 }
@@ -382,8 +367,8 @@ SEXP asRed(SEXP gray) {
         UNPROTECT(1);
         return res;
     }
-    catch(...) {
-        error("memory allocation problems in 'asRed' c++ routine");
+    catch(exception &error_) {
+        error(error_.what());
     }
     return R_NilValue;
 }
@@ -404,8 +389,8 @@ SEXP asGreen(SEXP gray) {
         UNPROTECT(1);
         return res;
     }
-    catch(...) {
-        error("memory allocation problems in 'asGreen' c++ routine");
+    catch(exception &error_) {
+        error(error_.what());
     }
     return R_NilValue;
 }
@@ -426,8 +411,8 @@ SEXP asBlue(SEXP gray) {
         UNPROTECT(1);
         return res;
     }
-    catch(...) {
-        error("memory allocation problems in 'asBlue' c++ routine");
+    catch(exception &error_) {
+        error(error_.what());
     }
     return R_NilValue;
 }

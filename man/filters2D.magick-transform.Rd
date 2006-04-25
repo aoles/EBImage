@@ -1,5 +1,5 @@
-\name{Transform 2D Filters}
-\alias{Transform 2D Filters}
+\name{Transformation}
+\alias{Transformation}
 
 \alias{rotate}
 \alias{sampleImage}
@@ -23,7 +23,7 @@
 }
 
 \arguments{
-    \item{x}{An instance of class \code{\link{Image2D}} or \code{\link{Image3D}}. For 3D objects, filters
+    \item{x}{An instance of class \code{\link{Image}}. For 3D objects, filters
         will be applied separately to each 2D slice corresponding to the first two dimensions.}
     \item{degrees}{Angle in degrees for counter-clockwise rotation of the image.}
     \item{dx}{New image width.}
@@ -31,7 +31,7 @@
 }
 
 \value{
-    A new instance of class \code{\link{Image2D}} or \code{\link{Image3D}}
+    A new instance of class \code{\link{Image}}
     with the same characteristics as the original, but with filter applied.
 }
 
@@ -46,7 +46,7 @@
 }
 
 \seealso{
-   \code{\link{Image2D}}, \code{\link{Image3D}}, \code{\link{Filters 2D}}
+   \code{\link{Image}}, \code{\link{Filters 2D}}
 }
 
 \references{

@@ -1,5 +1,5 @@
-\name{Color 2D Filters}
-\alias{Color 2D Filters}
+\name{Colors}
+\alias{Colors}
 
 \alias{contrast}
 \alias{equalize}
@@ -21,20 +21,18 @@
 }
 
 \usage{
-    contrast(x, sharpen, modify = FALSE)
-    equalize(x, modify = FALSE)
-    colorGamma(x, level, modify = FALSE)
-    mod(x, brightness = 1, saturation = 1, hue = 1, modify = FALSE)
-    shade(x, azimuth = 30, elevation = 30, shading = FALSE, modify = FALSE)
-    solarize(x, factor = 50, modify = FALSE)
+    contrast(x, sharpen)
+    equalize(x)
+    colorGamma(x, level)
+    mod(x, brightness = 1, saturation = 1, hue = 1)
+    shade(x, azimuth = 30, elevation = 30, shading = FALSE)
+    solarize(x, factor = 50)
 }
 
 \arguments{
-  \item{x}{An instance of class \code{\link{Image2D}} or \code{\link{Image3D}}. For 3D objects, filters
+  \item{x}{An instance of class \code{\link{Image}}. For 3D objects, filters
     will be applied separately to each 2D slice corresponding to the first two dimensions.}
   \item{sharpen}{Numeric scalar, a measure of intensity differences.}
-  \item{modify}{Logical scalar, if TRUE, \code{x} will be
-    modified in place (for performance and contrary to usual R pass-by-value semantics; see vignette)}
     \item{level}{Numeric scalar, uiform gamma level.}
     \item{brightness}{Numeric scalar, ratio of the current brightness value to adjust, 1.0 to keep the value.}
     \item{saturation}{Numeric scalar, ratio of the current saturation value to adjust, 1.0 to keep the value.}
@@ -50,7 +48,7 @@
 }
 
 \value{
-If \code{modify} is \code{FALSE}, a new instance of class \code{\link{Image2D}} or \code{\link{Image3D}}
+    A new instance of class \code{\link{Image}}
 with the same dimensions as \code{x}, but with filter(s) applied.
 
 If \code{modify} is \code{TRUE}, the invisible modified \code{x}.
@@ -74,7 +72,7 @@ If \code{modify} is \code{TRUE}, the invisible modified \code{x}.
 }
 
 \seealso{
-   \code{\link{Image2D}}, \code{\link{Image3D}}, \code{\link{Filters 2D}}
+   \code{\link{Image}}, \code{\link{Filters 2D}}
 }
 
 \references{

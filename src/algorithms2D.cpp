@@ -41,13 +41,14 @@ end
 void object_count(double* data, double* origData, ColRow& imsize, double* param, VectorDouble& x, VectorDouble& y, VectorDouble& size, VectorDouble& intensity);
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 SEXP objectCount(SEXP rimage, SEXP rOrigImage, SEXP params) {
+    if (!assertImage(rimage))
+        error("Wrong argument class, Image expected");
+    if (LOGICAL(GET_SLOT(rimage, mkString("rgb")))[0])
+        error("Algorithm works for grayscale images only");
     try {
         int * dim = INTEGER(GET_DIM(rimage));
-        int ndim = LENGTH(GET_DIM(rimage));
         ColRow imsize(dim[0], dim[1]);
-        int nimages = 1;
-        if (ndim > 2)
-            nimages = dim[2];
+        int nimages = dim[2];
         double * data;
         double * origData;
         SEXP res = R_NilValue;
@@ -72,7 +73,7 @@ SEXP objectCount(SEXP rimage, SEXP rOrigImage, SEXP params) {
                otherwise run the next line
                calc_dist_map(data, ncol, nrow, algorithm); */
             data = &(REAL(rimage)[i * imsize.col * imsize.row]);
-            if (rOrigImage != R_NilValue)
+            if (assertImage(rOrigImage))
                 origData = &(REAL(rOrigImage)[i * imsize.col * imsize.row]);
             else
                 origData = NULL;
@@ -114,8 +115,8 @@ SEXP objectCount(SEXP rimage, SEXP rOrigImage, SEXP params) {
             UNPROTECT(1); /* res */
         return res;
     }
-    catch(...) {
-        error("exception within distMap c++ routine");
+    catch(exception &error_) {
+        error(error_.what());
     }
     /* if it comes to this point I will be surprised */
     return R_NilValue;

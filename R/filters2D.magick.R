@@ -7,27 +7,30 @@
 # ============================================================================
 # IMAGE PROCESSING ROUTINES via ImageMagick
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-adaptThresh <- function(x, width = 20, height = 20, offset = 1000, preprocess = FALSE, modify = FALSE) {
-    .notImageError(x)
-    param = as.double(c(width, height, offset))
-    filter = as.integer(1)
-    if (!modify) {
-        if (preprocess)
-            x = gaussFilter(normalize(x), 4, 2)
-        else
-            x = copyImage(x)
-        return(.CallEBImage("stdFilter2D", x, filter, param))
-    }
-    else { # original data modified
-        if (preprocess) {
-            normalize(x, modify = TRUE)
-            gaussFilter(x, 4, 2, modify = TRUE)
-        }
-        invisible(.CallEBImage("stdFilter2D", x, filter, param))
-    }
-}
+# FIXME deprecate
+adaptThresh <- thresh
+#adaptThresh <- function(x, width = 20, height = 20, offset = 1000, preprocess = FALSE, modify = FALSE) {
+#    .notImageError(x)
+#    param = as.double(c(width, height, offset))
+#    filter = as.integer(1)
+#    if (!modify) {
+#        if (preprocess)
+#            x = gaussFilter(normalize(x), 4, 2)
+#        else
+#            x = copyImage(x)
+#        return(.CallEBImage("stdFilter2D", x, filter, param))
+#    }
+#    else { # original data modified
+#        if (preprocess) {
+#            normalize(x, modify = TRUE)
+#            gaussFilter(x, 4, 2, modify = TRUE)
+#        }
+#        invisible(.CallEBImage("stdFilter2D", x, filter, param))
+#    }
+#}
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-blur <- function(x, radius = 1, sigma = 0.5, modify = FALSE) {
+# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+.blur <- function(x, radius = 1, sigma = 0.5, modify = TRUE) {
     .notImageError(x)
     param = as.double(c(radius, sigma))
     filter = as.integer(2)
@@ -39,7 +42,12 @@ blur <- function(x, radius = 1, sigma = 0.5, modify = FALSE) {
         invisible(.CallEBImage("stdFilter2D", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-contrast <- function(x, sharpen, modify = FALSE) {
+blur <- function(x, radius = 1, sigma = 0.5) {
+    .blur(x, radius, sigma, modify = FALSE)
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+.contrast <- function(x, sharpen, modify = TRUE) {
     .notImageError(x)
     if (missing(sharpen))
         stop("argument 'sharpen' is essential")
@@ -53,7 +61,12 @@ contrast <- function(x, sharpen, modify = FALSE) {
         invisible(.CallEBImage("stdFilter2D", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-despeckle <- function(x, modify = FALSE) {
+contrast <- function(x, sharpen) {
+    .contrast(x, sharpen, modify = FALSE)
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+.despeckle <- function(x, modify = TRUE) {
     .notImageError(x)
     filter = as.integer(4)
     if (!modify) {
@@ -64,7 +77,12 @@ despeckle <- function(x, modify = FALSE) {
         invisible(.CallEBImage("stdFilter2D", x, filter, NULL))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-edge <- function(x, radius = 1, modify = FALSE) {
+despeckle <- function(x) {
+    .despeckle(x, modify = FALSE)
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+.edge <- function(x, radius = 1, modify = TRUE) {
     .notImageError(x)
     param = as.double(radius)
     filter = as.integer(5)
@@ -76,7 +94,12 @@ edge <- function(x, radius = 1, modify = FALSE) {
         invisible(.CallEBImage("stdFilter2D", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-enhance <- function(x, modify = FALSE) {
+edge <- function(x, radius = 1) {
+    .edge(x, radius)
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+.enhance <- function(x, modify = TRUE) {
     .notImageError(x)
     filter = as.integer(6)
     if (!modify) {
@@ -87,7 +110,12 @@ enhance <- function(x, modify = FALSE) {
         invisible(.CallEBImage("stdFilter2D", x, filter, NULL))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-equalize <- function(x, modify = FALSE) {
+enhance <- function(x) {
+    .enhance(x, modify = FALSE)
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+.equalize <- function(x, modify = TRUE) {
     .notImageError(x)
     filter = as.integer(7)
     if (!modify) {
@@ -96,6 +124,10 @@ equalize <- function(x, modify = FALSE) {
     }
     else # original data modified
         invisible(.CallEBImage("stdFilter2D", x, filter, NULL))
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+equalize <- function(x) {
+    .equalize(x, modify = FALSE)
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #ffill <- function(x, col, row, color, modify = FALSE) {
@@ -140,7 +172,8 @@ equalize <- function(x, modify = FALSE) {
 #        invisible(.CallEBImage("stdFilter2D", x, filter, param))
 #}
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-colorGamma <- function(x, level, modify = FALSE) {
+# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+.colorGamma <- function(x, level, modify = TRUE) {
     .notImageError(x)
     if (missing(level))
         stop("argument 'level' is essential")
@@ -154,7 +187,12 @@ colorGamma <- function(x, level, modify = FALSE) {
         invisible(.CallEBImage("stdFilter2D", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-gaussFilter <- function(x, width = 1, sigma = 0.5, modify = FALSE) {
+colorGamma <- function(x, level) {
+    .colorGamma(x, level, modify = FALSE)
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+.gaussFilter <- function(x, width = 1, sigma = 0.5, modify = TRUE) {
     .notImageError(x)
     param = as.double(c(width, sigma))
     filter = as.integer(11)
@@ -166,7 +204,12 @@ gaussFilter <- function(x, width = 1, sigma = 0.5, modify = FALSE) {
         invisible(.CallEBImage("stdFilter2D", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-medianFilter <- function(x, radius = 2, modify = FALSE) {
+gaussFilter <- function(x, width = 1, sigma = 0.5) {
+    .gaussFilter(x, width, sigma, modify = FALSE)
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+.medianFilter <- function(x, radius = 2, modify = TRUE) {
     .notImageError(x)
     param = as.double(radius)
     filter = as.integer(12)
@@ -178,7 +221,12 @@ medianFilter <- function(x, radius = 2, modify = FALSE) {
         invisible(.CallEBImage("stdFilter2D", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mod <- function(x, brightness = 1, saturation = 1, hue = 1, modify = FALSE) {
+medianFilter <- function(x, radius = 2) {
+    .medianFilter(x, radius, modify = FALSE)
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+.mod <- function(x, brightness = 1, saturation = 1, hue = 1, modify = TRUE) {
     .notImageError(x)
     param = as.double(c(brightness, saturation, hue))
     filter = as.integer(13)
@@ -190,7 +238,12 @@ mod <- function(x, brightness = 1, saturation = 1, hue = 1, modify = FALSE) {
         invisible(.CallEBImage("stdFilter2D", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-reduceNoise <- function(x, order = NULL, modify = FALSE) {
+mod <- function(x, brightness = 1, saturation = 1, hue = 1) {
+    .mod(x, brightness, saturation, hue, modify = FALSE)
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+.reduceNoise <- function(x, order = NULL, modify = TRUE) {
     .notImageError(x)
     if (is.null(order))
         order = -1
@@ -202,6 +255,10 @@ reduceNoise <- function(x, order = NULL, modify = FALSE) {
     }
     else # original data modified
         invisible(.CallEBImage("stdFilter2D", x, filter, param))
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+reduceNoise <- function(x, order = NULL) {
+    .reduceNoise(x, order, modify = FALSE)
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 rotate <- function(x, degrees = 90) {
@@ -229,7 +286,8 @@ scaleImage <- function(x, dx, dy) {
     return(.CallEBImage("stdFilter2DRedim", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-segment <- function(x, cluster = 1, smooth = 1.5, modify = FALSE) {
+# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+.segment <- function(x, cluster = 1, smooth = 1.5, modify = TRUE) {
     .notImageError(x)
     param = as.double(c(cluster, smooth))
     filter = as.integer(18)
@@ -241,7 +299,12 @@ segment <- function(x, cluster = 1, smooth = 1.5, modify = FALSE) {
         invisible(.CallEBImage("stdFilter2D", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-shade <- function(x, azimuth = 30, elevation = 30, shading = FALSE, modify = FALSE) {
+segment <- function(x, cluster = 1, smooth = 1.5) {
+    .segment(x, cluster, smooth, modify = FALSE)
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+.shade <- function(x, azimuth = 30, elevation = 30, shading = FALSE, modify = TRUE) {
     .notImageError(x)
     param = as.double(c(azimuth, elevation))
     filter = as.integer(19)
@@ -253,7 +316,12 @@ shade <- function(x, azimuth = 30, elevation = 30, shading = FALSE, modify = FAL
         invisible(.CallEBImage("stdFilter2D", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-sharpen <- function(x, radius = 1, sigma = 0.5, modify = FALSE) {
+shade <- function(x, azimuth = 30, elevation = 30, shading = FALSE) {
+    .shade(x, azimuth, elevation, shading, modify = FALSE)
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+.sharpen <- function(x, radius = 1, sigma = 0.5, modify = TRUE) {
     .notImageError(x)
     param = as.double(c(radius, sigma))
     filter = as.integer(20)
@@ -265,7 +333,12 @@ sharpen <- function(x, radius = 1, sigma = 0.5, modify = FALSE) {
         invisible(.CallEBImage("stdFilter2D", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-solarize <- function(x, factor = 50, modify = FALSE) {
+sharpen <- function(x, radius = 1, sigma = 0.5) {
+    .sharpen(x, radius, sigma, modify = FALSE)
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+.solarize <- function(x, factor = 50, modify = TRUE) {
     .notImageError(x)
     param = as.double(factor)
     filter = as.integer(21)
@@ -277,7 +350,12 @@ solarize <- function(x, factor = 50, modify = FALSE) {
         invisible(.CallEBImage("stdFilter2D", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-spread <- function(x, amount = 3, modify = FALSE) {
+solarize <- function(x, factor = 50) {
+    .solarize(x, factor, modify = FALSE)
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+.spread <- function(x, amount = 3, modify = TRUE) {
     .notImageError(x)
     param = as.double(amount)
     filter = as.integer(22)
@@ -289,7 +367,12 @@ spread <- function(x, amount = 3, modify = FALSE) {
         invisible(.CallEBImage("stdFilter2D", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-unsharpMask <- function(x, radius = 2, sigma = 0.5, amount = 5, threshold = 2, modify = FALSE) {
+spread <- function(x, amount = 3) {
+    .spread(x, amount, modify = FALSE)
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+.unsharpMask <- function(x, radius = 2, sigma = 0.5, amount = 5, threshold = 2, modify = TRUE) {
     .notImageError(x)
     param = as.double(c(radius, sigma, amount, threshold))
     filter = as.integer(23)
@@ -301,8 +384,12 @@ unsharpMask <- function(x, radius = 2, sigma = 0.5, amount = 5, threshold = 2, m
         invisible(.CallEBImage("stdFilter2D", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# possible types: uniform, gaussian, multi(plicativeGaussian), impulse, laplace(ian), poisson
-noise <- function(x, type = "gaussian", modify = FALSE) {
+unsharpMask <- function(x, radius = 2, sigma = 0.5, amount = 5, threshold = 2) {
+    .unsharpMask(x, radius, sigma, amount, threshold, modify = FALSE)
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+.noise <- function(x, type = "gaussian", modify = TRUE) {
     .notImageError(x)
     param = as.double(
         switch(type,
@@ -322,4 +409,9 @@ noise <- function(x, type = "gaussian", modify = FALSE) {
     }
     else # original data modified
         invisible(.CallEBImage("stdFilter2D", x, filter, param))
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# possible types: uniform, gaussian, multi(plicativeGaussian), impulse, laplace(ian), poisson
+noise <- function(x, type = "gaussian") {
+    .noise(x, type, modify = FALSE)
 }

@@ -33,7 +33,7 @@
       written. For read operations, this can also be an URL.}
     \item{rgb}{A logical value specifying if the image(s) read are to be stored as RGB or
         grayscales. A conversion is made automatically if necessary.}
-    \item{object}{A 2D or 3D image to be saved.}
+    \item{object}{An image to be saved.}
     \item{show.comments}{A logical value telling the ping routine if image comments should be displayed: output can be lengthy.}
 }
 
@@ -83,7 +83,7 @@ use subset operators to save parts of the image with this function.
 }
 
 \seealso{
-   \code{\link{Image2D}}, \code{\link{Image3D}}
+   \code{\link{Image}}
 }
 
 %\source{
@@ -99,10 +99,10 @@ use subset operators to save parts of the image with this function.
 }
 
 \examples{
-    # FIXME: load image, increase brightness, save image
-    \dontrun{im = read.image("test.tif")}
-    \dontrun{im = im + 0.1}
-    \dontrun{write.image(im, "test1.tif")}
+   % # FIXME: load image, increase brightness, save image
+   % \dontrun{im = read.image("test.tif")}
+   % \dontrun{im = im + 0.1}
+   % \dontrun{write.image(im, "test1.tif")}
 }
 
 \keyword{file}
