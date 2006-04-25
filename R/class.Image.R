@@ -393,7 +393,7 @@ setMethod("show", signature(object = "Image"),
             partial[j] = TRUE
           }
         if(any(partial))
-          cat("\tShowing ")
+          cat("Showing ")
         if(any(partial[1:2]))
           cat(sprintf("rows 1:%d and columns 1:%d of ", d[1], d[2]))
         if(partial[3])
