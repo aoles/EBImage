@@ -22,6 +22,10 @@ behavior of matrix(), array() or new("exprSet"). How about 1x1(x1)?
 object are misnomers (see details in the FIXME notes in
 man/class.Image2D.Rd)
 
+4.) Instead of the logical flag "rgb" can we have a factor with
+levels "rgb", "grayscale", this would be more extendable in case we
+ever need additional image types
+
 modify
 -------
 1.) The "modify" option occurs over and over. This should be carefully
