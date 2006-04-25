@@ -9,6 +9,8 @@ using namespace std;
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* THIS FUNCTION MODIFIES ITS rimage ARGUMENT, COPY BEFORE IF REQUIRED */
 SEXP stdFilter2D(SEXP rimage, SEXP filterNo, SEXP param) {
+    if (!assertImage(rimage))
+        error("Wrong argument class, Image expected");
     /* parse param here */
     double * _param = NULL;
     int npar = 0;
@@ -26,18 +28,11 @@ SEXP stdFilter2D(SEXP rimage, SEXP filterNo, SEXP param) {
             }
         }
     }
-    catch(exception &cerror) {
-        cout << "Caught c++ exception: " << cerror.what() << " when parsing function arguments in c++" << endl;
-        error("Arguments passed to the function are wrong");
-    }
-    catch(...) {
-        error("Caught unknown error when parsing function arguments in c++");
-        return R_NilValue;
+    catch(exception &error_) {
+        error(error_.what());
     }
     SEXP dim = GET_DIM(rimage);
-    int nimages = 1;
-    if (LENGTH(dim) > 2)
-            nimages = INTEGER(dim)[2];
+    int nimages = INTEGER(dim)[2];
     for (int i = 0; i < nimages; i++) {
         /* apply operation to a single image */
         MagickImage image = pullImageData(rimage, i);
@@ -179,21 +174,20 @@ SEXP stdFilter2D(SEXP rimage, SEXP filterNo, SEXP param) {
                         default: image.addNoise(GaussianNoise);
                     }
                 }; break;
-                default: error("wrong image processing filter in 'stdFilter2D' c++ routine");
+                default: error("Specified non-existing filter");
             }
         }
         catch(WarningUndefined &magickWarning) {
-            cout << "Caught Magick++ warning: " << magickWarning.what() << "... should not affect the result. Continuing..." << endl;
+            if (verbose)
+                warning(magickWarning.what());
         }
         catch(ErrorUndefined &magickError) {
-            cout << "Caught Magick++ error: " << magickError.what() << "... result will be affected" << endl;
-            error("Caught Magick++ error that would definitely affect the result");
+            if (_param != NULL) delete[] _param;
+            error(magickError.what());
         }
-        catch(exception &error) {
-            cout << "Caught c++ error: " << error.what() << "... result may be affected. Continuing..." << endl;
-        }
-        catch(...) {
-            cout << "Caught unknown error: result may be affected. Continuing..." << endl;
+        catch(exception &error_) {
+            if (_param != NULL) delete[] _param;
+            error(error_.what());
         }
         /* push modified image back */
         pushImageData(image, rimage, i);
@@ -206,6 +200,8 @@ SEXP stdFilter2D(SEXP rimage, SEXP filterNo, SEXP param) {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* This function changes image size and generates a new image! */
 SEXP stdFilter2DRedim(SEXP rimage, SEXP filterNo, SEXP param) {
+    if (!assertImage(rimage))
+        error("Wrong argument class, Image expected");
     /* parse param here */
     double * _param = NULL;
     int npar = 0;
@@ -223,13 +219,8 @@ SEXP stdFilter2DRedim(SEXP rimage, SEXP filterNo, SEXP param) {
             }
         }
     }
-    catch(exception &cerror) {
-        cout << "Caught c++ exception: " << cerror.what() << " when parsing function arguments in c++" << endl;
-        error("Arguments passed to the function are wrong");
-    }
-    catch(...) {
-        error("Caught unknown error when parsing function arguments in c++");
-        return R_NilValue;
+    catch(exception &error_) {
+        error(error_.what());
     }
     MagickStack stack = SEXP2Stack(rimage);
     MagickStack resStack;
@@ -263,17 +254,16 @@ SEXP stdFilter2DRedim(SEXP rimage, SEXP filterNo, SEXP param) {
             }
         }
         catch(WarningUndefined &magickWarning) {
-            cout << "Caught Magick++ warning: " << magickWarning.what() << "... should not affect the result. Continuing..." << endl;
+            if (verbose)
+                warning(magickWarning.what());
         }
         catch(ErrorUndefined &magickError) {
-            cout << "Caught Magick++ error: " << magickError.what() << "... result will be affected" << endl;
-            error("Caught Magick++ error that would definitely affect the result");
+            if (_param != NULL) delete[] _param;
+            error(magickError.what());
         }
-        catch(exception &error) {
-            cout << "Caught c++ error: " << error.what() << "... result may be affected. Continuing..." << endl;
-        }
-        catch(...) {
-            cout << "Caught unknown error: result may be affected. Continuing..." << endl;
+        catch(exception &error_) {
+            if (_param != NULL) delete[] _param;
+            error(error_.what());
         }
         /* push modified image back */
         resStack.push_back(image);
@@ -302,14 +292,13 @@ void normalizeDataset(double * data, double * range, int length) {
 
 /* this function modifies the object - must be copied before if required! */
 SEXP normalizeImages(SEXP rimage, SEXP range, SEXP independent) {
+    if (!assertImage(rimage))
+        error("Wrong argument class, Image expected");
     try {
         int * dim = INTEGER(GET_DIM(rimage));
-        int ndim = LENGTH(GET_DIM(rimage));
         int ncol = dim[0];
         int nrow = dim[1];
-        int nimages = 1;
-        if (ndim > 2)
-            nimages = dim[2];
+        int nimages = dim[2];
         /* grayscale images assumed of the type double */
         double * data;
         switch (LOGICAL(independent)[0]) {
@@ -325,8 +314,8 @@ SEXP normalizeImages(SEXP rimage, SEXP range, SEXP independent) {
             }
         }
     }
-    catch(...) {
-        error("exception within normalizeImages c++ routine");
+    catch(exception &error_) {
+        error(error_.what());
     }
     return rimage;
 }

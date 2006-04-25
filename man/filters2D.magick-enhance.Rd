@@ -1,5 +1,5 @@
-\name{Enhancing 2D Filters}
-\alias{Enhancing 2D Filters}
+\name{Enhancement}
+\alias{Enhancement}
 
 \alias{noise}
 \alias{blur}
@@ -27,23 +27,23 @@
 }
 
 \usage{
-    sharpen(x, radius = 1, sigma = 0.5, modify = FALSE)
-    unsharpMask(x, radius = 2, sigma = 0.5, amount = 5, threshold = 2, modify = FALSE)
+    sharpen(x, radius = 1, sigma = 0.5)
+    unsharpMask(x, radius = 2, sigma = 0.5, amount = 5, threshold = 2)
 
-    enhance(x, modify = FALSE)
-    despeckle(x, modify = FALSE)
-    reduceNoise(x, order = NULL, modify = FALSE)
+    enhance(x)
+    despeckle(x)
+    reduceNoise(x, order = NULL)
 
-    blur(x, radius = 1, sigma = 0.5, modify = FALSE)
-    medianFilter(x, radius = 2, modify = FALSE)
-    gaussFilter(x, width = 1, sigma = 0.5, modify = FALSE)
+    blur(x, radius = 1, sigma = 0.5)
+    medianFilter(x, radius = 2)
+    gaussFilter(x, width = 1, sigma = 0.5)
 
-    spread(x, amount = 3, modify = FALSE)
-    noise(x, type = "gaussian", modify = FALSE)
+    spread(x, amount = 3)
+    noise(x, type = "gaussian")
 }
 
 \arguments{
-    \item{x}{An instance of class \code{\link{Image2D}} or \code{\link{Image3D}}. For 3D objects, filters
+    \item{x}{An instance of class \code{\link{Image}}. For 3D objects, filters
         will be applied separately to each 2D slice corresponding to the first two dimensions.}
     \item{radius}{Numeric scalar. For \code{sharpen} and \code{blur}, \code{radius}
       specifies the radius of the Gaussian, in pixels, not counting the center pixel. For
@@ -51,8 +51,6 @@
     \item{sigma}{Numeric scalar specifying the standard deviation,
       measured in pixels, of the Laplacian for \code{sharpen} and
       \code{blur} and of the Gaussian for \code{unsharpMask} and \code{gaussFilter}.}
-    \item{modify}{Logical scalar, if TRUE, \code{x} will be
-      modified in place (for performance and contrary to usual R pass-by-value semantics; see vignette)}
     \item{amount}{Numeric scalar. For \code{unsharpMask}, specifies the percentage of the difference between the
         original and the blurred image that is added back to the original; for \code{spread} - the
         amount by which pixels are spread within the image.}
@@ -66,10 +64,8 @@
 }
 
 \value{
-If \code{modify} is \code{FALSE}, a new instance of class \code{\link{Image2D}} or \code{\link{Image3D}}
+    A new instance of class \code{\link{Image}}
 with the same dimensions as \code{x}, but with filter(s) applied.
-
-If \code{modify} is \code{TRUE}, the invisible modified \code{x}.
 }
 
 \details{
@@ -89,7 +85,7 @@ If \code{modify} is \code{TRUE}, the invisible modified \code{x}.
 }
 
 \seealso{
-   \code{\link{Image2D}}, \code{\link{Image3D}}, \code{\link{Filters 2D}}
+   \code{\link{Image}}, \code{\link{Filters 2D}}
 }
 
 \references{

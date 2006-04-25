@@ -1,10 +1,9 @@
-\name{Segmentation 2D Filters}
-\alias{Segmentation 2D Filters}
+\name{Segmentation}
+\alias{Segmentation}
 
 \alias{segment}
 %\alias{ffill}
 %\alias{ffillEdge}
-\alias{adaptThresh}
 \alias{edge}
 
 \concept{image segmentation}
@@ -19,23 +18,20 @@ Image segmentation filters, operating on both grayscale and RGB images.
 }
 
 \usage{
-    segment(x, cluster = 1, smooth = 1.5, modify = FALSE)
+    segment(x, cluster = 1, smooth = 1.5)
 %    ffill(x, col, row, color)
 %    ffillEdge(x, col, row, color)
-    adaptThresh(x, width = 20, height = 20, offset = 1000, preprocess = FALSE, modify = FALSE)
-    edge(x, radius = 1, modify = FALSE)
+    edge(x, radius = 1)
 }
 
 \arguments{
-    \item{x}{An instance of class \code{\link{Image2D}} or \code{\link{Image3D}}. For 3D objects, filters
+    \item{x}{An instance of class \code{\link{Image}}. For 3D objects, filters
         will be applied separately to each 2D slice corresponding to the first two dimensions.}
     \item{cluster}{Numeric scalar specifying the cluster threshold, that
       is the number of pixels a cluster must exceed for it to be considered valid.}
     \item{smooth}{Numeric scalar specifying the smoothing parameter
       which is used to eliminate noise in the second derivative of the histogram.
         A larger value results in a smoother second derivative.}
-    \item{modify}{Logical scalar, if TRUE, \code{x} will be
-      modified in place (for performance and contrary to usual R pass-by-value semantics; see vignette)}
 %    \item{col}{x-position of the target pixel.}
 %    \item{row}{y-position of the target pixel.}
 %    \item{color}{For \code{ffill} the color to replace with, for \code{ffillEdge} the color
@@ -53,10 +49,8 @@ Image segmentation filters, operating on both grayscale and RGB images.
 }
 
 \value{
-If \code{modify} is \code{FALSE}, a new instance of class \code{\link{Image2D}} or \code{\link{Image3D}}
+A new instance of class \code{\link{Image}}
 with the same dimensions as \code{x}, but with filter(s) applied.
-
-If \code{modify} is \code{TRUE}, the invisible modified \code{x}.
 }
 
 \details{
@@ -74,7 +68,7 @@ If \code{modify} is \code{TRUE}, the invisible modified \code{x}.
 }
 
 \seealso{
-   \code{\link{Image2D}}, \code{\link{Image3D}}, \code{\link{Filters 2D}}
+   \code{\link{Image}}, \code{\link{Filters 2D}}
 }
 
 \references{

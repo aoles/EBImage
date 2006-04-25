@@ -12,7 +12,7 @@ SEXP readImages(SEXP files, SEXP rgb) {
     isrgb = LOGICAL(rgb)[0];
     int nfiles = LENGTH(files);
     if (nfiles < 1)
-        error("length(files) must be non-zero");
+        error("At least one file/URL must be supplied");
     try {
         /* create an empty stack for images */
         MagickStack stack;
@@ -24,22 +24,19 @@ SEXP readImages(SEXP files, SEXP rgb) {
             }
             catch(WarningFileOpen &magickOpenWarning) {
                 if (verbose)
-                    cout << "\tImageMagick file I/O warning: " << magickOpenWarning.what() << endl;
+                    warning(magickOpenWarning.what());
             }
             catch(WarningUndefined &magickWarning) {
                 if (verbose)
-                    cout << "\tImageMagick warning: " << magickWarning.what() << endl;
+                    warning(magickWarning.what());
             }
             catch (ErrorUndefined &magickError) {
-                cout << "\tCaught ImageMagick error: " << magickError.what() << "... skipping file!" << endl;
+                warning(magickError.what());
                 continue;
             }
-            catch (exception &cerror) {
+            catch (exception &error_) {
                 if (verbose)
-                    cout << "\tCaught c++ error/warning: " << cerror.what() << "... trying to process the file!" << endl;
-            }
-            catch (...) {
-                cout << "\tUnidentified error/warning... trying to process the file!" << endl;
+                    warning(error_.what());
             }
             for (MagickStack::iterator it = pushstack.begin(); it != pushstack.end(); it++) {
                 MagickImage image = *it;
@@ -48,31 +45,25 @@ SEXP readImages(SEXP files, SEXP rgb) {
         }
         return stack2SEXP(stack, isrgb);
     }
-    catch(...) {
-        error("some image(s) could not be loaded - unknown error in 'readImages' c++ routine");
+    catch (exception &error_) {
+        error(error_.what());
     }
     /* the control should never come to this point */
-    error("'readImages' c++ code is wrong - it should have never come to this point");
+    error("Bug in readImages, please contact EBImage package developers");
     return R_NilValue;
 }
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 SEXP writeImages(SEXP rimage, SEXP files) {
-    if (rimage == R_NilValue) {
-        warning("nothing to write: exiting");
-        return R_NilValue;
-    }
+    if (!assertImage(rimage))
+        error("Wrong argument class, Image expected");
     try {
         SEXP dim = GET_DIM(rimage);
-        int ndim = LENGTH(dim);
-        if (ndim < 2 || ndim > 3)
-            error("'object' argument is expected to be of class 'Image2D' or 'Image3D'");
+        int nimages = INTEGER(dim)[2];
         int nfiles = LENGTH(files);
-        if (ndim == 2 && nfiles != 1)
-            error("incorrect number of files supplied (must be 1)");
-        if (ndim == 3 && nfiles != 1 && nfiles != INTEGER(dim)[2])
-            error("incorrect number of files supplied (must be 1 or match exactly dim(object)[[2]])");
-        if (ndim == 2) {
+        if (nfiles != 1 && nfiles != nimages)
+            error("Number of files must equal number of images or 1");
+        if (nimages == 1) {
             MagickImage image = SEXP2Image(rimage);
             image.write(CHAR(asChar(files)));
             return(R_NilValue);
@@ -92,18 +83,13 @@ SEXP writeImages(SEXP rimage, SEXP files) {
     }
     catch(WarningUndefined &magickWarning) {
         if (verbose)
-            cout << "\tImageMagick warning: " << magickWarning.what() << endl;
+            warning(magickWarning.what());
     }
     catch (ErrorUndefined &magickError) {
-        cout << "\tCaught ImageMagick error: " << magickError.what() << endl;
+        error(magickError.what());
     }
-    catch (exception &cerror) {
-        if (verbose)
-            cout << "\tCaught c++ error/warning: " << cerror.what() << endl;
-    }
-    catch (...) {
-        if (verbose)
-            cout << "\tUnidentified error/warning..." << endl;
+    catch (exception &error_) {
+        error(error_.what());
     }
     return R_NilValue;
 }
@@ -113,7 +99,7 @@ SEXP pingImages(SEXP files, SEXP showComments) {
     int fileSize = 0;
     bool comments = LOGICAL(showComments)[0];
     if (nfiles < 1)
-        error("length(files) must be non-zero");
+        error("At least one file/URL must be supplied");
     for (int i = 0; i < nfiles; i++) {
         MagickImage image;
         try {
@@ -121,23 +107,18 @@ SEXP pingImages(SEXP files, SEXP showComments) {
         }
         catch(WarningFileOpen &magickOpenWarning) {
             if (verbose)
-                cout << "\tImageMagick file I/O warning: " << magickOpenWarning.what() << endl;
+                warning(magickOpenWarning.what());
         }
         catch(WarningUndefined &magickWarning) {
             if (verbose)
-                cout << "\tImageMagick warning: " << magickWarning.what() << endl;
+                warning(magickWarning.what());
         }
         catch (ErrorUndefined &magickError) {
-            cout << "\tCaught ImageMagick error: " << magickError.what() << "... skipping file!" << endl;
+            warning(magickError.what());
             continue;
         }
-        catch (exception &cerror) {
-            if (verbose)
-                cout << "\tCaught c++ error/warning: " << cerror.what() << "... trying to process the file!" << endl;
-        }
-        catch (...) {
-            if (verbose)
-                cout << "\tUnidentified error/warning... trying to process the file!" << endl;
+        catch (exception &error_) {
+            warning(error_.what());
         }
         try {
             cout << "File: " << CHAR(STRING_ELT(files, i)) << endl;
@@ -153,8 +134,8 @@ SEXP pingImages(SEXP files, SEXP showComments) {
             cout << endl;
             fileSize += image.fileSize();
         }
-        catch(...) {
-            cout << "\tSome image attributes could not be read... skipping" << endl;
+        catch (exception &error_) {
+            warning(error_.what());
             continue;
         }
     }

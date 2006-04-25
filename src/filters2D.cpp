@@ -9,22 +9,21 @@
 using namespace std;
 
 SEXP adaptiveThreshold(SEXP rimage, SEXP param) {
-    /* R routine must ensure that rimage has correct type;
-       param are double and has correct number of parameters and both are non-NULL */
+    /* R routine must ensure that param is double and has correct number of
+       parameters and both are non-NULL */
+    if (!assertImage(rimage))
+        error("Wrong argument class, Image expected");
     if (LOGICAL(GET_SLOT(rimage, mkString("rgb")))[0])
-        error("this algorithm works for grayscale images only");
+        error("Algorithm works for grayscale images only");
     try {
         int w = (int)(REAL(param)[0] / 2.0);
         int h = (int)(REAL(param)[1] / 2.0);
         if (w * h == 0)
             error("width * height must be > 0");
         int * dim = INTEGER(GET_DIM(rimage));
-        int ndim = LENGTH(GET_DIM(rimage));
         int ncol = dim[0];
         int nrow = dim[1];
-        int nimages = 1;
-        if (ndim > 2)
-            nimages = dim[2];
+        int nimages = dim[2];
         /* grayscale images assumed of the type double */
         double * data;
         int npix = 4 * w * h;
@@ -96,9 +95,8 @@ SEXP adaptiveThreshold(SEXP rimage, SEXP param) {
         }
         UNPROTECT(1);
     }
-    catch(...) {
-      /* FIXME (wh 23.4.06) - does this error message make sense? */
-        error("exception within normalizeImages c++ routine");
+    catch(exception &error_) {
+        error(error_.what());
     }
     return rimage;
 }
@@ -114,23 +112,22 @@ inline void os_dist_map(double * data, int& ncol, int& nrow);
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 /* THIS FUNCTION MODIFIES rimage - COPY BEFORE IF REQUIRED */
 SEXP distMap(SEXP rimage, SEXP alg) {
+    if (!assertImage(rimage))
+        error("Wrong argument class, Image expected");
     try {
         int * dim = INTEGER(GET_DIM(rimage));
-        int ndim = LENGTH(GET_DIM(rimage));
         int algorithm = INTEGER(alg)[0];
         int ncol = dim[0];
         int nrow = dim[1];
-        int nimages = 1;
-        if (ndim > 2)
-            nimages = dim[2];
+        int nimages = dim[2];
         double * data;
         for (int i = 0; i < nimages; i++) {
             data = &(REAL(rimage)[i * ncol * nrow]);
             calc_dist_map(data, ncol, nrow, algorithm);
         }
     }
-    catch(...) {
-        error("exception within distMap c++ routine");
+    catch(exception &error_) {
+        error(error_.what());
     }
     return rimage;
 }
@@ -300,7 +297,7 @@ inline void lz_dist_map(double * data, int& ncol, int& nrow) {
             ptr += ncol;
         }
     }
-    catch(...) {
-      error("memory problems in 'lz_dist_map' c++ routine");
+    catch(exception &error_) {
+        error(error_.what());
     }
 }

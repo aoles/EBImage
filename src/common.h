@@ -13,6 +13,9 @@ typedef         Image          MagickImage;
 
 extern bool verbose;
 
+bool assertImage(SEXP rimage);
+bool assertImage2D(SEXP rimage);
+
 extern "C" {
     SEXP setVerbose(SEXP);
 };

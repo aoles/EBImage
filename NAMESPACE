@@ -1,22 +1,41 @@
 useDynLib("EBImage")
 export(
-    "Image2D", "Image3D", "copyImageHeader", "copyImage",
+    "Image",
 
-    "adaptThresh", "blur", "contrast", "despeckle", "edge", "enhance", "equalize",
+    "blur", "contrast", "despeckle", "edge", "enhance", "equalize",
     "colorGamma", "gaussFilter", "medianFilter", "mod", "reduceNoise",
     "rotate", "sampleImage", "scaleImage", "segment", "shade", "sharpen", "solarize",
     "spread", "unsharpMask", "noise", "distMap", "thresh",
 
     "read.image", "ping.image",
 
-    "objectCount"
+    "objectCount",
+
+    # DEPRECATE
+    "copyImage", "adaptThresh",
+
+    # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+    "copyImageHeader",
+    ".objectCount", ".distMap", ".thresh",
+    ".blur", ".contrast", ".despeckle", ".edge", ".enhance", ".equalize",
+    ".colorGamma", ".gaussFilter", ".medianFilter", ".mod", ".reduceNoise",
+    ".segment", ".shade", ".sharpen", ".solarize",
+    ".spread", ".unsharpMask", ".noise"
 )
 exportClasses(
-    "array", "Image2D", "Image3D"
+    "Image",
+    # DEPRECATE
+    "Image2D", "Image3D"
 )
 exportMethods(
-    "write.image", "display", "channels", "toGray", "toRGB", "toRed", "toGreen",
-    "toBlue", "getRed", "getGreen", "getBlue", "normalize", "minMax",
-    "as.integer", "as.double", "as.array", "summary", "[", "show",
-    "correctType", "isCorrectType"
+    "copy", "write.image", "display", "channels", "toGray", "toRGB", "toRed", "toGreen",
+    "toBlue", "getRed", "getGreen", "getBlue", "normalize",
+    "as.array", "summary", "[", "show",
+    "correctType", "isCorrectType",
+
+    # DEPRECATE
+    "minMax",
+
+    # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+    ".as.integer", ".as.double", ".normalize"
 )
