@@ -12,7 +12,7 @@
 \concept{image processing}
 
 \title{
-    Filters to Adjust Colors of 2D Images and Image Stacks (3D Images)
+    Filters to adjust colors of images
 }
 
 \description{
@@ -30,28 +30,26 @@
 }
 
 \arguments{
-  \item{x}{An instance of class \code{\link{Image}}. For 3D objects, filters
-    will be applied separately to each 2D slice corresponding to the first two dimensions.}
-  \item{sharpen}{Numeric scalar, a measure of intensity differences.}
+    \item{x}{An instance of class \code{\link{Image}}.}
+    \item{sharpen}{Numeric scalar, a measure of intensity differences.}
     \item{level}{Numeric scalar, uiform gamma level.}
-    \item{brightness}{Numeric scalar, ratio of the current brightness value to adjust, 1.0 to keep the value.}
-    \item{saturation}{Numeric scalar, ratio of the current saturation value to adjust, 1.0 to keep the value.}
-    \item{hue}{Numeric scalar, an absolute rotation of -180 to +180 degrees from the current position corresponding
-        to an argument range of 0 to 2.0, 1.0 for no change.}
+    \item{brightness}{Numeric scalar, ratio of the current brightness value to adjust,
+        1.0 to keep the value.}
+    \item{saturation}{Numeric scalar, ratio of the current saturation value to adjust,
+        1.0 to keep the value.}
+    \item{hue}{Numeric scalar, an absolute rotation of -180 to +180 degrees from the
+        current position corresponding to an argument range of 0 to 2.0, 1.0 for no change.}
     \item{azimuth}{Numeric scalar, together with \code{elevation} defines the position
-      of the light source for \code{shade}.}
-    \item{elevation}{Numeric scalar, together with \code{azimuth}
-      defines the position
-      of the light source for \code{shade}.}
+        of the light source for \code{shade}.}
+    \item{elevation}{Numeric scalar, together with \code{azimuth} defines the position
+        of the light source for \code{shade}.}
     \item{shading}{Specifies if color components (red, green and blue) should be shaded.}
     \item{factor}{Magnitude of solarization.}
 }
 
 \value{
-    A new instance of class \code{\link{Image}}
-with the same dimensions as \code{x}, but with filter(s) applied.
-
-If \code{modify} is \code{TRUE}, the invisible modified \code{x}.
+    A new instance of class \code{\link{Image}} with the same dimensions as \code{x},
+    but with filter(s) applied.
 }
 
 \details{

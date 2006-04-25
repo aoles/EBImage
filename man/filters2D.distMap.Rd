@@ -35,11 +35,12 @@
 }
 
 \source{
-The C code for the Lotufo-Zampirolli algorithm was adapted from the \code{animal} imaging library by Ricardo Fabbri.
+    The C code for the Lotufo-Zampirolli algorithm was adapted from the \code{animal}
+    imaging library by Ricardo Fabbri.
 }
 
 \references{
-The algorithm \code{LotufoZampirolli} is from R. Lotufo, F. Zampirolli, SIBGRAPI 2001, 100-105, 2001.
+    The algorithm \code{LotufoZampirolli} is from R. Lotufo, F. Zampirolli, SIBGRAPI 2001, 100-105, 2001.
 }
 
 \author{
