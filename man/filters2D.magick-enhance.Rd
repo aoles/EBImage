@@ -16,12 +16,12 @@
 \concept{image processing}
 
 \title{
-    Filters to Enhance the Appearance of 2D Images and Image Stacks
+    Filters to enhance appearance images
 }
 
 \description{
-    Several filters to enhance the appearance of 2D images and image stacks. The filters can be
-    roughly divided into 4 subcategories: edge enhancing and image sharpening filters, noise reduction
+    Filters to enhance appearance images. The filters can be roughly divided into 4 subcategories:
+    edge enhancing and image sharpening filters, noise reduction
     filters, blur filters, and noise addition filters. The filters are
     listed below in this sequence. They operate on both grayscale and RGB images.
 }
@@ -43,19 +43,18 @@
 }
 
 \arguments{
-    \item{x}{An instance of class \code{\link{Image}}. For 3D objects, filters
-        will be applied separately to each 2D slice corresponding to the first two dimensions.}
+    \item{x}{An instance of class \code{\link{Image}}.}
     \item{radius}{Numeric scalar. For \code{sharpen} and \code{blur}, \code{radius}
-      specifies the radius of the Gaussian, in pixels, not counting the center pixel. For
-      \code{medianFilter}, the radius of the neighbourhoods in which medians are calculated.}
-    \item{sigma}{Numeric scalar specifying the standard deviation,
-      measured in pixels, of the Laplacian for \code{sharpen} and
-      \code{blur} and of the Gaussian for \code{unsharpMask} and \code{gaussFilter}.}
-    \item{amount}{Numeric scalar. For \code{unsharpMask}, specifies the percentage of the difference between the
-        original and the blurred image that is added back to the original; for \code{spread} - the
-        amount by which pixels are spread within the image.}
-    \item{threshold}{Numeric scalar. Specifies the threshold in pixels needed to apply the difference amount in
-        \code{unsharpMask}.}
+        specifies the radius of the Gaussian, in pixels, not counting the center pixel. For
+        \code{medianFilter}, the radius of the neighbourhoods in which medians are calculated.}
+    \item{sigma}{Numeric scalar specifying the standard deviation, measured in pixels,
+        of the Laplacian for \code{sharpen} and \code{blur} and of the Gaussian for
+        \code{unsharpMask} and \code{gaussFilter}.}
+    \item{amount}{Numeric scalar. For \code{unsharpMask}, specifies the percentage of the difference
+        between the original and the blurred image that is added back to the original; for
+        \code{spread} - the amount by which pixels are spread within the image.}
+    \item{threshold}{Numeric scalar. Specifies the threshold in pixels needed to apply
+        the difference amount in \code{unsharpMask}.}
     \item{order}{Order of noise reduction, or NULL}
     \item{width}{The number of neighbouring pixels to be included in convolution for
         Gaussian blur (\code{gaussFilter}). For example, a width of 1 gives a '3x3' convolution mask.}
@@ -64,8 +63,8 @@
 }
 
 \value{
-    A new instance of class \code{\link{Image}}
-with the same dimensions as \code{x}, but with filter(s) applied.
+    A new instance of class \code{\link{Image}} with the same dimensions as \code{x}, but with
+    filter(s) applied.
 }
 
 \details{

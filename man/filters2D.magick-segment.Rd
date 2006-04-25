@@ -10,11 +10,11 @@
 \concept{image processing}
 
 \title{
-2D segmentation filters for images and image stacks
+    Image segmentation filters
 }
 
 \description{
-Image segmentation filters, operating on both grayscale and RGB images.
+    Image segmentation filters operating on both grayscale and RGB images.
 }
 
 \usage{
@@ -25,12 +25,11 @@ Image segmentation filters, operating on both grayscale and RGB images.
 }
 
 \arguments{
-    \item{x}{An instance of class \code{\link{Image}}. For 3D objects, filters
-        will be applied separately to each 2D slice corresponding to the first two dimensions.}
+    \item{x}{An instance of class \code{\link{Image}}.}
     \item{cluster}{Numeric scalar specifying the cluster threshold, that
-      is the number of pixels a cluster must exceed for it to be considered valid.}
+        is the number of pixels a cluster must exceed for it to be considered valid.}
     \item{smooth}{Numeric scalar specifying the smoothing parameter
-      which is used to eliminate noise in the second derivative of the histogram.
+        which is used to eliminate noise in the second derivative of the histogram.
         A larger value results in a smoother second derivative.}
 %    \item{col}{x-position of the target pixel.}
 %    \item{row}{y-position of the target pixel.}
@@ -39,18 +38,18 @@ Image segmentation filters, operating on both grayscale and RGB images.
     \item{width}{Numeric scalar, window size in \emph{x}-direction.}
     \item{height}{Numeric scalar, window size in \emph{y}-direction.}
     \item{offset}{Numeric scalar, in order to remove noise from
-      the background, the threshold may be adjusted
-      by subtracting this constant from the mean to compute the threshold.}
+        the background, the threshold may be adjusted
+        by subtracting this constant from the mean to compute the threshold.}
     \item{preprocess}{Logical scalar, if \code{TRUE}, the image is
-      normalized and a \code{gaussFilter} with arguments \code{width=4},
-      \code{sigma=2} is applied before calling the adaptive thresholding.}
+        normalized and a \code{gaussFilter} with arguments \code{width=4},
+        \code{sigma=2} is applied before calling the adaptive thresholding.}
     \item{radius}{Numeric scalar, the  neighborhood radius. A value of zero leads to
         an automatic radius selection.}
 }
 
 \value{
-A new instance of class \code{\link{Image}}
-with the same dimensions as \code{x}, but with filter(s) applied.
+    A new instance of class \code{\link{Image}} with the same dimensions as \code{x}, but
+    with filter(s) applied.
 }
 
 \details{

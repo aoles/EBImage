@@ -30,7 +30,7 @@
 }
 
 \seealso{
-   \code{\link{Image}}, \code{\link{Filters 2D}, \code{\link{objectCount}}, \code{\link{distMap}}}
+   \code{\link{Image}}, \code{\link{Filters 2D}}, \code{\link{objectCount}}, \code{\link{distMap}}
 }
 
 \author{
