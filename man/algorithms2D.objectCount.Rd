@@ -45,25 +45,15 @@
 }
 
 \value{
-    A matrix with as many rows as the number of features found and five columns:
-    index (\code{ID}) of the image in which the feature was found.
-    % FIXME:
-    % a value of "1" would be more consistent for Image considering that
-    % an Image is (or should be) just a stack with one image.
+    A matrix with as many rows as the number of features found and five/four columns:
+    index (\code{ID}) of the image in which the feature was found,
     \code{x} coordinate, \code{y} coordinate of the feature (correspond to the location
     of the local maxima, from where the feature was detected), object size (in pixels),
-    intensity/size.
-  % FIXME:
-  % 1. this is unclear. If 'ref' is not given, then the most
-  % straightforward behavior would be that the matrix does not contain
-  % the column 'intensity'
-  % 2. If 'intensity and 'size' are returned, then 'intensity/size' can
-  % be quickly computed on the fly by division, and returning it as a
-  % separate columns seems like a waste of space.
+    intensity (if ref is supplied).
 }
 
 \seealso{
-   \code{\link{Image}}, \code{\link{Filters 2D}, \code{\link{distMap}}}
+   \code{\link{Image}}, \code{\link{Filters 2D}}, \code{\link{distMap}}
 }
 
 \author{

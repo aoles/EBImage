@@ -82,11 +82,17 @@ SEXP objectCount(SEXP rimage, SEXP rOrigImage, SEXP params) {
             /*  copy all returned values to the list element*/
             int nobjects = x.size();
             for (int j = 0; j < nobjects; j++)
-                id.push_back(i);
-            PROTECT(items[i] = allocVector(REALSXP, nobjects * 5));
+                id.push_back(i + 1);
+            if (origData)
+                PROTECT(items[i] = allocVector(REALSXP, nobjects * 5));
+            else
+                PROTECT(items[i] = allocVector(REALSXP, nobjects * 4));
             PROTECT(dims[i] = allocVector(INTSXP, 2));
             if (nobjects > 0) {
-                INTEGER(dims[i])[1] = 5;
+                if (origData)
+                    INTEGER(dims[i])[1] = 5;
+                else
+                    INTEGER(dims[i])[1] = 4;
                 INTEGER(dims[i])[0] = nobjects;
                 SET_DIM(items[i], dims[i]);
             }
@@ -95,9 +101,7 @@ SEXP objectCount(SEXP rimage, SEXP rOrigImage, SEXP params) {
                 REAL(items[i])[j + nobjects] = x[j];
                 REAL(items[i])[j + 2 * nobjects] = y[j];
                 REAL(items[i])[j + 3 * nobjects] = size[j];
-                if (size[j] != 0)
-                    REAL(items[i])[j + 4 * nobjects] = intensity[j] / size[j];
-                else
+                if (origData)
                     REAL(items[i])[j + 4 * nobjects] = intensity[j];
             }
         }
