@@ -1,51 +1,162 @@
-
 Questions and Suggestions for EBImage
-WH 23.4.06
-======================================================
+===================================================================
+Legend:
+? - new report
+* - report being processed
++ - suggestion/bug accepted and corrected
+x - suggestion declined
 
-Classes
---------
-1.) I am wondering whether it would not be possible to unify the
-classes Image3D and Image2D, to something called e.g. "Image", which
-is essentially what is now Image3D, with the current Image2D as a
-special case of size=1 in the 3rd dimension. The validity function 
-of the class could make sure that always length(dim)==3.
-The current duplication of code and documentation is inelegant 
-and tedious to keep in sync and maintain.
-To ensure a smooth transition from legacy code, "Image2D" and
-"Image3D" could simply be aliases for the new "Image" class.
+Please put new reports/requests/TODOs on top of the file marked with
+?-mark stating initals and date as in the examples below. If a position
+was corrected/declined, please move it below the questions that are still
+open but above those resolved earlier in order to keep open questions
+on top.
 
-2.) Image2D() creates an image of size 2x2, image3D() a stack of two
-such images. This is somewhat unconventional, compare for the
-behavior of matrix(), array() or new("exprSet"). How about 1x1(x1)?
 
-3.) I think the methods "as.integer" and "as.double" for Image2D
-object are misnomers (see details in the FIXME notes in
-man/class.Image2D.Rd)
-
-4.) Instead of the logical flag "rgb" can we have a factor with
+===================================================================
+? [WH 23/04/06] rgb
+-------------------------------------------------------------------
+Instead of the logical flag "rgb" can we have a factor with
 levels "rgb", "grayscale", this would be more extendable in case we
 ever need additional image types
-
-5.) Instead of EBImage:::.notImageError, it would be cleaner and more
+===================================================================
+? [WH 23/04/06] .notImageError
+-------------------------------------------------------------------
+Instead of EBImage:::.notImageError, it would be cleaner and more
 generic to use S4's method dispatching and validity checking
 infrastructure to make sure that the method is only called of Image
 objects, and that these are valid.
+===================================================================
+? [WH 23/04/06] object count
+-------------------------------------------------------------------
+what about this algorithm:
+1. Find all local maxima
+2. Merge those that are too close together, allow not only for
+   maximal point but also maximal regions (e.g. ridges)
+3. Define as many regions as there as maxima, and seed them by the maxima.
+4. Apply a simultaneous floodfill to all the regions
+(I might try out this algorithm as soon as a I find time; on advantage
+that I see is that it works simultaneously on the regions rather than
+greedily one after another, greedy algorithms are simply but often
+rather suboptimal)
+===================================================================
+? [WH 23/04/06] example image
+-------------------------------------------------------------------
+The package should contain (at least) one example image, which is
+then used in the examples of the man pages. This could be either a
+file (e.g.  TIFF) or an object that can be loaded by "data()".
+===================================================================
+? [WH 23/04/06] filters2D.magick.Rd
+-------------------------------------------------------------------
+why so much redundancy in the documentation - this will be tedious to
+maintain when things evolve. Here just link to the "segment", "enhance"
+etc. and provide further details (e.g. function names) there.
+===================================================================
+? [WH 23/04/06] image.io.Rd - on image.read
+-------------------------------------------------------------------
+I think for our type of applications it would also be good to
+be able to emit warnings or an error if the images have different sizes (because
+in an HT screen, we expect them all to be the same size)
+===================================================================
+* [WH 23/04/06] correctType/isCorrectType (including help)
+-------------------------------------------------------------------
+ I think this should be done using the conventional way instead, using the
+ 'validObject' function and the 'validity' argument to 'setClass'
+% I don't like the idea of exposing this function to the user. All
+% methods that work on Image objects should automatically return a valid
+% object and there should be no need for such fudge; and if a user wants
+% to write a his own methods, again it is his responsibility and he
+% should use your existing functions as a template. This should never be necessary.
+% (os) - internal now
+%   \item{\code{correctType(Image)}:}{Corrects the internal representation of data to
+%         double for grayscales and integer for RGBs.}
+-------------------------------------------------------------------
+ [OS 25/04/06]
+ not sure if you suggest what I need here - unfortunately internal
+ representation of array changes dynamically between floating point and
+ integer and I need to assure what is that type but you are right in a way -
+ this is not used outside usually, can be hidden
+-------------------------------------------------------------------
+    \item{\code{isCorrectType(Image)}:}{Checks if the internal represantation
+        of data is correct - double for grayscales and integer for RGBs.}
+===================================================================
++ [WH 23/04/06] error and warning messages: file nor found
+-------------------------------------------------------------------
+Please think of an error message that makes more sense:
 
+> read.image(filenames)
+Caught c++ error/warning: ImageMagick: unable to open image
+`/home/huber/iScreens/data.main/HT10-C04/HT10-C04_A01_s1_w1.TIF': No
+such file or directory... trying to process the file!
 
-modify
--------
-1.) The "modify" option occurs over and over. This should be carefully
-explained in the vignette (including why we need it?), and then in the 
-man page only a short reference to that (I have already tried to do 
-the second, but not the first).
+a) Why does the program try to process the file if it doesn't even find it?
+b) "Caught c++ error/warning:" what is a C++ error? The user does not care
+what language we wrote this in, all they want know is what went wrong (in which
+function?) and what they need to do to fix it!
+===================================================================
++ [WH 23/04/06] error and warning messages: TIFF tag
+-------------------------------------------------------------------
+> read.image(filenames)
+"Caught c++ error/warning: ImageMagick:
+/home/huber/iScreens/data.main/HT10-C04/HT10-C04_A03_s1_w1.TIF:
+unknown field with tag 33628 (0x835c)
+encountered. `TIFFReadDirectory'... trying to process the file!"
 
-2.) I am not sure whether we really need and want this. It is contrary
+a) I am not sure that this unknow TAG is so important that we need to
+dump the screen full this warning ... can this verbosity be
+switched off by default, only to switch on for those that really care?
+b) "... trying to process the file!" is a somewhat useless message
+from the user perspective, and why has it an exclamation mark? I think
+the function (like any other good R function) should return quietly if
+all goes well, and print a meaningful error message if there is an
+error. And no unnecessary waffle otherwise.
+===================================================================
++ [WH 23/04/06] Classes
+-------------------------------------------------------------------
+  [OS 25/04/06] reorganized, some functions and methods should be
+  marked deprecated
+-------------------------------------------------------------------
+I am wondering whether it would not be possible to unify the
+classes Image3D and Image2D, to something called e.g. "Image", which
+is essentially what is now Image3D, with the current Image2D as a
+special case of size=1 in the 3rd dimension. The current duplication
+of code and documentation is inelegant and tedious to keep in sync and
+maintain.
+To ensure a smooth transition from legacy code, "Image2D" and
+"Image3D" could simply be aliases for the new "Image" class.
+===================================================================
++ [WH 23/04/06] Default Image Size
+-------------------------------------------------------------------
+Image2D() creates an image of size 2x2, image3D() a stack of two
+such images. This is somewhat unconventional, compare for the
+behavior of matrix(), array() or new("exprSet"). How about 1x1(x1)?
+===================================================================
++ [WH 23/04/06] as.integer; as.double
+-------------------------------------------------------------------
+  [OS 23/04/06] .as.integer; .as.double and for internal use only,
+  standard functions kept standard behaviour as for arrays
+-------------------------------------------------------------------
+I think the methods "as.integer" and "as.double" for Image2D
+object are misnomers (see details in the FIXME notes in
+man/class.Image2D.Rd)
+===================================================================
++ [WH 23/04/06] modify argument
+-------------------------------------------------------------------
+  [OS 25/04/06] modify is now not available in the documented
+  functions but moved to internal functions that start with a dot,
+  i.e. normalize(...) and .normalize(..., modify = TRUE) - the
+  former calls the latter with modify = FALSE
+  Generally I would really like to have these capabilities, at least
+  for myself. Therefore the functions are non-documented and look
+  like internal, so other users would really think before they try
+  to use them (if they find them).
+-------------------------------------------------------------------
+I am not sure whether we really need and want this. It is contrary
 to the usual pass-by-value semantics of R and will lead to endless
 confusion and headache when people start using this and get crashes,
 segfaults, and strange behaviour.
 
-3.) In particular, one gets the following weirdness - calling a function
+In particular, one gets the following weirdness - calling a function
 on x2 modifies x1 ...
 
 x = read.image(filenames)
@@ -54,21 +165,19 @@ display(x1)
 display(x2)
 adaptThresh(x1, width=20, height=20, offset=400, preprocess=TRUE, modify = TRUE)
 table(x1)
-
 x1
      0      1
 340538  21382
-
 thresh(x2, width=20, height=20, offset=400, preprocess=TRUE, modify = TRUE)
 table(x1)
-
 x1
      0
 361920
-
-
-thresh
-------
+===================================================================
++ [WH 23/04/06] thresh/adaptThresh
+-------------------------------------------------------------------
+  [OS 25/04/06] adaptThresh <- thresh and should be deprecated
+-------------------------------------------------------------------
 I don't yet understand why we need the separate function "thresh" and
 how it differs to ImageMagick's "adaptThresh" with respect to what it
 returns. I am much less worried about CPU time than about getting it
@@ -83,26 +192,23 @@ x2 = normalize(x[,,1])
 adaptThresh(x1, width=20, height=20, offset=400, preprocess=TRUE, modify = TRUE)
 thresh(x2, width=20, height=20, offset=400, preprocess=TRUE, modify = TRUE)
 table(x1)
-
 x1
      0      1
 340538  21382
-
 table(x2)
 x2
      0
 361920
-
-
-distMap 
-------- 
-
+===================================================================
++ [WH 23/04/06] distMap
+-------------------------------------------------------------------
+  [OS 25/04/06] distMap <- function(x, alg = "LotufoZampirolli")
+-------------------------------------------------------------------
 1.) It appears that the two algorithms "EBImage" and
 "Lotufo-Zampirolli" produce identical results, but yours is (much)
-slower. So why do we need it? 
+slower. So why do we need it?
 
 Consider this example code:
-
 n  = 200
 x  = Image2D(numeric(n*n), dim=c(n,n))
 rg = 5:(n-5)
@@ -110,7 +216,6 @@ for(j in rg) x[rg, j] = 1
 print(system.time(d1<-distMap(x, "Lotufo_Zampirolli")))
 print(system.time(d2<-distMap(x)))
 identical(sqrt(d1),  d2)
-
 > source("test.R")
 [1] 0.036 0.004 0.041 0.000 0.000
 [1] 7.236 0.020 7.285 0.000 0.000
@@ -123,55 +228,20 @@ huber/projects/iScreens/iScreens/R/anawh.R). Please, please, read the
 documentation, and the literature, and let's talk about things more,
 we don't want to be reinventing the wheel, and in particular not
 inferior wheels than those that already exist.
-
-2.) A man page saying "Default value is for algorithm designed
+===================================================================
++ [WH 23/04/06] distMap man page
+-------------------------------------------------------------------
+A man page saying "Default value is for algorithm designed
 specifically for EBImage" is not very helpful, this statement has
 information content zero. Other people WILL read this, such a
 description needs to be reasonably precise as in any other good R
 package; or if that is not possible, don't write anything and say
 "undocumented" and refer people to the source code.
-
-General
---------
-
-1.) The package should contain (at least) one example image, which is
-then used in the examples of the man pages. This could be either a
-file (e.g.  TIFF) or an object that can be loaded by "data()".
-
-2.) NAMESPACE: Why is it necessary to export the class "array"? 
-
-3.) There are several additional "FIXME" notes in the man pages, and in 
-the vignette, see 
-    grep FIXME R/*R man/*Rd inst/doc/*Rnw
-
-
-read.image
-----------
-1.) Please think of an error message that makes more sense: 
- 
-> read.image(filenames)
-Caught c++ error/warning: ImageMagick: unable to open image
-`/home/huber/iScreens/data.main/HT10-C04/HT10-C04_A01_s1_w1.TIF': No
-such file or directory... trying to process the file!
-
-a) Why does the program try to process the file if it doesn't even find it?
-b) "Caught c++ error/warning:" what is a C++ error? The user does not care 
-what language we wrote this in, all they want know is what went wrong (in which 
-function?) and what they need to do to fix it! 
-
-2.) > read.image(filenames)
-"Caught c++ error/warning: ImageMagick:
-/home/huber/iScreens/data.main/HT10-C04/HT10-C04_A03_s1_w1.TIF:
-unknown field with tag 33628 (0x835c)
-encountered. `TIFFReadDirectory'... trying to process the file!"
-
-a) I am not sure that this unknow TAG is so important that we need to
-dump the screen full this warning ... can this verbosity be
-switched off by default, only to switch on for those that really care?
-b) "... trying to process the file!" is a somewhat useless message
-from the user perspective, and why has it an exclamation mark? I think
-the function (like any other good R function) should return quietly if
-all goes well, and print a meaningful error message if there is an
-error. And no unnecessary waffle otherwise.
+===================================================================
++ [WH 23/04/06] exporting "array"
+-------------------------------------------------------------------
+  [OS 25/04/06] removed
+-------------------------------------------------------------------
+NAMESPACE: Why is it necessary to export the class "array"?
 
 
