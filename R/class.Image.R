@@ -30,8 +30,6 @@ setGeneric("getBlue",     function(object)      standardGeneric("getBlue"))
 setGeneric("normalize",   function(object, ...) standardGeneric("normalize"))
 setGeneric("as.array",    function(x)           standardGeneric("as.array"))
 setGeneric("summary",     function(object, ...) standardGeneric("summary"))
-setGeneric("correctType", function(object)      standardGeneric("correctType"))
-setGeneric("isCorrectType", function(object)    standardGeneric("isCorrectType"))
 
 # FIXME deprecate
 setGeneric("minMax",      function(object)      standardGeneric("minMax"))
@@ -40,6 +38,8 @@ setGeneric("minMax",      function(object)      standardGeneric("minMax"))
 setGeneric(".normalize",  function(object, ...) standardGeneric(".normalize"))
 setGeneric(".as.integer", function(x, ...)      standardGeneric(".as.integer"))
 setGeneric(".as.double",  function(x, ...)      standardGeneric(".as.double"))
+setGeneric("correctType", function(object)      standardGeneric("correctType"))
+setGeneric("isCorrectType", function(object)    standardGeneric("isCorrectType"))
 # ============================================================================
 # CONSTRUCTORS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -241,11 +241,6 @@ setMethod("normalize", signature(object = "Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#setMethod("[", signature(x = "Image", i = "missing", j = "missing"),
-#    function(x, i, j, ..., drop) {
-#        return(x)
-#    }
-#)
 setMethod("[", signature(x = "Image", i = "missing", j = "missing"),
     function(x, i, j, k, ..., drop) {
         if (missing(k))
@@ -262,19 +257,6 @@ setMethod("[", signature(x = "Image", i = "missing", j = "missing"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#setMethod("[", signature(x = "Image", i = "numeric", j = "missing"),
-#    function(x, i, j, ..., drop) {
-#        warning("subscripts [int, ] and [int] cannot be distinguished! [int] is used. Use [int,1:dim(x)[2]] instead of [int,]")
-#        tmp = callGeneric(x@.Data, i)
-#        if(is.array(tmp)) {
-#            res = copyImageHeader(x, class(x), x@rgb)
-#            res@.Data = tmp
-#            return(res)
-#        }
-#        else
-#            return(tmp)
-#    }
-#)
 setMethod("[", signature(x = "Image", i = "numeric", j = "missing"),
     function(x, i, j, k, ..., drop) {
         if (missing(k)) {
@@ -295,19 +277,6 @@ setMethod("[", signature(x = "Image", i = "numeric", j = "missing"),
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#setMethod("[", signature(x = "Image", i = "missing", j = "numeric"),
-#    function(x, i, j, ..., drop) {
-#        i = 1:(dim(x@.Data)[1])
-#        tmp = callGeneric(x@.Data, i, j)
-#        if(is.array(tmp)) {
-#            res = copyImageHeader(x, class(x), x@rgb)
-#            res@.Data = tmp
-#            return(res)
-#        }
-#        else
-#            return(tmp)
-#    }
-#)
 setMethod("[", signature(x = "Image", i = "missing", j = "numeric"),
     function(x, i, j, k, ..., drop) {
         if (missing(k))
@@ -323,18 +292,6 @@ setMethod("[", signature(x = "Image", i = "missing", j = "numeric"),
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#setMethod("[", signature(x = "Image", i = "numeric", j = "numeric"),
-#    function(x, i, j, ..., drop) {
-#        tmp = callGeneric(x@.Data, i, j)
-#        if(is.array(tmp)) {
-#            res = copyImageHeader(x, class(x), x@rgb)
-#            res@.Data = tmp
-#            return(res)
-#        }
-#        else
-#            return(tmp)
-#    }
-#)
 setMethod("[", signature(x = "Image", i = "numeric", j = "numeric"),
     function(x, i, j, k, ..., drop) {
         if (missing(k))
@@ -404,6 +361,12 @@ setMethod("show", signature(object = "Image"),
 #        if (!object@rgb)
 #            print(summary(as.numeric(object@.Data)))
         invisible(NULL)
+    }
+)
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod("print", signature(x = "Image"),
+    function(x, ...) {
+        show(x)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

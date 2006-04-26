@@ -14,11 +14,6 @@
 
 \details{
     The functions accept objects of class \code{\link{Image}} plus filter-specific arguments.
-% FIXME:
-% why so much redundancy in the documentation - this will be tedious to
-% maintain when things evolve. Here just link to the "segment", "enhance"
-% etc. and provide further details (e.g. function names) there.
-    ImageMagick-based filters:
     \describe{
         \item{\code{\link{Enhancement}}:}{\code{noise}, \code{blur},
             \code{despeckle}, \code{enhance}, \code{gaussFilter},
@@ -27,7 +22,7 @@
         \item{\code{\link{Segmentation}}:}{\code{\link{thresh}}, \code{edge},
             \code{segment}, \code{\link{distMap}}}
 %            , \code{ffill}, \code{ffillEdge}}
-        \item{\code{\link{Colors}}:}{\code{\link{normalize}}, \code{contrast}, \code{equalize},
+        \item{\code{\link{Color filters}}:}{\code{\link{normalize}}, \code{contrast}, \code{equalize},
             \code{colorGamma}, \code{mod}, \code{shade}, \code{solarize}}
         \item{\code{\link{Transformation}}:}{\code{rotate}, \code{sampleImage},
             \code{scaleImage}}

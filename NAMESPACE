@@ -11,6 +11,8 @@ export(
 
     "objectCount",
 
+    "verboseEBImage",
+
     # DEPRECATE
     "Image2D", "Image3D", "copyImage", "adaptThresh",
 

@@ -27,23 +27,13 @@
 }
 
 \description{
-A class to work with images in R. This is the basic class to hold image
-data and parameters. The class is directly derived from \code{\link{array}}, which enables
-efficient operations on image data (including subsetting, arithmetic etc).
+    A class to work with images in R. This is the basic class to hold image
+    data and parameters. The class is directly derived from \code{\link{array}},
+    which enables efficient operations on image data (including subsetting,
+    arithmetic etc).
 
-RGB images are coded in 8 bits per channel, 24 bits per pixel, stored in
-an R \code{integer} array. Grayscale images are coded \code{double} precision.
-
-%% Fixme: I am not sure whether this is the right place to explain this.
-%% Better would be a separate man page for 'correctType'. Do the users
-%% really always need to worry about such "low-level" stuff, or just if
-%% they do wild things? Also, the next sentence cannot be parsed as English :)
-%
-% User must take care that the internal
-% data type of the \code{Image} array stays correct\code{integer}, otherwise it is recommended
-% to run the \code{correctType} or overrriden \code{as.integer} and \code{as.double} to turn image
-% data into the correct representation. \code{correctType} is used automatically wherever necessary
-% (e.g. in calls to C++ routines if argument is copied!).
+    RGB images are coded in 8 bits per channel, 24 bits per pixel, stored in
+    an R \code{integer} array. Grayscale images are coded \code{double} precision.
 }
 
 \section{Creating Objects}{
@@ -81,38 +71,12 @@ an R \code{integer} array. Grayscale images are coded \code{double} precision.
             grayscale images. Results are instances of class \code{Image} in the
             desired mode and of the same size as the source.}
         \item{\code{show(Image)} and \code{summary(Image)}:}{Print summaries of the image}
-%            Although RGB images are stored with colors byte-aligned in integer
-%            variables, for display purposes (as well as for mathematical and arithmentical routines)
-%            every color is converted to a double in the range 0..1. Therefore, every pixel of
-%            an RGB image is displayed as \code{R(double):G(double):B(double)}, e.g.
-%            \code{0.77:0.58:0.89}, where 0.77 is red, 0.58 - green and 0.89 blue on the scale 0..1.
-%            See additionally \code{\link{print}}.}
         \item{\code{write.image(Image, files)}, \code{read.image(files)} and
             \code{ping.image(files)}:}{I/O operations for images in all formats supported by
             ImageMagick. See \code{\link{Image IO}} for further details.}
         \item{\code{normalize(Image, from = 0, to = 1.0, independent = FALSE)}:}{Normalizes
             image to the given range (grayscales only). \code{independent} indicates whether
             images in a stack are to be normalized independently.}
-
-% FIXME (wh)
-% I think this should be done using the conventional way instead, using the
-% 'validObject' function and the 'validity' argument to 'setClass'
-% (os)
-% not sure if you suggest what I need here - unfortunately internal representation of array
-% changes dynamically between floating point and integer and I need to assure what is that type
-% but you are right in a way - this is not used outside usually, can be hidden
-%        \item{\code{isCorrectType(Image)}:}{Checks if the internal represantation of data is correct -
-%            double for grayscales and integer for RGBs.}
-
-% FIXME (wh)
-% I don't like the idea of exposing this function to the user. All
-% methods that work on Image objects should automatically return a valid
-% object and there should be no need for such fudge; and if a user wants
-% to write a his own methods, again it is his responsibility and he
-% should use your existing functions as a template. This should never be necessary.
-% (os) - internal now
-%   \item{\code{correctType(Image)}:}{Corrects the internal representation of data to
-%         double for grayscales and integer for RGBs.}
     }
 }
 

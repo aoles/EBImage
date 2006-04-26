@@ -55,11 +55,7 @@
     Image will be created with the size of the first 2D image in the stack and the third dimension
     set to the number of images. When the data is moved to this new R structure, larger images
     will be cropped and smaller ones will be padded with zeroes on the right
-    and the bottom.
-% FIXME: I think for our type of applications it would also be good to
-% be able to emit warnings or an error if the images have different sizes (because
-% in an HT screen, we expect them all to be the same size)
-    Therefore it can be useful to load the largest image first.
+    and the bottom. Therefore it can be useful to load the largest image first.
     The conversion to RGB or grayscale is made on the stage of moving data from ImageMagick structures
     to the instance of \code{Image} direct memory copy routines.
 

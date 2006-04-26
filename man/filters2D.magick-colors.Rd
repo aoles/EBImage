@@ -1,5 +1,5 @@
-\name{Colors}
-\alias{Colors}
+\name{Color filters}
+\alias{Color filters}
 
 \alias{contrast}
 \alias{equalize}
