@@ -41,8 +41,8 @@ setGeneric("isCorrectType", function(object)    standardGeneric("isCorrectType")
 # ============================================================================
 # CONSTRUCTORS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Image <- function(data = array(0, c(1, 1, 1)), dim, rgb = FALSE) {
-    if (missing(dim)) {
+Image <- function(data = array(0, c(1, 1, 1)), dim = NULL, rgb = FALSE) {
+    if (is.null(dim)) {
         if (!is.array(data))
             stop("Convert data to array of 2 or 3 dimensions or specify argument dim")
         dim = dim(data)
