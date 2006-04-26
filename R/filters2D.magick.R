@@ -7,29 +7,6 @@
 # ============================================================================
 # IMAGE PROCESSING ROUTINES via ImageMagick
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# FIXME deprecate
-adaptThresh <- thresh
-#adaptThresh <- function(x, width = 20, height = 20, offset = 1000, preprocess = FALSE, modify = FALSE) {
-#    if (!assert(x))
-#        stop("Wrong class of argument x, Image expected")
-#    param = as.double(c(width, height, offset))
-#    filter = as.integer(1)
-#    if (!modify) {
-#        if (preprocess)
-#            x = gaussFilter(normalize(x), 4, 2)
-#        else
-#            x = copy(x)
-#        return(.CallEBImage("stdFilter2D", x, filter, param))
-#    }
-#    else { # original data modified
-#        if (preprocess) {
-#            normalize(x, modify = TRUE)
-#            gaussFilter(x, 4, 2, modify = TRUE)
-#        }
-#        invisible(.CallEBImage("stdFilter2D", x, filter, param))
-#    }
-#}
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .blur <- function(x, radius = 1, sigma = 0.5, modify = TRUE) {
     if (!assert(x))
