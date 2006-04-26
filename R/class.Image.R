@@ -61,7 +61,7 @@ Image <- function(data = array(0, c(1, 1, 1)), dim, rgb = FALSE) {
 Image2D <- Image
 Image3D <- Image
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-copyImageHeader <- function(x, newClass = "Image", rgb = FALSE) {
+.copyHeader <- function(x, newClass = "Image", rgb = FALSE) {
     .notImageError(x)
     if (rgb)
         res = new(newClass, .Data = integer(0), rgb = TRUE)
@@ -75,7 +75,7 @@ copyImageHeader <- function(x, newClass = "Image", rgb = FALSE) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("copy", signature(x = "Image"),
     function(x) {
-        res = copyImageHeader(x, class(x), rgb = x@rgb)
+        res = .copyHeader(x, class(x), rgb = x@rgb)
         if (x@rgb)
             res@.Data = array(as.integer(x@.Data), dim(x))
         else
@@ -117,7 +117,7 @@ setMethod("toGray", signature(object = "Image"),
             tmp = .CallEBImage("toGray", correctType(object))
         else
             tmp = .CallEBImage("toGray", object)
-        res = copyImageHeader(object, class(object), FALSE)
+        res = .copyHeader(object, class(object), FALSE)
         res@.Data = array(tmp, dim(object))
         return(res)
     }
@@ -131,7 +131,7 @@ setMethod("toRGB", signature(object = "Image"),
             tmp = .CallEBImage("toRGB", correctType(object))
         else
             tmp = .CallEBImage("toRGB", object)
-        res = copyImageHeader(object, class(object), TRUE)
+        res = .copyHeader(object, class(object), TRUE)
         res@.Data = array(tmp, dim(object))
         return(res)
     }
@@ -145,7 +145,7 @@ setMethod("toRed", signature(object = "Image"),
             tmp = .CallEBImage("asRed", correctType(object))
         else
             tmp = .CallEBImage("asRed", object)
-        res = copyImageHeader(object, class(object), TRUE)
+        res = .copyHeader(object, class(object), TRUE)
         res@.Data = array(tmp, dim(object))
         return(res)
     }
@@ -159,7 +159,7 @@ setMethod("toGreen", signature(object = "Image"),
             tmp = .CallEBImage("asGreen", correctType(object))
         else
             tmp = .CallEBImage("asGreen", object)
-        res = copyImageHeader(object, class(object), TRUE)
+        res = .copyHeader(object, class(object), TRUE)
         res@.Data = array(tmp, dim(object))
         return(res)
     }
@@ -173,7 +173,7 @@ setMethod("toBlue", signature(object = "Image"),
             tmp = .CallEBImage("asBlue", correctType(object))
         else
             tmp = .CallEBImage("asBlue", object)
-        res = copyImageHeader(object, class(object), TRUE)
+        res = .copyHeader(object, class(object), TRUE)
         res@.Data = array(tmp, dim(object))
         return(res)
     }
@@ -187,7 +187,7 @@ setMethod("getRed", signature(object = "Image"),
             tmp = .CallEBImage("getRed", correctType(object))
         else
             tmp = .CallEBImage("getRed", object)
-        res = copyImageHeader(object, class(object), FALSE)
+        res = .copyHeader(object, class(object), FALSE)
         res@.Data = array(tmp, dim(object))
         return(res)
     }
@@ -201,7 +201,7 @@ setMethod("getGreen", signature(object = "Image"),
             tmp = .CallEBImage("getGreen", correctType(object))
         else
             tmp = .CallEBImage("getGreen", object)
-        res = copyImageHeader(object, class(object), FALSE)
+        res = .copyHeader(object, class(object), FALSE)
         res@.Data = array(tmp, dim(object))
         return(res)
     }
@@ -215,7 +215,7 @@ setMethod("getBlue", signature(object = "Image"),
             tmp = .CallEBImage("getBlue", correctType(object))
         else
             tmp = .CallEBImage("getBlue", object)
-        res = copyImageHeader(object, class(object), FALSE)
+        res = .copyHeader(object, class(object), FALSE)
         res@.Data = array(tmp, dim(object))
         return(res)
     }
@@ -226,7 +226,7 @@ setMethod(".normalize", signature(object = "Image"),
         if (object@rgb)
             stop("Function supports grayscale images only")
         if (!modify) {
-            res = copyImage(object)
+            res = copy(object)
             return(.CallEBImage("normalizeImages", res, as.double(c(from, to)), independent))
         }
         else
@@ -247,7 +247,7 @@ setMethod("[", signature(x = "Image", i = "missing", j = "missing"),
             return(x)
         tmp = x@.Data[ , , k, drop = FALSE]
         if(is.array(tmp)) {
-            res = copyImageHeader(x, "Image", x@rgb)
+            res = .copyHeader(x, "Image", x@rgb)
             res@.Data = tmp
             return(res)
         }
@@ -268,7 +268,7 @@ setMethod("[", signature(x = "Image", i = "numeric", j = "missing"),
             tmp = x@.Data[i, , k, drop = FALSE]
         }
         if(is.array(tmp)) {
-            res = copyImageHeader(x, "Image", x@rgb)
+            res = .copyHeader(x, "Image", x@rgb)
             res@.Data = tmp
             return(res)
         }
@@ -283,7 +283,7 @@ setMethod("[", signature(x = "Image", i = "missing", j = "numeric"),
             k = 1:(dim(x@.Data)[3])
         tmp = x@.Data[ , j, k, drop = FALSE]
         if(is.array(tmp)) {
-            res = copyImageHeader(x, "Image", x@rgb)
+            res = .copyHeader(x, "Image", x@rgb)
             res@.Data = tmp
             return(res)
         }
@@ -298,7 +298,7 @@ setMethod("[", signature(x = "Image", i = "numeric", j = "numeric"),
             k = 1:(dim(x@.Data)[3])
         tmp = x@.Data[i, j, k, drop = FALSE]
         if(is.array(tmp)) {
-            res = copyImageHeader(x, "Image3D", x@rgb)
+            res = .copyHeader(x, "Image3D", x@rgb)
             res@.Data = tmp
             return(res)
         }
@@ -312,7 +312,7 @@ setMethod("[", signature(x = "Image", i = "array", j = "missing"),
         #tmp = callGeneric(x@.Data, i, drop = FALSE)
         tmp = x@.Data[i, drop = FALSE]
         if(is.array(tmp)) {
-            res = copyImageHeader(x, class(x), x@rgb)
+            res = .copyHeader(x, class(x), x@rgb)
             res@.Data = tmp
             return(res)
         }
@@ -326,7 +326,7 @@ setMethod("[", signature(x = "Image", i = "logical", j = "missing"),
         #tmp = callGeneric(x@.Data, i, drop = FALSE)
         tmp = x@.Data[i, drop = FALSE]
         if(is.array(tmp)) {
-            res = copyImageHeader(x, class(x), x@rgb)
+            res = .copyHeader(x, class(x), x@rgb)
             res@.Data = tmp
             return(res)
         }
@@ -337,36 +337,41 @@ setMethod("[", signature(x = "Image", i = "logical", j = "missing"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("show", signature(object = "Image"),
     function(object) {
-        d = dim(object)
-        if (object@rgb)
-            cat(paste("Image (RGB, 8bit/col): ", d[3], " image(s) of ", d[1], "x", d[2], "\n", sep =""))
-        else
-            cat(paste("Image (grayscale, double): ", d[3], " image(s) of ", d[1], "x", d[2], "\n", sep =""))
-        partial = rep(FALSE, 3)
-        dmax = c(10, 5, 2)
-        for(j in 1:3)
-          if (d[j] > dmax[j]) {
-            d[j] = dmax[j]
-            partial[j] = TRUE
-          }
-        if(any(partial))
-          cat("Showing ")
-        if(any(partial[1:2]))
-          cat(sprintf("rows 1:%d and columns 1:%d of ", d[1], d[2]))
-        if(partial[3])
-          cat(sprintf("images 1:%d\n", d[3]))
-        if(any(partial))
-          cat("\n")
-        print(object@.Data[1:d[1], 1:d[2], 1:d[3]], digits=3)
-#        if (!object@rgb)
-#            print(summary(as.numeric(object@.Data)))
-        invisible(NULL)
+        print(object)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("print", signature(x = "Image"),
-    function(x, ...) {
-        show(x)
+    function(x, data = FALSE, ...) {
+        if (data) {
+            print(x@.Data)
+        }
+        else {
+            d = dim(x)
+            if (x@rgb)
+                cat(paste("Image (RGB, 8bit/col): ", d[3], " image(s) of ", d[1], "x", d[2], "\n", sep =""))
+            else
+                cat(paste("Image (grayscale, double): ", d[3], " image(s) of ", d[1], "x", d[2], "\n", sep =""))
+            partial = rep(FALSE, 3)
+            dmax = c(10, 5, 2)
+            for(j in 1:3)
+                if (d[j] > dmax[j]) {
+                    d[j] = dmax[j]
+                    partial[j] = TRUE
+                }
+            if(any(partial))
+                cat("Showing ")
+            if(any(partial[1:2]))
+                cat(sprintf("rows 1:%d and columns 1:%d of ", d[1], d[2]))
+            if(partial[3])
+                cat(sprintf("images 1:%d\n", d[3]))
+            if(any(partial))
+                cat("\n")
+            print(x@.Data[1:d[1], 1:d[2], 1:d[3]], digits=3)
+            # if (!x@rgb)
+            #     print(summary(as.numeric(x@.Data)))
+        }
+        invisible(NULL)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -18,7 +18,7 @@
         if (ref@rgb)
             stop("Reference image must be grayscale")
     if (!modify)
-        x = copyImage(x)
+        x = copy(x)
     param = c(minArea, maxRadius, tolerance, maxObjects)
     return(.CallEBImage("objectCount", x, ref, as.double(param)))
 }
