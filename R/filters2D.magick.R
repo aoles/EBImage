@@ -10,7 +10,8 @@
 # FIXME deprecate
 adaptThresh <- thresh
 #adaptThresh <- function(x, width = 20, height = 20, offset = 1000, preprocess = FALSE, modify = FALSE) {
-#    .notImageError(x)
+#    if (!assert(x))
+#        stop("Wrong class of argument x, Image expected")
 #    param = as.double(c(width, height, offset))
 #    filter = as.integer(1)
 #    if (!modify) {
@@ -31,7 +32,8 @@ adaptThresh <- thresh
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .blur <- function(x, radius = 1, sigma = 0.5, modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     param = as.double(c(radius, sigma))
     filter = as.integer(2)
     if (!modify) {
@@ -48,7 +50,8 @@ blur <- function(x, radius = 1, sigma = 0.5) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .contrast <- function(x, sharpen, modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     if (missing(sharpen))
         stop("argument 'sharpen' is essential")
     param = as.double(sharpen)
@@ -67,7 +70,8 @@ contrast <- function(x, sharpen) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .despeckle <- function(x, modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     filter = as.integer(4)
     if (!modify) {
         x = copy(x)
@@ -83,7 +87,8 @@ despeckle <- function(x) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .edge <- function(x, radius = 1, modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     param = as.double(radius)
     filter = as.integer(5)
     if (!modify) {
@@ -100,7 +105,8 @@ edge <- function(x, radius = 1) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .enhance <- function(x, modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     filter = as.integer(6)
     if (!modify) {
         x = copy(x)
@@ -116,7 +122,8 @@ enhance <- function(x) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .equalize <- function(x, modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     filter = as.integer(7)
     if (!modify) {
         x = copy(x)
@@ -174,7 +181,8 @@ equalize <- function(x) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .colorGamma <- function(x, level, modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     if (missing(level))
         stop("argument 'level' is essential")
     param = as.double(level)
@@ -193,7 +201,8 @@ colorGamma <- function(x, level) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .gaussFilter <- function(x, width = 1, sigma = 0.5, modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     param = as.double(c(width, sigma))
     filter = as.integer(11)
     if (!modify) {
@@ -210,7 +219,8 @@ gaussFilter <- function(x, width = 1, sigma = 0.5) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .medianFilter <- function(x, radius = 2, modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     param = as.double(radius)
     filter = as.integer(12)
     if (!modify) {
@@ -226,8 +236,10 @@ medianFilter <- function(x, radius = 2) {
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+# FIXME: do not know why I always get black image
 .mod <- function(x, brightness = 1, saturation = 1, hue = 1, modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     param = as.double(c(brightness, saturation, hue))
     filter = as.integer(13)
     if (!modify) {
@@ -244,7 +256,8 @@ mod <- function(x, brightness = 1, saturation = 1, hue = 1) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .reduceNoise <- function(x, order = NULL, modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     if (is.null(order))
         order = -1
     param = as.double(order)
@@ -262,14 +275,16 @@ reduceNoise <- function(x, order = NULL) {
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 rotate <- function(x, degrees = 90) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     param = as.double(degrees)
     filter = as.integer(15)
     return(.CallEBImage("stdFilter2DRedim", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 sampleImage <- function(x, dx, dy) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     if (missing(dx) || missing(dy))
         stop("arguments 'dx' and 'dy' are essential")
     param = as.double(c(dx, dy))
@@ -278,7 +293,8 @@ sampleImage <- function(x, dx, dy) {
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 scaleImage <- function(x, dx, dy) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     if (missing(dx) || missing(dy))
         stop("arguments 'dx' and 'dy' are essential")
     param = as.double(c(dx, dy))
@@ -288,7 +304,8 @@ scaleImage <- function(x, dx, dy) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .segment <- function(x, cluster = 1, smooth = 1.5, modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     param = as.double(c(cluster, smooth))
     filter = as.integer(18)
     if (!modify) {
@@ -304,8 +321,10 @@ segment <- function(x, cluster = 1, smooth = 1.5) {
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+# FIXME: wrong number of parameters reported
 .shade <- function(x, azimuth = 30, elevation = 30, shading = FALSE, modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     param = as.double(c(azimuth, elevation))
     filter = as.integer(19)
     if (!modify) {
@@ -322,7 +341,8 @@ shade <- function(x, azimuth = 30, elevation = 30, shading = FALSE) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .sharpen <- function(x, radius = 1, sigma = 0.5, modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     param = as.double(c(radius, sigma))
     filter = as.integer(20)
     if (!modify) {
@@ -339,7 +359,8 @@ sharpen <- function(x, radius = 1, sigma = 0.5) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .solarize <- function(x, factor = 50, modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     param = as.double(factor)
     filter = as.integer(21)
     if (!modify) {
@@ -356,7 +377,8 @@ solarize <- function(x, factor = 50) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .spread <- function(x, amount = 3, modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     param = as.double(amount)
     filter = as.integer(22)
     if (!modify) {
@@ -373,7 +395,8 @@ spread <- function(x, amount = 3) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .unsharpMask <- function(x, radius = 2, sigma = 0.5, amount = 5, threshold = 2, modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     param = as.double(c(radius, sigma, amount, threshold))
     filter = as.integer(23)
     if (!modify) {
@@ -390,7 +413,8 @@ unsharpMask <- function(x, radius = 2, sigma = 0.5, amount = 5, threshold = 2) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .noise <- function(x, type = "gaussian", modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     param = as.double(
         switch(type,
             "uniform" = 1,

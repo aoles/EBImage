@@ -82,6 +82,27 @@
 }
 
 \examples{
+    # create 2 empty images of 300x200 size
+    im1 <- Image(0, c(300,200,2))
+    # fill images with two different data sets (waves)
+    for (i in 1:dim(im1)[[1]])
+        for (j in 1:dim(im1)[[2]]) {
+            im1[i,j,1] <- abs(sin(i*0.0314)*sin(i*0.0314) + cos(j*0.0314)*cos(j*0.0314))
+            im1[i,j,2] <- abs(sin(i*0.0314)) + abs(cos(j*0.0314))
+        }
+    # normalize images independently
+    im1 <- normalize(im1, independent = TRUE)
+    # combine two images as two color channels in one RGB image
+    im <- toRed(im1[,,1]) + toGreen(im1[,,2])
+    \dontrun{display(im)}
+    # equalize
+    \dontrun{display(equalize(im))}
+    # contrast
+    \dontrun{display(contrast(im, 100))}
+    # colorGamma
+    \dontrun{display(colorGamma(im, 0.5))}
+    # solarize
+    \dontrun{display(solarize(im)}
 }
 
 \keyword{dplot}

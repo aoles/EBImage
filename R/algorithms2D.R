@@ -7,16 +7,18 @@
 
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .objectCount <- function(x, ref = NULL, minArea = 20, maxRadius = 100, tolerance = 1, maxObjects = 1000, modify = TRUE) {
-    .notImageError(x)
-    if (!is.null(ref)) {
-        .notImageError(ref)
-        # FIXME : ensure here that both images have the same size
-    }
+    if(!assert(x))
+        stop("Wrong class of argument x")
     if (x@rgb)
         stop("Function supports distance maps only, which must be grayscale")
-    if (!is.null(ref))
+    if (!is.null(ref)) {
+        if(!assert(ref))
+            stop("Wrong class of argument ref")
         if (ref@rgb)
             stop("Reference image must be grayscale")
+        if(!assert(x, ref))
+            stop("Supplied images have different size or color scheme")
+    }
     if (!modify)
         x = copy(x)
     param = c(minArea, maxRadius, tolerance, maxObjects)

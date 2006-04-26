@@ -26,6 +26,7 @@
 \alias{toRed,Image-method}
 \alias{toRGB,Image-method}
 \alias{write.image,Image,character-method}
+\alias{assert,Image-method}
 
 % FIXME deprecating
 \alias{Image2D-class}
@@ -40,8 +41,6 @@
 \alias{.normalize,Image-method}
 
 \alias{.copyHeader}
-\alias{isCorrectType}
-\alias{correctType}
 
 \alias{.objectCount}
 \alias{.distMap}

@@ -6,7 +6,8 @@
 # ============================================================================
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .distMap <- function(x, alg = "LotufoZampirolli", modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     if (x@rgb)
         stop("cannot apply Distance Map algorithm onto RGB images")
     ialg = as.integer(grep(alg, c("EBImage", "LotufoZampirolli")))
@@ -30,7 +31,8 @@ distMap <- function(x, alg = "LotufoZampirolli") {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .thresh <- function(x, width = 20, height = 20, offset = 0.05, preprocess = FALSE, modify = TRUE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     param = as.double(c(width, height, offset))
     if (!modify) {
         if (preprocess)

@@ -5,6 +5,7 @@
 \alias{Image}
 \alias{Image-class}
 \alias{EBImage}
+\alias{is.validImage}
 \alias{copy}
 \alias{display}
 \alias{channels}
@@ -17,6 +18,7 @@
 \alias{getGreen}
 \alias{getBlue}
 \alias{normalize}
+\alias{assert}
 
 \concept{image representation}
 \concept{image analysis}
@@ -79,6 +81,11 @@
         \item{\code{normalize(Image, from = 0, to = 1.0, independent = FALSE)}:}{Normalizes
             image to the given range (grayscales only). \code{independent} indicates whether
             images in a stack are to be normalized independently.}
+        \item{\code{assert(Image)} and \code{is.validImage(Image)}:}{Checks if the object is Image and
+            if it is a valid image. The former is implemented as method and will generate an error if
+            supplied object is not Image. The latter is a simple function and will generate a warning.}
+        \item{\code{assert(Image,Image)}:}{Checks if two images have the same size and color scheme.
+            If yes, returns TRUE, otherwise generates warnings and returns FALSE.}
     }
 }
 
@@ -132,8 +139,10 @@
     imx <- im1[,,1]
     # invert image (pay attention it was first normalized to 0..1)
     imx <- 1.0 - imx
+    # combine two images as two color channels in one RGB image
+    im <- toRed(im1[,,1]) + toGreen(im1[,,2])
     # save image
-    write.image(im1, "Image.Rd.example.tif")
+    write.image(im, "Image.Rd.example.tif")
     \dontrun{display(im1)}
 }
 

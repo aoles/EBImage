@@ -48,11 +48,21 @@
 }
 
 \examples{
-    im = read.image("http://www.ebi.ac.uk/~osklyar/projects/EBImage/examples/segmented.tif")
-    # get the distance map
-    dm = distMap(im)
-    # get object count and object indexes
-    objects = objectCount(dm)
+    # create an empty image of 300x200 size
+    im1 <- Image(0, c(300,200,1))
+    # fill image with data (waves)
+    for (i in 1:dim(im1)[[1]])
+        for (j in 1:dim(im1)[[2]]) {
+            im1[i,j,1] <- abs(sin(i*0.0314)*sin(i*0.0314) + cos(j*0.0314)*cos(j*0.0314))
+        }
+    # normalize image
+    im1 <- normalize(im1)
+    # threshold
+    seg <- thresh(im1, 20, 20, 0)
+    # calculate distance map and normalize it
+    dm <- sqrt(distMap(seg))
+    res <- objectCount(dm)
+    print(res)
 }
 
 \keyword{dplot}

@@ -16,6 +16,7 @@ setClass("Image",
 # ============================================================================
 # NON-STANDARD GENERICS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setGeneric("assert",      function(object, ...) standardGeneric("assert"))
 setGeneric("copy",        function(x)           standardGeneric("copy"))
 setGeneric("display",     function(object, ...) standardGeneric("display"))
 setGeneric("channels",    function(object)      standardGeneric("channels"))
@@ -57,12 +58,45 @@ Image <- function(data = array(0, c(1, 1, 1)), dim, rgb = FALSE) {
       array(if (rgb) as.integer(data) else as.double(data), dim))
 }
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+is.validImage <- function(x) {
+    if (!is(x, "Image")) {
+        warning("Argument is not of class Image\n")
+        return(FALSE)
+    }
+    if (length(dim(x)) != 3) {
+        warning("Object class is Image, but data have wrong dimensionality: must be 3")
+        return(FALSE)
+    }
+    return(TRUE)
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod("assert", signature(object = "Image"),
+    function(object, object2, ...) {
+        if (missing(object2))
+            return(is.validImage(object))
+        if (!is.validImage(object) || !is.validImage(object2))
+            return(FALSE)
+        res <- TRUE
+        eq <- (dim(object) == dim(object2))
+        if (length(which(eq)) != 3) {
+            warning("Images have different sizes in one or several dimensions")
+            res <- FALSE
+        }
+        if (object@rgb != object2@rgb) {
+            warning("Images have different color modes")
+            res <- FALSE
+        }
+        return(res)
+    }
+)
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## FIXME deprecate both
 Image2D <- Image
 Image3D <- Image
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .copyHeader <- function(x, newClass = "Image", rgb = FALSE) {
-    .notImageError(x)
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
     if (rgb)
         res = new(newClass, .Data = integer(0), rgb = TRUE)
     else
@@ -442,12 +476,3 @@ setMethod("summary", signature(object = "Image"),
         summary(as.numeric(object@.Data))
     }
 )
-# ============================================================================
-# INTERNALS
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-.notImageError <- function(x) {
-    if (!is(x, "Image"))
-        stop("Wrong argument class, Image expected")
-    invisible(TRUE)
-}
-
