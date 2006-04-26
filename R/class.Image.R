@@ -32,9 +32,6 @@ setGeneric("normalize",   function(object, ...) standardGeneric("normalize"))
 setGeneric("as.array",    function(x)           standardGeneric("as.array"))
 setGeneric("summary",     function(object, ...) standardGeneric("summary"))
 
-# FIXME deprecate
-setGeneric("minMax",      function(object)      standardGeneric("minMax"))
-
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 setGeneric(".normalize",  function(object, ...) standardGeneric(".normalize"))
 setGeneric(".as.integer", function(x, ...)      standardGeneric(".as.integer"))
@@ -90,10 +87,6 @@ setMethod("assert", signature(object = "Image"),
     }
 )
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-## FIXME deprecate both
-Image2D <- Image
-Image3D <- Image
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .copyHeader <- function(x, newClass = "Image", rgb = FALSE) {
     if (!assert(x))
         stop("Wrong class of argument x, Image expected")
@@ -117,10 +110,6 @@ setMethod("copy", signature(x = "Image"),
         return(res)
     }
 )
-## FIXME deprecate
-copyImage <- function(x) {
-    return(copy(x))
-}
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("display", signature(object = "Image"),
     function(object) {
@@ -406,15 +395,6 @@ setMethod("print", signature(x = "Image"),
             #     print(summary(as.numeric(x@.Data)))
         }
         invisible(NULL)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# FIXME deprecate
-setMethod("minMax", signature(object = "Image"),
-    function(object) {
-        if (object@rgb)
-            stop("Function supports grayscale images only")
-        return(range(object@.Data))
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
