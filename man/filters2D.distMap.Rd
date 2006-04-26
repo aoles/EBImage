@@ -48,15 +48,24 @@
 }
 
 \examples{
-    im <- read.image("http://www.ebi.ac.uk/~osklyar/projects/EBImage/examples/segmented.tif")
-    dm <- distMap(im)
-
-%    x <- Image(numeric(100), dim=c(10,10))
-%for(j in 2:9) x[2:9, j]=1
-%
-%d1 = distMap(x, "LotufoZampirolli")
-%d2 = distMap(x)
-%identical(sqrt(d1),  d2)
+    # create an empty image of 300x200 size
+    im1 <- Image(0, c(300,200,1))
+    # fill image with data (waves)
+    for (i in 1:dim(im1)[[1]])
+        for (j in 1:dim(im1)[[2]]) {
+            im1[i,j,1] <- abs(sin(i*0.0314)*sin(i*0.0314) + cos(j*0.0314)*cos(j*0.0314))
+        }
+    # normalize image
+    im1 <- normalize(im1)
+    \dontrun{display(im1)}
+    # threshold
+    seg <- thresh(im1, 20, 20, 0)
+    \dontrun{display(seg)}
+    # calculate distance map and normalize it
+    dm <- distMap(seg)
+    dm <- sqrt(dm)
+    dmnorm <- normalize(dm)
+    \dontrun{display(dmnorm)}
 }
 
 \keyword{dplot}
