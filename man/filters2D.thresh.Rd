@@ -2,6 +2,9 @@
 
 \alias{thresh}
 
+% deprecating
+\alias{adaptThresh}
+
 \docType{function}
 
 \title{Adaptive threshold algorithm}
@@ -18,10 +21,15 @@
     \item{x}{An instance of class \code{\link{Image}}.}
     \item{width}{x-pixel region to evaluate the mean.}
     \item{height}{y-pixel region to evaluate the mean.}
-    \item{offset}{Threshold offset from the mean, a reasonable value should be within
-        the \code{range(Image)}.}
+    \item{offset}{Threshold offset from the mean, a reasonable value should be
+        within \code{range(Image)}.}
     \item{preprocess}{If \code{TRUE} \code{gaussFilter} with arguments 4, 2 is applied to the
         normalized image first.}
+}
+\details{
+    \code{adaptThresh} is deprecated. Please use \code{thresh} instead.
+    \code{thresh} has a different range of argument \code{offset}, which should be
+    within \code{range(Image)}.
 }
 
 \value{
