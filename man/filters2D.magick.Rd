@@ -37,14 +37,6 @@
     Oleg Sklyar, \email{osklyar@ebi.ac.uk}
 }
 
-\examples{
-    %# FIXME: load image, increase brightness, save image
-% FIXME: this does not really look like an example for filters
-    %\dontrun{im = read.image("test.tif")}
-    %\dontrun{im = im + 1000}
-    %\dontrun{write.image(im, "test1.tif")}
-}
-
 \keyword{dplot}
 \keyword{manip}
 \keyword{array}

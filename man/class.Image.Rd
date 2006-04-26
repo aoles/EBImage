@@ -115,13 +115,27 @@
     Oleg Sklyar, \email{osklyar@ebi.ac.uk}
 }
 
-%\examples{
-% FIXME:
-% don't talk about stuff that doesn't exist, until it exists :)
-%    \dontrun{im = read.image("test.tif")}
-%    \dontshow{exp(im)}
-%    \dontrun{display(im)}
-%}
+\examples{
+    # create 2 empty images of 300x200 size
+    im1 <- Image(0, c(300,200,2))
+    # fill images with two different data sets (waves)
+    for (i in 1:dim(im1)[[1]])
+        for (j in 1:dim(im1)[[2]]) {
+            im1[i,j,1] <- abs(sin(i*0.0314)*sin(i*0.0314) + cos(j*0.0314)*cos(j*0.0314))
+            im1[i,j,2] <- abs(sin(i*0.0314)) + abs(cos(j*0.0314))
+        }
+    # normalize images independently
+    im1 <- normalize(im1, independent = TRUE)
+    # get a copy of the second image
+    imx <- copy(im1)
+    # or simply
+    imx <- im1[,,1]
+    # invert image (pay attention it was first normalized to 0..1)
+    imx <- 1.0 - imx
+    # save image
+    write.image(im1, "Image.Rd.example.tif")
+    \dontrun{display(im1)}
+}
 
 \keyword{methods}
 \keyword{classes}
