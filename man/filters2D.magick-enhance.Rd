@@ -96,6 +96,33 @@
 }
 
 \examples{
+    # create 2 empty images of 300x200 size
+    im1 <- Image(0, c(300,200,2))
+    # fill images with two different data sets (waves)
+    for (i in 1:dim(im1)[[1]])
+        for (j in 1:dim(im1)[[2]]) {
+            im1[i,j,1] <- abs(sin(i*0.0314)*sin(i*0.0314) + cos(j*0.0314)*cos(j*0.0314))
+            im1[i,j,2] <- abs(sin(i*0.0314)) + abs(cos(j*0.0314))
+        }
+    # normalize images independently
+    im1 <- normalize(im1, independent = TRUE)
+    # combine two images as two color channels in one RGB image
+    im <- toRed(im1[,,1]) + toGreen(im1[,,2])
+    # noisy
+    noisy <- noise(im)
+    \dontrun{display(noisy)}
+    # reduce noise
+    newim <- reduceNoise(noisy)
+    \dontrun{display(newim)}
+    # blur
+    \dontrun{display(blur(newim))}
+    # unsharp mask
+    \dontrun{display(unsharpMask(blur(newim), 5, 0.5, 10))}
+    # sharpen
+    \dontrun{display(sharpen(blur(newim), 5))}
+    # median filter
+    filtered <- medianFilter(im1[,,1], 10)
+    \dontrun{normalize(display(im1[,,1] - filtered))}
 }
 
 \keyword{dplot}

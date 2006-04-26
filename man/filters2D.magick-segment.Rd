@@ -35,14 +35,6 @@
 %    \item{row}{y-position of the target pixel.}
 %    \item{color}{For \code{ffill} the color to replace with, for \code{ffillEdge} the color
 %        of the border until which the flood fill will spread.}
-    \item{width}{Numeric scalar, window size in \emph{x}-direction.}
-    \item{height}{Numeric scalar, window size in \emph{y}-direction.}
-    \item{offset}{Numeric scalar, in order to remove noise from
-        the background, the threshold may be adjusted
-        by subtracting this constant from the mean to compute the threshold.}
-    \item{preprocess}{Logical scalar, if \code{TRUE}, the image is
-        normalized and a \code{gaussFilter} with arguments \code{width=4},
-        \code{sigma=2} is applied before calling the adaptive thresholding.}
     \item{radius}{Numeric scalar, the  neighborhood radius. A value of zero leads to
         an automatic radius selection.}
 }
@@ -55,11 +47,6 @@
 \details{
     \code{segment} coalesces similar image components by analyzing histograms of the color
     components and identifying units that are homogeneous by fuzzy c-means clustering.
-
-    \code{adaptThresh} applies adaptive thresholding to the image. It is useful if the
-    ideal threshold level is not known in advance, or if the illumination gradient is not constant
-    across the image. Adaptive thresholding works by evaluating the mean of a pixel region and using the
-    mean as the thresholding level.
 
     \code{edge} edges the image.
 
@@ -79,6 +66,25 @@
 }
 
 \examples{
+    # create an empty image of 300x200 size
+    im1 <- Image(0, c(300,200,1))
+    # fill image with data (waves)
+    for (i in 1:dim(im1)[[1]])
+        for (j in 1:dim(im1)[[2]]) {
+            im1[i,j,1] <- abs(sin(i*0.0314)*sin(i*0.0314) + cos(j*0.0314)*cos(j*0.0314))
+        }
+    # normalize image
+    im1 <- normalize(im1)
+    \dontrun{display(im1)}
+    # threshold
+    seg <- thresh(im1, 20, 20, 0)
+    \dontrun{display(seg)}
+    # segment
+    seg1 <- segment(im1, 100, 0.1)
+    \dontrun{display(seg1)}
+    # edge
+    ed <- edge(seg1, 1)
+    \dontrun{display(ed)}
 }
 
 \keyword{dplot}

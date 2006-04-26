@@ -250,7 +250,7 @@ SEXP stdFilter2DRedim(SEXP rimage, SEXP filterNo, SEXP param) {
                         Geometry geom((unsigned int)_param[0], (unsigned int)_param[1]);
                     image.scale(geom);
                 }; break;
-                default: error("wrong image processing filter in 'stdFilter2DRedim' c++ routine");
+                default: error("Specified non-existing filter");
             }
         }
         catch(WarningUndefined &magickWarning) {

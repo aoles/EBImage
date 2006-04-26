@@ -26,7 +26,9 @@
     \item{x}{An instance of class \code{\link{Image}}.}
     \item{degrees}{Angle in degrees for counter-clockwise rotation of the image.}
     \item{dx}{New image width.}
-    \item{dy}{New image height.}
+    \item{dy}{New image height. FIXME: this argument is something else, although
+        ImageMagick tells it is what is written here, but the image is scaled/sampled
+        proportionally taking in account only the first argument.}
 }
 
 \value{
@@ -54,6 +56,23 @@
 }
 
 \examples{
+    # create an empty image of 300x200 size
+    im1 <- Image(0, c(300,200,1))
+    # fill image with data (waves)
+    for (i in 1:dim(im1)[[1]])
+        for (j in 1:dim(im1)[[2]]) {
+            im1[i,j,1] <- abs(sin(i*0.0314)*sin(i*0.0314) + cos(j*0.0314)*cos(j*0.0314))
+        }
+    # normalize image
+    im1 <- normalize(im1)
+    # segment and edge
+    ed <- edge(segment(im1, 100, 0.1), 1)
+    # rotate edged image
+    \dontrun{display(rotate(ed, 90))}
+    # scale image
+    \dontrun{display(scaleImage(ed, 400, 300))}
+    # sample image
+    \dontrun{display(sampleImage(ed, 400, 300))}
 }
 
 \keyword{dplot}

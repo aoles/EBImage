@@ -14,18 +14,24 @@ on top.
 
 
 ===================================================================
-? [WH 23/04/06] rgb
+? [OS 26/04/06] mod
+-------------------------------------------------------------------
+Any settings generate black image
+===================================================================
+? [OS 26/04/06] medianFilter
+-------------------------------------------------------------------
+Takes forever for radius > 10
+===================================================================
+? [OS 26/04/06] scaleImage, sampleImage
+-------------------------------------------------------------------
+Somehow argument dy is not used. Image is always scaled proportionally
+depending on the dx argument. Wrong documentation of ImageMagick?
+===================================================================
+? [WH 26/04/06] rgb
 -------------------------------------------------------------------
 Instead of the logical flag "rgb" can we have a factor with
 levels "rgb", "grayscale", this would be more extendable in case we
 ever need additional image types
-===================================================================
-? [WH 23/04/06] .notImageError
--------------------------------------------------------------------
-Instead of EBImage:::.notImageError, it would be cleaner and more
-generic to use S4's method dispatching and validity checking
-infrastructure to make sure that the method is only called of Image
-objects, and that these are valid.
 ===================================================================
 ? [WH 23/04/06] object count
 -------------------------------------------------------------------
@@ -79,6 +85,18 @@ in an HT screen, we expect them all to be the same size)
 -------------------------------------------------------------------
     \item{\code{isCorrectType(Image)}:}{Checks if the internal represantation
         of data is correct - double for grayscales and integer for RGBs.}
+===================================================================
++ [OS 26/04/06] add validity check to Image
+===================================================================
++ [WH 26/04/06] .notImageError
+-------------------------------------------------------------------
+  [OS 26/04/06] substituted with a function is.validImage that
+  should be used also for validity checks
+-------------------------------------------------------------------
+Instead of EBImage:::.notImageError, it would be cleaner and more
+generic to use S4's method dispatching and validity checking
+infrastructure to make sure that the method is only called of Image
+objects, and that these are valid.
 ===================================================================
 + [WH 23/04/06] error and warning messages: file nor found
 -------------------------------------------------------------------

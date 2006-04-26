@@ -1,6 +1,6 @@
 useDynLib("EBImage")
 export(
-    "Image",
+    "Image", "is.validImage",
 
     "blur", "contrast", "despeckle", "edge", "enhance", "equalize",
     "colorGamma", "gaussFilter", "medianFilter", "mod", "reduceNoise",
@@ -30,14 +30,14 @@ exportClasses(
     "Image2D", "Image3D"
 )
 exportMethods(
-    "copy", "write.image", "display", "channels", "toGray", "toRGB", "toRed", "toGreen",
+    "assert", "copy", "write.image", "display", "channels", "toGray", "toRGB", "toRed", "toGreen",
     "toBlue", "getRed", "getGreen", "getBlue", "normalize",
     "as.array", "summary", "[", "show", "print",
-    "correctType", "isCorrectType",
 
     # DEPRECATE
     "minMax",
 
     # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+    "correctType", "isCorrectType",
     ".as.integer", ".as.double", ".normalize"
 )
