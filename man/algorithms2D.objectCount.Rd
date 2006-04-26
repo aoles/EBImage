@@ -15,19 +15,6 @@
     is masked and the algorithm is applied to the remainder of the image.
 }
 
-% FIXME (wh):
-% what about this algorithm:
-% 1. Find all local maxima
-% 2. Merge those that are too close together, allow not only for
-% maximal point but also maximal regions (e.g. ridges)
-% 3. Define as many regions as there as maxima, and seed them by the
-% maxima.
-% 4. Apply a simultaneous floodfill to all the regions
-% (I might try out this algorithm as soon as a I find time; on advantage
-% that I see is that it works simultaneously on the regions rather than
-% greedily one after another, greedy algorithms are simply but often
-% rather suboptimal)
-
 \usage{
     objectCount(x, ref = NULL, minArea = 20, maxRadius = 100, tolerance = 1, maxObjects = 1000)
 }

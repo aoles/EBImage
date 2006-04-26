@@ -1,12 +1,6 @@
 \name{internals}
 \alias{internals}
 
-%\alias{to.gray,Image-method}
-%\alias{to.rgb,Image-method}
-%\alias{write.image,Image,character-method}
-%\alias{.warnOnStack}
-%\alias{.notImageError}
-%\alias{$,Image-method}
 \alias{as.array,Image-method}
 \alias{isCorrectType,Image-method}
 \alias{correctType,Image-method}
@@ -32,8 +26,7 @@
 \alias{toRGB,Image-method}
 \alias{write.image,Image,character-method}
 
-
-% deprecating
+% FIXME deprecating
 \alias{Image2D-class}
 \alias{Image3D-class}
 \alias{minMax,Image-method}
