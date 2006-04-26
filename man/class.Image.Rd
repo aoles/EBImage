@@ -4,7 +4,6 @@
 
 \alias{Image}
 \alias{Image-class}
-\alias{EBImage}
 \alias{is.validImage}
 \alias{copy}
 \alias{display}
@@ -20,12 +19,21 @@
 \alias{normalize}
 \alias{assert}
 
+% deprecating
+\alias{Image2D}
+\alias{Image3D}
+\alias{minMax}
+\alias{copyImage}
+\alias{copyImageHeader}
+
+
+
 \concept{image representation}
 \concept{image analysis}
 \concept{image processing}
 
 \title{
-    Class to work with images in R
+    Class/methods definitions to work with images in R
 }
 
 \description{
@@ -103,6 +111,15 @@
     e.g. TIFF. Image I/O routines are based on ImageMagick routines.
 
     Further information on the package and this class is available in the vignette.
+
+    DEPRECATED:
+
+    Classes \code{Image2D} and \code{Image3D} are deprecated and combined into one class \code{Image}.
+    Functions \code{Image2D} and \code{Image3D} are deprecated, please use \code{Image} with the same
+    syntax instead. \code{minMax} is deprecated, please use \code{\link{range}} instead. \code{copyImage}
+    image is deprecated, please use \code{copy} instead. \code{copyImageHeader} is deprecated and should
+    not be used. The substitution function \code{.copyHeader} should be used by the package
+    developers/package functions only.
 }
 
 \note{
