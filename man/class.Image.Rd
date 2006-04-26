@@ -70,7 +70,9 @@
             \code{getGreen(Image)}, \code{getBlue(Image)}:}{Allow for conversions between RGB and
             grayscale images. Results are instances of class \code{Image} in the
             desired mode and of the same size as the source.}
-        \item{\code{show(Image)} and \code{summary(Image)}:}{Print summaries of the image}
+        \item{\code{show(Image)}, \code{print(Image, data = FALSE)} and \code{summary(Image)}:}{Print
+            summaries of the image. Specify \code{data = TRUE} in \code{print()} to print all
+            data instead of the summary.}
         \item{\code{write.image(Image, files)}, \code{read.image(files)} and
             \code{ping.image(files)}:}{I/O operations for images in all formats supported by
             ImageMagick. See \code{\link{Image IO}} for further details.}

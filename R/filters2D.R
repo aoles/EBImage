@@ -17,7 +17,7 @@
 
     # 060105-01 TODO
     if (!modify) {
-        x = copyImage(x)
+        x = copy(x)
         return(.CallEBImage("distMap", x, ialg))
     }
     else
@@ -36,7 +36,7 @@ distMap <- function(x, alg = "LotufoZampirolli") {
         if (preprocess)
             x = gaussFilter(normalize(x), 4, 2)
         else
-            x = copyImage(x)
+            x = copy(x)
         return(.CallEBImage("adaptiveThreshold", x, param))
     }
     else { # original data modified

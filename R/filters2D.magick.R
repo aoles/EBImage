@@ -17,7 +17,7 @@ adaptThresh <- thresh
 #        if (preprocess)
 #            x = gaussFilter(normalize(x), 4, 2)
 #        else
-#            x = copyImage(x)
+#            x = copy(x)
 #        return(.CallEBImage("stdFilter2D", x, filter, param))
 #    }
 #    else { # original data modified
@@ -35,7 +35,7 @@ adaptThresh <- thresh
     param = as.double(c(radius, sigma))
     filter = as.integer(2)
     if (!modify) {
-        x = copyImage(x)
+        x = copy(x)
         return(.CallEBImage("stdFilter2D", x, filter, param))
     }
     else # original data modified
@@ -54,7 +54,7 @@ blur <- function(x, radius = 1, sigma = 0.5) {
     param = as.double(sharpen)
     filter = as.integer(3)
     if (!modify) {
-        x = copyImage(x)
+        x = copy(x)
         return(.CallEBImage("stdFilter2D", x, filter, param))
     }
     else # original data modified
@@ -70,7 +70,7 @@ contrast <- function(x, sharpen) {
     .notImageError(x)
     filter = as.integer(4)
     if (!modify) {
-        x = copyImage(x)
+        x = copy(x)
         return(.CallEBImage("stdFilter2D", x, filter, NULL))
     }
     else # original data modified
@@ -87,7 +87,7 @@ despeckle <- function(x) {
     param = as.double(radius)
     filter = as.integer(5)
     if (!modify) {
-        x = copyImage(x)
+        x = copy(x)
         return(.CallEBImage("stdFilter2D", x, filter, param))
     }
     else # original data modified
@@ -103,7 +103,7 @@ edge <- function(x, radius = 1) {
     .notImageError(x)
     filter = as.integer(6)
     if (!modify) {
-        x = copyImage(x)
+        x = copy(x)
         return(.CallEBImage("stdFilter2D", x, filter, NULL))
     }
     else # original data modified
@@ -119,7 +119,7 @@ enhance <- function(x) {
     .notImageError(x)
     filter = as.integer(7)
     if (!modify) {
-        x = copyImage(x)
+        x = copy(x)
         return(.CallEBImage("stdFilter2D", x, filter, NULL))
     }
     else # original data modified
@@ -144,7 +144,7 @@ equalize <- function(x) {
 #        param = as.double(c(col, color))
 #    filter = as.integer(8)
 #    if (!modify) {
-#        x = copyImage(x)
+#        x = copy(x)
 #        return(.CallEBImage("stdFilter2D", x, filter, param))
 #    }
 #    else # original data modified
@@ -165,7 +165,7 @@ equalize <- function(x) {
 #        param = as.double(c(col, color))
 #    filter = as.integer(9)
 #    if (!modify) {
-#        x = copyImage(x)
+#        x = copy(x)
 #        return(.CallEBImage("stdFilter2D", x, filter, param))
 #    }
 #    else # original data modified
@@ -180,7 +180,7 @@ equalize <- function(x) {
     param = as.double(level)
     filter = as.integer(10)
     if (!modify) {
-        x = copyImage(x)
+        x = copy(x)
         return(.CallEBImage("stdFilter2D", x, filter, param))
     }
     else # original data modified
@@ -197,7 +197,7 @@ colorGamma <- function(x, level) {
     param = as.double(c(width, sigma))
     filter = as.integer(11)
     if (!modify) {
-        x = copyImage(x)
+        x = copy(x)
         return(.CallEBImage("stdFilter2D", x, filter, param))
     }
     else
@@ -214,7 +214,7 @@ gaussFilter <- function(x, width = 1, sigma = 0.5) {
     param = as.double(radius)
     filter = as.integer(12)
     if (!modify) {
-        x = copyImage(x)
+        x = copy(x)
         return(.CallEBImage("stdFilter2D", x, filter, param))
     }
     else # original data modified
@@ -231,7 +231,7 @@ medianFilter <- function(x, radius = 2) {
     param = as.double(c(brightness, saturation, hue))
     filter = as.integer(13)
     if (!modify) {
-        x = copyImage(x)
+        x = copy(x)
         return(.CallEBImage("stdFilter2D", x, filter, param))
     }
     else # original data modified
@@ -250,7 +250,7 @@ mod <- function(x, brightness = 1, saturation = 1, hue = 1) {
     param = as.double(order)
     filter = as.integer(14)
     if (!modify) {
-        x = copyImage(x)
+        x = copy(x)
         return(.CallEBImage("stdFilter2D", x, filter, param))
     }
     else # original data modified
@@ -292,7 +292,7 @@ scaleImage <- function(x, dx, dy) {
     param = as.double(c(cluster, smooth))
     filter = as.integer(18)
     if (!modify) {
-        x = copyImage(x)
+        x = copy(x)
         return(.CallEBImage("stdFilter2D", x, filter, param))
     }
     else # original data modified
@@ -309,7 +309,7 @@ segment <- function(x, cluster = 1, smooth = 1.5) {
     param = as.double(c(azimuth, elevation))
     filter = as.integer(19)
     if (!modify) {
-        x = copyImage(x)
+        x = copy(x)
         return(.CallEBImage("stdFilter2D", x, filter, param))
     }
     else # original data modified
@@ -326,7 +326,7 @@ shade <- function(x, azimuth = 30, elevation = 30, shading = FALSE) {
     param = as.double(c(radius, sigma))
     filter = as.integer(20)
     if (!modify) {
-        x = copyImage(x)
+        x = copy(x)
         return(.CallEBImage("stdFilter2D", x, filter, param))
     }
     else # original data modified
@@ -343,7 +343,7 @@ sharpen <- function(x, radius = 1, sigma = 0.5) {
     param = as.double(factor)
     filter = as.integer(21)
     if (!modify) {
-        x = copyImage(x)
+        x = copy(x)
         return(.CallEBImage("stdFilter2D", x, filter, param))
     }
     else # original data modified
@@ -360,7 +360,7 @@ solarize <- function(x, factor = 50) {
     param = as.double(amount)
     filter = as.integer(22)
     if (!modify) {
-        x = copyImage(x)
+        x = copy(x)
         return(.CallEBImage("stdFilter2D", x, filter, param))
     }
     else # original data modified
@@ -377,7 +377,7 @@ spread <- function(x, amount = 3) {
     param = as.double(c(radius, sigma, amount, threshold))
     filter = as.integer(23)
     if (!modify) {
-        x = copyImage(x)
+        x = copy(x)
         return(.CallEBImage("stdFilter2D", x, filter, param))
     }
     else # original data modified
@@ -404,7 +404,7 @@ unsharpMask <- function(x, radius = 2, sigma = 0.5, amount = 5, threshold = 2) {
     )
     filter = as.integer(24)
     if (!modify) {
-        x = copyImage(x)
+        x = copy(x)
         return(.CallEBImage("stdFilter2D", x, filter, param))
     }
     else # original data modified

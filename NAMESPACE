@@ -17,7 +17,7 @@ export(
     "Image2D", "Image3D", "copyImage", "adaptThresh",
 
     # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
-    "copyImageHeader",
+    ".copyHeader",
     ".objectCount", ".distMap", ".thresh",
     ".blur", ".contrast", ".despeckle", ".edge", ".enhance", ".equalize",
     ".colorGamma", ".gaussFilter", ".medianFilter", ".mod", ".reduceNoise",
@@ -32,7 +32,7 @@ exportClasses(
 exportMethods(
     "copy", "write.image", "display", "channels", "toGray", "toRGB", "toRed", "toGreen",
     "toBlue", "getRed", "getGreen", "getBlue", "normalize",
-    "as.array", "summary", "[", "show",
+    "as.array", "summary", "[", "show", "print",
     "correctType", "isCorrectType",
 
     # DEPRECATE

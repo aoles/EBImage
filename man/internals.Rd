@@ -17,6 +17,7 @@
 \alias{getRed,Image-method}
 \alias{normalize,Image-method}
 \alias{show,Image-method}
+\alias{print,Image-method}
 \alias{copy,Image-method}
 \alias{summary,Image-method}
 \alias{toBlue,Image-method}
@@ -38,7 +39,7 @@
 \alias{.as.double,Image-method}
 \alias{.normalize,Image-method}
 
-\alias{copyImageHeader}
+\alias{.copyHeader}
 \alias{isCorrectType}
 \alias{correctType}
 
