@@ -69,7 +69,7 @@ I think for our type of applications it would also be good to
 be able to emit warnings or an error if the images have different sizes (because
 in an HT screen, we expect them all to be the same size)
 ===================================================================
-* [WH 23/04/06] correctType/isCorrectType (including help)
++ [WH 23/04/06] correctType/isCorrectType (including help)
 -------------------------------------------------------------------
  I think this should be done using the conventional way instead, using the
  'validObject' function and the 'validity' argument to 'setClass'
@@ -91,7 +91,10 @@ in an HT screen, we expect them all to be the same size)
     \item{\code{isCorrectType(Image)}:}{Checks if the internal represantation
         of data is correct - double for grayscales and integer for RGBs.}
 ===================================================================
-+ [OS 26/04/06] add validity check to Image
+x [OS 26/04/06] add validity check to Image
+-------------------------------------------------------------------
+will not work, data structures are not consistent during some operations,
+if I avoid this I will generate too much redundant data.
 ===================================================================
 + [WH 26/04/06] .notImageError
 -------------------------------------------------------------------
