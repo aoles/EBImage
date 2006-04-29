@@ -1,0 +1,69 @@
+============================================================
+Linux Installation Notes
+------------------------------------------------------------
+To install EBImage on a Linux/Unix system you will need a
+working copy of R and the latest version of ImageMagick and
+Magick++ libraries and header files. If installing ImageMagick
+from source you will need to compile it and run
+
+make
+make install
+
+Additionally you might need to run
+
+make install-lib
+make install-headers
+
+to install a development version.
+
+If you use an rpm based Linux, please be sure to include
+
+ImageMagick
+ImageMagick-devel
+ImageMagick-Magick++
+ImageMagick-Magick++-devel
+
+rpms (names can differ depending on the distribution).
+
+Before compiling EBImage, please ensure that Magick++-config
+(installed with ImageMagick devel) is in your path (normally
+in /usr/bin).
+
+============================================================
+Apple Mac Installation Notes
+------------------------------------------------------------
+Thanks to Firas Swidan <swidanf@hhmi.org>
+------------------------------------------------------------
+ImageMagick comes preinstalled on Apple Mac. However there are
+some missing dependencies. Compilation requires libjasper and
+libjpeg to be present on the system.
+
+Get Jasper from http://www.ece.uvic.ca/~mdadams/jasper/ and
+compile as usual. This should solve -ljasper dependency problem.
+
+To compile libjpeg, get the source from http://www.ijg.org.
+You will need Apple analogue of libtool (glibtool) in order to
+compile a shared library from the source. Use fink from
+http://fink.sourceforge.net to install glibtool. Then, see the
+comments from Firas:
+
+I managed to install the EBImage package. There were some problems
+with installing libjpeg.so. Here is a description of the whole
+process:
+
+1: ./configure --enable-shared --enable-static
+Did not manage to identify the OS and printed an error message.
+
+2: Trying "make", despite the error, returned an error concerning
+libtool: The variable LIBTOOL was assigned the value "./libtool"
+(error: libtool was not found in the local directory). Trying to
+change the value to "libtool" did not solve the problem, since it
+is an Apple "libtool", which uses a different syntax (e.g. No
+--mode= option).
+
+3: To solve that, I used fink ( http://fink.sourceforge.net/) to
+install GNU libtool, which is named glibtool. Changing the "libtool"
+in the Makefile to "glibtool" solved the problem and produced libjpeg.so.
+Running R CMD INSTALL worked and installed EBImage.
+
+
