@@ -321,7 +321,7 @@ setMethod("[", signature(x = "Image", i = "numeric", j = "numeric"),
             k = 1:(dim(x@.Data)[3])
         tmp = x@.Data[i, j, k, drop = FALSE]
         if(is.array(tmp)) {
-            res = .copyHeader(x, "Image3D", x@rgb)
+            res = .copyHeader(x, "Image", x@rgb)
             res@.Data = tmp
             return(res)
         }

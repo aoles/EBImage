@@ -293,7 +293,7 @@ SEXP getRed(SEXP rgb) {
         void * src = &(INTEGER(rgb)[0]);
         image.read(nval, 1, "RGBp", CharPixel, src);
         SEXP res;
-        PROTECT(res = allocVector(INTSXP, nval));
+        PROTECT(res = allocVector(REALSXP, nval));
         void * dest = &(REAL(res)[0]);
         image.opacity(OpaqueOpacity);
         /* image.type(GrayscaleType); */
@@ -315,7 +315,7 @@ SEXP getGreen(SEXP rgb) {
         void * src = &(INTEGER(rgb)[0]);
         image.read(nval, 1, "RGBp", CharPixel, src);
         SEXP res;
-        PROTECT(res = allocVector(INTSXP, nval));
+        PROTECT(res = allocVector(REALSXP, nval));
         void * dest = &(REAL(res)[0]);
         image.opacity(OpaqueOpacity);
         /* image.type(GrayscaleType); */
@@ -337,7 +337,7 @@ SEXP getBlue(SEXP rgb) {
         void * src = &(INTEGER(rgb)[0]);
         image.read(nval, 1, "RGBp", CharPixel, src);
         SEXP res;
-        PROTECT(res = allocVector(INTSXP, nval));
+        PROTECT(res = allocVector(REALSXP, nval));
         void * dest = &(REAL(res)[0]);
         image.opacity(OpaqueOpacity);
         /* image.type(GrayscaleType); */
