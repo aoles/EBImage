@@ -32,11 +32,15 @@ SEXP readImages(SEXP files, SEXP rgb) {
             }
             catch (ErrorUndefined &magickError) {
                 warning(magickError.what());
-                continue;
+//                continue;  // commented: maybe something was loaded
             }
             catch (exception &error_) {
                 if (verbose)
                     warning(error_.what());
+            }
+            catch (...) {
+                if (verbose)
+                    warning("Unidentified non-critical IO problem");
             }
             for (MagickStack::iterator it = pushstack.begin(); it != pushstack.end(); it++) {
                 MagickImage image = *it;
@@ -47,6 +51,9 @@ SEXP readImages(SEXP files, SEXP rgb) {
     }
     catch (exception &error_) {
         error(error_.what());
+    }
+    catch (...) {
+        error("Unidentified critical memory problem");
     }
     /* the control should never come to this point */
     error("Bug in readImages, please contact EBImage package developers");
@@ -91,6 +98,9 @@ SEXP writeImages(SEXP rimage, SEXP files) {
     catch (exception &error_) {
         error(error_.what());
     }
+    catch (...) {
+        error("Unidentified critical memory problem");
+    }
     return R_NilValue;
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -120,6 +130,9 @@ SEXP pingImages(SEXP files, SEXP showComments) {
         catch (exception &error_) {
             warning(error_.what());
         }
+        catch (...) {
+            error("Unidentified non-critical IO problem");
+        }
         try {
             cout << "File: " << CHAR(STRING_ELT(files, i)) << endl;
             cout << "\tsize: width=" << image.columns() << "  height=" << image.rows() << endl;
@@ -137,6 +150,9 @@ SEXP pingImages(SEXP files, SEXP showComments) {
         catch (exception &error_) {
             warning(error_.what());
             continue;
+        }
+        catch (...) {
+            error("Unidentified non-critical IO problem");
         }
     }
     cout << "TOTAL size of all files: " << fileSize << endl << endl;
