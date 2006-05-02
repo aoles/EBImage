@@ -259,7 +259,7 @@ rotate <- function(x, degrees = 90) {
     return(.CallEBImage("stdFilter2DRedim", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-sampleImage <- function(x, dx, dy) {
+sample.image <- function(x, dx, dy) {
     if (!assert(x))
         stop("Wrong class of argument x, Image expected")
     if (missing(dx) || missing(dy))
@@ -269,7 +269,7 @@ sampleImage <- function(x, dx, dy) {
     return(.CallEBImage("stdFilter2DRedim", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-scaleImage <- function(x, dx, dy) {
+scale.image <- function(x, dx, dy) {
     if (!assert(x))
         stop("Wrong class of argument x, Image expected")
     if (missing(dx) || missing(dy))

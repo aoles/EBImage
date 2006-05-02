@@ -36,3 +36,13 @@ adaptThresh <- function(x, width = 20, height = 20, offset = 0.05, preprocess = 
     warning("adaptThresh(...) is deprecated. Use thresh(...) instead. Argument offset has now different range.")
     thresh(x, width, height, offset, preprocess)
 }
+## ------------------------------------------------------------
+scaleImage <- function(x, dx, dy) {
+    warning("scaleImage() and sampleImage(...) are deprecated. Use scale.image(...) and sample.image(...) instead")
+    scale.image(x, dx, dy)
+}
+## ------------------------------------------------------------
+sampleImage <- function(x, dx, dy) {
+    warning("scaleImage() and sampleImage(...) are deprecated. Use scale.image(...) and sample.image(...) instead")
+    sample.image(x, dx, dy)
+}

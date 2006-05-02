@@ -4,7 +4,7 @@ export(
 
     "blur", "contrast", "despeckle", "edge", "enhance", "equalize",
     "colorGamma", "gaussFilter", "medianFilter", "mod", "reduceNoise",
-    "rotate", "sampleImage", "scaleImage", "segment", "shade", "sharpen", "solarize",
+    "rotate", "sample.image", "scale.image", "segment", "shade", "sharpen", "solarize",
     "spread", "unsharpMask", "noise", "distMap", "thresh",
 
     "read.image", "ping.image",
@@ -14,7 +14,7 @@ export(
     "verboseEBImage",
 
     # DEPRECATE
-    "Image2D", "Image3D", "copyImage", "adaptThresh",
+    "Image2D", "Image3D", "copyImage", "adaptThresh", "sampleImage", "scaleImage",
 
     # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
     ".copyHeader",
@@ -32,7 +32,7 @@ exportClasses(
 exportMethods(
     "assert", "copy", "write.image", "display", "channels", "toGray", "toRGB", "toRed", "toGreen",
     "toBlue", "getRed", "getGreen", "getBlue", "normalize",
-    "as.array", "summary", "[", "show", "print",
+    "as.array", "summary", "[", "show", "print", "plot",
 
     # DEPRECATE
     "minMax",

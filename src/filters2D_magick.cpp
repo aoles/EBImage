@@ -240,14 +240,14 @@ SEXP stdFilter2DRedim(SEXP rimage, SEXP filterNo, SEXP param) {
                 case 16: {
                     if (npar < 2)
                         error("wrong number of parameters in call to 'sample'");
-                        Geometry geom((unsigned int)_param[0], (unsigned int)_param[1]);
+                    Geometry geom((unsigned int)_param[0], (unsigned int)_param[1]);
                     image.sample(geom);
                 }; break;
                 /* scale */
                 case 17: {
                     if (npar < 2)
                         error("wrong number of parameters in call to 'scale'");
-                        Geometry geom((unsigned int)_param[0], (unsigned int)_param[1]);
+                    Geometry geom((unsigned int)_param[0], (unsigned int)_param[1]);
                     image.scale(geom);
                 }; break;
                 default: error("Specified non-existing filter");

@@ -1,7 +1,6 @@
 \name{internals}
 \alias{internals}
 
-\alias{as.array,Image-method}
 \alias{isCorrectType,Image-method}
 \alias{correctType,Image-method}
 \alias{[,Image,missing,missing-method}
@@ -16,8 +15,6 @@
 \alias{getGreen,Image-method}
 \alias{getRed,Image-method}
 \alias{normalize,Image-method}
-\alias{show,Image-method}
-\alias{print,Image-method}
 \alias{copy,Image-method}
 \alias{summary,Image-method}
 \alias{toBlue,Image-method}
@@ -27,6 +24,7 @@
 \alias{toRGB,Image-method}
 \alias{write.image,Image,character-method}
 \alias{assert,Image-method}
+\alias{plot,Image,missing-method}
 
 % FIXME deprecating
 \alias{Image2D-class}
