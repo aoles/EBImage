@@ -4,6 +4,8 @@
 \alias{rotate}
 \alias{sampleImage}
 \alias{scaleImage}
+\alias{sample.image}
+\alias{scale.image}
 
 \concept{image transformation}
 \concept{image processing}
@@ -18,17 +20,17 @@
 
 \usage{
     rotate(x, degrees = 90)
-    sampleImage(x, dx, dy)
-    scaleImage(x, dx, dy)
+    sampleImage(x, dx, dy)  # deprecated, use scale.image instead
+    sample.image(x, dx, dy)
+    scaleImage(x, dx, dy)   # deprecated, use scale.image instead
+    scale.image(x, dx, dy)
 }
 
 \arguments{
     \item{x}{An instance of class \code{\link{Image}}.}
     \item{degrees}{Angle in degrees for counter-clockwise rotation of the image.}
-    \item{dx}{New image width.}
-    \item{dy}{New image height. FIXME: this argument is something else, although
-        ImageMagick tells it is what is written here, but the image is scaled/sampled
-        proportionally taking in account only the first argument.}
+    \item{dx}{New image width to fit in.}
+    \item{dy}{New image height to fit in.}
 }
 
 \value{
@@ -39,8 +41,9 @@
 \details{
     \code{rotate} rotates images counter-clockwise.
 
-    \code{sampleImage} uses sampling algorithm to resize images, whereas \code{scaleImage} uses
-    simple ratio algorithm.
+    \code{sample.image} uses sampling algorithm to resize images, whereas \code{scale.image} uses
+    simple ratio algorithm. Images are resized proportionally to fit in the given \code{dx} and
+    \code{dy}.
 }
 
 \seealso{
@@ -70,9 +73,9 @@
     # rotate edged image
     \dontrun{display(rotate(ed, 90))}
     # scale image
-    \dontrun{display(scaleImage(ed, 400, 300))}
+    \dontrun{display(scale.image(ed, 400, 300))}
     # sample image
-    \dontrun{display(sampleImage(ed, 400, 300))}
+    \dontrun{display(sample.image(ed, 400, 300))}
 }
 
 \keyword{dplot}

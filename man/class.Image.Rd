@@ -18,6 +18,10 @@
 \alias{getBlue}
 \alias{normalize}
 \alias{assert}
+\alias{plot,Image-method}
+\alias{show,Image-method}
+\alias{print,Image-method}
+\alias{as.array,Image-method}
 
 % deprecating
 \alias{Image2D}
@@ -68,10 +72,13 @@
     All methods of class \code{array} plus the following defined specifically for class \code{Image}:
 
     \describe{
-        \item{\code{display(Image)}:}{Displays an image on the screen. Only one image at a time
+        \item{\code{display(Image)}:}{Displays an image on the screen. Only one Image at a time
             can be displayed. Trying to call \code{display} when another image is on the
             screen will generate an error. At the moment it is not possible to automatically
             close the display window, please do not report it as a wish-feature.}
+        \item{\code{plot(Image)}:}{A slow substitution for \code{display} based on \code{graphics:::image}
+            method. This method works for grayscale images only and supports multiple windows.
+            In contrast to \code{display}, only the first image of a stack is displayed.}
         \item{\code{channels(Image)}:}{Returns a list of 3 grayscale images (named \code{red},
             \code{green} and \code{blue}) that represent channels of the input image. If the input
             image is grayscale, all three resulting images are the same.}
