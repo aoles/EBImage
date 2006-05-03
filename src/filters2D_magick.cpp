@@ -174,6 +174,17 @@ SEXP stdFilter2D(SEXP rimage, SEXP filterNo, SEXP param) {
                         default: image.addNoise(GaussianNoise);
                     }
                 }; break;
+                /* trim */
+                case 26: {
+                    if (npar < 1)
+                        error("wrong number of parameters in call to 'trim'");
+                    Color oldColor = image.backgroundColor();
+                    ColorGray newColor(_param[0]);
+                    image.backgroundColor(newColor);
+//                    image.colorFuzz(0.1);
+                    image.trim();
+                    image.backgroundColor(oldColor);
+                }; break;
                 default: error("Specified non-existing filter");
             }
         }
@@ -249,6 +260,13 @@ SEXP stdFilter2DRedim(SEXP rimage, SEXP filterNo, SEXP param) {
                         error("wrong number of parameters in call to 'scale'");
                     Geometry geom((unsigned int)_param[0], (unsigned int)_param[1]);
                     image.scale(geom);
+                }; break;
+                /* zoom */
+                case 25: {
+                    if (npar < 2)
+                        error("wrong number of parameters in call to 'zoom'");
+                    Geometry geom((unsigned int)_param[0], (unsigned int)_param[1]);
+                    image.zoom(geom);
                 }; break;
                 default: error("Specified non-existing filter");
             }

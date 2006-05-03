@@ -15,6 +15,7 @@ MagickImage  pullImageData(SEXP rimage, int index);
 void         pushImageData(MagickImage& image, SEXP rimage, int index);
 
 extern "C" {
+    /* images */
     SEXP toGray(SEXP rgb);
     SEXP toRGB(SEXP gray);
     SEXP getRed(SEXP rgb);
@@ -23,4 +24,8 @@ extern "C" {
     SEXP asRed(SEXP gray);
     SEXP asGreen(SEXP gray);
     SEXP asBlue(SEXP gray);
+
+    /* colors */
+    SEXP toColorString(SEXP rgb);
+    SEXP fromColorString(SEXP str); /* RGB vector */
 };
