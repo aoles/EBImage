@@ -3,13 +3,17 @@ setClass("Drawable",
         x           = "matrix",
         strokeColor = "character",
         strokeWidth = "numeric",
-        fillColor   = "character"
+        fillColor   = "character",
+        doFill      = "logical",
+        fillOpacity = "numeric"
     ),
     prototype(
         x           = matrix(0, 4, 1),
         strokeColor = "#FFFFFF",
         strokeWidth = 1,
-        fillColor   = "-"
+        fillColor   = "#000000",
+        doFill      = TRUE,
+        fillOpacity = 0.5
     )
 )
 
@@ -47,7 +51,7 @@ setClass("DrawableLine",
 )
 
 DrawableLine <- function(x1, y1, x2, y2) {
-    if (missing(x) || missing(y) || missing(x1) || missing(y1))
+    if (missing(x1) || missing(y1) || missing(x2) || missing(y2))
         stop("Please supply all four coordinates")
     if (length(x1) != length(y1) || length(x2) != length(y2) || length(x1) != length(x2))
         stop("Vectors of coordinates must be of the same length")
@@ -59,7 +63,7 @@ setClass("DrawableRect",
 )
 
 DrawableRect <-function(x1, y1, x2, y2) {
-    if (missing(x) || missing(y) || missing(x1) || missing(y1))
+    if (missing(x1) || missing(y1) || missing(x2) || missing(y2))
         stop("Please supply all four coordinates")
     if (length(x1) != length(y1) || length(x2) != length(y2) || length(x1) != length(x2))
         stop("Vectors of coordinates must be of the same length")
@@ -71,7 +75,7 @@ setClass("DrawableEllipse",
 )
 
 DrawableEllipse <-function(x1, y1, x2, y2) {
-    if (missing(x) || missing(y) || missing(x1) || missing(y1))
+    if (missing(x1) || missing(y1) || missing(x2) || missing(y2))
         stop("Please supply all four coordinates")
     if (length(x1) != length(y1) || length(x2) != length(y2) || length(x1) != length(x2))
         stop("Vectors of coordinates must be of the same length")

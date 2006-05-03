@@ -30,7 +30,7 @@ SEXP drawShapes(SEXP rimage, SEXP drawable) {
         if (strcmp(drawablestr, "DrawableEllipse") == 0) shape = 5;
         if (shape <= 0)
             error("Wrong class of argument drawable");
-        cout << shape << endl;
+        //cout << shape << endl;
         SEXP dataSlot = GET_SLOT(drawable, mkString("x"));
         double * data = REAL(dataSlot);
         Color col = ColorGray(0);
@@ -44,10 +44,10 @@ SEXP drawShapes(SEXP rimage, SEXP drawable) {
         objects.push_back(DrawableStrokeColor(col));
         double width = REAL(GET_SLOT(drawable, mkString("strokeWidth")))[0];
         objects.push_back(DrawableStrokeWidth(width));
-        SEXP fillColor = GET_SLOT(drawable, mkString("fillColor"));
-
-        if (strcmp(CHAR(asChar(fillColor)), "-") != 0) {
+        bool doFill = LOGICAL(GET_SLOT(drawable, mkString("doFill")))[0];
+        if (doFill) {
             col = ColorGray(0.5);
+            SEXP fillColor = GET_SLOT(drawable, mkString("fillColor"));
             try {
                 col = Color(CHAR(asChar(fillColor)));
             }
@@ -55,6 +55,11 @@ SEXP drawShapes(SEXP rimage, SEXP drawable) {
                 warning(error_.what());
             }
             objects.push_back(DrawableFillColor(col));
+            double opacity = REAL(GET_SLOT(drawable, mkString("fillOpacity")))[0];
+            objects.push_back(DrawableFillOpacity(opacity));
+        }
+        else {
+            objects.push_back(DrawableFillOpacity(0));
         }
         switch(shape) {
             case 1: {
@@ -69,7 +74,7 @@ SEXP drawShapes(SEXP rimage, SEXP drawable) {
                     x = data[i];
                     y = data[i + nobjects];
                     r = data[i + 2 * nobjects];
-                    obj = DrawableEllipse(x, y, r, r, 0, 0);
+                    obj = DrawableEllipse(x, y, r, r, 0, 360);
                     objects.push_back(obj);
                 }
             }; break;
@@ -111,7 +116,7 @@ SEXP drawShapes(SEXP rimage, SEXP drawable) {
                     y1 = data[i + nobjects];
                     x2 = data[i + 2 * nobjects];
                     y2 = data[i + 3 * nobjects];
-                    obj = DrawableEllipse(0.5 * (x1 + x2), 0.5 * (y1 + y2), 0.5 * fabs(x2 - x1), 0.5 * fabs(y2 - y1), 0, 0);
+                    obj = DrawableEllipse(0.5 * (x1 + x2), 0.5 * (y1 + y2), 0.5 * fabs(x2 - x1), 0.5 * fabs(y2 - y1), 0, 360);
                     objects.push_back(obj);
                 }
             }; break;
