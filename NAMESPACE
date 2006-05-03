@@ -4,14 +4,19 @@ export(
 
     "blur", "contrast", "despeckle", "edge", "enhance", "equalize",
     "colorGamma", "gaussFilter", "medianFilter", "mod", "reduceNoise",
-    "rotate", "sample.image", "scale.image", "segment", "shade", "sharpen", "solarize",
-    "spread", "unsharpMask", "noise", "distMap", "thresh",
+    "rotate", "sample.image", "scale.image", "zoom.image", "segment", "shade", "sharpen", "solarize", "trim",
+    "spread", "unsharpMask", "noise", "distMap", "thresh", "draw",
 
     "read.image", "ping.image",
 
     "objectCount",
 
     "verboseEBImage",
+
+    "colString", "colRGB",
+
+    "DrawableText", "DrawableCircle", "DrawableLine",
+    "DrawableRect", "DrawableEllipse",
 
     # DEPRECATE
     "Image2D", "Image3D", "copyImage", "adaptThresh", "sampleImage", "scaleImage",
@@ -22,12 +27,14 @@ export(
     ".blur", ".contrast", ".despeckle", ".edge", ".enhance", ".equalize",
     ".colorGamma", ".gaussFilter", ".medianFilter", ".mod", ".reduceNoise",
     ".segment", ".shade", ".sharpen", ".solarize",
-    ".spread", ".unsharpMask", ".noise"
+    ".spread", ".unsharpMask", ".noise", ".trim", ".draw"
 )
 exportClasses(
     "Image",
     # DEPRECATE
-    "Image2D", "Image3D"
+    "Image2D", "Image3D",
+    "Drawable", "DrawableText", "DrawableCircle", "DrawableLine",
+    "DrawableRect", "DrawableEllipse"
 )
 exportMethods(
     "assert", "copy", "write.image", "display", "channels", "toGray", "toRGB", "toRed", "toGreen",

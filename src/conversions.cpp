@@ -416,4 +416,51 @@ SEXP asBlue(SEXP gray) {
     }
     return R_NilValue;
 }
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+   colors
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+SEXP toColorString(SEXP rgb) {
+    SEXP res = R_NilValue;
+    bool isProtected = false;
+    try {
+        double * values = REAL(rgb);
+        Color col;
+        switch(LENGTH(rgb)) {
+            case 1: col = ColorGray(values[0]); break;
+            case 3: col = ColorRGB(values[0], values[1], values[2]); break;
+            default:
+                error("Please supply either 1 value for gray or 3 for RGB");
+        }
+        PROTECT(res = allocVector(STRSXP,1));
+        isProtected = true;
+        SET_STRING_ELT(res, 0, mkChar(string(col).c_str()));
+        UNPROTECT(1);
+    }
+    catch(exception &error_) {
+        if (isProtected)
+            UNPROTECT(1);
+        error(error_.what());
+    }
+    return res;
+}
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+SEXP fromColorString(SEXP str) { /* RGB vector */
+    SEXP res = R_NilValue;
+    bool isProtected = false;
+    try {
+        ColorRGB col = Color(CHAR(asChar(str)));
+        PROTECT(res = allocVector(REALSXP, 3));
+        isProtected = true;
+        REAL(res)[0] = col.red();
+        REAL(res)[1] = col.green();
+        REAL(res)[2] = col.blue();
+        UNPROTECT(1);
+    }
+    catch(exception &error_) {
+        if (isProtected)
+            UNPROTECT(1);
+        error(error_.what());
+    }
+    return res;
+}
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */

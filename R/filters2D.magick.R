@@ -279,6 +279,16 @@ scale.image <- function(x, dx, dy) {
     return(.CallEBImage("stdFilter2DRedim", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+zoom.image <- function(x, dx, dy) {
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
+    if (missing(dx) || missing(dy))
+        stop("arguments 'dx' and 'dy' are essential")
+    param = as.double(c(dx, dy))
+    filter = as.integer(25)
+    return(.CallEBImage("stdFilter2DRedim", x, filter, param))
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .segment <- function(x, cluster = 1, smooth = 1.5, modify = TRUE) {
     if (!assert(x))
@@ -415,4 +425,22 @@ unsharpMask <- function(x, radius = 2, sigma = 0.5, amount = 5, threshold = 2) {
 # possible types: uniform, gaussian, multi(plicativeGaussian), impulse, laplace(ian), poisson
 noise <- function(x, type = "gaussian") {
     .noise(x, type, modify = FALSE)
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
+.trim <- function(x, bg = 0, modify = TRUE) {
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
+    param = as.double(bg)
+    filter = as.integer(26)
+    if (!modify) {
+        x = copy(x)
+        return(.CallEBImage("stdFilter2D", x, filter, param))
+    }
+    else # original data modified
+        invisible(.CallEBImage("stdFilter2D", x, filter, param))
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+trim <- function(x, bg = 0) {
+    .trim(x, bg, modify = FALSE)
 }
