@@ -2,10 +2,14 @@
 \alias{Transformation}
 
 \alias{rotate}
-\alias{sampleImage}
-\alias{scaleImage}
 \alias{sample.image}
 \alias{scale.image}
+\alias{zoom.image}
+\alias{trim}
+
+% deprecate
+\alias{sampleImage}
+\alias{scaleImage}
 
 \concept{image transformation}
 \concept{image processing}
@@ -24,6 +28,8 @@
     sample.image(x, dx, dy)
     scaleImage(x, dx, dy)   # deprecated, use scale.image instead
     scale.image(x, dx, dy)
+    zoom.image(x, dx, dy)
+    trim(x, bg = 0)
 }
 
 \arguments{
@@ -31,6 +37,7 @@
     \item{degrees}{Angle in degrees for counter-clockwise rotation of the image.}
     \item{dx}{New image width to fit in.}
     \item{dy}{New image height to fit in.}
+    \item{bg}{Background color shade to trim.}
 }
 
 \value{
@@ -41,7 +48,8 @@
 \details{
     \code{rotate} rotates images counter-clockwise.
 
-    \code{sample.image} uses sampling algorithm to resize images, whereas \code{scale.image} uses
+    \code{sample.image} uses sampling algorithm to resize images, whereas \code{scale.image} and \code{zoom.image} (difference to be clarified from
+    ImageMagick help pages) use
     simple ratio algorithm. Images are resized proportionally to fit in the given \code{dx} and
     \code{dy}.
 }

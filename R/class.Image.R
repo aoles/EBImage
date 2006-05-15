@@ -31,7 +31,8 @@ setGeneric("getBlue",     function(object)      standardGeneric("getBlue"))
 setGeneric("normalize",   function(object, ...) standardGeneric("normalize"))
 setGeneric("as.array",    function(x)           standardGeneric("as.array"))
 setGeneric("summary",     function(object, ...) standardGeneric("summary"))
-setGeneric("plot",        function(x, y, ...)      standardGeneric("plot"))
+setGeneric("plot",        function(x, y, ...)   standardGeneric("plot"))
+setGeneric("print",       function(x, ...)      standardGeneric("print"))
 
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 setGeneric(".normalize",  function(object, ...) standardGeneric(".normalize"))
@@ -246,7 +247,7 @@ setMethod("getBlue", signature(object = "Image"),
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod(".normalize", signature(object = "Image"),
-    function(object, from = 0, to = 1.0, modify = FALSE, independent = FALSE) {
+    function(object, from = 0, to = 1.0, independent = FALSE, modify = TRUE) {
         if (object@rgb)
             stop("Function supports grayscale images only")
         if (!modify) {
@@ -260,7 +261,7 @@ setMethod(".normalize", signature(object = "Image"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("normalize", signature(object = "Image"),
     function(object, from = 0, to = 1.0, independent = FALSE) {
-        .normalize(object, from, to, modify = FALSE, independent)
+        .normalize(object, from, to, independent, modify = FALSE)
     }
 )
 

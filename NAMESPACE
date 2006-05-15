@@ -4,7 +4,8 @@ export(
 
     "blur", "contrast", "despeckle", "edge", "enhance", "equalize",
     "colorGamma", "gaussFilter", "medianFilter", "mod", "reduceNoise",
-    "rotate", "sample.image", "scale.image", "zoom.image", "segment", "shade", "sharpen", "solarize", "trim",
+    "rotate", "sample.image", "scale.image", "zoom.image", "segment",
+    "shade", "sharpen", "solarize", "trim",
     "spread", "unsharpMask", "noise", "distMap", "thresh", "draw",
 
     "read.image", "ping.image",
@@ -15,8 +16,8 @@ export(
 
     "colString", "colRGB",
 
-    "DrawableText", "DrawableCircle", "DrawableLine",
-    "DrawableRect", "DrawableEllipse",
+    # "DrawableText",
+    "DrawableCircle", "DrawableLine", "DrawableRect", "DrawableEllipse",
 
     # DEPRECATE
     "Image2D", "Image3D", "copyImage", "adaptThresh", "sampleImage", "scaleImage",
@@ -31,10 +32,11 @@ export(
 )
 exportClasses(
     "Image",
+    # "Drawable",
+    # "DrawableText",
+    "DrawableCircle", "DrawableLine", "DrawableRect", "DrawableEllipse",
     # DEPRECATE
-    "Image2D", "Image3D",
-    "Drawable", "DrawableText", "DrawableCircle", "DrawableLine",
-    "DrawableRect", "DrawableEllipse"
+    "Image2D", "Image3D"
 )
 exportMethods(
     "assert", "copy", "write.image", "display", "channels", "toGray", "toRGB", "toRed", "toGreen",

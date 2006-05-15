@@ -1,4 +1,4 @@
-AC_INIT([EBImage], 1.0.3)
+AC_INIT([EBImage], 1.3.016)
 
 AC_CHECK_PROG(magickfound, [Magick++-config --version], yes, no)
 if test "$magickfound" = "yes"; then

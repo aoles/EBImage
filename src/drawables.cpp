@@ -108,15 +108,17 @@ SEXP drawShapes(SEXP rimage, SEXP drawable) {
             }; break;
             /* ellipse */
             case 5: {
-                int nobjects = LENGTH(dataSlot) / 4;
+                int nobjects = LENGTH(dataSlot) / 6;
                 Drawable obj;
-                double x1, y1, x2, y2;
+                double x1, y1, x2, y2, s, e;
                 for (int i = 0; i < nobjects; i++) {
                     x1 = data[i];
                     y1 = data[i + nobjects];
                     x2 = data[i + 2 * nobjects];
                     y2 = data[i + 3 * nobjects];
-                    obj = DrawableEllipse(0.5 * (x1 + x2), 0.5 * (y1 + y2), 0.5 * fabs(x2 - x1), 0.5 * fabs(y2 - y1), 0, 360);
+                    s =  data[i + 4 * nobjects];
+                    e =  data[i + 5 * nobjects];
+                    obj = DrawableEllipse(0.5 * (x1 + x2), 0.5 * (y1 + y2), 0.5 * fabs(x2 - x1), 0.5 * fabs(y2 - y1), s, e);
                     objects.push_back(obj);
                 }
             }; break;
