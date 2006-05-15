@@ -8,8 +8,8 @@
 }
 
 \description{
-    Some filters are ported from ImageMagick library. Applied to a image stacks, filters are executed
-    sequentially and independently for each 2D image.
+    Some filters are ported from ImageMagick library. Applied to a image stacks,
+    filters are executed sequentially and independently for each 2D image.
 }
 
 \details{

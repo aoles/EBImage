@@ -30,6 +30,11 @@
 \alias{Image2D-class}
 \alias{Image3D-class}
 \alias{minMax,Image-method}
+\alias{Drawable-class}
+\alias{DrawableCircle-class}
+\alias{DrawableRect-class}
+\alias{DrawableEllipse-class}
+\alias{DrawableLine-class}
 
 % internal
 \alias{.as.integer,Image-method}
@@ -59,6 +64,8 @@
 \alias{.spread}
 \alias{.unsharpMask}
 \alias{.noise}
+\alias{.draw}
+\alias{.trim}
 \alias{correctType}
 \alias{isCorrectType}
 \alias{verboseEBImage}
