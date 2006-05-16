@@ -41,7 +41,7 @@ exportClasses(
 exportMethods(
     "assert", "copy", "write.image", "display", "channels", "toGray", "toRGB", "toRed", "toGreen",
     "toBlue", "getRed", "getGreen", "getBlue", "normalize",
-    "as.array", "summary", "[", "show", "print", "plot",
+    "as.array", "summary", "[", "show", "print", "plot.image",
 
     # DEPRECATE
     "minMax",

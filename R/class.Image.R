@@ -31,7 +31,7 @@ setGeneric("getBlue",     function(object)      standardGeneric("getBlue"))
 setGeneric("normalize",   function(object, ...) standardGeneric("normalize"))
 setGeneric("as.array",    function(x)           standardGeneric("as.array"))
 setGeneric("summary",     function(object, ...) standardGeneric("summary"))
-setGeneric("plot",        function(x, y, ...)   standardGeneric("plot"))
+setGeneric("plot.image",  function(x, ...)      standardGeneric("plot.image"))
 setGeneric("print",       function(x, ...)      standardGeneric("print"))
 
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
@@ -459,8 +459,8 @@ setMethod("summary", signature(object = "Image"),
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("plot", signature(x = "Image", y = "missing"),
-    function(x, y, xlab = "", ylab = "", axes = FALSE, ...) {
+setMethod("plot.image", signature(x = "Image"),
+    function(x, xlab = "", ylab = "", axes = FALSE, ...) {
         if (x@rgb)
             stop("Function defined for grayscale images only. Use display() instead")
         .dim <- dim(x)

@@ -24,7 +24,7 @@
 \alias{toRGB,Image-method}
 \alias{write.image,Image,character-method}
 \alias{assert,Image-method}
-\alias{plot,Image,missing-method}
+\alias{plot.image,Image-method}
 
 % FIXME deprecating
 \alias{Image2D-class}
