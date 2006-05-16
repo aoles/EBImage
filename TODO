@@ -31,27 +31,6 @@ might be the result of changes made there (I was able to read the same image
 with the previous version. I tried to run ImageMagick "convert" command line
 to make sure the image and ImageMagick are still intact).
 ===================================================================
-? [Firas 30/04/06] way to plot images
--------------------------------------------------------------------
-I have been playing a bit with EBImage and encoutered the following issue
-while displaying images and thought it might interest you.
-
-The function display(im) did not display anything on my machine. According
-to the documentation, it has some limitations - I am not sure if they are
-related to my problem or not. I used the rtiff package instead to plot the
-images. The rtiff package redefines plot for matrices, making it plotting
-the image instead of the function graph. This also eliminates the limitation
-that the display function has (one can plot as many images as one likes). In
-addition, it allows one to use locator() to locate interesting pixels
-(though because of transposing the matrix before plotting one needs to
-exchange the x and y coordinates, see call to plotIm below, and do a weird
-transformation for the y coordinates before transposing or the x coordinates
-after transposing - I don't know if one can use locator() with display() or
-not).
-Here is how I plot the images:
-
-> >plotIm <- function(im) { plot(t(matrix(im, nro= nrow(im), ncol = ncol(im)))) }
-===================================================================
 ? [OS 26/04/06] mod
 -------------------------------------------------------------------
 Any settings generate black image
@@ -101,6 +80,27 @@ etc. and provide further details (e.g. function names) there.
 I think for our type of applications it would also be good to
 be able to emit warnings or an error if the images have different sizes (because
 in an HT screen, we expect them all to be the same size)
+===================================================================
++ [Firas 30/04/06] way to plot images
+-------------------------------------------------------------------
+I have been playing a bit with EBImage and encoutered the following issue
+while displaying images and thought it might interest you.
+
+The function display(im) did not display anything on my machine. According
+to the documentation, it has some limitations - I am not sure if they are
+related to my problem or not. I used the rtiff package instead to plot the
+images. The rtiff package redefines plot for matrices, making it plotting
+the image instead of the function graph. This also eliminates the limitation
+that the display function has (one can plot as many images as one likes). In
+addition, it allows one to use locator() to locate interesting pixels
+(though because of transposing the matrix before plotting one needs to
+exchange the x and y coordinates, see call to plotIm below, and do a weird
+transformation for the y coordinates before transposing or the x coordinates
+after transposing - I don't know if one can use locator() with display() or
+not).
+Here is how I plot the images:
+
+> >plotIm <- function(im) { plot(t(matrix(im, nro= nrow(im), ncol = ncol(im)))) }
 ===================================================================
 + [Firas 30/04/06] wrong class in subscription
 -------------------------------------------------------------------

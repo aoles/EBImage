@@ -18,7 +18,7 @@
 \alias{getBlue}
 \alias{normalize}
 \alias{assert}
-\alias{plot,Image-method}
+\alias{plot.image}
 \alias{show,Image-method}
 \alias{print,Image-method}
 \alias{as.array,Image-method}
@@ -76,7 +76,7 @@
             can be displayed. Trying to call \code{display} when another image is on the
             screen will generate an error. At the moment it is not possible to automatically
             close the display window, please do not report it as a wish-feature.}
-        \item{\code{plot(Image)}:}{A slow substitution for \code{display} based on \code{graphics:::image}
+        \item{\code{plot.image(Image)}:}{A slow substitution for \code{display} based on \code{graphics:::image}
             method. This method works for grayscale images only and supports multiple windows.
             In contrast to \code{display}, only the first image of a stack is displayed.}
         \item{\code{channels(Image)}:}{Returns a list of 3 grayscale images (named \code{red},
