@@ -6,8 +6,9 @@ if test "$magickfound" = "yes"; then
     AC_CHECK_PROG(magickincludes, [Magick++-config --cppflags], yes, no)
     if test "$magickincludes" = "yes"; then
         echo ImageMagick++ includes located in `Magick++-config --cppflags`
-        CXXFLAGS="`Magick++-config --cppflags`"
-        CXXFLAGS="${CXXFLAGS} `Magick++-config --cxxflags`"
+        COMPILERFLAGS="`Magick++-config --cppflags`"
+        COMPILERFLAGS="${CXXFLAGS} `Magick++-config --cxxflags`"
+        CXXFLAGS="${COMPILERFLAGS} ${CXXFLAGS}"
         LIBS="`Magick++-config --ldflags`"
         LIBS="${LIBS} `Magick++-config --libs`"
     else
