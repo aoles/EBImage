@@ -37,10 +37,10 @@
 \section{Slots}{
     \describe{
         \item{\code{x}:}{Matrix of coordinates and parameters: 3 columns of (x,y,r) for circles;
-            4 columns of (x1,y1,x2,y2) - bounding box coordinates for ellipses, lines and rectangles.}
-        \item{\code{strokeColor}:}{Stroke color as character in X11 format, i.e. "#FF0000".}
-        \item{\code{strokeWidth}:}{Stroke width in pixels.}
-        \item{\code{fillColor}:}{Fill color as character in X11 format, i.e. "#00FF00"}
+            4 columns of (x1,y1,x2,y2) - bounding box coordinates for ellipses, lines and rectangles}
+        \item{\code{strokeColor}:}{Stroke color as character in X11 format}
+        \item{\code{strokeWidth}:}{Stroke width in pixels}
+        \item{\code{fillColor}:}{Fill color as character in X11 format}
         \item{\code{doFill}:}{A logical value if objects have to be filled.}
         \item{\code{fillOpacity}:}{A numeric value between 0 and 1 for filled object transparency.
             0 - transparent and 1 - opacue fill.}
