@@ -269,15 +269,15 @@ sample.image <- function(x, dx, dy) {
     return(.CallEBImage("stdFilter2DRedim", x, filter, param))
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-scale.image <- function(x, dx, dy) {
-    if (!assert(x))
-        stop("Wrong class of argument x, Image expected")
-    if (missing(dx) || missing(dy))
-        stop("arguments 'dx' and 'dy' are essential")
-    param = as.double(c(dx, dy))
-    filter = as.integer(17)
-    return(.CallEBImage("stdFilter2DRedim", x, filter, param))
-}
+#scale.image <- function(x, dx, dy) {
+#    if (!assert(x))
+#        stop("Wrong class of argument x, Image expected")
+#    if (missing(dx) || missing(dy))
+#        stop("arguments 'dx' and 'dy' are essential")
+#    param = as.double(c(dx, dy))
+#    filter = as.integer(17)
+#    return(.CallEBImage("stdFilter2DRedim", x, filter, param))
+#}
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 zoom.image <- function(x, dx, dy) {
     if (!assert(x))

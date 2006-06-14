@@ -3,7 +3,7 @@
 
 \alias{rotate}
 \alias{sample.image}
-\alias{scale.image}
+%\alias{scale.image}
 \alias{zoom.image}
 \alias{trim}
 
@@ -24,10 +24,10 @@
 
 \usage{
     rotate(x, degrees = 90)
-    sampleImage(x, dx, dy)  # deprecated, use scale.image instead
+    sampleImage(x, dx, dy)  # deprecated, use sample.image instead
     sample.image(x, dx, dy)
-    scaleImage(x, dx, dy)   # deprecated, use scale.image instead
-    scale.image(x, dx, dy)
+    scaleImage(x, dx, dy)   # deprecated, use sample.image instead
+%    scale.image(x, dx, dy)
     zoom.image(x, dx, dy)
     trim(x, bg = 0)
 }

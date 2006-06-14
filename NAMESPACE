@@ -4,7 +4,7 @@ export(
 
     "blur", "contrast", "despeckle", "edge", "enhance", "equalize",
     "colorGamma", "gaussFilter", "medianFilter", "mod", "reduceNoise",
-    "rotate", "sample.image", "scale.image", "zoom.image", "segment",
+    "rotate", "sample.image", "zoom.image", "segment",
     "shade", "sharpen", "solarize", "trim",
     "spread", "unsharpMask", "noise", "distMap", "thresh", "draw",
 
