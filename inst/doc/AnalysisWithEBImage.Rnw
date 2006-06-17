@@ -1,0 +1,17 @@
+%\VignetteIndexEntry{Image analysis with EBImage}
+%\VignetteDepends{}
+%\VignetteKeywords{image processing, visualization}
+%\VignettePackage{EBImage}
+
+\documentclass[a4paper]{report}
+\usepackage{Rnews}
+\usepackage[round]{natbib}
+
+%\usepackage[baseurl={http://www.ebi.ac.uk/~osklyar/projects/EBImage/},pdftitle={EBImage - Image Processing Toolkit For R},pdfauthor={Oleg Sklyar},pdfsubject={EBImage},pdfkeywords={image processing},pagebackref,bookmarks,colorlinks,linkcolor=darkblue,citecolor=darkblue,pagecolor=darkblue,raiselinks,plainpages,pdftex]{hyperref}
+
+\bibliographystyle{abbrvnat}
+\begin{document}
+\begin{article}
+\include{ebimage}
+\end{article}
+\end{document}
