@@ -53,7 +53,7 @@ inline double dist(Point & p1, Point & p2) {
     return sqrt((long double)((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y)));
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void doWatershed(double *, double *, Point &, double, int, vector<TheObject> &);
+void doWatershed(double *, double *, Point &, double, int, vector<TheObject> &, bool);
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 SEXP watershedDetection(SEXP rimage, SEXP srcimage, SEXP seeds, SEXP params) {
     if (!assertImage(rimage))
@@ -76,8 +76,9 @@ SEXP watershedDetection(SEXP rimage, SEXP srcimage, SEXP seeds, SEXP params) {
         Point size(dim[0], dim[1]);
         double mindist = REAL(params)[0];
         double minradius = REAL(params)[1];
+        bool   rmedges = (bool)REAL(params)[2];
         vector<TheObject> objects;
-        doWatershed(data, srcdata, size, mindist, (int)minradius, objects);
+        doWatershed(data, srcdata, size, mindist, (int)minradius, objects, rmedges);
         int nobj = objects.size();
         if (nobj > 0) {
             Point pt;
@@ -108,7 +109,7 @@ SEXP watershedDetection(SEXP rimage, SEXP srcimage, SEXP seeds, SEXP params) {
     return res;
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void doWatershed(double * data, double * srcdata, Point & size, double mindist, int minradius, vector<TheObject> & objects) {
+void doWatershed(double * data, double * srcdata, Point & size, double mindist, int minradius, vector<TheObject> & objects, bool rmedges) {
     int npts = size.x * size.y;
     /* DistMap will be negated (-1*) and this is its minimum value then */
     int mindata = 0;
@@ -212,9 +213,11 @@ void doWatershed(double * data, double * srcdata, Point & size, double mindist, 
             /* it is not neighbouring any object, but maube it is close enough anyway 
                THE ABOVE IS much FASTER, therefore this is only run if the above does not
                show anything */
+            /* not sure if we need this */
+            /* OH YES, WE DO - comment and check otherwise - terrible */
             if (!seeded) {
                 objind = -1;
-                /* we only consider objects closer than mindist */
+                // we only consider objects closer than mindist
                 objdist  = mindist;
                 for (io = 0; io < objects.size(); io++) {
                     objdist0 = dist(coordFromIndex(objects[io].index, size, objcentre), pt);
@@ -274,7 +277,9 @@ void doWatershed(double * data, double * srcdata, Point & size, double mindist, 
     } // d
     /* now we have all objects - let's get their shapes */
     /* we will use its sorted state to speed up calculations */
+    /* remove edgy points if required */
     objind = -1;
+    bool dorm = false;
     for (i = 0; i < nonBG; i++) {
         val = data[index[i]];
         /* just o be sure that we do not do smth wrong */
@@ -286,11 +291,18 @@ void doWatershed(double * data, double * srcdata, Point & size, double mindist, 
             coordFromIndex(objects[objind].index, size, objcentre);
             objects[objind].dx = pt.x - objcentre.x;
             objects[objind].dy = pt.y - objcentre.y;
+            dorm = false;
+            if (rmedges)
+                if (objects[objind].edge > 0.1 * objects[objind].perimeter)
+                    dorm = true;
         }
         else {
             objects[objind].dx += pt.x - objcentre.x;
             objects[objind].dy += pt.y - objcentre.y;
         }
+        if (dorm)
+            data[index[i]] = BG;
     }    
+    
     delete[] index;
 } 

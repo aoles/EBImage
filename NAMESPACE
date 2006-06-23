@@ -10,7 +10,7 @@ export(
 
     "read.image", "ping.image",
 
-    "objectCount",
+    "objectCount", "watershed",
 
     "verboseEBImage",
 
