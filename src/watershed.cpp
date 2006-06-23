@@ -85,8 +85,8 @@ SEXP watershedDetection(SEXP rimage, SEXP srcimage, SEXP seeds, SEXP params) {
             SEXP dims;
             PROTECT(dims = allocVector(INTSXP, 2));
             INTEGER(dims)[0] = nobj;
-            INTEGER(dims)[1] = 9;
-            PROTECT(res = allocVector(REALSXP, nobj * 9));
+            INTEGER(dims)[1] = 7; //9;
+            PROTECT(res = allocVector(REALSXP, nobj * 7)); //9));
             SET_DIM(res, dims);
             for (int i = 0; i < nobj; i++) {
                 REAL(res)[i]            = 0; /* index */
@@ -97,8 +97,10 @@ SEXP watershedDetection(SEXP rimage, SEXP srcimage, SEXP seeds, SEXP params) {
                 REAL(res)[i + 4 * nobj] = objects[i].size;
                 REAL(res)[i + 5 * nobj] = objects[i].perimeter;
                 REAL(res)[i + 6 * nobj] = objects[i].edge;
+            /* we do not need these two at the moment - do not work 
                 REAL(res)[i + 7 * nobj] = objects[i].dx;
                 REAL(res)[i + 8 * nobj] = objects[i].dy;
+            */
             }
             UNPROTECT(2);
         }
@@ -275,25 +277,28 @@ void doWatershed(double * data, double * srcdata, Point & size, double mindist, 
             }
         } // i 
     } // d
-    /* now we have all objects - let's get their shapes */
-    /* we will use its sorted state to speed up calculations */
-    /* remove edgy points if required */
+/*
+    This does not work as it is supposed - apparently index is not fully sorted
+
+    // now we have all objects - let's get their shapes 
+    // we will use its sorted state to speed up calculations 
+    // remove edgy points if required 
     objind = -1;
     bool dorm = false;
     for (i = 0; i < nonBG; i++) {
         val = data[index[i]];
-        /* just o be sure that we do not do smth wrong */
+        // just o be sure that we do not do smth wrong 
         if (val <= 0) continue;
         coordFromIndex(index[i], size, pt);
         if (val != objind) {
-            /* we change objind and considering data are sorted - reset the dx, dy */
+            // we change objind and considering data are sorted - reset the dx, dy 
             objind = (int)val;
             coordFromIndex(objects[objind].index, size, objcentre);
             objects[objind].dx = pt.x - objcentre.x;
             objects[objind].dy = pt.y - objcentre.y;
             dorm = false;
             if (rmedges)
-                if (objects[objind].edge > 0.1 * objects[objind].perimeter)
+                if (objects[objind].edge > 3) //0.05 * objects[objind].perimeter)
                     dorm = true;
         }
         else {
@@ -303,6 +308,6 @@ void doWatershed(double * data, double * srcdata, Point & size, double mindist, 
         if (dorm)
             data[index[i]] = BG;
     }    
-    
+*/    
     delete[] index;
 } 
