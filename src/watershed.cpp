@@ -2,7 +2,7 @@
 #include "conversions.h"
 #include <R_ext/Error.h>
 #include <vector>
-#include <algorithm>
+/* #include <algorithm> */
 #include <iostream>
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 const double BG = 0;
@@ -53,147 +53,9 @@ inline double dist(Point & p1, Point & p2) {
     return sqrt((long double)((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y)));
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void doWatershed(double * data, double * srcdata, Point & size, double mindist, int minradius, vector<TheObject> & objects) {
-    int npts = size.x * size.y;
-    /* I need to create a vector of indexes, which is sorted by the intensity of the corresponding distmap value */
-    int mindata = 0;
-    int nonzeros = -1;
-    for (int i = 0; i < npts; i++) {
-        data[i] = -ceil(data[i]);
-        if (data[i] < BG) {
-            nonzeros++;
-            if (data[i] < mindata)
-                mindata = (int)data[i];
-        }
-    }
-    int * index = new int[nonzeros];
-    int lastpt = -1;
-    for (int i = 0; i < npts; i++) {
-        if (data[i] < BG) {
-            lastpt++;
-            index[lastpt] = i;
-        }
-    }
-/* DEBUG */
-//cout << "Max " << mindata << " lastpt " << lastpt << endl;
-    /* if value of the maximum point is smaller than the minradius - return */
-    if (fabs(mindata) < minradius) return;
-    Point pt, objcentre;
-    bool seeded, edgypt; int objind, objind0, perimeterpt; double objdist, objdist0, val;
-    for (int d = mindata; d < 0; d++) {
-/* DEBUG */
-//cout << "d " << d  << endl;
-//cout << objects.size() << endl;
-        int i = 0;
-        while (i <= lastpt) {        
-            if (data[index[i]] > d) {
-                i++;
-                continue;
-            }
-/* DEBUG */
-//cout << "i " << i  << " of " << lastpt << endl;
-//cout << objects.size() << endl;
-            /* get coordinates of the current point */
-            coordFromIndex(index[i], size, pt);
-            /* check neighbours: if one or more negative - add the closest, if all non-negative - 
-              check to start new seed - check if any other seed is close and 
-              add to closest otherwise and check if object is larger than minsize before starting the object */
-            seeded = false;
-            perimeterpt = 0;
-            edgypt = false;
-            objind = -1;
-            objdist = size.x + size.y;
-//cout << "pass getting coordinates" << endl;
-            for (int ix = pt.x - 1; ix <= pt.x + 1; ix += 2) {
-                for (int iy = pt.y - 1; iy <= pt.y + 1; iy += 2) {
-                    if (ix < 0 || ix >= size.x || iy < 0 || iy >= size.y) {
-                        edgypt = true;
-                        continue;
-                    }
-                    val = data[ix + iy * size.x];
-                    if (val < 0) continue;
-                    /* this can be a perimeter point and it can edge more than one obj/BG */
-                    if (val == 0) {
-                        perimeterpt++;
-                        continue;
-                    }
-//cout << "hit " << val << endl;
-                    objind0 = (int)val - 1;
-                    if (objind0 == objind || objind0 >= objects.size()) continue;
-                    objcentre = coordFromIndex(objects[objind0].index, size, objcentre);
-                    objdist0 = dist(objcentre, pt);
-                    /* must only be smaller to prevent returning to the same object */
-                    if (objdist0 < objdist) {
-                        objdist = objdist0;
-                        /* if it is not the first seed - it is also a perimeter point */
-                        if (objind >= 0) {
-                            perimeterpt++;
-                            /* add a perimeter point to the seed we do not consider any more */
-                            objects[objind].perimeter++;
-                        }
-                        objind = objind0;
-                        seeded = true;
-                    }
-                } /* iy */
-            } /* ix */
-//cout << "pass neighbours" << endl;
-            if (!seeded) {
-                /* try to check adding to the closest seed if dist < mindist */
-                objind = -1;
-                objdist  = mindist;
-                for (int io = 0; io < objects.size(); io++) {
-                    objcentre = coordFromIndex(objects[io].index, size, objcentre);
-                    objdist0 = dist(objcentre, pt);
-                    if (objdist0 < objdist) {
-                        objdist = objdist0;
-                        objind = io;
-                        seeded = true;
-                    }
-                }        
-            }
-//cout << "pass !seeded vicinity check" << endl;
-            if (seeded) {
-//cout << "seeded" << endl;
-//cout << "adding to seed " << objind << endl;
-                /* add point to the seed */
-                data[index[i]] = (double)(objind + 1);
-                objects[objind].size++;
-                if (edgypt) 
-                    objects[objind].edge++;
-                objects[objind].perimeter += perimeterpt;
-                if (srcdata)
-                    objects[objind].intensity += srcdata[index[i]];
-                objects[objind].dx += pt.x - objcentre.x;
-                objects[objind].dy += pt.y - objcentre.y;
-            }
-            else {
-                if (fabs(data[index[i]]) >= minradius) {
-//cout << "starting new" << endl;
-                    /* start seed */
-                    if (srcdata)
-                        objects.push_back(TheObject(index[i], srcdata[index[i]]));
-                    else
-                        objects.push_back(TheObject(index[i], 0.0));
-                    data[index[i]] = (double)objects.size();
-                }
-                else {
-                    /* disregard */
-//cout << "disregard" << endl;
-                    data[index[i]] = BG;
-                }
-            }
-            /* move last value and -- last point */
-            if (i < lastpt) {
-//cout << "move last pt" << endl;
-                index[i] = index[lastpt];
-                lastpt--;        
-            }
-        } // i 
-    } // d
-    delete[] index;
-} 
+void doWatershed(double *, double *, Point &, double, int, vector<TheObject> &);
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void stopIfAnyWrong(SEXP rimage, SEXP srcimage) {
+SEXP watershedDetection(SEXP rimage, SEXP srcimage, SEXP seeds, SEXP params) {
     if (!assertImage(rimage))
         error("Wrong argument class, Image expected");
     if (LOGICAL(GET_SLOT(rimage, mkString("rgb")))[0])
@@ -204,19 +66,6 @@ void stopIfAnyWrong(SEXP rimage, SEXP srcimage) {
         if (LOGICAL(GET_SLOT(srcimage, mkString("rgb")))[0])
             error("Algorithm works for grayscale source images only");
     }
-}
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-    int index;         
-    double intensity;  
-    int size;          
-    int edge;          
-    int perimeter;     
-    double dx;         
-    double dy;
- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-SEXP watershedDetection(SEXP rimage, SEXP srcimage, SEXP seeds, SEXP params) {
-    stopIfAnyWrong(rimage, srcimage);
     SEXP res = R_NilValue;
     try {
         double * data = &(REAL(rimage)[0]);
@@ -258,3 +107,190 @@ SEXP watershedDetection(SEXP rimage, SEXP srcimage, SEXP seeds, SEXP params) {
     }
     return res;
 }
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+void doWatershed(double * data, double * srcdata, Point & size, double mindist, int minradius, vector<TheObject> & objects) {
+    int npts = size.x * size.y;
+    /* DistMap will be negated (-1*) and this is its minimum value then */
+    int mindata = 0;
+    /* how many nonBG pixels we have */
+    int nonBG = -1;
+    /* negate data converting to integer, determine nonBG and midata */
+    /* integer conversion basically means segmenting image to discrete colors, the number of these
+       colors is determined by the maximum value on the distmap, i.e. by the size of the largest object */
+    for (int i = 0; i < npts; i++) {
+        data[i] = -ceil(data[i]);
+        if (data[i] < BG) {
+            nonBG++;
+            if (data[i] < mindata)
+                mindata = (int)data[i];
+        }
+    }
+    /* create an array of indeces of all nonBG pixels (could combine with the previous
+       loop, but then array size equals npts, which is too huge (reduce mem usage) */
+    int * index = new int[nonBG];
+    int lastpt = -1;
+    for (int i = 0; i < npts; i++) 
+        if (data[i] < BG) {
+            lastpt++;
+            index[lastpt] = i;
+        }
+/* DEBUG */
+//cout << "Max " << mindata << " lastpt " << lastpt << endl;
+    /* if value of the maximum object is smaller than the minradius - return */
+    if (fabs(mindata) < minradius) return;
+    /* help variables for loops t ospeed them up, c-style, but fast */
+    Point pt, objcentre; 
+    bool seeded, edgypt; double objdist, objdist0, val;
+    int i, d, ix, iy, io, objind, objind0, perimeterpt; 
+    /* main loop through different distmap levels, i.e. discretised colours */
+    /* note: d's are negative */
+    for (d = mindata; d < 0; d++) {
+/* DEBUG */
+//cout << "d " << d  << endl;
+//cout << objects.size() << endl;
+        /* main sub-loop through indexes that left */
+        i = 0;
+        while (i <= lastpt) {        
+            /* go to next index if this color is farther in the row */
+            if (data[index[i]] > d) {
+                i++;
+                continue;
+            }
+/* DEBUG */
+//cout << "i " << i  << " of " << lastpt << endl;
+//cout << objects.size() << endl;
+            /* get coordinates of the current point */
+            coordFromIndex(index[i], size, pt);
+            /* check neighbours: seeded the closest of neighbouring obejcts */
+            seeded = false;
+            perimeterpt = 0; /* to how many other obejcts is this point a neighbour, if any */
+            edgypt = false;  /* is this point on the image edge */
+            objind = -1;     /* if seeded, index of object */
+            objdist = size.x + size.y; /* if seeded, distance to the object */
+//cout << "pass getting coordinates" << endl;
+            /* check 8 points  */
+            for (ix = pt.x - 1; ix <= pt.x + 1; ix++) {
+                for (iy = pt.y - 1; iy <= pt.y + 1; iy++) {
+                    /* do not do anything for the point itself */
+                    if (ix == pt.x && iy == pt.y) continue;
+                    /* set as edgy if any neighbour out of image */
+                    if (ix < 0 || ix >= size.x || iy < 0 || iy >= size.y) {
+                        edgypt = true;
+                        continue;
+                    }
+                    /* get value for the neighbour */
+                    val = data[ix + iy * size.x];
+                    /* neighbour is a normal point of distmap - not BG and not object, do nothing */
+                    if (val < 0) continue;
+                    /* increase perimeter if neighbour is BG and do nothing else */
+                    if (val == 0) {
+                        perimeterpt++;
+                        continue;
+                    }
+//cout << "hit " << val << endl;
+                    /* so neightbor is object - get its index */
+                    objind0 = (int)val - 1;
+                    /* check if it is existing object and not already defined from other neighbour */
+                    if (objind0 == objind || objind0 >= objects.size()) continue;
+                    /* check if this object is closer than other detected, or just update */
+                    objdist0 = dist(coordFromIndex(objects[objind0].index, size, objcentre), pt);
+                    /* so we like this object - it is closer */
+                    if (objdist0 < objdist) {
+                        objdist = objdist0;
+                        /* if it is not the first object - it is also a perimeter point */
+                        if (objind >= 0) {
+                            perimeterpt++;
+                            /* add a perimeter point to the object we do not consider any more */
+                            objects[objind].perimeter++;
+                        }
+                        objind = objind0;
+                        seeded = true;
+                    }
+                } /* iy */
+            } /* ix */
+//cout << "pass neighbours" << endl;
+            /* it is not neighbouring any object, but maube it is close enough anyway 
+               THE ABOVE IS much FASTER, therefore this is only run if the above does not
+               show anything */
+            if (!seeded) {
+                objind = -1;
+                /* we only consider objects closer than mindist */
+                objdist  = mindist;
+                for (io = 0; io < objects.size(); io++) {
+                    objdist0 = dist(coordFromIndex(objects[io].index, size, objcentre), pt);
+                    if (objdist0 < objdist) {
+                        objdist = objdist0;
+                        objind = io;
+                        seeded = true;
+                    }
+                }        
+            }
+//cout << "pass !seeded vicinity check" << endl;
+            if (seeded) {
+//cout << "seeded" << endl;
+//cout << "adding to seed " << objind << endl;
+                /* add point to the seed */
+                /* mark image with the index */
+                data[index[i]] = (double)(objind + 1);
+                objects[objind].size++;
+                if (edgypt) 
+                    objects[objind].edge++;
+                objects[objind].perimeter += perimeterpt;
+                if (srcdata)
+                    objects[objind].intensity += srcdata[index[i]];
+                /* dynamically update centre, use dx, dy for temporary summation */
+                objects[objind].dx += pt.x;
+                objects[objind].dy += pt.y;
+                objects[objind].index = (int)(objects[objind].dx / objects[objind].size) + (int)(objects[objind].dy / objects[objind].size) * size.x;
+            }
+            else {
+                if (fabs(data[index[i]]) >= minradius) {
+//cout << "starting new" << endl;
+                    /* start seed */
+                    if (srcdata)
+                        objects.push_back(TheObject(index[i], srcdata[index[i]]));
+                    else
+                        objects.push_back(TheObject(index[i], 0.0));
+                    data[index[i]] = (double)objects.size();
+                    /* dynamically update centre, use dx, dy for temporary summation */
+                    objects[objects.size() - 1].dx = pt.x;
+                    objects[objects.size() - 1].dy = pt.y;
+                }
+                else {
+                    /* disregard */
+//cout << "disregard" << endl;
+                    data[index[i]] = BG;
+                }
+            }
+            /* replace this with last point - effectively index will be sorted acsending! */
+            if (i < lastpt) {
+//cout << "move last pt" << endl;
+                objind = index[i];
+                index[i] = index[lastpt];
+                index[lastpt] = objind;
+                lastpt--;        
+            }
+        } // i 
+    } // d
+    /* now we have all objects - let's get their shapes */
+    /* we will use its sorted state to speed up calculations */
+    objind = -1;
+    for (i = 0; i < nonBG; i++) {
+        val = data[index[i]];
+        /* just o be sure that we do not do smth wrong */
+        if (val <= 0) continue;
+        coordFromIndex(index[i], size, pt);
+        if (val != objind) {
+            /* we change objind and considering data are sorted - reset the dx, dy */
+            objind = (int)val;
+            coordFromIndex(objects[objind].index, size, objcentre);
+            objects[objind].dx = pt.x - objcentre.x;
+            objects[objind].dy = pt.y - objcentre.y;
+        }
+        else {
+            objects[objind].dx += pt.x - objcentre.x;
+            objects[objind].dy += pt.y - objcentre.y;
+        }
+    }    
+    delete[] index;
+} 
