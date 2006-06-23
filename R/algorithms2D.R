@@ -47,7 +47,7 @@ objectCount <- function(x, ref = NULL, minArea = 20, maxRadius = 100, tolerance 
     param = c(mindist, minradius, as.double(rm.edges))
     res <- .CallEBImage("watershedDetection", x, ref, NULL, as.double(param))
     if (!is.null(res)) {
-        colnames(res) <- c("index", "x", "y", "intens", "size", "perim", "edge", "dx", "dy")
+        colnames(res) <- c("index", "x", "y", "intens", "size", "perim", "edge") #, "dx", "dy")
         if (rm.edges) res <- res[res[,7] == 0,]
     }
     return(res)
