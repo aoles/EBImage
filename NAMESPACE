@@ -24,7 +24,7 @@ export(
 
     # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
     ".copyHeader",
-    ".objectCount", ".distMap", ".thresh",
+    ".objectCount", ".distMap", ".thresh", ".watershed",
     ".blur", ".contrast", ".despeckle", ".edge", ".enhance", ".equalize",
     ".colorGamma", ".gaussFilter", ".medianFilter", ".mod", ".reduceNoise",
     ".segment", ".shade", ".sharpen", ".solarize",
