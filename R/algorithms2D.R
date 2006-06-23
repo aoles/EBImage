@@ -28,8 +28,8 @@
 objectCount <- function(x, ref = NULL, minArea = 20, maxRadius = 100, tolerance = 1, maxObjects = 1000) {
     .objectCount(x, ref, minArea, maxRadius, tolerance, maxObjects, modify = FALSE)
 }
-
-.watershed <- function(x, ref = NULL, mindist = 15, minradius = 10) {
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+.watershed <- function(x, ref = NULL, mindist = 15, minradius = 10, rm.edges = TRUE, modify = TRUE) {
     if(!assert(x))
         stop("Wrong class of argument x")
     if (x@rgb)
@@ -42,8 +42,17 @@ objectCount <- function(x, ref = NULL, minArea = 20, maxRadius = 100, tolerance 
         if(!assert(x, ref))
             stop("Supplied images have different size or color scheme")
     }
-    param = c(mindist, minradius)
+    if (!modify)
+        x = copy(x)
+    param = c(mindist, minradius, as.double(rm.edges))
     res <- .CallEBImage("watershedDetection", x, ref, NULL, as.double(param))
-#    colnames(res) <- c("index", "x", "y", "intens", "size", "perim", "edge", "dx", "dy")
+    if (!is.null(res)) {
+        colnames(res) <- c("index", "x", "y", "intens", "size", "perim", "edge", "dx", "dy")
+        if (rm.edges) res <- res[res[,7] == 0,]
+    }
     return(res)
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+watershed <- function(x, ref = NULL, mindist = 15, minradius = 10, rm.edges = TRUE) {
+    .watershed(x, ref, mindist, minradius, rm.edges, FALSE)
 }
