@@ -140,11 +140,12 @@ void doWatershed(double * data, double * srcdata, Point & size, double mindist, 
 /* DEBUG */
 //cout << "Max " << mindata << " lastpt " << lastpt << endl;
     /* if value of the maximum object is smaller than the minradius - return */
-    if (fabs(mindata) < minradius) return;
+    if (abs(mindata) < minradius) return;
     /* help variables for loops t ospeed them up, c-style, but fast */
     Point pt, objcentre; 
     bool seeded, edgypt; double objdist, objdist0, val;
-    int i, d, ix, iy, io, objind, objind0, perimeterpt; 
+    int i, d, ix, iy, objind, perimeterpt; 
+    unsigned int objind0, io;
     /* main loop through different distmap levels, i.e. discretised colours */
     /* note: d's are negative */
     for (d = mindata; d < 0; d++) {
