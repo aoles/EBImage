@@ -29,7 +29,7 @@ objectCount <- function(x, ref = NULL, minArea = 20, maxRadius = 100, tolerance 
     .objectCount(x, ref, minArea, maxRadius, tolerance, maxObjects, modify = FALSE)
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-.watershed <- function(x, ref = NULL, mindist = 15, minradius = 10, rm.edges = TRUE, modify = TRUE) {
+.watershed <- function(x, ref = NULL, mindist = 15, minradius = 10, edgeFactor = 0.2, modify = TRUE) {
     if(!assert(x))
         stop("Wrong class of argument x")
     if (x@rgb)
@@ -44,15 +44,17 @@ objectCount <- function(x, ref = NULL, minArea = 20, maxRadius = 100, tolerance 
     }
     if (!modify)
         x = copy(x)
-    param = c(mindist, minradius, as.double(rm.edges))
+    param = c(mindist, minradius, edgeFactor)
     res <- .CallEBImage("watershedDetection", x, ref, NULL, as.double(param))
     if (!is.null(res)) {
+        # rm all those for which rm = TRUE (non 0) and remove that column
+        res <- res[res[,8] == 0, 1:7]
         colnames(res) <- c("index", "x", "y", "intens", "size", "perim", "edge") #, "dx", "dy")
-        if (rm.edges) res <- res[res[,7] == 0,]
+#        if (rm.edges) res <- res[res[,7]/res[,6] >= edgeFactor,]
     }
     return(res)
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-watershed <- function(x, ref = NULL, mindist = 15, minradius = 10, rm.edges = TRUE) {
-    .watershed(x, ref, mindist, minradius, rm.edges, FALSE)
+watershed <- function(x, ref = NULL, mindist = 15, minradius = 10, edgeFactor = 0.2) {
+    .watershed(x, ref, mindist, minradius, edgeFactor, FALSE)
 }

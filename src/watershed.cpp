@@ -14,16 +14,18 @@ struct TheObject {
         this->size = size;
         this->edge = edge;
         this->perimeter = perimeter;
-        dx = 0;
-        dy = 0;
+        x = 0;
+        y = 0;
+        rm = false;
     }
     int index;          /* index of the object origin on the image */
     double intensity;   /* overall intensity */
     int size;           /* size of the object */
     int perimeter;      /* number of perimeter points */
     int edge;           /* number of edge points */
-    double dx;          /* elongation in x direction */
-    double dy;          /* elongation in y direction */
+    double x;          /* summ of all x coordinates */
+    double y;          /* summ of all y coordinates */
+    bool  rm;          /* if the object has to be removed due to any reason: edgy, combined with smth etc */
 };
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 struct Point {
@@ -53,7 +55,7 @@ inline double dist(Point & p1, Point & p2) {
     return sqrt((long double)((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y)));
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void doWatershed(double *, double *, Point &, double, int, vector<TheObject> &, bool);
+void doWatershed(double *, double *, Point &, double, int, vector<TheObject> &, double);
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 SEXP watershedDetection(SEXP rimage, SEXP srcimage, SEXP seeds, SEXP params) {
     if (!assertImage(rimage))
@@ -76,17 +78,21 @@ SEXP watershedDetection(SEXP rimage, SEXP srcimage, SEXP seeds, SEXP params) {
         Point size(dim[0], dim[1]);
         double mindist = REAL(params)[0];
         double minradius = REAL(params)[1];
-        bool   rmedges = (bool)REAL(params)[2];
+        double edgeFactor = REAL(params)[2];
         vector<TheObject> objects;
-        doWatershed(data, srcdata, size, mindist, (int)minradius, objects, rmedges);
+        if (seeds != R_NilValue) {
+            /* TODO fill in objects */        
+        
+        }
+        doWatershed(data, srcdata, size, mindist, (int)minradius, objects, edgeFactor);
         int nobj = objects.size();
         if (nobj > 0) {
             Point pt;
             SEXP dims;
             PROTECT(dims = allocVector(INTSXP, 2));
             INTEGER(dims)[0] = nobj;
-            INTEGER(dims)[1] = 7; //9;
-            PROTECT(res = allocVector(REALSXP, nobj * 7)); //9));
+            INTEGER(dims)[1] = 8; //9;
+            PROTECT(res = allocVector(REALSXP, nobj * 8)); //9));
             SET_DIM(res, dims);
             for (int i = 0; i < nobj; i++) {
                 REAL(res)[i]            = 0; /* index */
@@ -97,9 +103,10 @@ SEXP watershedDetection(SEXP rimage, SEXP srcimage, SEXP seeds, SEXP params) {
                 REAL(res)[i + 4 * nobj] = objects[i].size;
                 REAL(res)[i + 5 * nobj] = objects[i].perimeter;
                 REAL(res)[i + 6 * nobj] = objects[i].edge;
+                REAL(res)[i + 7 * nobj] = (double)objects[i].rm;
             /* we do not need these two at the moment - do not work 
-                REAL(res)[i + 7 * nobj] = objects[i].dx;
-                REAL(res)[i + 8 * nobj] = objects[i].dy;
+                REAL(res)[i + 7 * nobj] = objects[i].x;
+                REAL(res)[i + 8 * nobj] = objects[i].y;
             */
             }
             UNPROTECT(2);
@@ -111,15 +118,18 @@ SEXP watershedDetection(SEXP rimage, SEXP srcimage, SEXP seeds, SEXP params) {
     return res;
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-void doWatershed(double * data, double * srcdata, Point & size, double mindist, int minradius, vector<TheObject> & objects, bool rmedges) {
+void doWatershed(double * data, double * srcdata, Point & size, double mindist, int minradius, vector<TheObject> & objects, double edgeFactor) {
     int npts = size.x * size.y;
+    /* if we supply objects with seeds, we do not add any new and just use those */
+    bool noNewObjects = false;
+    if (objects.size() > 0) noNewObjects = true;
     /* DistMap will be negated (-1*) and this is its minimum value then */
     int mindata = 0;
     /* how many nonBG pixels we have */
-    int nonBG = -1;
-    /* negate data converting to integer, determine nonBG and midata */
-    /* integer conversion basically means segmenting image to discrete colors, the number of these
-       colors is determined by the maximum value on the distmap, i.e. by the size of the largest object */
+    int nonBG = 0;
+    /* negate data: BG will be 0, positive will be index of objects */
+    /* this conversion to int is needed to ensure that when we later on go by incrememting d by 1 we 
+       do not miss values between 0 and 1, i,e, we set 0 = 0, 0.x = 1 */
     for (int i = 0; i < npts; i++) {
         data[i] = -ceil(data[i]);
         if (data[i] < BG) {
@@ -128,8 +138,8 @@ void doWatershed(double * data, double * srcdata, Point & size, double mindist, 
                 mindata = (int)data[i];
         }
     }
-    /* create an array of indeces of all nonBG pixels (could combine with the previous
-       loop, but then array size equals npts, which is too huge (reduce mem usage) */
+    /* create an array of indexes of all nonBG pixels (could combine with the previous
+       loop, but then array size would equal npts, which is too huge (reduce mem usage) */
     int * index = new int[nonBG];
     int lastpt = -1;
     for (int i = 0; i < npts; i++) 
@@ -137,46 +147,38 @@ void doWatershed(double * data, double * srcdata, Point & size, double mindist, 
             lastpt++;
             index[lastpt] = i;
         }
-/* DEBUG */
-//cout << "Max " << mindata << " lastpt " << lastpt << endl;
     /* if value of the maximum object is smaller than the minradius - return */
     if (abs(mindata) < minradius) return;
-    /* help variables for loops t ospeed them up, c-style, but fast */
-    Point pt, objcentre; 
-    bool seeded, edgypt; double objdist, objdist0, val;
-    int i, d, ix, iy, objind, perimeterpt; 
-    unsigned int objind0, io;
+    vector<int> borders;
     /* main loop through different distmap levels, i.e. discretised colours */
     /* note: d's are negative */
-    for (d = mindata; d < 0; d++) {
-/* DEBUG */
-//cout << "d " << d  << endl;
-//cout << objects.size() << endl;
+    for (int d = mindata; d < 0; d++) {
+        /* help variables for loops t ospeed them up, c-style, but fast */
+        Point pti, objcentre; 
+        bool seeded, edgypt; double objdist, objdist0, val;
+        int ix, iy, objind, perimeterpt; 
+        unsigned int objind0, io;
         /* main sub-loop through indexes that left */
-        i = 0;
+        int i = 0;
         while (i <= lastpt) {        
             /* go to next index if this color is farther in the row */
             if (data[index[i]] > d) {
                 i++;
                 continue;
             }
-/* DEBUG */
-//cout << "i " << i  << " of " << lastpt << endl;
-//cout << objects.size() << endl;
             /* get coordinates of the current point */
-            coordFromIndex(index[i], size, pt);
+            coordFromIndex(index[i], size, pti);
             /* check neighbours: seeded the closest of neighbouring obejcts */
             seeded = false;
             perimeterpt = 0; /* to how many other obejcts is this point a neighbour, if any */
             edgypt = false;  /* is this point on the image edge */
             objind = -1;     /* if seeded, index of object */
             objdist = size.x + size.y; /* if seeded, distance to the object */
-//cout << "pass getting coordinates" << endl;
             /* check 8 points  */
-            for (ix = pt.x - 1; ix <= pt.x + 1; ix++) {
-                for (iy = pt.y - 1; iy <= pt.y + 1; iy++) {
+            for (ix = pti.x - 1; ix <= pti.x + 1; ix++) {
+                for (iy = pti.y - 1; iy <= pti.y + 1; iy++) {
                     /* do not do anything for the point itself */
-                    if (ix == pt.x && iy == pt.y) continue;
+                    if (ix == pti.x && iy == pti.y) continue;
                     /* set as edgy if any neighbour out of image */
                     if (ix < 0 || ix >= size.x || iy < 0 || iy >= size.y) {
                         edgypt = true;
@@ -191,13 +193,12 @@ void doWatershed(double * data, double * srcdata, Point & size, double mindist, 
                         perimeterpt++;
                         continue;
                     }
-//cout << "hit " << val << endl;
                     /* so neightbor is object - get its index */
                     objind0 = (int)val - 1;
                     /* check if it is existing object and not already defined from other neighbour */
                     if (objind0 == objind || objind0 >= objects.size()) continue;
                     /* check if this object is closer than other detected, or just update */
-                    objdist0 = dist(coordFromIndex(objects[objind0].index, size, objcentre), pt);
+                    objdist0 = dist(coordFromIndex(objects[objind0].index, size, objcentre), pti);
                     /* so we like this object - it is closer */
                     if (objdist0 < objdist) {
                         objdist = objdist0;
@@ -212,18 +213,18 @@ void doWatershed(double * data, double * srcdata, Point & size, double mindist, 
                     }
                 } /* iy */
             } /* ix */
-//cout << "pass neighbours" << endl;
+            /* add this pixel to the list of all borders */
+            if (perimeterpt > 0)
+                borders.push_back(index[i]);
             /* it is not neighbouring any object, but maube it is close enough anyway 
                THE ABOVE IS much FASTER, therefore this is only run if the above does not
                show anything */
-            /* not sure if we need this */
-            /* OH YES, WE DO - comment and check otherwise - terrible */
             if (!seeded) {
                 objind = -1;
                 // we only consider objects closer than mindist
                 objdist  = mindist;
                 for (io = 0; io < objects.size(); io++) {
-                    objdist0 = dist(coordFromIndex(objects[io].index, size, objcentre), pt);
+                    objdist0 = dist(coordFromIndex(objects[io].index, size, objcentre), pti);
                     if (objdist0 < objdist) {
                         objdist = objdist0;
                         objind = io;
@@ -231,12 +232,8 @@ void doWatershed(double * data, double * srcdata, Point & size, double mindist, 
                     }
                 }        
             }
-//cout << "pass !seeded vicinity check" << endl;
             if (seeded) {
-//cout << "seeded" << endl;
-//cout << "adding to seed " << objind << endl;
-                /* add point to the seed */
-                /* mark image with the index */
+                /* add point to the object, mark image with the index */
                 data[index[i]] = (double)(objind + 1);
                 objects[objind].size++;
                 if (edgypt) 
@@ -244,71 +241,114 @@ void doWatershed(double * data, double * srcdata, Point & size, double mindist, 
                 objects[objind].perimeter += perimeterpt;
                 if (srcdata)
                     objects[objind].intensity += srcdata[index[i]];
-                /* dynamically update centre, use dx, dy for temporary summation */
-                objects[objind].dx += pt.x;
-                objects[objind].dy += pt.y;
-                objects[objind].index = (int)(objects[objind].dx / objects[objind].size) + (int)(objects[objind].dy / objects[objind].size) * size.x;
+                /* dynamically update centre (its index), use x, y for temporary summation */
+                objects[objind].x += pti.x;
+                objects[objind].y += pti.y;
+                objects[objind].index = (int)(objects[objind].x / objects[objind].size) + (int)(objects[objind].y / objects[objind].size) * size.x;
             }
             else {
-                if (fabs(data[index[i]]) >= minradius) {
-//cout << "starting new" << endl;
+                /* start a new object if its radius (determined by the highest dm value) is larger than minradius */
+                /* and if we are allowed to create new seeds */
+                if (fabs(data[index[i]]) >= minradius && !noNewObjects) {
                     /* start seed */
                     if (srcdata)
                         objects.push_back(TheObject(index[i], srcdata[index[i]]));
                     else
                         objects.push_back(TheObject(index[i], 0.0));
                     data[index[i]] = (double)objects.size();
-                    /* dynamically update centre, use dx, dy for temporary summation */
-                    objects[objects.size() - 1].dx = pt.x;
-                    objects[objects.size() - 1].dy = pt.y;
+                    /* dynamically update centre, use x, y for temporary summation */
+                    objects[objects.size() - 1].x = pti.x;
+                    objects[objects.size() - 1].y = pti.y;
                 }
                 else {
-                    /* disregard */
-//cout << "disregard" << endl;
+                    /* otherwise disregard */
                     data[index[i]] = BG;
                 }
             }
-            /* replace this with last point - effectively index will be sorted acsending! */
+            /* replace this with last point  */
             if (i < lastpt) {
-//cout << "move last pt" << endl;
                 objind = index[i];
                 index[i] = index[lastpt];
                 index[lastpt] = objind;
-                lastpt--;        
             }
+            lastpt--;        
         } // i 
     } // d
-/*
-    This does not work as it is supposed - apparently index is not fully sorted
-
-    // now we have all objects - let's get their shapes 
-    // we will use its sorted state to speed up calculations 
-    // remove edgy points if required 
-    objind = -1;
-    bool dorm = false;
-    for (i = 0; i < nonBG; i++) {
-        val = data[index[i]];
-        // just o be sure that we do not do smth wrong 
-        if (val <= 0) continue;
-        coordFromIndex(index[i], size, pt);
-        if (val != objind) {
-            // we change objind and considering data are sorted - reset the dx, dy 
-            objind = (int)val;
-            coordFromIndex(objects[objind].index, size, objcentre);
-            objects[objind].dx = pt.x - objcentre.x;
-            objects[objind].dy = pt.y - objcentre.y;
-            dorm = false;
-            if (rmedges)
-                if (objects[objind].edge > 3) //0.05 * objects[objind].perimeter)
-                    dorm = true;
+    unsigned int nobj = objects.size();
+    if (nobj > 1) {
+        /* try to combine objects that are close */
+        int * combineWith = new int[nobj];
+        /* mark edgy and small objects for deletion, they can still be combined with other */
+        for (int i = 0; i < nobj; i++) {
+            combineWith[i] = -1;
+            if (objects[i].perimeter == 0) {
+                objects[i].rm = true;
+                continue;
+            }
+            if (objects[i].edge / (double)objects[i].perimeter > edgeFactor) {
+                objects[i].rm = true;
+                continue;
+            }
+            if (objects[i].size < M_PI * minradius * minradius)
+                objects[i].rm = true;
         }
-        else {
-            objects[objind].dx += pt.x - objcentre.x;
-            objects[objind].dy += pt.y - objcentre.y;
+        Point pti, ptj;
+        for (int i = 0; i < nobj - 1; i++) {
+            /* we do not want other objects to be combined with this */
+            if (objects[i].rm) continue;
+            coordFromIndex(objects[i].index, size, pti);
+            for (int j = i + 1; j < nobj; j++) {
+                /* skip objects that will already be combined with other */
+                if (combineWith[j] < 0) 
+                    if (dist(coordFromIndex(objects[j].index, size, ptj), pti) <= mindist) {
+                        objects[j].rm = true; // it will be combined or removed anyway
+                        /* new value for combineWith */
+                        int k = combineWith[i];
+                        if (k < 0) k = i;
+                        /* but only if this new object is not gonna be removed */
+                        double fullperimeter = objects[j].perimeter + objects[k].perimeter;
+                        int fulledge = objects[j].edge + objects[k].edge;
+                        if (fullperimeter != 0)
+                            if (fulledge / fullperimeter > edgeFactor) 
+                                continue;
+                        /* do combine objects */
+                        combineWith[j] = k;
+                        objects[k].x += objects[j].x;
+                        objects[k].y += objects[j].y;
+                        objects[k].size += objects[j].size;
+                        objects[k].index = (int)(objects[k].x / objects[k].size) + (int)(objects[k].y / objects[k].size) * size.x;
+                        objects[k].intensity += objects[j].intensity;
+                        objects[k].perimeter = (int)fullperimeter;
+                        objects[k].edge = fulledge;
+                    } // if (dist
+            } // j
+        } // i
+        /* mark image */
+        double val;
+        for (int i = 0; i < nonBG; i++) {
+            val = data[index[i]];
+            if (val <= BG || val > nobj) {
+                if (val != BG) data[index[i]] = BG;
+                continue;
+            }
+            if (combineWith[(int)val - 1] >= 0) {
+                data[index[i]] = (double)combineWith[(int)val - 1];
+            }
+            else {
+                if (objects[(int)val - 1].rm)
+                    data[index[i]] = BG;
+            }
         }
-        if (dorm)
-            data[index[i]] = BG;
-    }    
-*/    
+        delete[] combineWith;
+        /* mark all borders with highest index + 1 */
+        int nborders = borders.size();
+        for (int i = 0; i < nborders; i++) {
+            int ind = borders[i];
+            /* do not mark if object was selected for removal */
+            if (data[ind] > BG)
+                data[ind] = nobj + 1;
+        }
+    }
     delete[] index;
+    // result is returned in objects 
 } 
