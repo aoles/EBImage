@@ -463,4 +463,98 @@ SEXP fromColorString(SEXP str) { /* RGB vector */
     }
     return res;
 }
+
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+MagickImage colorToImage(SEXP x) {
+    try {
+        int nvalues = LENGTH(x);
+        Geometry geom(nvalues, 1);
+        MagickImage image(geom, "black");
+        if (IS_INTEGER(x)) {
+            image.read(nvalues, 1, "RGBp", CharPixel, &(INTEGER(x)[0]));
+            return image;
+        }
+        if (IS_NUMERIC(x)) {
+            image.read(nvalues, 1, "I", DoublePixel, &(REAL(x)[0]));
+            return image;
+        }
+        if (IS_CHARACTER(x)) {
+            char * str;
+            for (int i = 0; i < nvalues; i++) {
+                str = CHAR(STRING_ELT(x, i));
+                if (strcmp(str, "NA") != 0)
+                    image.pixelColor(i, 0, Color(str));
+            }
+        }
+        return image;
+    }
+    catch(exception &error_) {
+        error(error_.what());
+    }
+    /* this should never happen, but it prevents warning: the function exits either on
+       previous return or on error - it should not happen that the control comes here
+    */
+    return MagickImage(Geometry(1, 1), "black");
+}
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+SEXP intToColorString(SEXP x) {
+    SEXP res = R_NilValue;
+    int nprotect = 0;
+    try {
+        if (!IS_INTEGER(x) && !IS_NUMERIC(x))
+            error("argument must be a numeric or integer vector (NA's allowed)");
+        int nvalues = LENGTH(x);
+        PROTECT(res = allocVector(STRSXP, nvalues));
+        nprotect++;
+        MagickImage image = colorToImage(x);
+        if (IS_INTEGER(x)) {
+            int * values = &(INTEGER(x)[0]);
+            for (int i = 0; i < nvalues; i++) {
+                if (values[i] == NA_INTEGER)
+                    SET_STRING_ELT(res, i, NA_STRING);
+                else
+                    SET_STRING_ELT(res, i, mkChar(string(image.pixelColor(i, 0)).c_str()));
+            }
+        }
+        else {
+            double * values = &(REAL(x)[0]);
+            for (int i = 0; i < nvalues; i++) {
+                if (isnan(values[i]) || isinf(values[i]))
+                    SET_STRING_ELT(res, i, NA_STRING);
+                else
+                    SET_STRING_ELT(res, i, mkChar(string(image.pixelColor(i, 0)).c_str()));
+            }
+        }
+    }
+    catch(exception &error_) {
+        error(error_.what());
+    }
+    UNPROTECT(nprotect);
+    return res;
+}
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+SEXP colorStringToInt(SEXP x) {
+    SEXP res = R_NilValue;
+    int nprotect = 0;
+    try {
+        if (!IS_CHARACTER(x))
+            error("argument must be a character vector (NA's allowed)");
+        int nvalues = LENGTH(x);
+        PROTECT(res = allocVector(INTSXP, nvalues));
+        nprotect++;
+        MagickImage image = colorToImage(x);
+        int * values = &(INTEGER(res)[0]);
+        image.opacity(OpaqueOpacity);
+        image.type(TrueColorType);
+        image.write(0, 0, nvalues, 1, "RGBp", CharPixel, values);
+        for (int i = 0; i < nvalues; i++)
+            if (strcmp(CHAR(STRING_ELT(x, i)), "NA") == 0)
+                values[i] = NA_INTEGER;
+    }
+    catch(exception &error_) {
+        error(error_.what());
+    }
+    UNPROTECT(nprotect);
+    return res;
+}
+

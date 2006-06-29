@@ -9,6 +9,6 @@
 #include "common.h"
 
 extern "C" {
-    SEXP watershedDetection(SEXP rimage, SEXP srcimage, SEXP seeds, SEXP params);
+    SEXP watershedDetection(SEXP rimage, SEXP ref, SEXP seeds, SEXP params);
 };
 
