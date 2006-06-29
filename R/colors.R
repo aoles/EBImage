@@ -17,3 +17,11 @@ colRGB <- function(col) {
     col <- as.character(col)
     return(.CallEBImage("fromColorString", col))
 }
+
+colString1 <- function(x) {
+    return(.CallEBImage("intToColorString", x))
+}
+
+colRGB1 <- function(x) {
+    return(.CallEBImage("colorStringToInt", x))
+}

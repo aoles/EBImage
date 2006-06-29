@@ -1,4 +1,4 @@
-AC_INIT([EBImage], 1.3.016)
+AC_INIT([EBImage], 1.3.024)
 
 AC_CHECK_PROG(magickfound, [Magick++-config --version], yes, no)
 if test "$magickfound" = "yes"; then
@@ -7,10 +7,11 @@ if test "$magickfound" = "yes"; then
     if test "$magickincludes" = "yes"; then
         echo ImageMagick++ includes located in `Magick++-config --cppflags`
         COMPILERFLAGS="`Magick++-config --cppflags`"
-        COMPILERFLAGS="${CXXFLAGS} `Magick++-config --cxxflags`"
+        COMPILERFLAGS="${COMPILERFLAGS} `Magick++-config --cxxflags`"
         CXXFLAGS="${COMPILERFLAGS} ${CXXFLAGS}"
         LIBS="`Magick++-config --ldflags`"
         LIBS="${LIBS} `Magick++-config --libs`"
+        LIBS="${LIBS} ${LFLAGS}"
     else
         AC_MSG_ERROR("Cannot find ImageMagick++-devel (Magick++-devel)")
     fi

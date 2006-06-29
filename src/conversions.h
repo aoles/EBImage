@@ -28,4 +28,7 @@ extern "C" {
     /* colors */
     SEXP toColorString(SEXP rgb);
     SEXP fromColorString(SEXP str); /* RGB vector */
+    
+    SEXP intToColorString(SEXP x);
+    SEXP colorStringToInt(SEXP x);
 };
