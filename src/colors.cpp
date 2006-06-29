@@ -1,7 +1,345 @@
 #include "colors.h"
 
 #include <R_ext/Error.h>
+#include <vector>
 #include <iostream>
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SEXP          image2INTEGER   (MagickImage & image, vector<int> & nas);
+SEXP          image2REAL      (MagickImage & image, vector<int> & nas);
+SEXP          image2CHARACTER (MagickImage & image, vector<int> & nas);
+vector<int>   getNAs          (SEXP x);
+MagickImage   vector2image    (SEXP x, vector<int> & nas);
+void          add2image       (MagickImage & image, MagickImage & addition);
+void          sub2image       (MagickImage & image, MagickImage & subtraction);
+void          scale2image     (MagickImage & image, double factor);
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SEXP any2rgb     (SEXP x);
+SEXP any2gray    (SEXP x);
+SEXP any2X11char (SEXP x);
+SEXP add2rgb     (SEXP x, SEXP y);
+SEXP sub2rgb     (SEXP x, SEXP y);
+SEXP scale2rgb   (SEXP x, SEXP factor);
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SEXP any2rgb(SEXP x) {
+    vector<int> nas = getNAs(x);
+    MagickImage image = vector2image(x, nas);
+    return image2INTEGER(image, nas);
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SEXP any2gray(SEXP x) {
+    vector<int> nas = getNAs(x);
+    MagickImage image = vector2image(x, nas);
+    return image2REAL(image, nas);
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SEXP any2X11char(SEXP x) {
+    vector<int> nas = getNAs(x);
+    MagickImage image = vector2image(x, nas);
+    return image2CHARACTER(image, nas);
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SEXP add2rgb(SEXP x, SEXP y) {
+    vector<int> nas = getNAs(x);
+    vector<int> nas1 = getNAs(y);
+    MagickImage image = vector2image(x, nas);
+    MagickImage addition = vector2image(y, nas1);
+    add2image(image, addition);
+    /* TODO combine to nas */
+    return image2INTEGER(image, nas);
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SEXP sub2rgb(SEXP x, SEXP y) {
+    vector<int> nas = getNAs(x);
+    vector<int> nas1 = getNAs(y);
+    MagickImage image = vector2image(x, nas);
+    MagickImage subtraction = vector2image(y, nas1);
+    sub2image(image, subtraction);
+    /* TODO combine to nas */
+    return image2INTEGER(image, nas);
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SEXP scale2rgb(SEXP x, SEXP factor) {
+    vector<int> nas = getNAs(x);
+    MagickImage image = vector2image(x, nas);
+    try {
+        double value = REAL(factor)[0];
+        scale2image(image, value);
+    }
+    catch(exception &error_) {
+        error(error_.what());
+    }
+    return image2INTEGER(image, nas);
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// internal function that returns an R-integer (RGB) from the supplied image
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SEXP image2INTEGER(MagickImage & image, vector<int> & nas) {
+    SEXP res = R_NilValue;
+    int nprotect = 0;
+    try {
+        int nvalues = image.columns() * image.rows();
+        PROTECT(res = allocVector(INTSXP, nvalues));
+        nprotect++;
+        int * values = &(INTEGER(res)[0]);
+        image.opacity(OpaqueOpacity);
+        image.type(TrueColorType);
+        image.write(0, 0, image.columns(), image.rows(), "RGBp", CharPixel, values);
+        if (nas.size() > 0) {
+            vector<int>::iterator it = nas.begin();
+            for (int i = 0; i < nvalues; i++) {
+                if (*it != i) continue;
+                values[i] = NA_INTEGER;
+                if (it != nas.end()) it++;
+            }
+        }
+    }
+    catch(exception &error_) {
+        error(error_.what());
+    }
+    UNPROTECT(nprotect);
+    return res;
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// internal function that returns an R-numeric (grayscale) from the supplied image
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SEXP image2REAL(MagickImage & image, vector<int> & nas) {
+    SEXP res = R_NilValue;
+    int nprotect = 0;
+    try {
+        int nvalues = image.columns() * image.rows();
+        PROTECT(res = allocVector(REALSXP, nvalues));
+        nprotect++;
+        double * values = &(REAL(res)[0]);
+        image.opacity(OpaqueOpacity);
+        image.type(GrayscaleType);
+        image.write(0, 0, image.columns(), image.rows(), "I", DoublePixel, values);
+        if (nas.size() > 0) {
+            vector<int>::iterator it = nas.begin();
+            for (int i = 0; i < nvalues; i++) {
+                if (*it != i) continue;
+                values[i] = NA_REAL;
+                if (it != nas.end()) it++;
+            }
+        }
+    }
+    catch(exception &error_) {
+        error(error_.what());
+    }
+    UNPROTECT(nprotect);
+    return res;
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// internal function that returns an R-character (X11-format) from the supplied image
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SEXP image2CHARACTER(MagickImage & image, vector<int> & nas) {
+    SEXP res = R_NilValue;
+    int nprotect = 0;
+    try {
+        int nx = image.columns();
+        int ny = image.rows();
+        PROTECT(res = allocVector(STRSXP, nx * ny));
+        nprotect++;
+        image.opacity(OpaqueOpacity);
+        image.type(TrueColorType);
+        if (nas.size() <= 0) {
+            for (int j = 0; j < ny; j++)
+                for (int i = 0; i < nx; i++)
+                    SET_STRING_ELT(res, i + j * nx, mkChar(string(image.pixelColor(i, j)).c_str()));
+        }
+        else {
+            int index;
+            vector<int>::iterator it = nas.begin();
+            for (int j = 0; j < ny; j++)
+                for (int i = 0; i < nx; i++) {
+                    index = i + j * nx;
+                    if (*it == index) {
+                        SET_STRING_ELT(res, index, NA_STRING);
+                        if (it != nas.end()) it++;
+                    }
+                    else 
+                        SET_STRING_ELT(res, index, mkChar(string(image.pixelColor(i, j)).c_str()));
+                }
+        }
+    }
+    catch(exception &error_) {
+        error(error_.what());
+    }
+    UNPROTECT(nprotect);
+    return res;
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// internal function that returns a vector with indexes of all NAs in an 
+// integer, character or numeric R-vector 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+vector<int> getNAs(SEXP x) {
+    vector<int> res;
+    try {
+        int nvalues = LENGTH(x);
+        if (IS_INTEGER(x)) {
+            int * values = &(INTEGER(x)[0]);
+            for (int i = 0; i < nvalues; i++)
+                if (values[i] == NA_INTEGER)
+                    res.push_back(i);
+            return res;
+        }
+        if (IS_NUMERIC(x)) {
+            double * values = &(REAL(x)[0]);
+            for (int i = 0; i < nvalues; i++)
+                if (isnan(values[i]))
+                    res.push_back(i);
+            return res;
+        }
+        if (IS_CHARACTER(x)) {
+            for (int i = 0; i < nvalues; i++)
+                if (strcmp(CHAR(STRING_ELT(x, i)), "NA") == 0)
+                    res.push_back(i);
+            return res;
+        }
+        error("supplied argument could not be coersed to numeric, integer or character");
+    }
+    catch(exception &error_) {
+        error(error_.what());
+    }
+    /* unreachable */
+    return res;    
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// internal functions that converts an integer, character or numeric R-vector
+// into a MagickImage of size nvalues x 1, supply vector of NA indexes 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+MagickImage vector2image(SEXP x, vector<int> & nas) {
+    try {
+        int nvalues = LENGTH(x);
+        if (IS_INTEGER(x))
+            return MagickImage(nvalues, 1, "RGBp", CharPixel, &(INTEGER(x)[0]));
+        if (IS_NUMERIC(x))
+            return MagickImage(nvalues, 1, "I", DoublePixel, &(REAL(x)[0]));
+        if (IS_CHARACTER(x)) {
+            MagickImage image(Geometry(nvalues, 1), "black");
+            char * str;
+            if (nas.size() <= 0) {
+                for (int i = 0; i < nvalues; i++)
+                    image.pixelColor(i, 0, Color(CHAR(STRING_ELT(x, i))));
+            }
+            else {
+                vector<int>::iterator it = nas.begin();
+                for (int i = 0; i < nvalues; i++) {
+                    if (*it == i) {
+                        if (it != nas.end())
+                            it++;
+                        continue;
+                    }
+                    image.pixelColor(i, 0, Color(CHAR(STRING_ELT(x, i))));
+                }
+            }
+            return image;
+        }
+        error("supplied argument could not be coersed to numeric, integer or character");
+    }
+    catch(exception &error_) {
+        error(error_.what());
+    }
+    /* unreachable */
+    return MagickImage();
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// internal functions that adds to equal-size images
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void add2image(MagickImage & image, MagickImage & addition) {
+    try {
+        if (image.size() != addition.size())
+            error("supplied arrays have different sizes");
+        ColorRGB col, coladd;
+        int nx = image.columns();
+        int ny = image.rows();
+        double val;
+        for (int j = 0; j < ny; j++)
+            for (int i = 0; i < nx; i++) {
+                col = image.pixelColor(i, j);
+                coladd = addition.pixelColor(i, j);
+                val = col.red() + coladd.red();
+                if (val > 1.0) val = 1.0;
+                col.red(val);
+                val = col.green() + coladd.green();
+                if (val > 1.0) val = 1.0;
+                col.green(val);
+                val = col.blue() + coladd.blue();
+                if (val > 1.0) val = 1.0;
+                col.blue();
+                image.pixelColor(i, j, col);
+            }
+    }
+    catch(exception &error_) {
+        error(error_.what());
+    }
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// internal functions that subtracts an equal-size images
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void sub2image(MagickImage & image, MagickImage & subtraction) {
+    try {
+        if (image.size() != subtraction.size())
+            error("supplied arrays have different sizes");
+        ColorRGB col, colsub;
+        int nx = image.columns();
+        int ny = image.rows();
+        double val;
+        for (int j = 0; j < ny; j++)
+            for (int i = 0; i < nx; i++) {
+                col = image.pixelColor(i, j);
+                colsub = subtraction.pixelColor(i, j);
+                val = col.red() - colsub.red();
+                if (val < 0.0) val = 0.0;
+                col.red(val);
+                val = col.green() - colsub.green();
+                if (val < 0.0) val = 0.0;
+                col.green(val);
+                val = col.blue() - colsub.blue();
+                if (val < 0.0) val = 0.0;
+                col.blue();
+                image.pixelColor(i, j, col);
+            }
+    }
+    catch(exception &error_) {
+        error(error_.what());
+    }
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// internal function that scales image color
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+void scale2image(MagickImage & image, double factor) {
+    try {
+        ColorRGB col;
+        int nx = image.columns();
+        int ny = image.rows();
+        double val;
+        for (int j = 0; j < ny; j++)
+            for (int i = 0; i < nx; i++) {
+                col = image.pixelColor(i, j);
+                val = col.red() * factor;
+                if (val < 0.0) val = 0.0;
+                if (val > 1.0) val = 1.0;
+                col.red(val);
+                val = col.green() * factor;
+                if (val < 0.0) val = 0.0;
+                if (val > 1.0) val = 1.0;
+                col.green(val);
+                val = col.blue() * factor;
+                if (val < 0.0) val = 0.0;
+                if (val > 1.0) val = 1.0;
+                col.blue();
+                image.pixelColor(i, j, col);
+            }
+    }
+    catch(exception &error_) {
+        error(error_.what());
+    }
+}
+
+
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 SEXP toGray(SEXP rgb) {
@@ -248,15 +586,14 @@ MagickImage colorToImage(SEXP x) {
                 if (strcmp(str, "NA") != 0)
                     image.pixelColor(i, 0, Color(str));
             }
+            return image;
         }
-        return image;
+        error("supplied argument could not be coersed to numeric, integer or character");
     }
     catch(exception &error_) {
         error(error_.what());
     }
-    /* this should never happen, but it prevents warning: the function exits either on
-       previous return or on error - it should not happen that the control comes here
-    */
+    /* unreachable - only to prevent warning that nothing is returned */
     return MagickImage(Geometry(1, 1), "black");
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
