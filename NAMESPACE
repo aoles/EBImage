@@ -21,6 +21,7 @@ export(
 
     # DEPRECATE
     "Image2D", "Image3D", "copyImage", "adaptThresh", "sampleImage", "scaleImage",
+    any2rgb, any2gray, any2X11char, add2rgb, sub2rgb, scale2rgb,
 
     # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
     ".copyHeader",

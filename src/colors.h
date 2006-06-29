@@ -23,4 +23,15 @@ extern "C" {
     
     SEXP intToColorString(SEXP x);
     SEXP colorStringToInt(SEXP x);
+    
+    
+    
+    
+    SEXP any2rgb     (SEXP x);
+    SEXP any2gray    (SEXP x);
+    SEXP any2X11char (SEXP x);
+    SEXP add2rgb     (SEXP x, SEXP y);
+    SEXP sub2rgb     (SEXP x, SEXP y);
+    SEXP scale2rgb   (SEXP x, SEXP factor);
+
 };
