@@ -10,5 +10,6 @@
 
 extern "C" {
     SEXP watershedDetection(SEXP rimage, SEXP ref, SEXP seeds, SEXP params);
+    SEXP paintWatershed(SEXP x, SEXP img, SEXP cols, SEXP dofill, SEXP doborders, SEXP opacity);
 };
 

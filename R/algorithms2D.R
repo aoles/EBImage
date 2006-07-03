@@ -65,25 +65,37 @@ watershed <- function(x, mindist = 15, minradius = 10, edgeFactor = 0.2, seeds =
     .watershed(x, mindist, minradius, edgeFactor, seeds, ref, FALSE)
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-paintWatershed2D <- function(x, img, col = c("blue", "white", "red"), do.fill = TRUE, do.borders = TRUE) {
+paintx <- function(x, img, col = "default", do.fill = TRUE, do.borders = TRUE, opacity = 0.2) {
     if(!assert(img))
         stop("Wrong class of argument img")
-    if (dim(img)[[3]] > 1)
-        stop("function implemented for single 2D images only, use subscripts");
+    if (col == "default")
+        col <- c("#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")
+    res <- .copyHeader(img, rgb = TRUE);
+    res@.Data <- array(scale2rgb(img@.Data, 1.0 - as.numeric(opacity)), dim(img))
     if (!do.fill && !do.borders)
-        stop("both do.fill and do.borders set to FALSE - nothing to do")
-    if (!img@rgb)
-        stop("img must be RGB, convert to RGB first")
-    if (is.null(x$objects))
-        stop("x must contain 'objects' element as returned by watershed function")   
-    if (is.null(x$pixels) && do.fill)
-        stop("x must contain 'pixels' element to enable fill");
-    if (is.null(x$borders) && do.borders)
-        stop("x must contain 'borders' element to enable plotting borders");
-    nobj <- dim(x$objects)[[1]]
-    colRamp <- colorRamp(fcol)
-    mcol = colRamp(((1:nobj) - 1) / nobj) / 256
-    col = rgb(mcol[,1], mcol[,2], mcol[,3])
-    
-    
+        return(res)
+    nimg <- dim(img)[[3]]
+    colRamp <- colorRamp(col)
+    cols <- list()
+    for (i in 1:nimg) {
+        nobj <- 0
+        if (nimg > 1) {
+            if (!is.null(x[[i]]$objects))
+                nobj <- length(x[[i]]$objects[,1])
+        }
+        else {
+            if (!is.null(x$objects))
+                nobj <- length(x$objects[,1])
+        }
+        if (nobj > 0) {
+            mcol <- colRamp(((1:nobj) - 1) / (nobj - 1)) / 256
+            r <- .CallEBImage("asRed", mcol[,1])
+            g <- .CallEBImage("asGreen", mcol[,2])
+            b <- .CallEBImage("asBlue", mcol[,3])
+            cols[[i]] <- r + g + b
+        } 
+        else 
+            cols[[i]] = NULL    
+    }
+    return(.CallEBImage("paintWatershed", x, res, cols, as.logical(do.fill), as.logical(do.borders), as.numeric(opacity)))
 }
