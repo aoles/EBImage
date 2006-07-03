@@ -27,6 +27,11 @@ colRGB1 <- function(x) {
 }
 
 
+
+
+
+
+
 any2rgb <- function(x) {
     return(.CallEBImage("any2rgb", x))
 }

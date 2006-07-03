@@ -239,6 +239,70 @@ SEXP watershedDetection(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
     return res;
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+SEXP paintWatershed(SEXP x, SEXP img, SEXP cols, SEXP dofill, SEXP doborders, SEXP opacity) {
+    try {
+        int nimages = INTEGER(GET_DIM(img))[2];
+        if (nimages <= 0)
+            error("no images supplied");
+        if (nimages > 1 && LENGTH(x) != nimages)
+            error("list x must have the same number of elements as the number of images");
+        Point size(INTEGER(GET_DIM(img))[0], INTEGER(GET_DIM(img))[1]);
+        bool fill = LOGICAL(dofill);
+        bool outline = LOGICAL(doborders);
+        double ropac = REAL(opacity)[0];
+        for (int i = 0; i < nimages; i++) {
+            SEXP xx;
+            if (nimages > 1)
+                xx = VECTOR_ELT(x, i);
+            else
+                xx = x;
+            if (xx == R_NilValue) continue;
+            if (VECTOR_ELT(cols, i) == R_NilValue) continue;
+            int * col = INTEGER(VECTOR_ELT(cols, i));
+            int nobj = LENGTH(VECTOR_ELT(cols, i));
+            int * imgdata = &(INTEGER(img)[i * size.x * size.y]);
+            if (VECTOR_ELT(xx, 1) != R_NilValue && fill) {
+                MagickImage dots(nobj, 1, "RGBp", CharPixel, col);
+                for (int j = 0; j < nobj; j++) {
+                    ColorRGB cc = dots.pixelColor(j, 0);
+                    cc.red(cc.red() * ropac);
+                    cc.green(cc.green() * ropac);
+                    cc.blue(cc.blue() * ropac);
+                    dots.pixelColor(j, 0, cc);
+                }
+                dots.opacity(OpaqueOpacity);
+                dots.type(TrueColorType);
+                int * newcol = new int[nobj];
+                dots.write(0, 0, nobj, 1, "RGBp", CharPixel, newcol);
+                int * pixels = INTEGER(VECTOR_ELT(xx, 1));
+                int npxs = INTEGER(GET_DIM(VECTOR_ELT(xx, 1)))[1];
+                int index;
+                for (int j = 0; j < nobj; j++) {
+                    
+                    for (int k = 0; k < npxs; k++)
+                        if ((index = pixels[j + k * nobj]) != NA_INTEGER) 
+                            imgdata[index] += newcol[j];
+                }
+                delete[] newcol;
+            }
+            if (VECTOR_ELT(xx, 2) != R_NilValue && outline) {
+                int * borders = INTEGER(VECTOR_ELT(xx, 2));
+                int nbrd = INTEGER(GET_DIM(VECTOR_ELT(xx, 2)))[1];
+                int index;
+                for (int j = 0; j < nobj; j++) {
+                    for (int k = 0; k < nbrd; k++)
+                        if ((index = borders[j + k * nobj]) != NA_INTEGER) 
+                            imgdata[index] = col[j];
+                }
+            }
+        }
+    }
+    catch(exception &error_) {
+        error(error_.what());
+    }
+    return img;
+}
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void doWatershed(double * data, Point & size, double mindist, double minradius, vector<TheFeature> & objects, double edgeFactor) {
     int npts = size.x * size.y;
     /* if we supply objects with seeds, we do not add any new and just use those */
