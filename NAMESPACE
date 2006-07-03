@@ -10,18 +10,18 @@ export(
 
     "read.image", "ping.image",
 
-    "objectCount", "watershed",
+    "objectCount", "watershed", "paintws",
 
     "verboseEBImage",
 
     "colString", "colRGB",
+    "any2rgb", "any2gray", "any2X11char", "add2rgb", "sub2rgb", "scale2rgb",
 
     # "DrawableText",
     "DrawableCircle", "DrawableLine", "DrawableRect", "DrawableEllipse",
 
     # DEPRECATE
     "Image2D", "Image3D", "copyImage", "adaptThresh", "sampleImage", "scaleImage",
-    any2rgb, any2gray, any2X11char, add2rgb, sub2rgb, scale2rgb,
 
     # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
     ".copyHeader",

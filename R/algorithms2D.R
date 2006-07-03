@@ -65,7 +65,7 @@ watershed <- function(x, mindist = 15, minradius = 10, edgeFactor = 0.2, seeds =
     .watershed(x, mindist, minradius, edgeFactor, seeds, ref, FALSE)
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-paintx <- function(x, img, col = "default", do.fill = TRUE, do.borders = TRUE, opacity = 0.2) {
+paintws <- function(x, img, col = "default", do.fill = TRUE, do.borders = TRUE, opacity = 0.2) {
     if(!assert(img))
         stop("Wrong class of argument img")
     if (col == "default")

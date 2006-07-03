@@ -126,7 +126,7 @@ SEXP watershedDetection(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
                     iseeds = VECTOR_ELT(seeds, i);
                 else
                     iseeds = seeds;
-                int * pts = &(INTEGER(iseeds)[0]);
+                double * pts = REAL(iseeds);
                 int npts = LENGTH(iseeds) / 2;
                 for (int j = 0; j < npts; j++) {
                     objects.push_back(TheFeature());
@@ -400,7 +400,7 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
                         seededdist = objdist;
                         seeded = io;
                     }
-                }        
+                }      
             }
             if (seeded < 0) {
                 /* start a new object if its radius (determined by the highest dm value) is larger than minradius */
