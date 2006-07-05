@@ -22,20 +22,6 @@ levels "rgb", "grayscale", this would be more extendable in case we
 ever need additional image types
 
 ===================================================================
-? [WH 23/04/06] object count
--------------------------------------------------------------------
-what about this algorithm:
-1. Find all local maxima
-2. Merge those that are too close together, allow not only for
-   maximal point but also maximal regions (e.g. ridges)
-3. Define as many regions as there as maxima, and seed them by the maxima.
-4. Apply a simultaneous floodfill to all the regions
-(I might try out this algorithm as soon as a I find time; on advantage
-that I see is that it works simultaneously on the regions rather than
-greedily one after another, greedy algorithms are simply but often
-rather suboptimal)
-
-===================================================================
 ? [WH 23/04/06] image.io.Rd - on image.read
 -------------------------------------------------------------------
 I think for our type of applications it would also be good to
