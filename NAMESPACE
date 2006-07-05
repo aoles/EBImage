@@ -8,9 +8,9 @@ export(
     shade, sharpen, solarize, trim,
     spread, unsharpMask, noise, 
     
-    distMap, thresh, draw, ws, wsPaint,
+    distMap, thresh, ws, wsPaint, wsImages,
 
-    DrawableCircle, DrawableLine, DrawableRect, DrawableEllipse,
+    draw, DrawableCircle, DrawableLine, DrawableRect, DrawableEllipse,
 
     # DEPRECATE
     Image2D, Image3D, copyImage, adaptThresh, sampleImage, scaleImage,

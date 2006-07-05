@@ -16,7 +16,7 @@ t2 <- thresh(a2, 300, 300, 0.00, TRUE)
 dm2 <- sqrt(distMap(t2))
 x2 <- ws(dm2, 50, 15, 0.2, seeds, ref = a2)
 img2 <- wsPaint(x2, a2, opac = 0.3)
-img3 <- wsPaint(x1, img2, opac = 0.3)
+img2 <- wsPaint(x1, img2, opac = 0.3)
 
 x3 <- ws(dm2, 45, 20, 0.2, ref = a2) # no seeds
 img3 <- wsPaint(x3, a2, opac = 0.3)

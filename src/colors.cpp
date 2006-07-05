@@ -14,7 +14,6 @@ const int R   = 1;
 const int G   = 2;
 const int B   = 3;
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 SEXP          image2INTEGER   (MagickImage & image, vector<int> & nas, int ch);
 SEXP          image2REAL      (MagickImage &, vector<int> &, int ch);
 SEXP          image2CHARACTER (MagickImage &, vector<int> &, int ch);
@@ -23,6 +22,7 @@ MagickImage   vector2image    (SEXP, vector<int> &);
 void          add2image       (MagickImage &, MagickImage &);
 void          sub2image       (MagickImage &, MagickImage &);
 void          scale2image     (MagickImage &, double);
+
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 SEXP any2rgb(SEXP x) {
@@ -160,7 +160,7 @@ SEXP image2REAL(MagickImage & image, vector<int> & nas, int ch) {
         if (ch == ALL)
             image.type(GrayscaleType);
         else
-        image.type(TrueColorType);
+            image.type(TrueColorType);
         switch (ch) {
             case R: image.write(0, 0, image.columns(), image.rows(), "R", DoublePixel, values); break;
             case G: image.write(0, 0, image.columns(), image.rows(), "G", DoublePixel, values); break;

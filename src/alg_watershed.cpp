@@ -5,12 +5,14 @@ See: alg_watershed.h for license
 ------------------------------------------------------------------------- */
 #include "alg_watershed.h"
 #include "indexing.h"
+#include "conversions.h"
 
 #include <R_ext/Error.h>
 
 #include <vector>
 #include <iostream>
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+const int OBJ_NCOL = 6;
 const double BG = 0;
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 class TheFeature {
@@ -121,8 +123,8 @@ SEXP ws(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
             PROTECT(objDim[i] = allocVector(INTSXP, 2));
             nprotect++;
             INTEGER(objDim[i])[0] = nobj;
-            INTEGER(objDim[i])[1] = 6;
-            PROTECT(objMtx[i] = allocVector(REALSXP, INTEGER(objDim[i])[0] * INTEGER(objDim[i])[1]));
+            INTEGER(objDim[i])[1] = OBJ_NCOL;
+            PROTECT(objMtx[i] = allocVector(REALSXP, INTEGER(objDim[i])[0] * OBJ_NCOL));
             nprotect++;
             SET_DIM(objMtx[i], objDim[i]);
             double * val = &(REAL(objMtx[i])[0]);
@@ -206,7 +208,8 @@ SEXP ws(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
     catch(exception &error_) {
         error(error_.what());
     }
-    UNPROTECT(nprotect);  
+    if (nprotect > 0)
+        UNPROTECT(nprotect);  
     return res;
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -229,8 +232,9 @@ SEXP ws_paint(SEXP x, SEXP img, SEXP cols, SEXP dofill, SEXP doborders, SEXP opa
                 xx = x;
             if (xx == R_NilValue) continue;
             if (VECTOR_ELT(cols, i) == R_NilValue) continue;
-            int * col = INTEGER(VECTOR_ELT(cols, i));
             int nobj = LENGTH(VECTOR_ELT(cols, i));
+            if (nobj == 0) continue;
+            int * col = INTEGER(VECTOR_ELT(cols, i));
             int * imgdata = &(INTEGER(img)[i * size.x * size.y]);
             if (VECTOR_ELT(xx, 1) != R_NilValue && fill) {
                 MagickImage dots(nobj, 1, "RGBp", CharPixel, col);
@@ -249,7 +253,6 @@ SEXP ws_paint(SEXP x, SEXP img, SEXP cols, SEXP dofill, SEXP doborders, SEXP opa
                 int npxs = INTEGER(GET_DIM(VECTOR_ELT(xx, 1)))[1];
                 int index;
                 for (int j = 0; j < nobj; j++) {
-                    
                     for (int k = 0; k < npxs; k++)
                         if ((index = pixels[j + k * nobj]) != NA_INTEGER) 
                             imgdata[index] += newcol[j];
@@ -272,6 +275,122 @@ SEXP ws_paint(SEXP x, SEXP img, SEXP cols, SEXP dofill, SEXP doborders, SEXP opa
         error(error_.what());
     }
     return img;
+}
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+ creates stacks of images of objects from the ws function, uses img as reference
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+SEXP ws_images(SEXP x, SEXP img) {
+    SEXP res = R_NilValue;
+    int nprotect = 0;
+    try {
+        unsigned int i, j, k;
+        unsigned int nimages = INTEGER(GET_DIM(img))[2];
+        if (nimages == 0)
+            error("no images supplied");
+        if (nimages > 1 && (unsigned int)LENGTH(x) != nimages)
+            error("list x must have the same number of elements as the number of images");
+        if (nimages > 1) {
+            PROTECT(res = allocVector(VECSXP, nimages));
+            nprotect++;
+        }
+        SEXP * items = new SEXP[nimages];
+        Point size(INTEGER(GET_DIM(img))[0], INTEGER(GET_DIM(img))[1]);
+        bool rgb = LOGICAL(GET_SLOT(img, mkString("rgb")))[0];
+        for (i = 0; i < nimages; i++) {
+            items[i] = R_NilValue;
+            SEXP xx;
+            if (nimages > 1)
+                xx = VECTOR_ELT(x, i);
+            else
+                xx = x;
+            if (xx == R_NilValue) continue;
+            SEXP objMtx = VECTOR_ELT(xx, 0);
+            SEXP pxsMtx = VECTOR_ELT(xx, 1);
+            if (objMtx == R_NilValue || pxsMtx == R_NilValue) continue;
+            double * obj = REAL(objMtx);
+            int * pixels = INTEGER(pxsMtx);
+            unsigned int nobj = LENGTH(objMtx) / OBJ_NCOL;
+            if (nobj == 0) continue;
+            unsigned int npxs = LENGTH(pxsMtx) / nobj;
+            if (npxs == 0) continue;
+            /* get maximum dx dy for all objects */
+            int dx = 0, dy = 0;
+            vector<Point> min, max;
+            for (j = 0; j < nobj; j++) {
+                Point pt;
+                pt = getpoint(pixels[j], size.x);
+                min.push_back(pt);
+                max.push_back(pt);
+                int index, ddx, ddy;
+                for (k = 1; k < obj[j + 2 * nobj]; k++) {
+                    if ((index = pixels[j + k * nobj]) == NA_INTEGER) continue;
+                    pt = getpoint(index, size.x);
+                    if (pt.x < min[j].x) {
+                        min[j].x = pt.x;
+                        if ((ddx = max[j].x - min[j].x) > dx) dx = ddx;
+                    }
+                    if (pt.y < min[j].y) {
+                        min[j].y = pt.y;
+                        if ((ddy = max[j].y - min[j].y) > dy) dy = ddy;
+                    }
+                    if (pt.x > max[j].x) {
+                        max[j].x = pt.x;
+                        if ((ddx = max[j].x - min[j].x) > dx) dx = ddx;
+                    }
+                    if (pt.y > max[j].y) {
+                        max[j].y = pt.y;
+                        if ((ddy = max[j].y - min[j].y) > dy) dy = ddy;
+                    }
+                } // k
+            } // j
+            /* create objects' image stack */
+            MagickStack imgstack;
+            int offset = i * size.x * size.y;
+            MagickImage dot(Geometry(1, 1), "black");
+            for (j = 0; j < nobj; j++) {
+                // TODO bg color to add here
+                MagickImage image(Geometry(dx + 1, dy + 1), "black");
+                
+                int ddx = (min[j].x + max[j].x - dx) / 2; // x' = x - ddx
+                int ddy = (min[j].y + max[j].y - dy) / 2; // y' = y - ddy
+                int index;
+                Point pt;
+                for (k = 0; k < obj[j + 2 * nobj]; k++) {
+                    if ((index = pixels[j + k * nobj]) == NA_INTEGER) continue;
+                    if (rgb)
+                        dot.read(1, 1, "RGBp", CharPixel, &(INTEGER(img)[offset + index]));
+                    else
+                        dot.read(1, 1, "I", DoublePixel, &(REAL(img)[offset + index]));
+                    pt = getpoint(index, size.x);
+                    pt.x = pt.x - ddx;
+                    pt.y = pt.y - ddy;
+                    image.pixelColor(pt.x, pt.y, dot.pixelColor(0, 0));                                   
+                }
+                image.opacity(OpaqueOpacity);
+                if (rgb)
+                    image.type(TrueColorType);
+                else
+                    image.type(GrayscaleType);
+                imgstack.push_back(image);
+            }
+            PROTECT(items[i] = stack2SEXP(imgstack, rgb));
+            nprotect++;
+        }
+        /* if more than one image, add all results to the list, otherwise, output first */
+        if (nimages > 1)
+            for (i = 0; i < nimages; i++)
+                SET_VECTOR_ELT(res, i, items[i]);
+        else
+            res = items[0];
+        /* clenup */
+        delete[] items;
+    }
+    catch(exception &error_) {
+        error(error_.what());
+    }
+    if (nprotect > 0)
+        UNPROTECT(nprotect);  
+    return res;
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
  runs watershed detection algorithm for the data of a single image,
