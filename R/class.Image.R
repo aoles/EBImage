@@ -1,9 +1,22 @@
-# ============================================================================
-# Image: class definition and method for class 'Image'
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Copyright: Oleg Sklyar, 2005-2006
-#            European Bioinformatics Institute; Bioconductor.org
-# ============================================================================
+# -------------------------------------------------------------------------
+# Class Image, definition and methods
+ 
+# Copyright (c) 2006 Oleg Sklyar
+
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License 
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.          
+
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+
+# See the GNU General Public License for more details.
+# GPL license wording: http://www.gnu.org/licenses/gpl.html
+
+# -------------------------------------------------------------------------
+
 setClass("Image",
     representation(
         rgb        = "logical"
@@ -13,33 +26,15 @@ setClass("Image",
     ),
     contains = "array"
 )
-# ============================================================================
-# NON-STANDARD GENERICS
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setGeneric("assert",      function(object, ...) standardGeneric("assert"))
-setGeneric("copy",        function(x)           standardGeneric("copy"))
-setGeneric("display",     function(object, ...) standardGeneric("display"))
-setGeneric("channels",    function(object)      standardGeneric("channels"))
-setGeneric("toGray",      function(object)      standardGeneric("toGray"))
-setGeneric("toRGB",       function(object)      standardGeneric("toRGB"))
-setGeneric("toRed",       function(object)      standardGeneric("toRed"))
-setGeneric("toGreen",     function(object)      standardGeneric("toGreen"))
-setGeneric("toBlue",      function(object)      standardGeneric("toBlue"))
-setGeneric("getRed",      function(object)      standardGeneric("getRed"))
-setGeneric("getGreen",    function(object)      standardGeneric("getGreen"))
-setGeneric("getBlue",     function(object)      standardGeneric("getBlue"))
-setGeneric("normalize",   function(object, ...) standardGeneric("normalize"))
-setGeneric("as.array",    function(x)           standardGeneric("as.array"))
-setGeneric("summary",     function(object, ...) standardGeneric("summary"))
-setGeneric("plot.image",  function(x, ...)      standardGeneric("plot.image"))
-setGeneric("print",       function(x, ...)      standardGeneric("print"))
 
-# FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
-setGeneric(".normalize",  function(object, ...) standardGeneric(".normalize"))
-setGeneric(".as.integer", function(x, ...)      standardGeneric(".as.integer"))
-setGeneric(".as.double",  function(x, ...)      standardGeneric(".as.double"))
-setGeneric("correctType", function(object)      standardGeneric("correctType"))
-setGeneric("isCorrectType", function(object)    standardGeneric("isCorrectType"))
+# ============================================================================
+# generics for internal use only
+setGeneric(".normalize",    function(object, ...) standardGeneric(".normalize"))
+setGeneric(".as.integer",   function(x, ...)      standardGeneric(".as.integer"))
+setGeneric(".as.double",    function(x, ...)      standardGeneric(".as.double"))
+setGeneric("correctType",   function(object)      standardGeneric("correctType"))
+setGeneric("isCorrectType", function(object)      standardGeneric("isCorrectType"))
+
 # ============================================================================
 # CONSTRUCTORS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -99,6 +94,7 @@ setMethod("assert", signature(object = "Image"),
     # copy all fields here except data and rgb
     return(res)
 }
+
 # ============================================================================
 # METHODS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -137,11 +133,11 @@ setMethod("channels", signature(object = "Image"),
 setMethod("toGray", signature(object = "Image"),
     function(object) {
         if (!object@rgb)
-            return(object)
+            return(copy(object))
         if (!isCorrectType(object))
-            tmp = .CallEBImage("toGray", correctType(object))
+            tmp = .CallEBImage("any2gray", correctType(object))
         else
-            tmp = .CallEBImage("toGray", object)
+            tmp = .CallEBImage("any2gray", object)
         res = .copyHeader(object, class(object), FALSE)
         res@.Data = array(tmp, dim(object))
         return(res)
@@ -151,25 +147,70 @@ setMethod("toGray", signature(object = "Image"),
 setMethod("toRGB", signature(object = "Image"),
     function(object) {
         if (object@rgb)
-            return(object)
+            return(copy(object))
         if (!isCorrectType(object))
-            tmp = .CallEBImage("toRGB", correctType(object))
+            tmp = .CallEBImage("any2rgb", correctType(object))
         else
-            tmp = .CallEBImage("toRGB", object)
+            tmp = .CallEBImage("any2rgb", object)
         res = .copyHeader(object, class(object), TRUE)
         res@.Data = array(tmp, dim(object))
         return(res)
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod("toX11char", signature(object = "Image"),
+    function(object) {
+        return(.CallEBImage("any2X11char", object@.Data))
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod("add2RGB", signature(x = "Image", y = "ANY"),
+    function(x, y) {
+        if (length(y) != length(x))
+            stop("length mismatch")
+        if (!isCorrectType(x))
+            tmp = .CallEBImage("add2rgb", correctType(x), y)
+        else
+            tmp = .CallEBImage("any2rgb", x, y)
+        res = .copyHeader(x, class(x), TRUE)
+        res@.Data = array(tmp, dim(x))
+        return(res)
+    }
+)
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod("sub2RGB", signature(x = "Image", y = "ANY"),
+    function(x, y) {
+        if (length(y) != length(x))
+            stop("length mismatch")
+        if (!isCorrectType(x))
+            tmp = .CallEBImage("sub2rgb", correctType(x), y)
+        else
+            tmp = .CallEBImage("sub2rgb", x, y)
+        res = .copyHeader(x, class(x), TRUE)
+        res@.Data = array(tmp, dim(x))
+        return(res)
+    }
+)
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod("scale2RGB", signature(x = "Image", mult = "numeric"),
+    function(x, mult) {
+        if (!isCorrectType(x))
+            tmp = .CallEBImage("scale2rgb", correctType(x), mult)
+        else
+            tmp = .CallEBImage("scale2rgb", x, mult)
+        res = .copyHeader(x, class(x), TRUE)
+        res@.Data = array(tmp, dim(x))
+        return(res)
+    }
+)
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("toRed", signature(object = "Image"),
     function(object) {
-        if (object@rgb)
-            stop("Function supports grayscale images only")
         if (!isCorrectType(object))
-            tmp = .CallEBImage("asRed", correctType(object))
+            tmp = .CallEBImage("asred", correctType(object))
         else
-            tmp = .CallEBImage("asRed", object)
+            tmp = .CallEBImage("asred", object)
         res = .copyHeader(object, class(object), TRUE)
         res@.Data = array(tmp, dim(object))
         return(res)
@@ -178,12 +219,10 @@ setMethod("toRed", signature(object = "Image"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("toGreen", signature(object = "Image"),
     function(object) {
-        if (object@rgb)
-            stop("Function supports grayscale images only")
         if (!isCorrectType(object))
-            tmp = .CallEBImage("asGreen", correctType(object))
+            tmp = .CallEBImage("asgreen", correctType(object))
         else
-            tmp = .CallEBImage("asGreen", object)
+            tmp = .CallEBImage("asgreen", object)
         res = .copyHeader(object, class(object), TRUE)
         res@.Data = array(tmp, dim(object))
         return(res)
@@ -192,12 +231,10 @@ setMethod("toGreen", signature(object = "Image"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("toBlue", signature(object = "Image"),
     function(object) {
-        if (object@rgb)
-            stop("Function supports grayscale images only")
         if (!isCorrectType(object))
-            tmp = .CallEBImage("asBlue", correctType(object))
+            tmp = .CallEBImage("asblue", correctType(object))
         else
-            tmp = .CallEBImage("asBlue", object)
+            tmp = .CallEBImage("asblue", object)
         res = .copyHeader(object, class(object), TRUE)
         res@.Data = array(tmp, dim(object))
         return(res)
@@ -207,11 +244,11 @@ setMethod("toBlue", signature(object = "Image"),
 setMethod("getRed", signature(object = "Image"),
     function(object) {
         if (!object@rgb)
-            return(object)
+            return(copy(object))
         if (!isCorrectType(object))
-            tmp = .CallEBImage("getRed", correctType(object))
+            tmp = .CallEBImage("getred", correctType(object))
         else
-            tmp = .CallEBImage("getRed", object)
+            tmp = .CallEBImage("getred", object)
         res = .copyHeader(object, class(object), FALSE)
         res@.Data = array(tmp, dim(object))
         return(res)
@@ -221,11 +258,11 @@ setMethod("getRed", signature(object = "Image"),
 setMethod("getGreen", signature(object = "Image"),
     function(object) {
         if (!object@rgb)
-            return(object)
+            return(copy(object))
         if (!isCorrectType(object))
-            tmp = .CallEBImage("getGreen", correctType(object))
+            tmp = .CallEBImage("getgreen", correctType(object))
         else
-            tmp = .CallEBImage("getGreen", object)
+            tmp = .CallEBImage("getgreen", object)
         res = .copyHeader(object, class(object), FALSE)
         res@.Data = array(tmp, dim(object))
         return(res)
@@ -235,11 +272,11 @@ setMethod("getGreen", signature(object = "Image"),
 setMethod("getBlue", signature(object = "Image"),
     function(object) {
         if (!object@rgb)
-            return(object)
+            return(copy(object))
         if (!isCorrectType(object))
-            tmp = .CallEBImage("getBlue", correctType(object))
+            tmp = .CallEBImage("getblue", correctType(object))
         else
-            tmp = .CallEBImage("getBlue", object)
+            tmp = .CallEBImage("getblue", object)
         res = .copyHeader(object, class(object), FALSE)
         res@.Data = array(tmp, dim(object))
         return(res)
@@ -285,8 +322,7 @@ setMethod("[", signature(x = "Image", i = "missing", j = "missing"),
 setMethod("[", signature(x = "Image", i = "numeric", j = "missing"),
     function(x, i, j, k, ..., drop) {
         if (missing(k)) {
-            warning("Undistinguishable [int, , ANY] and [int], using [int]. Use [int,1:dim(x)[2],ANY] for [int, , ANY]")
-            #tmp = callGeneric(x@.Data, i, drop = FALSE)
+            warning("using index [int], cannot distinguish from [int,,ANY], use [int,1:dim(x)[2],ANY] otherwise")
             tmp = x@.Data[i, drop = FALSE]
         }
         else {
@@ -470,3 +506,30 @@ setMethod("plot.image", signature(x = "Image"),
         graphics:::image(x = X, y = Y, z = matrix(x[,,1], .dim[1:2]), asp=asp, col = gray((0:255)/255), axes=axes, xlab=xlab, ylab=ylab,  ...)
     }
 )
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod("write.image", signature(object = "Image", files = "character"),
+    function(object, files) {
+        files = as.character(files)
+        if (!isCorrectType(object))
+            object = correctType(object)
+        invisible(.CallEBImage("writeImages", object, files))
+    }
+)
+# ============================================================================
+# ASSOCIATED ROUTINES
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+read.image <- function(files, rgb = FALSE) {
+    files = as.character(files)
+    if (length(files) < 1)
+        stop("At least one file/URL must be supplied")
+    rgb = as.logical(rgb)[[1]]
+    return(.CallEBImage("readImages", files, rgb))
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ping.image <- function(files, show.comments = FALSE) {
+    files = as.character(files)
+    if (length(files) < 1)
+        stop("At least one file/URL must be supplied")
+    invisible(.CallEBImage("pingImages", files, as.logical(show.comments)))
+}
+

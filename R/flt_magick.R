@@ -1,12 +1,22 @@
-# ============================================================================
-# 2D Image Processing routines based on Magick++ functions
-# 1-to-1 R implementations of Magick::Image methods in stdFilters.cpp
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Copyright: Oleg Sklyar, 2005-2006
-#            European Bioinformatics Institute; Bioconductor.org
-# ============================================================================
-# IMAGE PROCESSING ROUTINES via ImageMagick
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# -------------------------------------------------------------------------
+# Image filters based on ImageMagick
+# Bundled with src/flt_magick.{h,cpp}
+ 
+# Copyright (c) 2005 Oleg Sklyar
+
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License 
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.          
+
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+
+# See the GNU General Public License for more details.
+# GPL license wording: http://www.gnu.org/licenses/gpl.html
+
+# -------------------------------------------------------------------------
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .blur <- function(x, radius = 1, sigma = 0.5, modify = TRUE) {
     if (!assert(x))

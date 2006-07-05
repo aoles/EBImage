@@ -1,4 +1,10 @@
-#include "watershed.h"
+/* -------------------------------------------------------------------------
+Watershed algorithm of object detection
+Copyright (c) 2006 Oleg Sklyar
+See: alg_watershed.h for license
+------------------------------------------------------------------------- */
+#include "alg_watershed.h"
+#include "indexing.h"
 
 #include <R_ext/Error.h>
 
@@ -6,41 +12,6 @@
 #include <iostream>
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 const double BG = 0;
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-struct Point {
-    Point() {
-        x = 0;
-        y = 0;
-    }
-    Point(int x, int y) {
-        this->x = x;
-        this->y = y;
-    }
-    Point(const Point& obj) {
-        x = obj.x;
-        y = obj.y;
-    }
-    int x;
-    int y;
-};
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-Point getpoint(const int & index, const int & xsize) {
-    Point res(0, index / xsize);
-    res.x = index - res.y * xsize;
-    return res;
-}
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-int getindex(const Point & pt, const int xsize) {
-    return pt.x + pt.y * xsize;
-}
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-int getindex(const int & x, const int & y, const int xsize) {
-    return x + y * xsize;
-}
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-double dist(const Point & p1, const Point & p2) {
-    return sqrt((long double)((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y)));
-}
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 class TheFeature {
     private:
@@ -73,7 +44,7 @@ class TheFeature {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void doWatershed(double *, Point &, double, double, vector<TheFeature> &, double);
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-SEXP watershedDetection(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
+SEXP watershed(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
     /* !!! use nprotect++ everywhere you use PROTECT, cleanup automatic */
     if (!assertImage(rimage))
         error("Wrong argument class, Image expected");
@@ -239,7 +210,7 @@ SEXP watershedDetection(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
     return res;
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-SEXP paintWatershed(SEXP x, SEXP img, SEXP cols, SEXP dofill, SEXP doborders, SEXP opacity) {
+SEXP paintws(SEXP x, SEXP img, SEXP cols, SEXP dofill, SEXP doborders, SEXP opacity) {
     try {
         int nimages = INTEGER(GET_DIM(img))[2];
         if (nimages <= 0)

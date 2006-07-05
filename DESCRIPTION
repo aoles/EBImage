@@ -1,11 +1,11 @@
 Package: EBImage
-Version: 1.3.026
-Date: 03 July 2006
+Version: 1.3.030
+Date: 05 July 2006
 Title: Image processing and analysis toolkit for R
 Author: Oleg Sklyar, Wolfgang Huber
 Maintainer: Oleg Sklyar <osklyar@ebi.ac.uk>
 SystemRequirements: Magick++ version > 6.0.0
-Depends: R (>= 2.2.0)
+Depends: R (>= 2.2.0), methods
 Description: Image processing and analysis toolkit for R (image IO, conversion, display, processing)
 License: GPL
 URL: http://www.ebi.ac.uk/~osklyar/projects/EBImage/

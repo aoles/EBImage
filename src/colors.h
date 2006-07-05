@@ -9,6 +9,7 @@
 #include "common.h"
 
 extern "C" {
+/*
     SEXP toGray(SEXP rgb);
     SEXP toRGB(SEXP gray);
     SEXP getRed(SEXP rgb);
@@ -17,21 +18,19 @@ extern "C" {
     SEXP asRed(SEXP gray);
     SEXP asGreen(SEXP gray);
     SEXP asBlue(SEXP gray);
+*/    
 
-    SEXP toColorString(SEXP rgb);
-    SEXP fromColorString(SEXP str); /* RGB vector */
-    
-    SEXP intToColorString(SEXP x);
-    SEXP colorStringToInt(SEXP x);
-    
-    
-    
-    
     SEXP any2rgb     (SEXP x);
     SEXP any2gray    (SEXP x);
     SEXP any2X11char (SEXP x);
     SEXP add2rgb     (SEXP x, SEXP y);
     SEXP sub2rgb     (SEXP x, SEXP y);
     SEXP scale2rgb   (SEXP x, SEXP factor);
+    SEXP getred      (SEXP x);
+    SEXP asred       (SEXP x);
+    SEXP getgreen    (SEXP x);
+    SEXP asgreen     (SEXP x);
+    SEXP getblue     (SEXP x);
+    SEXP asblue      (SEXP x);
 
 };

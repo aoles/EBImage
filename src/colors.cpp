@@ -4,41 +4,38 @@
 #include <vector>
 #include <iostream>
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-SEXP          image2INTEGER   (MagickImage & image, vector<int> & nas);
-SEXP          image2REAL      (MagickImage & image, vector<int> & nas);
-SEXP          image2CHARACTER (MagickImage & image, vector<int> & nas);
-vector<int>   getNAs          (SEXP x);
-MagickImage   vector2image    (SEXP x, vector<int> & nas);
-void          add2image       (MagickImage & image, MagickImage & addition);
-void          sub2image       (MagickImage & image, MagickImage & subtraction);
-void          scale2image     (MagickImage & image, double factor);
+const int ALL = 0;
+const int R   = 1;
+const int G   = 2;
+const int B   = 3;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-SEXP any2rgb     (SEXP x);
-SEXP any2gray    (SEXP x);
-SEXP any2X11char (SEXP x);
-SEXP add2rgb     (SEXP x, SEXP y);
-SEXP sub2rgb     (SEXP x, SEXP y);
-SEXP scale2rgb   (SEXP x, SEXP factor);
+SEXP          image2INTEGER   (MagickImage & image, vector<int> & nas, int ch);
+SEXP          image2REAL      (MagickImage &, vector<int> &, int ch);
+SEXP          image2CHARACTER (MagickImage &, vector<int> &, int ch);
+vector<int>   getNAs          (SEXP);
+MagickImage   vector2image    (SEXP, vector<int> &);
+void          add2image       (MagickImage &, MagickImage &);
+void          sub2image       (MagickImage &, MagickImage &);
+void          scale2image     (MagickImage &, double);
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 SEXP any2rgb(SEXP x) {
     vector<int> nas = getNAs(x);
     MagickImage image = vector2image(x, nas);
-    return image2INTEGER(image, nas);
+    return image2INTEGER(image, nas, ALL);
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 SEXP any2gray(SEXP x) {
     vector<int> nas = getNAs(x);
     MagickImage image = vector2image(x, nas);
-    return image2REAL(image, nas);
+    return image2REAL(image, nas, ALL);
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 SEXP any2X11char(SEXP x) {
     vector<int> nas = getNAs(x);
     MagickImage image = vector2image(x, nas);
-    return image2CHARACTER(image, nas);
+    return image2CHARACTER(image, nas, ALL);
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 SEXP add2rgb(SEXP x, SEXP y) {
@@ -48,7 +45,7 @@ SEXP add2rgb(SEXP x, SEXP y) {
     MagickImage addition = vector2image(y, nas1);
     add2image(image, addition);
     /* TODO combine to nas */
-    return image2INTEGER(image, nas);
+    return image2INTEGER(image, nas, ALL);
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 SEXP sub2rgb(SEXP x, SEXP y) {
@@ -58,7 +55,7 @@ SEXP sub2rgb(SEXP x, SEXP y) {
     MagickImage subtraction = vector2image(y, nas1);
     sub2image(image, subtraction);
     /* TODO combine to nas */
-    return image2INTEGER(image, nas);
+    return image2INTEGER(image, nas, ALL);
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 SEXP scale2rgb(SEXP x, SEXP factor) {
@@ -71,12 +68,48 @@ SEXP scale2rgb(SEXP x, SEXP factor) {
     catch(exception &error_) {
         error(error_.what());
     }
-    return image2INTEGER(image, nas);
+    return image2INTEGER(image, nas, ALL);
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SEXP getred(SEXP x) {
+    vector<int> nas = getNAs(x);
+    MagickImage image = vector2image(x, nas);
+    return image2REAL(image, nas, R);
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SEXP asred(SEXP x) {
+    vector<int> nas = getNAs(x);
+    MagickImage image = vector2image(x, nas);
+    return image2INTEGER(image, nas, R);
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SEXP getgreen(SEXP x) {
+    vector<int> nas = getNAs(x);
+    MagickImage image = vector2image(x, nas);
+    return image2REAL(image, nas, G);
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SEXP asgreen(SEXP x) {
+    vector<int> nas = getNAs(x);
+    MagickImage image = vector2image(x, nas);
+    return image2INTEGER(image, nas, G);
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SEXP getblue(SEXP x) {
+    vector<int> nas = getNAs(x);
+    MagickImage image = vector2image(x, nas);
+    return image2REAL(image, nas, B);
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+SEXP asblue(SEXP x) {
+    vector<int> nas = getNAs(x);
+    MagickImage image = vector2image(x, nas);
+    return image2INTEGER(image, nas, B);
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // internal function that returns an R-integer (RGB) from the supplied image
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-SEXP image2INTEGER(MagickImage & image, vector<int> & nas) {
+SEXP image2INTEGER(MagickImage & image, vector<int> & nas, int ch) {
     SEXP res = R_NilValue;
     int nprotect = 0;
     try {
@@ -86,7 +119,12 @@ SEXP image2INTEGER(MagickImage & image, vector<int> & nas) {
         int * values = &(INTEGER(res)[0]);
         image.opacity(OpaqueOpacity);
         image.type(TrueColorType);
-        image.write(0, 0, image.columns(), image.rows(), "RGBp", CharPixel, values);
+        switch (ch) {
+            case R: image.write(0, 0, image.columns(), image.rows(), "Rppp", CharPixel, values); break;
+            case G: image.write(0, 0, image.columns(), image.rows(), "pGpp", CharPixel, values); break;
+            case B: image.write(0, 0, image.columns(), image.rows(), "ppBp", CharPixel, values); break;
+            default: image.write(0, 0, image.columns(), image.rows(), "RGBp", CharPixel, values); 
+        }
         if (nas.size() > 0) {
             vector<int>::iterator it = nas.begin();
             for (int i = 0; i < nvalues; i++) {
@@ -105,7 +143,7 @@ SEXP image2INTEGER(MagickImage & image, vector<int> & nas) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // internal function that returns an R-numeric (grayscale) from the supplied image
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-SEXP image2REAL(MagickImage & image, vector<int> & nas) {
+SEXP image2REAL(MagickImage & image, vector<int> & nas, int ch) {
     SEXP res = R_NilValue;
     int nprotect = 0;
     try {
@@ -114,8 +152,16 @@ SEXP image2REAL(MagickImage & image, vector<int> & nas) {
         nprotect++;
         double * values = &(REAL(res)[0]);
         image.opacity(OpaqueOpacity);
-        image.type(GrayscaleType);
-        image.write(0, 0, image.columns(), image.rows(), "I", DoublePixel, values);
+        if (ch == ALL)
+            image.type(GrayscaleType);
+        else
+        image.type(TrueColorType);
+        switch (ch) {
+            case R: image.write(0, 0, image.columns(), image.rows(), "R", DoublePixel, values); break;
+            case G: image.write(0, 0, image.columns(), image.rows(), "G", DoublePixel, values); break;
+            case B: image.write(0, 0, image.columns(), image.rows(), "B", DoublePixel, values); break;
+            default: image.write(0, 0, image.columns(), image.rows(), "I", DoublePixel, values);
+        }
         if (nas.size() > 0) {
             vector<int>::iterator it = nas.begin();
             for (int i = 0; i < nvalues; i++) {
@@ -134,7 +180,7 @@ SEXP image2REAL(MagickImage & image, vector<int> & nas) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // internal function that returns an R-character (X11-format) from the supplied image
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-SEXP image2CHARACTER(MagickImage & image, vector<int> & nas) {
+SEXP image2CHARACTER(MagickImage & image, vector<int> & nas, int ch) {
     SEXP res = R_NilValue;
     int nprotect = 0;
     try {
@@ -144,10 +190,28 @@ SEXP image2CHARACTER(MagickImage & image, vector<int> & nas) {
         nprotect++;
         image.opacity(OpaqueOpacity);
         image.type(TrueColorType);
+        ColorRGB col;
         if (nas.size() <= 0) {
             for (int j = 0; j < ny; j++)
-                for (int i = 0; i < nx; i++)
-                    SET_STRING_ELT(res, i + j * nx, mkChar(string(image.pixelColor(i, j)).c_str()));
+                for (int i = 0; i < nx; i++) {
+                    col = image.pixelColor(i, j);
+                    switch (ch) {
+                        case R: {
+                            col.green(0);
+                            col.blue(0);
+                        }; break;
+                        case G: {
+                            col.red(0);
+                            col.blue(0);
+                        }; break;
+                        case B: {
+                            col.red(0);
+                            col.green(0);
+                        }; break;
+                        default: {};                    
+                    }
+                    SET_STRING_ELT(res, i + j * nx, mkChar(string(col).c_str()));
+                }
         }
         else {
             int index;
@@ -159,8 +223,25 @@ SEXP image2CHARACTER(MagickImage & image, vector<int> & nas) {
                         SET_STRING_ELT(res, index, NA_STRING);
                         if (it != nas.end()) it++;
                     }
-                    else 
-                        SET_STRING_ELT(res, index, mkChar(string(image.pixelColor(i, j)).c_str()));
+                    else {
+                        col = image.pixelColor(i, j);
+                        switch (ch) {
+                            case R: {
+                                col.green(0);
+                                col.blue(0);
+                            }; break;
+                            case G: {
+                                col.red(0);
+                                col.blue(0);
+                            }; break;
+                            case B: {
+                                col.red(0);
+                                col.green(0);
+                            }; break;
+                            default: {};                    
+                        }
+                        SET_STRING_ELT(res, index, mkChar(string(col).c_str()));
+                    }
                 }
         }
     }
@@ -341,7 +422,7 @@ void scale2image(MagickImage & image, double factor) {
 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-SEXP toGray(SEXP rgb) {
+/*SEXP toGray(SEXP rgb) {
     int nval = LENGTH(rgb);
     try {
         Geometry geom(nval, 1);
@@ -362,7 +443,7 @@ SEXP toGray(SEXP rgb) {
     }
     return R_NilValue;
 }
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
 SEXP toRGB(SEXP gray) {
     int nval = LENGTH(gray);
     try {
@@ -384,7 +465,6 @@ SEXP toRGB(SEXP gray) {
     }
     return R_NilValue;
 }
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 SEXP getRed(SEXP rgb) {
     int nval = LENGTH(rgb);
     try {
@@ -396,7 +476,7 @@ SEXP getRed(SEXP rgb) {
         PROTECT(res = allocVector(REALSXP, nval));
         void * dest = &(REAL(res)[0]);
         image.opacity(OpaqueOpacity);
-        /* image.type(GrayscaleType); */
+        // image.type(GrayscaleType);
         image.write(0, 0, nval, 1, "R", DoublePixel, dest);
         UNPROTECT(1);
         return res;
@@ -406,7 +486,6 @@ SEXP getRed(SEXP rgb) {
     }
     return R_NilValue;
 }
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 SEXP getGreen(SEXP rgb) {
     int nval = LENGTH(rgb);
     try {
@@ -418,7 +497,7 @@ SEXP getGreen(SEXP rgb) {
         PROTECT(res = allocVector(REALSXP, nval));
         void * dest = &(REAL(res)[0]);
         image.opacity(OpaqueOpacity);
-        /* image.type(GrayscaleType); */
+        // image.type(GrayscaleType);
         image.write(0, 0, nval, 1, "G", DoublePixel, dest);
         UNPROTECT(1);
         return res;
@@ -428,7 +507,6 @@ SEXP getGreen(SEXP rgb) {
     }
     return R_NilValue;
 }
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 SEXP getBlue(SEXP rgb) {
     int nval = LENGTH(rgb);
     try {
@@ -440,7 +518,7 @@ SEXP getBlue(SEXP rgb) {
         PROTECT(res = allocVector(REALSXP, nval));
         void * dest = &(REAL(res)[0]);
         image.opacity(OpaqueOpacity);
-        /* image.type(GrayscaleType); */
+        // image.type(GrayscaleType);
         image.write(0, 0, nval, 1, "B", DoublePixel, dest);
         UNPROTECT(1);
         return res;
@@ -450,7 +528,6 @@ SEXP getBlue(SEXP rgb) {
     }
     return R_NilValue;
 }
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 SEXP asRed(SEXP gray) {
     int nval = LENGTH(gray);
     try {
@@ -472,7 +549,6 @@ SEXP asRed(SEXP gray) {
     }
     return R_NilValue;
 }
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 SEXP asGreen(SEXP gray) {
     int nval = LENGTH(gray);
     try {
@@ -494,7 +570,6 @@ SEXP asGreen(SEXP gray) {
     }
     return R_NilValue;
 }
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 SEXP asBlue(SEXP gray) {
     int nval = LENGTH(gray);
     try {
@@ -516,144 +591,4 @@ SEXP asBlue(SEXP gray) {
     }
     return R_NilValue;
 }
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-   colors
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-SEXP toColorString(SEXP rgb) {
-    SEXP res = R_NilValue;
-    bool isProtected = false;
-    try {
-        double * values = REAL(rgb);
-        Color col;
-        switch(LENGTH(rgb)) {
-            case 1: col = ColorGray(values[0]); break;
-            case 3: col = ColorRGB(values[0], values[1], values[2]); break;
-            default:
-                error("Please supply either 1 value for gray or 3 for RGB");
-        }
-        PROTECT(res = allocVector(STRSXP,1));
-        isProtected = true;
-        SET_STRING_ELT(res, 0, mkChar(string(col).c_str()));
-        UNPROTECT(1);
-    }
-    catch(exception &error_) {
-        if (isProtected)
-            UNPROTECT(1);
-        error(error_.what());
-    }
-    return res;
-}
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-SEXP fromColorString(SEXP str) { /* RGB vector */
-    SEXP res = R_NilValue;
-    bool isProtected = false;
-    try {
-        ColorRGB col = Color(CHAR(asChar(str)));
-        PROTECT(res = allocVector(REALSXP, 3));
-        isProtected = true;
-        REAL(res)[0] = col.red();
-        REAL(res)[1] = col.green();
-        REAL(res)[2] = col.blue();
-        UNPROTECT(1);
-    }
-    catch(exception &error_) {
-        if (isProtected)
-            UNPROTECT(1);
-        error(error_.what());
-    }
-    return res;
-}
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-MagickImage colorToImage(SEXP x) {
-    try {
-        int nvalues = LENGTH(x);
-        Geometry geom(nvalues, 1);
-        MagickImage image(geom, "black");
-        if (IS_INTEGER(x)) {
-            image.read(nvalues, 1, "RGBp", CharPixel, &(INTEGER(x)[0]));
-            return image;
-        }
-        if (IS_NUMERIC(x)) {
-            image.read(nvalues, 1, "I", DoublePixel, &(REAL(x)[0]));
-            return image;
-        }
-        if (IS_CHARACTER(x)) {
-            char * str;
-            for (int i = 0; i < nvalues; i++) {
-                str = CHAR(STRING_ELT(x, i));
-                if (strcmp(str, "NA") != 0)
-                    image.pixelColor(i, 0, Color(str));
-            }
-            return image;
-        }
-        error("supplied argument could not be coersed to numeric, integer or character");
-    }
-    catch(exception &error_) {
-        error(error_.what());
-    }
-    /* unreachable - only to prevent warning that nothing is returned */
-    return MagickImage(Geometry(1, 1), "black");
-}
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-SEXP intToColorString(SEXP x) {
-    SEXP res = R_NilValue;
-    int nprotect = 0;
-    try {
-        if (!IS_INTEGER(x) && !IS_NUMERIC(x))
-            error("argument must be a numeric or integer vector (NA's allowed)");
-        int nvalues = LENGTH(x);
-        PROTECT(res = allocVector(STRSXP, nvalues));
-        nprotect++;
-        MagickImage image = colorToImage(x);
-        if (IS_INTEGER(x)) {
-            int * values = &(INTEGER(x)[0]);
-            for (int i = 0; i < nvalues; i++) {
-                if (values[i] == NA_INTEGER)
-                    SET_STRING_ELT(res, i, NA_STRING);
-                else
-                    SET_STRING_ELT(res, i, mkChar(string(image.pixelColor(i, 0)).c_str()));
-            }
-        }
-        else {
-            double * values = &(REAL(x)[0]);
-            for (int i = 0; i < nvalues; i++) {
-                if (isnan(values[i]) || isinf(values[i]))
-                    SET_STRING_ELT(res, i, NA_STRING);
-                else
-                    SET_STRING_ELT(res, i, mkChar(string(image.pixelColor(i, 0)).c_str()));
-            }
-        }
-    }
-    catch(exception &error_) {
-        error(error_.what());
-    }
-    UNPROTECT(nprotect);
-    return res;
-}
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-SEXP colorStringToInt(SEXP x) {
-    SEXP res = R_NilValue;
-    int nprotect = 0;
-    try {
-        if (!IS_CHARACTER(x))
-            error("argument must be a character vector (NA's allowed)");
-        int nvalues = LENGTH(x);
-        PROTECT(res = allocVector(INTSXP, nvalues));
-        nprotect++;
-        MagickImage image = colorToImage(x);
-        int * values = &(INTEGER(res)[0]);
-        image.opacity(OpaqueOpacity);
-        image.type(TrueColorType);
-        image.write(0, 0, nvalues, 1, "RGBp", CharPixel, values);
-        for (int i = 0; i < nvalues; i++)
-            if (strcmp(CHAR(STRING_ELT(x, i)), "NA") == 0)
-                values[i] = NA_INTEGER;
-    }
-    catch(exception &error_) {
-        error(error_.what());
-    }
-    UNPROTECT(nprotect);
-    return res;
-}
-
+*/

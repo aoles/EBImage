@@ -1,17 +1,34 @@
-# Package initialization routine
-.onLoad <- function(lib, pkg) {
-    ## use useDynLib("EBImage") in NAMESPACE instead
-    ## library.dynam("EBImage", pkg, lib)
-    ## cat("* EBImage of Bioconductor.org: help(EBImage) to get started...\n")
-    require("methods")
-}
+# -------------------------------------------------------------------------
+# Package initialization code
+ 
+# Copyright (c) 2006 Oleg Sklyar
 
-# shortcut to call library functions for EBImage
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License 
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.          
+
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+
+# See the GNU General Public License for more details.
+# GPL license wording: http://www.gnu.org/licenses/gpl.html
+
+# -------------------------------------------------------------------------
 .CallEBImage <- function(name, ...) {
     .Call(name, ..., PACKAGE = "EBImage")
 }
-
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 verboseEBImage <- function(verbose = TRUE) {
     .CallEBImage("setVerbose", as.logical(verbose))
     invisible(FALSE)
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+.onLoad <- function(lib, pkg) {
+    ## use useDynLib("EBImage") in NAMESPACE instead
+    ## library.dynam("EBImage", pkg, lib)
+    require("methods")
+    verboseEBImage(FALSE)
+    cat("-= EBImage of Bioconductor.org =-\n")
 }
