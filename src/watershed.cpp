@@ -1,8 +1,8 @@
 #include "watershed.h"
-#include "conversions.h"
+
 #include <R_ext/Error.h>
+
 #include <vector>
-/* #include <algorithm> */
 #include <iostream>
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 const double BG = 0;
@@ -302,9 +302,13 @@ SEXP paintWatershed(SEXP x, SEXP img, SEXP cols, SEXP dofill, SEXP doborders, SE
     }
     return img;
 }
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+ runs watershed detection algorithm for the data of a single image,
+ returns results in objects
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void doWatershed(double * data, Point & size, double mindist, double minradius, vector<TheFeature> & objects, double edgeFactor) {
-    int npts = size.x * size.y;
+    unsigned i, j, k; // used too often below, thus preallocated
+    unsigned int npts = size.x * size.y;
     /* if we supply objects with seeds, we do not add any new and just use those */
     bool noNewObjects = false;
     if (objects.size() > 0) noNewObjects = true;
@@ -315,7 +319,7 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
     /* negate data: BG will be 0, positive will be index of objects */
     /* this conversion to int is needed to ensure that when we later on go by incrememting d by 1 we 
        do not miss values between 0 and 1, i,e, we set 0 = 0, 0.x = 1 */
-    for (int i = 0; i < npts; i++) {
+    for (i = 0; i < npts; i++) {
         data[i] = -ceil(data[i]);
         if (data[i] < BG) {
             pxs.push_back(getpoint(i, size.x));
@@ -335,7 +339,7 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
         unsigned int objind0, io;
 */
         /* main sub-loop through indexes that left */
-        for (unsigned int i = 0; i < pxs.size(); ) {
+        for (i = 0; i < pxs.size(); ) {
             Point pti = pxs[i];
             /* go to next index if this color is farther in the row */
             int iindex = getindex(pti, size.x);
@@ -394,11 +398,11 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
             if (seeded < 0) {
                 // we only consider objects closer than mindist
                 seededdist  = mindist;
-                for (unsigned int io = 0; io < objects.size(); io++) {
-                    double objdist = dist(objects[io].centre(), pti);
+                for (j = 0; j < objects.size(); j++) {
+                    double objdist = dist(objects[j].centre(), pti);
                     if (objdist < seededdist) {
                         seededdist = objdist;
-                        seeded = io;
+                        seeded = j;
                     }
                 }      
             }
@@ -429,10 +433,9 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
             pxs.pop_back();
         } // i 
     } // d
-    int nobj = objects.size();
-    if (nobj < 1) return;
+    if (objects.size() < 1) return;
     /* mark small and edgy objects */ 
-    for (int i = 0; i < objects.size(); i++) {
+    for (i = 0; i < objects.size(); i++) {
         if (objects[i].borders.size() == 0) {
             objects[i].ok = false;
             continue;
@@ -448,22 +451,22 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
     /* iterate through the objects until no combinations can be found, combine small objects */
     do {
         combiFound = false;
-        for (int i = 0; i < objects.size() && !combiFound; i++) {
+        for (i = 0; i < objects.size() && !combiFound; i++) {
             /* do not combine into this object, it is bad, combine vice versa if possible */
             if (!objects[i].ok) continue;
             Point ci = objects[i].centre();
-            for (int j = 0; j < objects.size() && !combiFound; j++) {
+            for (j = 0; j < objects.size() && !combiFound; j++) {
                 if (i == j) continue;
                 Point cj = objects[j].centre();
                 if (dist(ci, cj) <= mindist) {
                     /* combine j into i and delete j */
                     combiFound = true;
                     objects[j].ok = false;
-                    for (int k = 0; k < objects[j].pixels.size(); k++)
+                    for (k = 0; k < objects[j].pixels.size(); k++)
                         objects[i].pixels.push_back(objects[j].pixels[k]);
-                    for (int k = 0; k < objects[j].borders.size(); k++)
+                    for (k = 0; k < objects[j].borders.size(); k++)
                         objects[i].borders.push_back(objects[j].borders[k]);
-                    for (int k = 0; k < objects[j].edges.size(); k++)
+                    for (k = 0; k < objects[j].edges.size(); k++)
                         objects[i].edges.push_back(objects[j].edges[k]);
                     /* substitute objects[j] with last and delete last */
                     objects[j] = objects.back();
@@ -475,7 +478,7 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
         }
     } while (combiFound);
     /* delete bad objects */
-    for (int i = 0; i < objects.size();) {
+    for (i = 0; i < objects.size();) {
         if (objects[i].ok) {
             i++;
             continue;
