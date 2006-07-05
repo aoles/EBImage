@@ -21,7 +21,7 @@ export(
     .blur, .contrast, .despeckle, .edge, .enhance, .equalize,
     .colorGamma, .gaussFilter, .medianFilter, .mod, .reduceNoise,
     .segment, .shade, .sharpen, .solarize,
-    .spread, .unsharpMask, .noise, .trim, .draw
+    .spread, .unsharpMask, .noise, .trim, .draw, .erode
 )
 exportClasses(
     Image,
