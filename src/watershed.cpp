@@ -52,9 +52,9 @@ class TheFeature {
             ok = true;
         };
         Point centre() {
-            unsigned int ps = pixels.size();
+            int ps = pixels.size();
             if (ps > _ind + 1)
-                for (unsigned int i = _ind + 1; i < ps; i++) {
+                for (int i = _ind + 1; i < ps; i++) {
                     _centre.x += pixels[i].x;
                     _centre.y += pixels[i].y;
                 }
@@ -144,8 +144,8 @@ SEXP watershedDetection(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
             /* return NULL for this image if no objects detected */
             if (nobj == 0) continue;
             /* values that will keep maximum numbers of pixels and border pixels in objects */
-            int maxpxs = 0;
-            int maxbrd = 0;
+            unsigned int maxpxs = 0;
+            unsigned int maxbrd = 0;
             /* create object matrix: INTEGER */
             PROTECT(objDim[i] = allocVector(INTSXP, 2));
             nprotect++;
@@ -165,7 +165,7 @@ SEXP watershedDetection(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
                     maxpxs = objects[j].pixels.size();
                 double intens = 0;
                 if (refdata)
-                    for (int k = 0; k < objects[j].pixels.size(); k++)
+                    for (unsigned int k = 0; k < objects[j].pixels.size(); k++)
                         intens += refdata[getindex(objects[j].pixels[k], size.x)];
                 val[j + 3 * nobj] = intens;
                 val[j + 4 * nobj] = objects[j].borders.size();
@@ -193,7 +193,7 @@ SEXP watershedDetection(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
             int * borders = &(INTEGER(brdMtx[i])[0]);
             /* put values of pixels and borders, rest fill with NA */
             for (int j = 0; j < nobj; j++) {
-                int k;
+                unsigned int k;
                 for (k = 0; k < objects[j].pixels.size(); k++)
                     pixels[j + k * nobj] = getindex(objects[j].pixels[k], size.x);
                 for (k = objects[j].pixels.size(); k < maxpxs; k++)
@@ -335,7 +335,7 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
         unsigned int objind0, io;
 */
         /* main sub-loop through indexes that left */
-        for (int i = 0; i < pxs.size(); ) {
+        for (unsigned int i = 0; i < pxs.size(); ) {
             Point pti = pxs[i];
             /* go to next index if this color is farther in the row */
             int iindex = getindex(pti, size.x);
@@ -370,7 +370,7 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
                     /* so neightbor is object - get its index */
                     int objind = (int)val - 1;
                     /* check if it is existing object and not already defined from other neighbour */
-                    if (objind == seeded || objind >= objects.size()) continue;
+                    if (objind == seeded || objind >= (int)objects.size()) continue;
                     /* check if this object is closer than other detected, or just update */
                     double objdist = dist(objects[objind].centre(), pti);
                     /* so we like this object - it is closer */
@@ -394,7 +394,7 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
             if (seeded < 0) {
                 // we only consider objects closer than mindist
                 seededdist  = mindist;
-                for (int io = 0; io < objects.size(); io++) {
+                for (unsigned int io = 0; io < objects.size(); io++) {
                     double objdist = dist(objects[io].centre(), pti);
                     if (objdist < seededdist) {
                         seededdist = objdist;
