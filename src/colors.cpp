@@ -219,7 +219,6 @@ MagickImage vector2image(SEXP x, vector<int> & nas) {
             return MagickImage(nvalues, 1, "I", DoublePixel, &(REAL(x)[0]));
         if (IS_CHARACTER(x)) {
             MagickImage image(Geometry(nvalues, 1), "black");
-            char * str;
             if (nas.size() <= 0) {
                 for (int i = 0; i < nvalues; i++)
                     image.pixelColor(i, 0, Color(CHAR(STRING_ELT(x, i))));
