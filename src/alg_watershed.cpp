@@ -44,7 +44,7 @@ class TheFeature {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void doWatershed(double *, Point &, double, double, vector<TheFeature> &, double);
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-SEXP watershed(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
+SEXP ws(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
     /* !!! use nprotect++ everywhere you use PROTECT, cleanup automatic */
     if (!assertImage(rimage))
         error("Wrong argument class, Image expected");
@@ -210,7 +210,7 @@ SEXP watershed(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
     return res;
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-SEXP paintws(SEXP x, SEXP img, SEXP cols, SEXP dofill, SEXP doborders, SEXP opacity) {
+SEXP ws_paint(SEXP x, SEXP img, SEXP cols, SEXP dofill, SEXP doborders, SEXP opacity) {
     try {
         int nimages = INTEGER(GET_DIM(img))[2];
         if (nimages <= 0)

@@ -8,7 +8,7 @@ export(
     shade, sharpen, solarize, trim,
     spread, unsharpMask, noise, 
     
-    distMap, thresh, draw, watershed, paintws,
+    distMap, thresh, draw, ws, wsPaint,
 
     DrawableCircle, DrawableLine, DrawableRect, DrawableEllipse,
 
@@ -17,7 +17,7 @@ export(
 
     # these functions break R rules and modify their arguments
     # undocumented and not recomended - you have been warned!
-    .distMap, .thresh, .watershed,
+    .distMap, .thresh, .ws,
     .blur, .contrast, .despeckle, .edge, .enhance, .equalize,
     .colorGamma, .gaussFilter, .medianFilter, .mod, .reduceNoise,
     .segment, .shade, .sharpen, .solarize,

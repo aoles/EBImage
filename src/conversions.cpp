@@ -1,3 +1,8 @@
+/* -------------------------------------------------------------------------
+Image conversion routines
+Copyright (c) 2006 Oleg Sklyar
+See: conversions.h for license
+------------------------------------------------------------------------- */
 #include "conversions.h"
 
 #include <R_ext/Error.h>

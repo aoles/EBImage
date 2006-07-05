@@ -21,7 +21,7 @@ GPL license wording: http://www.gnu.org/licenses/gpl.html
 #include "common.h"
 
 extern "C" {
-    SEXP watershed(SEXP rimage, SEXP ref, SEXP seeds, SEXP params);
-    SEXP paintws(SEXP x, SEXP img, SEXP cols, SEXP dofill, SEXP doborders, SEXP opacity);
+    SEXP ws(SEXP rimage, SEXP ref, SEXP seeds, SEXP params);
+    SEXP ws_paint(SEXP x, SEXP img, SEXP cols, SEXP dofill, SEXP doborders, SEXP opacity);
 };
 

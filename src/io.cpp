@@ -1,3 +1,8 @@
+/* -------------------------------------------------------------------------
+Image IO
+Copyright (c) 2005 Oleg Sklyar
+See: io.h for license
+------------------------------------------------------------------------- */
 #include "io.h"
 #include "conversions.h"
 
@@ -32,7 +37,6 @@ SEXP readImages(SEXP files, SEXP rgb) {
             }
             catch (ErrorUndefined &magickError) {
                 warning(magickError.what());
-//                continue;  // commented: maybe something was loaded
             }
             catch (exception &error_) {
                 if (verbose)
