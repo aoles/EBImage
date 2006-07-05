@@ -72,7 +72,10 @@ wsPaint <- function(x, img, opac=0.2, col="default", fill=TRUE, brds=TRUE) {
     opac <- as.double(opac)
     if (opac < 0 || opac > 1)
         stop("'opac' must be in the range [0,1]")
-    res <- scale2RGB(img, 1.0 - opac)
+    if (fill)
+        res <- scale2RGB(img, 1.0 - opac)
+    else
+        res <- toRGB(img)
     if (!fill && !brds)
         return(res)
     nimg <- dim(img)[[3]]
@@ -101,3 +104,14 @@ wsPaint <- function(x, img, opac=0.2, col="default", fill=TRUE, brds=TRUE) {
     brds <- as.logical(brds)
     return(.CallEBImage("ws_paint", x, res, cols, fill, brds, opac))
 }
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Returns images for objects determined by ws function - a list of image stacks 
+# with one object per image
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+wsImages <- function(x, img) {
+    if(!assert(img))
+        stop("wrong class of argument img")
+    return(.CallEBImage("ws_images", x, img))
+}
+

@@ -23,5 +23,7 @@ GPL license wording: http://www.gnu.org/licenses/gpl.html
 extern "C" {
     SEXP ws(SEXP rimage, SEXP ref, SEXP seeds, SEXP params);
     SEXP ws_paint(SEXP x, SEXP img, SEXP cols, SEXP dofill, SEXP doborders, SEXP opacity);
+    // TODO: add bg color
+    SEXP ws_images(SEXP x, SEXP img); 
 };
 
