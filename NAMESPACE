@@ -1,53 +1,47 @@
-useDynLib("EBImage")
+useDynLib(EBImage)
 export(
-    "Image", "is.validImage",
+    Image, read.image, ping.image,
 
-    "blur", "contrast", "despeckle", "edge", "enhance", "equalize",
-    "colorGamma", "gaussFilter", "medianFilter", "mod", "reduceNoise",
-    "rotate", "sample.image", "zoom.image", "segment",
-    "shade", "sharpen", "solarize", "trim",
-    "spread", "unsharpMask", "noise", "distMap", "thresh", "draw",
+    blur, contrast, despeckle, edge, enhance, equalize,
+    colorGamma, gaussFilter, medianFilter, mod, reduceNoise,
+    rotate, sample.image, zoom.image, segment,
+    shade, sharpen, solarize, trim,
+    spread, unsharpMask, noise, 
+    
+    distMap, thresh, draw, watershed, paintws,
 
-    "read.image", "ping.image",
-
-    "objectCount", "watershed", "paintws",
-
-    "verboseEBImage",
-
-    "colString", "colRGB",
-    "any2rgb", "any2gray", "any2X11char", "add2rgb", "sub2rgb", "scale2rgb",
-
-    # "DrawableText",
-    "DrawableCircle", "DrawableLine", "DrawableRect", "DrawableEllipse",
+    DrawableCircle, DrawableLine, DrawableRect, DrawableEllipse,
 
     # DEPRECATE
-    "Image2D", "Image3D", "copyImage", "adaptThresh", "sampleImage", "scaleImage",
+    Image2D, Image3D, copyImage, adaptThresh, sampleImage, scaleImage,
 
-    # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
-    ".copyHeader",
-    ".objectCount", ".distMap", ".thresh", ".watershed",
-    ".blur", ".contrast", ".despeckle", ".edge", ".enhance", ".equalize",
-    ".colorGamma", ".gaussFilter", ".medianFilter", ".mod", ".reduceNoise",
-    ".segment", ".shade", ".sharpen", ".solarize",
-    ".spread", ".unsharpMask", ".noise", ".trim", ".draw"
+    # these functions break R rules and modify their arguments
+    # undocumented and not recomended - you have been warned!
+    .distMap, .thresh, .watershed,
+    .blur, .contrast, .despeckle, .edge, .enhance, .equalize,
+    .colorGamma, .gaussFilter, .medianFilter, .mod, .reduceNoise,
+    .segment, .shade, .sharpen, .solarize,
+    .spread, .unsharpMask, .noise, .trim, .draw
 )
 exportClasses(
-    "Image",
-    # "Drawable",
-    # "DrawableText",
-    "DrawableCircle", "DrawableLine", "DrawableRect", "DrawableEllipse",
+    Image,
+
+    Drawable, DrawableCircle, DrawableLine, DrawableRect, DrawableEllipse,
+
     # DEPRECATE
-    "Image2D", "Image3D"
+    Image2D, Image3D
 )
 exportMethods(
-    "assert", "copy", "write.image", "display", "channels", "toGray", "toRGB", "toRed", "toGreen",
-    "toBlue", "getRed", "getGreen", "getBlue", "normalize",
-    "as.array", "summary", "[", "show", "print", "plot.image",
+    assert, copy, write.image, display, channels, normalize,
+    as.array, summary, "[", show, print, plot.image,
 
+    toGray, toRGB, toX11char, toRed, toGreen, toBlue, getRed, getGreen, getBlue, 
+    add2RGB, sub2RGB, scale2RGB, 
+    
     # DEPRECATE
-    "minMax",
+    minMax,
 
-    # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
-    "correctType", "isCorrectType",
-    ".as.integer", ".as.double", ".normalize"
+    # these functions break R rules and modify their arguments
+    # undocumented and not recomended - you have been warned!
+    .normalize
 )

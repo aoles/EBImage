@@ -1,8 +1,8 @@
 /* -------------------------------------------------------------------------
 
-Common definitions for the EBImage project
+Image indexing routines: index <--> point
  
-Copyright (c) 2005 Oleg Sklyar
+Copyright (c) 2006 Oleg Sklyar
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License 
@@ -18,22 +18,18 @@ GPL license wording: http://www.gnu.org/licenses/gpl.html
 
 ------------------------------------------------------------------------- */
 
-#include <Magick++.h>
-#include <R.h>
-#include <Rdefines.h>
+#include "common.h"
 
-using namespace std;
-using namespace Magick;
-
-typedef         list<Image>    MagickStack;
-typedef         Image          MagickImage;
-
-extern bool verbose;
-
-bool assertImage(SEXP rimage);
-bool assertImage2D(SEXP rimage);
-
-extern "C" {
-    SEXP setVerbose(SEXP);
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+struct Point {
+    Point();
+    Point(int x, int y);
+    Point(const Point& obj);
+    int x;
+    int y;
 };
-
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+Point   getpoint (const int & index, const int & xsize);
+int     getindex (const Point & pt, const int xsize);
+int     getindex (const int & x, const int & y, const int xsize);
+double  dist     (const Point & p1, const Point & p2);

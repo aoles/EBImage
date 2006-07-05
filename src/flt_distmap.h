@@ -1,6 +1,6 @@
 /* -------------------------------------------------------------------------
 
-Common definitions for the EBImage project
+Distance map filter
  
 Copyright (c) 2005 Oleg Sklyar
 
@@ -16,24 +16,16 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 GPL license wording: http://www.gnu.org/licenses/gpl.html
 
+Function 'lz_dist_map' is adapted from the ANIMAL package,
+corresponding license is applicable to this piece of code!
+Algorithm for this function by: R. Lotufo, F. Zampirolli, 
+SIBGRAPI 2001, 100-105, 2001
+
 ------------------------------------------------------------------------- */
 
-#include <Magick++.h>
-#include <R.h>
-#include <Rdefines.h>
-
-using namespace std;
-using namespace Magick;
-
-typedef         list<Image>    MagickStack;
-typedef         Image          MagickImage;
-
-extern bool verbose;
-
-bool assertImage(SEXP rimage);
-bool assertImage2D(SEXP rimage);
+#include "common.h"
 
 extern "C" {
-    SEXP setVerbose(SEXP);
+    SEXP distMap(SEXP rimage, SEXP alg);
 };
 

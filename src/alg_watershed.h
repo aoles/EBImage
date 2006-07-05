@@ -1,8 +1,8 @@
 /* -------------------------------------------------------------------------
 
-Common definitions for the EBImage project
+Watershed algorithm of object detection
  
-Copyright (c) 2005 Oleg Sklyar
+Copyright (c) 2006 Oleg Sklyar
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License 
@@ -18,22 +18,10 @@ GPL license wording: http://www.gnu.org/licenses/gpl.html
 
 ------------------------------------------------------------------------- */
 
-#include <Magick++.h>
-#include <R.h>
-#include <Rdefines.h>
-
-using namespace std;
-using namespace Magick;
-
-typedef         list<Image>    MagickStack;
-typedef         Image          MagickImage;
-
-extern bool verbose;
-
-bool assertImage(SEXP rimage);
-bool assertImage2D(SEXP rimage);
+#include "common.h"
 
 extern "C" {
-    SEXP setVerbose(SEXP);
+    SEXP watershed(SEXP rimage, SEXP ref, SEXP seeds, SEXP params);
+    SEXP paintws(SEXP x, SEXP img, SEXP cols, SEXP dofill, SEXP doborders, SEXP opacity);
 };
 

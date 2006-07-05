@@ -3,6 +3,7 @@
    but if this changes uncomment it
 #include "distmaps.h"
 */
+#include "indexing.h"
 #include "conversions.h"
 #include <R_ext/Error.h>
 #include <vector>
