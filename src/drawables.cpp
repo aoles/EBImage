@@ -1,3 +1,8 @@
+/* -------------------------------------------------------------------------
+Implementation of ImageMagick drawables in EBImage-R
+Copyright (c) 2006 Oleg Sklyar
+See: drawables.h for license
+------------------------------------------------------------------------- */
 #include "drawables.h"
 #include "conversions.h"
 

@@ -24,7 +24,7 @@
 # Breaks R rules and modifies the original image, for internal use only
 # use watershed() instead!
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-.watershed <- function(x, mind=15, minr=10, ef=0.2, seeds=NULL, ref=NULL, modify=TRUE) {
+.ws <- function(x, mind=15, minr=10, ef=0.2, seeds=NULL, ref=NULL, modify=TRUE) {
     if(!assert(x))
         stop("wrong class of argument 'x'")
     if (x@rgb)
@@ -53,20 +53,20 @@
         warning("reasonable range for 'ef' is [0,1]")
     if (!modify)
         x <- copy(x)
-    res <- .CallEBImage("watershed", x, ref, seeds, c(mind, minr, ef))
+    res <- .CallEBImage("ws", x, ref, seeds, c(mind, minr, ef))
     return(res)
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Safe exported implementation of watershed (uses modify = FALSE in .watershed)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-watershed <- function(x, mind=15, minr=10, ef=0.2, seeds=NULL, ref=NULL) {
-    .watershed(x, mind, minr, ef, seeds, ref, FALSE)
+ws <- function(x, mind=15, minr=10, ef=0.2, seeds=NULL, ref=NULL) {
+    .ws(x, mind, minr, ef, seeds, ref, FALSE)
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Paints img with objects detected with watershed by a set of provided colors
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-paintws <- function(x, img, opac=0.2, col="default", fill=TRUE, brds=TRUE) {
+wsPaint <- function(x, img, opac=0.2, col="default", fill=TRUE, brds=TRUE) {
     if(!assert(img))
         stop("wrong class of argument img")
     opac <- as.double(opac)
@@ -99,5 +99,5 @@ paintws <- function(x, img, opac=0.2, col="default", fill=TRUE, brds=TRUE) {
     }
     fill <- as.logical(fill)
     brds <- as.logical(brds)
-    return(.CallEBImage("paintws", x, res, cols, fill, brds, opac))
+    return(.CallEBImage("ws_paint", x, res, cols, fill, brds, opac))
 }

@@ -1,3 +1,8 @@
+/* -------------------------------------------------------------------------
+Color conversion routines
+Copyright (c) 2006 Oleg Sklyar
+See: colors.h for license
+------------------------------------------------------------------------- */
 #include "colors.h"
 
 #include <R_ext/Error.h>
@@ -44,7 +49,7 @@ SEXP add2rgb(SEXP x, SEXP y) {
     MagickImage image = vector2image(x, nas);
     MagickImage addition = vector2image(y, nas1);
     add2image(image, addition);
-    /* TODO combine to nas */
+    /* TODO combine two nas */
     return image2INTEGER(image, nas, ALL);
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -54,7 +59,7 @@ SEXP sub2rgb(SEXP x, SEXP y) {
     MagickImage image = vector2image(x, nas);
     MagickImage subtraction = vector2image(y, nas1);
     sub2image(image, subtraction);
-    /* TODO combine to nas */
+    /* TODO combine two nas */
     return image2INTEGER(image, nas, ALL);
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -418,177 +423,3 @@ void scale2image(MagickImage & image, double factor) {
         error(error_.what());
     }
 }
-
-
-
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-/*SEXP toGray(SEXP rgb) {
-    int nval = LENGTH(rgb);
-    try {
-        Geometry geom(nval, 1);
-        MagickImage image(geom, "black");
-        void * src = &(INTEGER(rgb)[0]);
-        image.read(nval, 1, "RGBp", CharPixel, src);
-        SEXP res;
-        PROTECT(res = allocVector(REALSXP, nval));
-        void * dest = &(REAL(res)[0]);
-        image.opacity(OpaqueOpacity);
-        image.type(GrayscaleType);
-        image.write(0, 0, nval, 1, "I", DoublePixel, dest);
-        UNPROTECT(1);
-        return res;
-    }
-    catch(exception &error_) {
-        error(error_.what());
-    }
-    return R_NilValue;
-}
-
-SEXP toRGB(SEXP gray) {
-    int nval = LENGTH(gray);
-    try {
-        Geometry geom(nval, 1);
-        MagickImage image(geom, "black");
-        void * src = &(REAL(gray)[0]);
-        image.read(nval, 1, "I", DoublePixel, src);
-        SEXP res;
-        PROTECT(res = allocVector(INTSXP, nval));
-        void * dest = &(INTEGER(res)[0]);
-        image.opacity(OpaqueOpacity);
-        image.type(TrueColorType);
-        image.write(0, 0, nval, 1, "RGBO", CharPixel, dest);
-        UNPROTECT(1);
-        return res;
-    }
-    catch(exception &error_) {
-        error(error_.what());
-    }
-    return R_NilValue;
-}
-SEXP getRed(SEXP rgb) {
-    int nval = LENGTH(rgb);
-    try {
-        Geometry geom(nval, 1);
-        MagickImage image(geom, "black");
-        void * src = &(INTEGER(rgb)[0]);
-        image.read(nval, 1, "RGBp", CharPixel, src);
-        SEXP res;
-        PROTECT(res = allocVector(REALSXP, nval));
-        void * dest = &(REAL(res)[0]);
-        image.opacity(OpaqueOpacity);
-        // image.type(GrayscaleType);
-        image.write(0, 0, nval, 1, "R", DoublePixel, dest);
-        UNPROTECT(1);
-        return res;
-    }
-    catch(exception &error_) {
-        error(error_.what());
-    }
-    return R_NilValue;
-}
-SEXP getGreen(SEXP rgb) {
-    int nval = LENGTH(rgb);
-    try {
-        Geometry geom(nval, 1);
-        MagickImage image(geom, "black");
-        void * src = &(INTEGER(rgb)[0]);
-        image.read(nval, 1, "RGBp", CharPixel, src);
-        SEXP res;
-        PROTECT(res = allocVector(REALSXP, nval));
-        void * dest = &(REAL(res)[0]);
-        image.opacity(OpaqueOpacity);
-        // image.type(GrayscaleType);
-        image.write(0, 0, nval, 1, "G", DoublePixel, dest);
-        UNPROTECT(1);
-        return res;
-    }
-    catch(exception &error_) {
-        error(error_.what());
-    }
-    return R_NilValue;
-}
-SEXP getBlue(SEXP rgb) {
-    int nval = LENGTH(rgb);
-    try {
-        Geometry geom(nval, 1);
-        MagickImage image(geom, "black");
-        void * src = &(INTEGER(rgb)[0]);
-        image.read(nval, 1, "RGBp", CharPixel, src);
-        SEXP res;
-        PROTECT(res = allocVector(REALSXP, nval));
-        void * dest = &(REAL(res)[0]);
-        image.opacity(OpaqueOpacity);
-        // image.type(GrayscaleType);
-        image.write(0, 0, nval, 1, "B", DoublePixel, dest);
-        UNPROTECT(1);
-        return res;
-    }
-    catch(exception &error_) {
-        error(error_.what());
-    }
-    return R_NilValue;
-}
-SEXP asRed(SEXP gray) {
-    int nval = LENGTH(gray);
-    try {
-        Geometry geom(nval, 1);
-        MagickImage image(geom, "black");
-        void * src = &(REAL(gray)[0]);
-        image.read(nval, 1, "I", DoublePixel, src);
-        SEXP res;
-        PROTECT(res = allocVector(INTSXP, nval));
-        void * dest = &(INTEGER(res)[0]);
-        image.opacity(OpaqueOpacity);
-        image.type(TrueColorType);
-        image.write(0, 0, nval, 1, "ROOO", CharPixel, dest);
-        UNPROTECT(1);
-        return res;
-    }
-    catch(exception &error_) {
-        error(error_.what());
-    }
-    return R_NilValue;
-}
-SEXP asGreen(SEXP gray) {
-    int nval = LENGTH(gray);
-    try {
-        Geometry geom(nval, 1);
-        MagickImage image(geom, "black");
-        void * src = &(REAL(gray)[0]);
-        image.read(nval, 1, "I", DoublePixel, src);
-        SEXP res;
-        PROTECT(res = allocVector(INTSXP, nval));
-        void * dest = &(INTEGER(res)[0]);
-        image.opacity(OpaqueOpacity);
-        image.type(TrueColorType);
-        image.write(0, 0, nval, 1, "OGOO", CharPixel, dest);
-        UNPROTECT(1);
-        return res;
-    }
-    catch(exception &error_) {
-        error(error_.what());
-    }
-    return R_NilValue;
-}
-SEXP asBlue(SEXP gray) {
-    int nval = LENGTH(gray);
-    try {
-        Geometry geom(nval, 1);
-        MagickImage image(geom, "black");
-        void * src = &(REAL(gray)[0]);
-        image.read(nval, 1, "I", DoublePixel, src);
-        SEXP res;
-        PROTECT(res = allocVector(INTSXP, nval));
-        void * dest = &(INTEGER(res)[0]);
-        image.opacity(OpaqueOpacity);
-        image.type(TrueColorType);
-        image.write(0, 0, nval, 1, "OOBO", CharPixel, dest);
-        UNPROTECT(1);
-        return res;
-    }
-    catch(exception &error_) {
-        error(error_.what());
-    }
-    return R_NilValue;
-}
-*/

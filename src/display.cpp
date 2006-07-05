@@ -1,3 +1,8 @@
+/* -------------------------------------------------------------------------
+Image display
+Copyright (c) 2005 Oleg Sklyar
+See: display.h for license
+------------------------------------------------------------------------- */
 #include "display.h"
 #include "conversions.h"
 
