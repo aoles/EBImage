@@ -30,5 +30,5 @@ verboseEBImage <- function(verbose = TRUE) {
     ## library.dynam("EBImage", pkg, lib)
     require("methods")
     verboseEBImage(FALSE)
-    cat("-= EBImage of Bioconductor.org =-\n")
+    cat("  .: EBImage of Bioconductor.org :.\n")
 }

@@ -11,15 +11,18 @@ See flt_morph.h for license
 
 using namespace std;
 
-inline bool match(int * kernel, double * data, Point & size, Point & at, double & mismatch) {
+/* kernel size must be odd number: 3, 5, 7 etc */
+inline bool match(int * kernel, Point &ksize, double * data, Point & dsize, Point & at, double & mismatch) {
     int i, j, xx, yy;
-    for (i = -1; i <= 1; i++)
-        for (j = -1; j <= 1; j++) {
-            if (!kernel[i + 1 + (j + 1) * 3]) continue;
+    int kcx = ksize.x / 2;
+    int kcy = ksize.y / 2;
+    for (i = -kcx; i <= kcx; i++)
+        for (j = -kcy; j <= kcy; j++) {
+            if (kernel[(i + kcx) + (j + kcy) * ksize.x] == 0) continue;
             xx = at.x + i;
             yy = at.y + j;
-            if (xx < 0 || yy < 0 || xx >= size.x || yy >= size.y) return false;
-            if (data[xx + yy * size.x] == mismatch) return false;
+            if (xx < 0 || yy < 0 || xx >= dsize.x || yy >= dsize.y) continue;
+            if (data[xx + yy * dsize.x] == mismatch) return false;
         }
     return true;
 }
@@ -36,11 +39,10 @@ SEXP erodeDilate(SEXP x, SEXP kernel, SEXP iters, SEXP alg) {
             error("wrong argument class, Image expected");
         if (LOGICAL(GET_SLOT(x, mkString("rgb")))[0])
             error("input must be a binary image");
-        if (LENGTH(kernel) != 9)
-            error("only 3x3 kernels supported so far");
         Point size(INTEGER(GET_DIM(x))[0], INTEGER(GET_DIM(x))[1]);
         unsigned int nimages = INTEGER(GET_DIM(x))[2];
-        int * kern = LOGICAL(kernel);
+        int * kern = INTEGER(kernel);
+        Point ksize(INTEGER(GET_DIM(kernel))[0], INTEGER(GET_DIM(kernel))[1]);
         int nrepeats = INTEGER(iters)[0];
         Point pt;
         for (i = 0; i < nimages; i++) {
@@ -49,7 +51,7 @@ SEXP erodeDilate(SEXP x, SEXP kernel, SEXP iters, SEXP alg) {
                 for (int j = 0; j < size.x * size.y; j++) {
                     if (data[j] == resetto) continue;
                     pt = getpoint(j, size.x);    
-                    if (!match(kern, data, size, pt, resetto)) 
+                    if (!match(kern, ksize, data, size, pt, resetto)) 
                             data[j] = 0.5;
                 }
                 for (int j = 0; j < size.x * size.y; j++)

@@ -9,17 +9,12 @@ export(
     spread, unsharpMask, noise, 
     
     distMap, thresh, ws, wsPaint, wsImages, 
-    erode, dilate, mopen, mclose,
+    mErode, mDilate, mOpen, mClose, mKernel,
 
     draw, DrawableCircle, DrawableLine, DrawableRect, DrawableEllipse
 )
 exportClasses(
-    Image,
-
-    Drawable, DrawableCircle, DrawableLine, DrawableRect, DrawableEllipse,
-
-    # DEPRECATE
-    Image2D, Image3D
+    Image, Drawable, DrawableCircle, DrawableLine, DrawableRect, DrawableEllipse
 )
 exportMethods(
     assert, copy, write.image, display, channels, normalize,
