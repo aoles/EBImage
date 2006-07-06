@@ -20,18 +20,26 @@
 }
 
 \section{Usage}{
-    \code{toRGB(object)}\\
-    \code{toGary(object)}\\
-    \code{toX11char(object)}\\
-    \code{toRed(object)}\\
-    \code{toGreen(object)}\\
-    \code{toBlue(object)}\\
-    \code{getRed(object)}\\
-    \code{getGreen(object)}\\
+    \code{toRGB(object)}
+    
+    \code{toGary(object)}
+    
+    \code{toX11char(object)}
+    
+    \code{toRed(object)}
+    
+    \code{toGreen(object)}
+    
+    \code{toBlue(object)}
+    
+    \code{getRed(object)}
+    
+    \code{getGreen(object)}
+    
     \code{getBlue(object)}
 }
 \section{Arguments}{
-    \item{object}{An object of class \code{Image} for image conversions, 
+    \item{\code{object}}{An object of class \code{Image} for image conversions, 
         \code{numeric/double} to convert from grayscale values, \code{integer} to
         convert from RGB values, \code{character} to convert from RGB values
         written as X11 strings}

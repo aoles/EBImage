@@ -15,17 +15,19 @@
 }
 
 \section{Usage}{
-    \code{add2RGB(x, y)}\\
-    \code{sub2RGB(x, y)}\\
+    \code{add2RGB(x, y)}
+    
+    \code{sub2RGB(x, y)}
+    
     \code{scale3RGB(x, mult)}
 }
 \section{Arguments}{
-    \item{x}{An object of class \code{Image} for image conversions, 
+    \item{\code{x}}{An object of class \code{Image} for image conversions, 
         \code{numeric/double} to convert from grayscale values, \code{integer} to
         convert from RGB values, \code{character} to convert from RGB values
         written as X11 strings}
-    \item{y}{idib}
-    \item{mult}{Scaling factor, data will be multiplied by this value. RGB values
+    \item{\code{y}}{idib}
+    \item{\code{mult}}{Scaling factor, data will be multiplied by this value. RGB values
         multiplied by-channel}
 }
 \section{Value}{
