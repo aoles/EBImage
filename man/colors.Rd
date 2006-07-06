@@ -1,48 +1,83 @@
-\name{colRGB}
+\name{Colors}
 
-%\alias{colRGB}
-%\alias{colString}
+\alias{Colors}
+\alias{toGray}
+\alias{toRGB}
+\alias{toX11char}
+\alias{toRed}
+\alias{toGreen}
+\alias{toBlue}
+\alias{getRed}
+\alias{getGreen}
+\alias{getBlue}
 
-\docType{function}
+\docType{class}
 
 \title{Color conversion routines}
+
 \description{
-%    Routines analogous to \code{\link{rgb}} and \code{\link{col2rgb}},
-%    that can however operate with 16-bit color channels, i.e. handling X11
-%    color strings in form \verb|#0000FFFF0000| instead of \verb|#00FF00|.
+    Functions to manipulate and convert colors. 
 }
 
-\usage{
-%    colRGB(col)
-%    colString(r, g, b, gray)
+\section{Usage}{
+    \code{toRGB(object)}\\
+    \code{toGary(object)}\\
+    \code{toX11char(object)}\\
+    \code{toRed(object)}\\
+    \code{toGreen(object)}\\
+    \code{toBlue(object)}\\
+    \code{getRed(object)}\\
+    \code{getGreen(object)}\\
+    \code{getBlue(object)}
 }
-\arguments{
-%    \item{col}{Character vector giving the color string, either in form
-%        of 16-bit \verb|#0000FFFF0000| or 8-bit \verb|#00FF00|}
-%    \item{r}{Red value between 0 and 1}
-%    \item{g}{Green value between 0 and 1}
-%    \item{b}{Blue value between 0 and 1}
-%    \item{gray}{Gray value between 0 and 1}
+\section{Arguments}{
+    \item{object}{An object of class \code{Image} for image conversions, 
+        \code{numeric/double} to convert from grayscale values, \code{integer} to
+        convert from RGB values, \code{character} to convert from RGB values
+        written as X11 strings}
 }
+
 \details{
-    If \code{gray} is specified in call to \code{colString}, values of
-    \code{r}, \code{g}, and \code{b} are ommited.
+    Separate from images, colors in EBImage can be specified as \code{integer} 
+    values for RGB colors with byte-per-channel encoding; \code{double} values 
+    (normally in the range [0,1]) or as X11 strings. The above functions accept 
+    arguments of any of the above type and do the conversions automatically.
+    
+    For images, only two different modes are supported so far: \code{integer} and
+    \code{double} for RGB and grayscale images correspondingly. Using 
+    \code{toX11char} on an image will generate a \code{character} vector of the 
+    same size as the image data.
 }
 
-\value{
-    \code{colRGB} returns a vector of length 3 giving RGB channel values as
-    doubles in the range 0..1
-
-    \code{colString} returns a character value in form of 16-bit X11
-    color string.
+\section{Value}{
+    A vector if the argument is a vector, \code{Image} if the argument is an image
+    (with the exception of \code{toX11char} where the result is always a character
+    vector).
+    
+    \code{toGray}, \code{getRed}, \code{getGreen}, \code{getBlue} return data
+    as double for grayscale values in the range [0,1].
+    
+    \code{toRGB}, \code{toRed}, \code{toGreen}, \code{toBlue} return data
+    as integer with byte-per-channel color encoding.
 }
 
 \seealso{
-   \code{\link{Drawable}}
+   \code{\link{Image}}, \code{\link{add2RGB}}, \code{\link{scale2RGB}}
 }
 
 \author{
-    Oleg Sklyar, \email{osklyar@ebi.ac.uk}
+    Copyright (c) 2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
+}
+
+\examples{
+    fullred <- toRed(1.0)
+    somegreen <- toGreen(0.5)
+    abitblue <- toBlue(0.2)
+    rgb <- fullred + somegreen + abitblue
+    asX11 <- toX11char(rgb)
+    asgray <- toGray(asX11)
+    print(asX11)
+    print(asgray)
 }
 
 \keyword{dplot}

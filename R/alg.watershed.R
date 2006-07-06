@@ -66,19 +66,19 @@ ws <- function(x, mind=15, minr=10, ef=0.2, seeds=NULL, ref=NULL) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Paints img with objects detected with watershed by a set of provided colors
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-wsPaint <- function(x, img, opac=0.2, col="default", fill=TRUE, brds=TRUE) {
-    if(!assert(img))
-        stop("wrong class of argument img")
+wsPaint <- function(wsres, ref, opac=0.2, col="default", fill=TRUE, brds=TRUE) {
+    if(!assert(ref))
+        stop("wrong class of argument ref")
     opac <- as.double(opac)
-    if (opac < 0 || opac > 1)
-        stop("'opac' must be in the range [0,1]")
+    if (opac <= 0 || opac >= 1)
+        stop("'opac' must be in the range (0,1)")
     if (fill)
-        res <- scale2RGB(img, 1.0 - opac)
+        res <- scale2RGB(ref, 1.0 - opac)
     else
-        res <- toRGB(img)
+        res <- toRGB(ref)
     if (!fill && !brds)
         return(res)
-    nimg <- dim(img)[[3]]
+    nimg <- dim(ref)[[3]]
     if (col == "default")
         col <- c("#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")
     colRamp <- colorRamp(col)
@@ -86,12 +86,12 @@ wsPaint <- function(x, img, opac=0.2, col="default", fill=TRUE, brds=TRUE) {
     for (i in 1:nimg) {
         nobj <- 0
         if (nimg > 1) {
-            if (!is.null(x[[i]]$objects))
-                nobj <- length(x[[i]]$objects[,1])
+            if (!is.null(wsres[[i]]$objects))
+                nobj <- length(wsres[[i]]$objects[,1])
         }
         else {
-            if (!is.null(x$objects))
-                nobj <- length(x$objects[,1])
+            if (!is.null(wsres$objects))
+                nobj <- length(wsres$objects[,1])
         }
         if (nobj > 0) {
             mcol <- colRamp(((1:nobj) - 1) / (nobj - 1)) / 256
@@ -102,16 +102,16 @@ wsPaint <- function(x, img, opac=0.2, col="default", fill=TRUE, brds=TRUE) {
     }
     fill <- as.logical(fill)
     brds <- as.logical(brds)
-    return(.CallEBImage("ws_paint", x, res, cols, fill, brds, opac))
+    return(.CallEBImage("ws_paint", wsres, res, cols, fill, brds, opac))
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Returns images for objects determined by ws function - a list of image stacks 
 # with one object per image
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-wsImages <- function(x, img) {
-    if(!assert(img))
-        stop("wrong class of argument img")
-    return(.CallEBImage("ws_images", x, img))
+wsImages <- function(wsres, ref) {
+    if(!assert(ref))
+        stop("wrong class of argument ref")
+    return(.CallEBImage("ws_images", wsres, ref))
 }
 

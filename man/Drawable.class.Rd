@@ -7,7 +7,13 @@
 \alias{DrawableRect}
 \alias{DrawableEllipse}
 \alias{DrawableLine}
-\alias{DrawableText}
+%\alias{DrawableText}
+\alias{Drawable-class}
+\alias{DrawableCircle-class}
+\alias{DrawableRect-class}
+\alias{DrawableEllipse-class}
+\alias{DrawableLine-class}
+%\alias{DrawableText-class}
 
 \concept{image analysis}
 \concept{image processing}
@@ -67,7 +73,7 @@
 }
 
 \author{
-    Oleg Sklyar, \email{osklyar@ebi.ac.uk}
+    Copyright (c) 2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
 }
 
 \examples{

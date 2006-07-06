@@ -11,7 +11,7 @@
     as derived from the virtual class \code{\link{Drawable}}. The following primitives are supported
     at the moment: \code{\link{DrawableCircle}} - circles, \code{\link{DrawableRect}} - rectangles,
     \code{\link{DrawableEllipse}} - ellipses, \code{\link{DrawableLine}} - lines. To come shortly
-    \code{\link{DrawableText}} to display texts.
+    \code{DrawableText} to display texts.
 }
 
 \usage{
@@ -31,7 +31,7 @@
 }
 
 \author{
-    Oleg Sklyar, \email{osklyar@ebi.ac.uk}
+    Copyright (c) 2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
 }
 
 \examples{

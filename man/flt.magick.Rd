@@ -8,8 +8,8 @@
 }
 
 \description{
-    Some filters are ported from ImageMagick library. Applied to a image stacks,
-    filters are executed sequentially and independently for each 2D image.
+    Some filters are ported from ImageMagick library. Applied to image stacks
+    filters are executed sequentially and independently for each image.
 }
 
 \details{
@@ -21,7 +21,8 @@
             \code{spread}, \code{unsharpMask}}
         \item{\code{\link{Segmentation}}:}{\code{\link{thresh}}, \code{edge},
             \code{segment}, \code{\link{distMap}}}
-%            , \code{ffill}, \code{ffillEdge}}
+        \item{\code{\link{Morphology}}:}{\code{mErode}, \code{mDilate},
+            \code{mOpen}, \code{mClose}}
         \item{\code{\link{Color filters}}:}{\code{\link{normalize}}, \code{contrast}, \code{equalize},
             \code{colorGamma}, \code{mod}, \code{shade}, \code{solarize}}
         \item{\code{\link{Transformation}}:}{\code{rotate}, \code{sample.image}}
@@ -33,7 +34,7 @@
 }
 
 \author{
-    Oleg Sklyar, \email{osklyar@ebi.ac.uk}
+    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
 }
 
 \keyword{dplot}

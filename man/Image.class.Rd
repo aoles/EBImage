@@ -8,28 +8,12 @@
 \alias{copy}
 \alias{display}
 \alias{channels}
-\alias{toGray}
-\alias{toRGB}
-\alias{toRed}
-\alias{toGreen}
-\alias{toBlue}
-\alias{getRed}
-\alias{getGreen}
-\alias{getBlue}
 \alias{normalize}
 \alias{assert}
 \alias{plot.image}
 \alias{show,Image-method}
 \alias{print,Image-method}
 \alias{as.array,Image-method}
-
-% deprecating
-\alias{Image2D}
-\alias{Image3D}
-\alias{minMax}
-\alias{copyImage}
-\alias{copyImageHeader}
-
 
 
 \concept{image representation}
@@ -118,15 +102,6 @@
     e.g. TIFF. Image I/O routines are based on ImageMagick routines.
 
     Further information on the package and this class is available in the vignette.
-
-    DEPRECATED:
-
-    Classes \code{Image2D} and \code{Image3D} are deprecated and combined into one class \code{Image}.
-    Functions \code{Image2D} and \code{Image3D} are deprecated, please use \code{Image} with the same
-    syntax instead. \code{minMax} is deprecated, please use \code{\link{range}} instead. \code{copyImage}
-    image is deprecated, please use \code{copy} instead. \code{copyImageHeader} is deprecated and should
-    not be used. The substitution function \code{.copyHeader} should be used by the package
-    developers/package functions only.
 }
 
 \note{
@@ -135,7 +110,7 @@
 }
 
 \seealso{
-   \code{\link{Image IO}}, \code{\link{Filters 2D}}
+   \code{\link{Image IO}}, \code{\link{Filters 2D}}, \code{link{Colors}}
 }
 
 \references{
@@ -143,7 +118,7 @@
 }
 
 \author{
-    Oleg Sklyar, \email{osklyar@ebi.ac.uk}
+    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
 }
 
 \examples{
