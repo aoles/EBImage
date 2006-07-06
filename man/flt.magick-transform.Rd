@@ -3,13 +3,8 @@
 
 \alias{rotate}
 \alias{sample.image}
-%\alias{scale.image}
 \alias{zoom.image}
 \alias{trim}
-
-% deprecate
-\alias{sampleImage}
-\alias{scaleImage}
 
 \concept{image transformation}
 \concept{image processing}
@@ -24,10 +19,7 @@
 
 \usage{
     rotate(x, degrees = 90)
-    sampleImage(x, dx, dy)  # deprecated, use sample.image instead
     sample.image(x, dx, dy)
-    scaleImage(x, dx, dy)   # deprecated, use sample.image instead
-%    scale.image(x, dx, dy)
     zoom.image(x, dx, dy)
     trim(x, bg = 0)
 }
@@ -63,7 +55,7 @@
 }
 
 \author{
-    Oleg Sklyar, \email{osklyar@ebi.ac.uk}
+    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
 }
 
 \examples{
@@ -80,8 +72,6 @@
     ed <- edge(segment(im1, 100, 0.1), 1)
     # rotate edged image
     \dontrun{display(rotate(ed, 90))}
-    # scale image
-    \dontrun{display(scale.image(ed, 400, 300))}
     # sample image
     \dontrun{display(sample.image(ed, 400, 300))}
 }

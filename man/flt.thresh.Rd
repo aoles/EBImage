@@ -38,32 +38,15 @@
 }
 
 \seealso{
-   \code{\link{Image}}, \code{\link{Filters 2D}}, \code{\link{objectCount}}, \code{\link{distMap}}
+   \code{\link{Image}}, \code{\link{Filters 2D}}, \code{\link{distMap}}
 }
 
 \author{
-    Oleg Sklyar, \email{osklyar@ebi.ac.uk}
+    Copyright (c) 2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
 }
 
 \examples{
-    # create an empty image of 300x200 size
-    im1 <- Image(0, c(300,200,1))
-    # fill image with data (waves)
-    for (i in 1:dim(im1)[[1]])
-        for (j in 1:dim(im1)[[2]]) {
-            im1[i,j,1] <- abs(sin(i*0.0314)*sin(i*0.0314) + cos(j*0.0314)*cos(j*0.0314))
-        }
-    # normalize image
-    im1 <- normalize(im1)
-    \dontrun{display(im1)}
-    # threshold
-    seg <- thresh(im1, 20, 20, 0)
-    \dontrun{display(seg)}
-    # calculate distance map and normalize it
-    dm <- distMap(seg)
-    dm <- sqrt(dm)
-    dmnorm <- normalize(dm)
-    \dontrun{display(dmnorm)}
+    # see example for distMap
 }
 
 \keyword{dplot}

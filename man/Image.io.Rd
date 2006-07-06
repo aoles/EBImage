@@ -73,14 +73,14 @@
 }
 
 \author{
-    Oleg Sklyar, \email{osklyar@ebi.ac.uk}
+    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
 }
 
 \examples{
     urls <- c("http://www.ebi.ac.uk/~osklyar/projects/EBImage/examples/example.tif", "http://www.ebi.ac.uk/~osklyar/projects/EBImage/examples/segmented.tif")
-    ping.image(urls)
+    \dontrun{ping.image(urls)}
     im <- read.image(urls)
-    write.image(im, "image.io.Rd.example.tif")
+    \dontrun{write.image(im, "image.io.Rd.example.tif")}
 }
 
 \keyword{file}

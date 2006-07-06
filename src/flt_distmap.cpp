@@ -42,7 +42,11 @@ SEXP distMap(SEXP rimage, SEXP alg) {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 inline void calc_dist_map(double * data, int& ncol, int& nrow, int& alg) {
     switch(alg) {
-        case 2: lz_dist_map(data, ncol, nrow); break;
+        case 2: {
+            lz_dist_map(data, ncol, nrow); 
+            for (int i = 0; i < ncol * nrow; i++)
+                data[i] = sqrt(data[i]);
+        }; break;
         default: os_dist_map(data, ncol, nrow);
     };
 }

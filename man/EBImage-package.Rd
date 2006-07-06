@@ -5,7 +5,7 @@
 
 \docType{package}
 
-\title{EBImage package overview}
+\title{EBImage package overview and changelog}
 
 \description{
    EBImage is an image processing and analysis package for R. The primary goal of the
@@ -29,15 +29,52 @@
     \code{\link{Color filters}} and \code{\link{Enhancement}}.
 
     Further algorithms currently include distance maps (\code{\link{distMap}}), adaptive
-    thresholding (\code{\link{thresh}}), feature counting (\code{\link{objectCount}}).
+    thresholding (\code{\link{thresh}}), object detection by a modified watershed algorithm 
+    (\code{\link{ws}}), mathematical image morphology with \code{\link{mErode}}, 
+    ImageMagick \code{\link{Drawable}}s etc.
 
     Images in different formats can be loaded and saved with \code{\link{read.image}} and
     \code{\link{write.image}}.
 
     To view results of image processing on the screen, \code{\link{display}} function can be used.
 }
+
+\section{Changelog}{
+    \itemize{
+        \item{06/07/2006}{Added morphological operations (erosion, dilation, opening, closing) (\code{\link{Morphology}})}
+        \item{05/07/2006}{\code{wsImages} added to generate image stack of detected 
+            objects/per image. \code{wsPaint} added to paint results of watershed object detection
+            (\code{\link{ws}}). Color conversions finished enabling converting colors between three
+            different representaions - double intensity values, integer RGB's and X11 strings}
+        \item{29/06/2006}{Added watershed object detection: \code{\link{ws}}}
+        \item{17/06/2006}{Added first full vignette!}
+        \item{02/05/2006}{Added \code{\link{plot.image}} to display images on 
+            machines where \code{link{display}} fails}
+        \item{29/04/2006}{Added INSTALL file with installation descriptions for Mac etc}
+        \item{25/04/2006}{Major restructurin deprecating Image2D, Image3D in favor 
+            of \code{\link{Image}}}
+        \item{24/04/2006}{EBImage first time in the Bioconductor release!}
+        \item{31/03/2006}{Uses autoconf to generate configure script}
+    }
+}
+
 \author{
-    Oleg Sklyar, \email{osklyar@ebi.ac.uk}. 2005-2006. European Bioinformatics Institute. Package
-    is a part of Bioconductor release branch since release 1.8.
+    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}. European
+    Bioinformatics Institute, Wellcome Trust Genome Campus, Hinxton, Cambs, 
+    CB10 1SD, England
+
+    Released under GPL:
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License 
+    as published by the Free Software Foundation; either version 2
+    of the License, or (at your option) any later version.          
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+
+    See the GNU General Public License for more details.
+    GPL license wording: http://www.gnu.org/licenses/gpl.html    
 }
 \keyword{package}
