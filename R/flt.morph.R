@@ -1,5 +1,5 @@
 # -------------------------------------------------------------------------
-# Morphological filters: erode
+# Morphological filters: erode, dilate, mopen, mclose
  
 # Copyright (c) 2006 Oleg Sklyar
 
@@ -16,9 +16,74 @@
 # GPL license wording: http://www.gnu.org/licenses/gpl.html
 
 # -------------------------------------------------------------------------
-
-.erode <- function(x, kernel=matrix(TRUE,3,3), iter=2) {
+.erode <- function(x, kernel = matrix(TRUE,3,3), iter = 2, modify = TRUE) {
     if (!assert(x))
         stop("Wrong class of argument x, Image expected")
-    return(.CallEBImage("morph_erode", x, as.integer(kernel), as.integer(iter)))
+    if (x@rgb)
+        stop("Only grayscale images are supported (only binary at the moment: {0,1})")
+    if (!modify) {
+        x <- copy(x)
+        # 0 - erode, 1 - dilate
+        return(.CallEBImage("erodeDilate", x, as.logical(kernel), as.integer(iter), as.integer(0))) 
+    }
+    else # original data modified
+        invisible(.CallEBImage("erodeDilate", x, as.logical(kernel), as.integer(iter), as.integer(0))) 
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+erode <- function(x, kernel = matrix(TRUE,3,3), iter = 2) {
+    return(.erode(x, kernel, iter, FALSE))
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+.dilate <- function(x, kernel = matrix(TRUE,3,3), iter = 2, modify = TRUE) {
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
+    if (x@rgb)
+        stop("Only grayscale images are supported (only binary at the moment: {0,1})")
+    if (!modify) {
+        x <- copy(x)
+        # 0 - erode, 1 - dilate
+        return(.CallEBImage("erodeDilate", x, as.logical(kernel), as.integer(iter), as.integer(1))) 
+    }
+    else # original data modified
+        invisible(.CallEBImage("erodeDilate", x, as.logical(kernel), as.integer(iter), as.integer(1))) 
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+dilate <- function(x, kernel = matrix(TRUE,3,3), iter = 2) {
+    return(.dilate(x, kernel, iter, FALSE))
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+.mopen <- function(x, kernel = matrix(TRUE,3,3), iter = 2, modify = TRUE) {
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
+    if (x@rgb)
+        stop("Only grayscale images are supported (only binary at the moment: {0,1})")
+    if (!modify)
+        x <- copy(x)
+    .erode(x, kernel, iter, TRUE)
+    if (modify)
+        invisible(.dilate(x, kernel, iter, TRUE))
+    else
+        return(.dilate(x, kernel, iter, TRUE))
+}    
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+mopen <- function(x, kernel = matrix(TRUE,3,3), iter = 2) {
+    return(.mopen(x, kernel, iter, FALSE))
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+.mclose <- function(x, kernel = matrix(TRUE,3,3), iter = 2, modify = TRUE) {
+    if (!assert(x))
+        stop("Wrong class of argument x, Image expected")
+    if (x@rgb)
+        stop("Only grayscale images are supported (only binary at the moment: {0,1})")
+    if (!modify)
+        x <- copy(x)
+    .dilate(x, kernel, iter, TRUE)
+    if (modify)
+        invisible(.erode(x, kernel, iter, TRUE))
+    else
+        return(.erode(x, kernel, iter, TRUE))
+}    
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+mclose <- function(x, kernel = matrix(TRUE,3,3), iter = 2) {
+    return(.mclose(x, kernel, iter, FALSE))
 }

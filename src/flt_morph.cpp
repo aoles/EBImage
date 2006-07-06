@@ -12,9 +12,9 @@ See flt_morph.h for license
 using namespace std;
 
 inline bool match(int * kernel, double * data, Point & size, Point & at, double & mismatch) {
-    int xx, yy;
-    for (int i = -1; i <= 1; i++)
-        for (int j = -1; j <= 1; j++) {
+    int i, j, xx, yy;
+    for (i = -1; i <= 1; i++)
+        for (j = -1; j <= 1; j++) {
             if (!kernel[i + 1 + (j + 1) * 3]) continue;
             xx = at.x + i;
             yy = at.y + j;
@@ -26,8 +26,10 @@ inline bool match(int * kernel, double * data, Point & size, Point & at, double 
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 // function modifies its argument !!!  
-SEXP morph_erode(SEXP x, SEXP kernel, SEXP iters) {
-    double resetto = 0; // check foreground
+SEXP erodeDilate(SEXP x, SEXP kernel, SEXP iters, SEXP alg) {
+    double resetto = 0; // erode - check foreground
+    if (INTEGER(alg)[0] != 0)
+        resetto = 1.0;  // dilate - check background
     try {
         unsigned int i;
         if (!assertImage(x))
@@ -59,20 +61,5 @@ SEXP morph_erode(SEXP x, SEXP kernel, SEXP iters) {
     catch(exception &error_) {
         error(error_.what());
     }
-    return x;
-}
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-SEXP morph_dilate(SEXP x, SEXP kernel, SEXP iters) {
-
-    return x;
-}
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-SEXP morph_open(SEXP x, SEXP kernel, SEXP iters) {
-
-    return x;
-}
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-SEXP morph_close(SEXP x, SEXP kernel, SEXP iters) {
-
     return x;
 }

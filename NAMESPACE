@@ -8,20 +8,10 @@ export(
     shade, sharpen, solarize, trim,
     spread, unsharpMask, noise, 
     
-    distMap, thresh, ws, wsPaint, wsImages,
+    distMap, thresh, ws, wsPaint, wsImages, 
+    erode, dilate, mopen, mclose,
 
-    draw, DrawableCircle, DrawableLine, DrawableRect, DrawableEllipse,
-
-    # DEPRECATE
-    Image2D, Image3D, copyImage, adaptThresh, sampleImage, scaleImage,
-
-    # these functions break R rules and modify their arguments
-    # undocumented and not recomended - you have been warned!
-    .distMap, .thresh, .ws,
-    .blur, .contrast, .despeckle, .edge, .enhance, .equalize,
-    .colorGamma, .gaussFilter, .medianFilter, .mod, .reduceNoise,
-    .segment, .shade, .sharpen, .solarize,
-    .spread, .unsharpMask, .noise, .trim, .draw, .erode
+    draw, DrawableCircle, DrawableLine, DrawableRect, DrawableEllipse
 )
 exportClasses(
     Image,
@@ -36,12 +26,5 @@ exportMethods(
     as.array, summary, "[", show, print, plot.image,
 
     toGray, toRGB, toX11char, toRed, toGreen, toBlue, getRed, getGreen, getBlue, 
-    add2RGB, sub2RGB, scale2RGB, 
-    
-    # DEPRECATE
-    minMax,
-
-    # these functions break R rules and modify their arguments
-    # undocumented and not recomended - you have been warned!
-    .normalize
+    add2RGB, sub2RGB, scale2RGB
 )
