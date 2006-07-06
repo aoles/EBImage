@@ -22,9 +22,6 @@ GPL license wording: http://www.gnu.org/licenses/gpl.html
 #include "common.h"
 
 extern "C" {
-    SEXP morph_erode  (SEXP x, SEXP kernel, SEXP iters);
-    SEXP morph_dilate (SEXP x, SEXP kernel, SEXP iters);
-    SEXP morph_open   (SEXP x, SEXP kernel, SEXP iters);
-    SEXP morph_close  (SEXP x, SEXP kernel, SEXP iters);
+    SEXP erodeDilate(SEXP x, SEXP kernel, SEXP iters, SEXP alg);
 };
 
