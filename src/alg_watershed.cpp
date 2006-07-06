@@ -471,13 +471,12 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
                     if (objdist < seededdist) {
                         seededdist = objdist;
                         /* if it is not the first object - it is also a perimeter point */
-                        /* TODO: not sure if to count touching points as perimeter
-                        if (objind >= 0) {
+                        /* TODO: not sure if to count touching points as perimeter */
+                        if (seeded >= 0) {
                             border = true;
                             // add a border point to the object we do not consider any more 
                             objects[seeded].borders.push_back(pti);
                         }
-                        */
                         seeded = objind;
                     }
                 } /* iy */
@@ -492,6 +491,11 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
                     double objdist = dist(objects[j].centre(), pti);
                     if (objdist < seededdist) {
                         seededdist = objdist;
+                        if (seeded >= 0) {
+                            border = true;
+                            // add a border point to the object we do not consider any more 
+                            objects[seeded].borders.push_back(pti);
+                        }
                         seeded = j;
                     }
                 }      
