@@ -79,7 +79,7 @@ wsPaint <- function(wsres, ref, opac=0.2, col="default", fill=TRUE, brds=TRUE) {
     if (!fill && !brds)
         return(res)
     nimg <- dim(ref)[[3]]
-    if (col == "default")
+    if (col[[1]] == "default")
         col <- c("#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854")
     colRamp <- colorRamp(col)
     cols <- list()
