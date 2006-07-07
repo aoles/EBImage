@@ -15,7 +15,7 @@ img1 <- wsPaint(x1, a1, opac = 0.3)
 seeds <- x1$objects[,1:2]
 
 a2 <- read.image("HT10-C04_A03_w3-0.png")
-a3 <- sqrt(normalize(a1 + a2))
+a3 <- sqrt(normalize(normalize(a1) + normalize(a2)))
 t2 <- thresh(a3, 300, 300, 0.00, TRUE)
 t2 <- mClose(mOpen(t2, 1, mKernel(11)), 1, mKernel(11))
 dm2 <- distMap(t2)

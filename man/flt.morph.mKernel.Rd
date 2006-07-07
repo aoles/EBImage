@@ -26,7 +26,7 @@
 }
 
 \seealso{
-   \code{\link{Image}}, \code{\link{Filters 2D}, \code{\link{Morphology}}}
+   \code{\link{Image}}, \code{\link{Filters 2D}}, \code{\link{Morphology}}
 }
 
 \author{

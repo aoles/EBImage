@@ -40,41 +40,43 @@
 }
 
 \section{Changelog}{
-    \itemize{
-        \item{06/07/2006}{Added morphological operations (erosion, dilation, opening, closing) (\code{\link{Morphology}})}
-        \item{05/07/2006}{\code{wsImages} added to generate image stack of detected 
+    \describe{
+        \item{\code{06.07.2006:} }{Added morphological operations (erosion, dilation, opening, closing) (\code{\link{Morphology}})}
+        \item{\code{05.07.2006:} }{\code{wsImages} added to generate image stack of detected 
             objects/per image. \code{wsPaint} added to paint results of watershed object detection
             (\code{\link{ws}}). Color conversions finished enabling converting colors between three
             different representaions - double intensity values, integer RGB's and X11 strings}
-        \item{29/06/2006}{Added watershed object detection: \code{\link{ws}}}
-        \item{17/06/2006}{Added first full vignette!}
-        \item{02/05/2006}{Added \code{\link{plot.image}} to display images on 
-            machines where \code{link{display}} fails}
-        \item{29/04/2006}{Added INSTALL file with installation descriptions for Mac etc}
-        \item{25/04/2006}{Major restructurin deprecating Image2D, Image3D in favor 
+        \item{\code{29.06.2006:} }{Added watershed object detection: \code{\link{ws}}}
+        \item{\code{17.06.2006:} }{Added first full vignette!}
+        \item{\code{02.05.2006:} }{Added \code{\link{plot.image}} to display images on 
+            machines where \code{\link{display}} fails}
+        \item{\code{29.04.2006:} }{Added INSTALL file with installation descriptions for Mac etc}
+        \item{\code{25.04.2006:} }{Major restructuring deprecating Image2D, Image3D in favor 
             of \code{\link{Image}}}
-        \item{24/04/2006}{EBImage first time in the Bioconductor release!}
-        \item{31/03/2006}{Uses autoconf to generate configure script}
+        \item{\code{24.04.2006:} }{EBImage first time in the Bioconductor release!}
+        \item{\code{31.03.2006:} }{Uses autoconf to generate configure script}
     }
 }
 
 \author{
-    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}. European
-    Bioinformatics Institute, Wellcome Trust Genome Campus, Hinxton, Cambs, 
-    CB10 1SD, England
+    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}. Parts of 
+    code by Wolfgang Huber : \email{huber@ebi.ac.uk}
+    
+    European Bioinformatics Institute, Wellcome Trust Genome Campus, 
+    Hinxton, Cambs, CB10 1SD, England
 
-    Released under GPL:
+    Released under \code{LGPL}:
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public License 
-    as published by the Free Software Foundation; either version 2
-    of the License, or (at your option) any later version.          
+    \code{This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public License 
+    as published by the Free Software Foundation; either version 2.1
+    of the License, or (at your option) any later version.}
 
-    This library is distributed in the hope that it will be useful,
+    \code{This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.}
 
-    See the GNU General Public License for more details.
-    GPL license wording: http://www.gnu.org/licenses/gpl.html    
+    \code{See the GNU Lesser General Public License for more details.
+    LGPL license wording: http://www.gnu.org/licenses/lgpl.html}
 }
 \keyword{package}
