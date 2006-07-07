@@ -110,7 +110,7 @@
 }
 
 \seealso{
-   \code{\link{Image IO}}, \code{\link{Filters 2D}}, \code{link{Colors}}
+   \code{\link{Image IO}}, \code{\link{Filters 2D}}, \code{\link{Colors}}
 }
 
 \references{

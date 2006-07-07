@@ -47,7 +47,7 @@
 }
 
 \seealso{
-   \code{\link{Image}}, \code{\link{Filters 2D}, \code{\link{mKernel}}}
+   \code{\link{Image}}, \code{\link{Filters 2D}}, \code{\link{mKernel}}
 }
 
 \author{
