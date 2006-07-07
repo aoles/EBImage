@@ -227,8 +227,8 @@ SEXP ws_paint(SEXP x, SEXP img, SEXP cols, SEXP dofill, SEXP doborders, SEXP opa
         if (nimages > 1 && LENGTH(x) != nimages)
             error("list x must have the same number of elements as the number of images");
         Point size(INTEGER(GET_DIM(img))[0], INTEGER(GET_DIM(img))[1]);
-        bool fill = LOGICAL(dofill);
-        bool outline = LOGICAL(doborders);
+        bool fill = LOGICAL(dofill)[0];
+        bool outline = LOGICAL(doborders)[0];
         double ropac = REAL(opacity)[0];
         for (int i = 0; i < nimages; i++) {
             SEXP xx;
