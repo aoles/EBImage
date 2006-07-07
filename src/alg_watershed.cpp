@@ -12,9 +12,15 @@ See: alg_watershed.h for license
 #include <vector>
 #include <iostream>
 
-const int OBJ_NCOL = 6;
+const int OBJ_NCOL = 6; // number of columns in the 'objects' matrix of ws return
 const double BG = 0;
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+ this class represents and stores one single detected object, indices of
+ its pixels in 'pixels', indices or borders in 'borders' and of those on
+ the image edges in 'edges'. ok indicates if the object should be deleted
+ as bad after there was a possiblity to combine it with a good one (say if
+ a large part of the object is cut by the image edge)
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 class TheFeature {
     private:
         int _ind;
@@ -471,7 +477,6 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
                     if (objdist < seededdist) {
                         seededdist = objdist;
                         /* if it is not the first object - it is also a perimeter point */
-                        /* TODO: not sure if to count touching points as perimeter */
                         if (seeded >= 0) {
                             border = true;
                             // add a border point to the object we do not consider any more 
@@ -501,8 +506,8 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
                 }      
             }
             if (seeded < 0) {
-                /* start a new object if its radius (determined by the highest dm value) is larger than minradius */
-                /* and if we are allowed to create new seeds */
+                /* start a new object if its radius (determined by the highest dm value) 
+                   is larger than minradius and if we are allowed to create new seeds */
                 if (fabs(data[iindex]) >= minradius && !noNewObjects) {
                     objects.push_back(TheFeature());
                     seeded = objects.size() - 1;
@@ -541,6 +546,10 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
         if (objects[i].pixels.size() < M_PI * minradius * minradius)
             objects[i].ok = false;
     }
+    /* at this point currently detected border pixels played their role and 
+    are deleted, they are redetected more accurately at the end */
+    for (i = 0; i < objects.size(); i++)
+        objects[i].borders.clear();
     bool combiFound;
     /* iterate through the objects until no combinations can be found, combine small objects */
     do {
@@ -556,10 +565,16 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
                     /* combine j into i and delete j */
                     combiFound = true;
                     objects[j].ok = false;
-                    for (k = 0; k < objects[j].pixels.size(); k++)
-                        objects[i].pixels.push_back(objects[j].pixels[k]);
-                    for (k = 0; k < objects[j].borders.size(); k++)
-                        objects[i].borders.push_back(objects[j].borders[k]);
+                    /* mark image part of the old object with the new number - 
+                    does not matter it will not correspond to the object later 
+                    (when objects are reshuffled) - it will be unique and we
+                    need a unique number to map the borders */
+                    Point ptk;
+                    for (k = 0; k < objects[j].pixels.size(); k++) {
+                        ptk = objects[j].pixels[k];
+                        objects[i].pixels.push_back(ptk);
+                        data[getindex(ptk, size.x)] = (double)(i + 1);
+                    }
                     for (k = 0; k < objects[j].edges.size(); k++)
                         objects[i].edges.push_back(objects[j].edges[k]);
                     /* substitute objects[j] with last and delete last */
@@ -579,6 +594,35 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
         }
         objects[i] = objects.back();
         objects.pop_back();
+    }
+    /* redetect borders: pay attention - image now has numbers that do not 
+    correspond to object indecies, but they are unique */
+    for (i = 0; i < objects.size(); i++) {
+        Point ptj; double val;
+        for (j = 0; j < objects[i].pixels.size(); j++) {
+            ptj = objects[i].pixels[j];
+            val = data[getindex(ptj, size.x)];
+            if (ptj.x - 1 >= 0)
+                if (data[getindex(ptj.x - 1, ptj.y, size.x)] != val) {
+                    objects[i].borders.push_back(ptj);
+                    continue;
+                }
+            if (ptj.x + 1 < size.x)
+                if (data[getindex(ptj.x + 1, ptj.y, size.x)] != val) {
+                    objects[i].borders.push_back(ptj);
+                    continue;
+                }
+            if (ptj.y - 1 >= 0)
+                if (data[getindex(ptj.x, ptj.y - 1, size.x)] != val) {
+                    objects[i].borders.push_back(ptj);
+                    continue;
+                }
+            if (ptj.y + 1 < size.y)
+                if (data[getindex(ptj.x, ptj.y + 1, size.x)] != val) {
+                    objects[i].borders.push_back(ptj);
+                    continue;
+                }
+        }
     }
     // result is returned in objects 
 } 
