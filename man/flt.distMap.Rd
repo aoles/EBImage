@@ -32,7 +32,7 @@
 }
 
 \seealso{
-   \code{\link{Image}}, \code{\link{Filters 2D}}, \code{\link{ws}}
+   \code{\link{Image}}, \code{\link{Filters 2D}}, \code{\link{wsObjects}}
 }
 
 \source{
