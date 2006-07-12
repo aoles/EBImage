@@ -8,7 +8,7 @@ export(
     shade, sharpen, solarize, trim,
     spread, unsharpMask, noise, 
     
-    distMap, thresh, ws, wsPaint, wsImages, 
+    distMap, thresh, wsObjects, wsPaint, wsImages, 
     mErode, mDilate, mOpen, mClose, mKernel,
 
     draw, DrawableCircle, DrawableLine, DrawableRect, DrawableEllipse
