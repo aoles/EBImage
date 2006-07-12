@@ -24,7 +24,7 @@
 # Breaks R rules and modifies the original image, for internal use only
 # use watershed() instead!
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-.ws <- function(x, mind=15, minr=10, ef=0.2, seeds=NULL, ref=NULL, modify=TRUE) {
+.wsObjects <- function(x, mind=15, minr=10, ef=0.2, seeds=NULL, ref=NULL, modify=TRUE) {
     if(!assert(x))
         stop("wrong class of argument 'x'")
     if (x@rgb)
@@ -53,14 +53,14 @@
         warning("reasonable range for 'ef' is [0,1]")
     if (!modify)
         x <- copy(x)
-    res <- .CallEBImage("ws", x, ref, seeds, c(mind, minr, ef))
+    res <- .CallEBImage("ws_objects", x, ref, seeds, c(mind, minr, ef))
     return(res)
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Safe exported implementation of watershed (uses modify = FALSE in .watershed)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ws <- function(x, mind=15, minr=10, ef=0.2, seeds=NULL, ref=NULL) {
-    .ws(x, mind, minr, ef, seeds, ref, FALSE)
+wsObjects <- function(x, mind=15, minr=10, ef=0.2, seeds=NULL, ref=NULL) {
+    .wsObjects(x, mind, minr, ef, seeds, ref, FALSE)
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

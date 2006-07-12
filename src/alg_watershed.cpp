@@ -52,7 +52,7 @@ class TheFeature {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 void doWatershed(double *, Point &, double, double, vector<TheFeature> &, double);
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-SEXP ws(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
+SEXP ws_objects(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
     /* !!! use nprotect++ everywhere you use PROTECT, cleanup automatic */
     if (!assertImage(rimage))
         error("Wrong argument class, Image expected");

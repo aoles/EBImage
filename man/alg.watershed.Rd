@@ -1,6 +1,6 @@
-\name{ws}
+\name{wsObjects}
 
-\alias{ws}
+\alias{wsObjects}
 \alias{wsPaint}
 \alias{wsImages}
 
@@ -9,23 +9,23 @@
 \title{Object detection and marking with watershed algorithm}
 
 \description{
-    Modified watershed algorithm is used in \code{ws} to identify objects in an 
-    image. Supplying the results of \code{ws} along with a reference image to
+    Modified watershed algorithm is used in \code{wsObjects} to identify objects in an 
+    image. Supplying the results of \code{wsObjects} along with a reference image to
     \code{wsPaint} allows to obtain an image with all detected objects marked
-    in different colors for quality control. Supplying the results of \code{ws}
+    in different colors for quality control. Supplying the results of \code{wsObjects}
     along with a reference image to \code{wsImages} will generate an image stack
     with a single detected object per image positioned in the centre of the image.
     This can be used further for pattern recognition etc.
 }
 
 \usage{
-    ws(x, mind=15, minr=10, ef=0.2, seeds=NULL, ref=NULL)
+    wsObjects(x, mind=15, minr=10, ef=0.2, seeds=NULL, ref=NULL)
     wsPaint(wsres, ref, opac=0.2, col="default", fill=TRUE, brds=TRUE)
     wsImages(wsres, ref)
 }
 \arguments{
     \item{x}{An instance of class \code{\link{Image}}, grayscale - a distance map!}
-    \item{ref}{Reference image, grayscale for \code{ws}, any otherwise}
+    \item{ref}{Reference image, grayscale for \code{wsObjects}, any otherwise}
     \item{mind}{Minimum distance between objects, if two identified objects are 
         closer, they are combined into one}
     \item{minr}{Minimum distance (radius) from the object centre to the background (minimum
@@ -37,7 +37,7 @@
         rows being the number of objects, where the object detection can only start from. If 
         this value is given, no new object will be created, but some can still be combined
         together if they are too close)}
-    \item{wsres}{A list as returned by \code{ws}. See description of the values below.}
+    \item{wsres}{A list as returned by \code{wsObjects}. See description of the values below.}
     \item{opac}{A numeric value for the opacity of painted objects on the reference image. 
         The reference image will correspondingly have the opacity equal 1 - opac. Values must
         be between 0 and 1 (both excluding).}
@@ -52,7 +52,7 @@
 }
 
 \value{
-    \code{ws} returns a named list with elements {objects, pixels, borders} for 
+    \code{wsObjects} returns a named list with elements {objects, pixels, borders} for 
     single images or a list of such lists for image stacks. Item \code{objects} is a 
     matrix with rows specifying detected objects and columns - their properties.
     Cols 1 and 2 - x,y coordinates of the object geometrical center on the image;
@@ -77,7 +77,7 @@
 }
 
 \details{
-    \code{ws} uses distance maps for its \code{x} arguments. It will either fail
+    \code{wsObjects} uses distance maps for its \code{x} arguments. It will either fail
     or in the worst case take forever to generate an inadequate result if any 
     other image is supplied! 
 }
@@ -109,7 +109,7 @@
     # calculate distance map and normalize it
     dm <- distMap(seg)
     # detect objects
-    x <- ws(dm, ref = im1)
+    x <- wsObjects(dm, ref = im1)
     # paint original image
     painted <- wsPaint(x, im1)
     \dontrun{display(painted)}

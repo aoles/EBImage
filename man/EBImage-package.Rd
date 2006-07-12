@@ -30,7 +30,7 @@
 
     Further algorithms currently include distance maps (\code{\link{distMap}}), adaptive
     thresholding (\code{\link{thresh}}), object detection by a modified watershed algorithm 
-    (\code{\link{ws}}), mathematical image morphology with \code{\link{mErode}}, 
+    (\code{\link{wsObjects}}), mathematical image morphology with \code{\link{mErode}}, 
     ImageMagick \code{\link{Drawable}}s etc.
 
     Images in different formats can be loaded and saved with \code{\link{read.image}} and
@@ -44,9 +44,9 @@
         \item{\code{06.07.2006:} }{Added morphological operations (erosion, dilation, opening, closing) (\code{\link{Morphology}})}
         \item{\code{05.07.2006:} }{\code{wsImages} added to generate image stack of detected 
             objects/per image. \code{wsPaint} added to paint results of watershed object detection
-            (\code{\link{ws}}). Color conversions finished enabling converting colors between three
+            (\code{\link{wsObjects}}). Color conversions finished enabling converting colors between three
             different representaions - double intensity values, integer RGB's and X11 strings}
-        \item{\code{29.06.2006:} }{Added watershed object detection: \code{\link{ws}}}
+        \item{\code{29.06.2006:} }{Added watershed-based object detection: \code{\link{wsObjects}}}
         \item{\code{17.06.2006:} }{Added first full vignette!}
         \item{\code{02.05.2006:} }{Added \code{\link{plot.image}} to display images on 
             machines where \code{\link{display}} fails}
