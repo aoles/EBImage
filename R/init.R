@@ -25,6 +25,16 @@ verboseEBImage <- function(verbose = TRUE) {
     invisible(FALSE)
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+updateEBImageDev <- function() {
+    install.packages("EBImage", repos="http://www.bioconductor.org/packages/1.9/bioc")
+    cat("\n\nPlease re-load the library!\n\n")
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+updateEBImage <- function() {
+    install.packages("EBImage", repos="http://www.ebi.ac.uk/huber-srv/data/Rrepos")
+    cat("\n\nPlease re-load the library!\n\n")
+}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .onLoad <- function(lib, pkg) {
     ## use useDynLib("EBImage") in NAMESPACE instead
     ## library.dynam("EBImage", pkg, lib)
