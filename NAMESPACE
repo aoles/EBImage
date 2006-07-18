@@ -11,7 +11,9 @@ export(
     distMap, thresh, wsObjects, wsPaint, wsImages, 
     mErode, mDilate, mOpen, mClose, mKernel,
 
-    draw, DrawableCircle, DrawableLine, DrawableRect, DrawableEllipse
+    draw, DrawableCircle, DrawableLine, DrawableRect, DrawableEllipse,
+    
+    updateEBImage, updateEBImageDev
 )
 exportClasses(
     Image, Drawable, DrawableCircle, DrawableLine, DrawableRect, DrawableEllipse

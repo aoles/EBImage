@@ -39,6 +39,8 @@
 \alias{toRGB,ANY-method}
 \alias{toX11char,Image-method}
 \alias{toX11char,ANY-method}
+\alias{updateEBImage}
+\alias{updateEBImageDev}
 
 \title{
     Internals
