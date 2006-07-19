@@ -1,11 +1,14 @@
 ============================================================
-Linux Installation Notes
+Linux/UNIX Installation Notes
 ------------------------------------------------------------
 To install EBImage on a Linux/Unix system you will need a
-working copy of R and the latest version of ImageMagick and
-Magick++ libraries and header files. If installing ImageMagick
-from source you will need to compile it and run
+working copy of R and the working copy of ImageMagick and
+Magick++ libraries and header files versioned 6.x.x. 
+Refer to www.imagemagick.org for the installation procedures of
+ImageMagick, but generally to compile and install it from
+source you need to run (in its unpacked directory):
 
+./configure
 make
 make install
 
@@ -14,24 +17,32 @@ Additionally you might need to run
 make install-lib
 make install-headers
 
-to install a development version.
+to install a development version (but usually this is not 
+required with new versions of ImageMagick).
 
-If you use an rpm based Linux, please be sure to include
+If you use an rpm based Linux, please be sure to include rpms
 
 ImageMagick
 ImageMagick-devel
 ImageMagick-Magick++
 ImageMagick-Magick++-devel
 
-rpms (names can differ depending on the distribution).
+Names can differ depending on the distribution.
 
 Before compiling EBImage, please ensure that Magick++-config
 (installed with ImageMagick devel) is in your path (normally
-in /usr/bin).
+in /usr/bin), simply run it as:
+Magick++-config --cppflags - the result should be somthing like
+-I/usr/include or wherever your Magick++ include files are located.
 
 ============================================================
-Apple Mac Installation Notes
+Apple MacOS Installation Notes
 ------------------------------------------------------------
+One can install ImageMagick from source in exactly the same 
+manner as described above, or one can use preinstalled version (not
+recommended) delivered with the system. In both cases, if problems occur
+please refer to the notes below.
+
 Thanks to Firas Swidan <swidanf@hhmi.org>
 ------------------------------------------------------------
 ImageMagick comes preinstalled on Apple Mac. However there are
@@ -49,7 +60,7 @@ comments from Firas:
 
 I managed to install the EBImage package. There were some problems
 with installing libjpeg.so. Here is a description of the whole
-process:
+process of installing ImageMagick:
 
 1: ./configure --enable-shared --enable-static
 Did not manage to identify the OS and printed an error message.
@@ -66,4 +77,8 @@ install GNU libtool, which is named glibtool. Changing the "libtool"
 in the Makefile to "glibtool" solved the problem and produced libjpeg.so.
 Running R CMD INSTALL worked and installed EBImage.
 
+--
+
+O.S.
+Updated 19/07/2006
 
