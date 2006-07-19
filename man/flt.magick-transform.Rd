@@ -40,11 +40,11 @@
 \details{
     \code{rotate} rotates images counter-clockwise.
 
-    \code{sample.image} uses sampling algorithm to resize images, whereas \code{scale.image} and \code{zoom.image} (difference to be clarified from
-    ImageMagick help pages) use
-    simple ratio algorithm. Images are resized proportionally to fit in the given \code{dx} and
-    \code{dy}.
-}
+    \code{sample.image} uses sampling algorithm to proportionally scale the image
+    
+    Functions \code{zoom.image} and \code{trim} have not been tested yet - they are
+    1:1 wrappers around corresponding Magick++ functions, please refer to ImageMagick
+    documentation pages for further help.}
 
 \seealso{
    \code{\link{Image}}, \code{\link{Filters 2D}}

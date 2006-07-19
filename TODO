@@ -11,8 +11,8 @@ Takes forever for radius > 10 (on large images)
 ===================================================================
 ? [OS 26/04/06] scaleImage, sampleImage
 -------------------------------------------------------------------
-Somehow argument dy is not used. Image is always scaled proportionally
-depending on the dx argument. Wrong documentation of ImageMagick?
+Only proportional scaling, think of other options for non-proportional 
+scaling
 
 ===================================================================
 ? [WH 26/04/06] rgb
