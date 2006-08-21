@@ -45,6 +45,7 @@ setClass("Drawable",
 # ============================================================================
 setClass("DrawableCircle",
     contains = "Drawable",
+    representation(),   # 2.4.0-devel bug workaround
     prototype(
         x           = matrix(0, ncol = 3, nrow = 1)
     ),
@@ -63,6 +64,7 @@ DrawableCircle <- function(x, y, r) {
 # ============================================================================
 setClass("DrawableLine",
     contains = "Drawable",
+    representation(),   # 2.4.0-devel bug workaround
     prototype(
         x           = matrix(0, ncol = 4, nrow = 1)
     ),
@@ -80,7 +82,8 @@ DrawableLine <- function(x1, y1, x2, y2) {
 }
 # ============================================================================
 setClass("DrawableRect",
-    contains = "DrawableLine"
+    contains = "DrawableLine",
+    representation(),   # 2.4.0-devel bug workaround   
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 DrawableRect <-function(x1, y1, x2, y2) {
@@ -93,6 +96,7 @@ DrawableRect <-function(x1, y1, x2, y2) {
 # ============================================================================
 setClass("DrawableEllipse",
     contains = "Drawable",
+    representation(),   # 2.4.0-devel bug workaround   
     prototype(
         x           = matrix(0, ncol = 6, nrow = 1)
     ),
