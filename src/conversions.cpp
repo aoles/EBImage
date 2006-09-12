@@ -122,6 +122,8 @@ MagickStack SEXP2Stack(SEXP rimage) {
                     image.opacity(OpaqueOpacity);
                 }
             }
+			image.fileName("\0");
+			image.x11Display(getenv("DISPLAY"));
             stack.push_back(image);
         }
     }
@@ -158,6 +160,8 @@ MagickImage  SEXP2Image(SEXP rimage) {
                 image.opacity(OpaqueOpacity);
             }
         }
+		image.fileName("\0");
+		image.x11Display(getenv("DISPLAY"));
         return image;
     }
     catch(exception &error_) {
@@ -200,6 +204,8 @@ MagickImage pullImageData(SEXP rimage, int index) {
                 image.opacity(OpaqueOpacity);
             }
         }
+		image.fileName("\0");
+		image.x11Display(getenv("DISPLAY"));
         return image;
     }
     catch(exception &error_) {
