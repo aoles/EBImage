@@ -39,6 +39,7 @@
 \alias{toRGB,ANY-method}
 \alias{toX11char,Image-method}
 \alias{toX11char,ANY-method}
+\alias{tile,Image,numeric-method}
 
 \title{
     Internals

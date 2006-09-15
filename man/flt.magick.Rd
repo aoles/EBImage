@@ -25,7 +25,7 @@
             \code{mOpen}, \code{mClose}}
         \item{\code{\link{Color filters}}:}{\code{\link{normalize}}, \code{contrast}, \code{equalize},
             \code{colorGamma}, \code{mod}, \code{shade}, \code{solarize}}
-        \item{\code{\link{Transformation}}:}{\code{rotate}, \code{sample.image}}
+        \item{\code{\link{Transformation}}:}{\code{rotate}, \code{sample.image}, \code{tile}}
     }
 }
 

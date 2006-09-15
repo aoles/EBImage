@@ -5,6 +5,7 @@
 \alias{sample.image}
 \alias{zoom.image}
 \alias{trim}
+\alias{tile}
 
 \concept{image transformation}
 \concept{image processing}
@@ -22,6 +23,7 @@
     sample.image(x, dx, dy)
     zoom.image(x, dx, dy)
     trim(x, bg = 0)
+    tile(x, width, ...)
 }
 
 \arguments{
@@ -30,11 +32,15 @@
     \item{dx}{New image width to fit in.}
     \item{dy}{New image height to fit in.}
     \item{bg}{Background color shade to trim.}
+    \item{width}{An integer value for the number of image in a row of a tiled image.}
+    \item{...}{Further arguments for \code{tile} -- \code{fg} for foreground colour (default 
+    "yellow") and \code{bg} for background (default "black"). Colours can be specified
+    as gray levels in the range [0,1] or as integer representations of RGB (like in
+    RGB images) or as X11 string, e.g. "red" or "\#5522ee".}
 }
 
 \value{
-    A new instance of class \code{\link{Image}}
-    with the same characteristics as the original, but with filter applied.
+    A new instance of class \code{\link{Image}} and filter applied.
 }
 
 \details{
@@ -44,7 +50,13 @@
     
     Functions \code{zoom.image} and \code{trim} have not been tested yet - they are
     1:1 wrappers around corresponding Magick++ functions, please refer to ImageMagick
-    documentation pages for further help.}
+    documentation pages for further help.
+    
+    \code{tile} takes an image stack and arranges all images of this stack on a single 
+    2D image in a tiled manner with \code{width} number of images in a row. The number
+    of images in columns is automatically evaluated from \code{width} and the total
+    number of images. 
+}
 
 \seealso{
    \code{\link{Image}}, \code{\link{Filters 2D}}
