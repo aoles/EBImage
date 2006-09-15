@@ -23,5 +23,5 @@ exportMethods(
     as.array, summary, "[", show, print, plot.image,
 
     toGray, toRGB, toX11char, toRed, toGreen, toBlue, getRed, getGreen, getBlue, 
-    add2RGB, sub2RGB, scale2RGB
+    add2RGB, sub2RGB, scale2RGB, tile
 )

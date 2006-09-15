@@ -515,6 +515,41 @@ setMethod("write.image", signature(object = "Image", files = "character"),
         invisible(.CallEBImage("writeImages", object, files))
     }
 )
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod("tile", signature(x = "Image", width = "numeric"),
+	function(x, width = 5, fg = "yellow", bg = "black", ...) {
+		width = width[1]
+		if (width <= 0)
+			stop("width must be a positive integer")
+		.dim <- dim(x)
+		if (length(.dim) != 3)
+			stop("function can be applied to 3D images only")
+		if (.dim[3] == 1)
+			return(x)
+		nrow <- as.integer((.dim[3] - 1) / width) + 1
+		if (x@rgb) {
+			fg <- toRGB(fg)
+			bg <- toRGB(bg)
+		}
+		else {
+			fg <- toGray(fg)
+			bg <- toRGB(bg)
+		}
+		res <- Image(fg, c((.dim[1] + 1) * width - 1, (.dim[2] + 1) * nrow - 1, 1), rgb = x@rgb)
+		for (i in 1:width) 
+			for (j in 1:nrow) {
+					starti <- (i-1) * (.dim[1] + 1) + 1
+					endi <- starti + .dim[1] - 1
+					startj <- (j-1) * (.dim[2] + 1) + 1
+					endj <- startj + .dim[2] - 1
+				if (i + (j-1) * width <= .dim[3])
+					res[starti:endi, startj:endj, 1] <- x[,, i + (j-1) * width]
+				else
+					res[starti:endi, startj:endj, 1] <- bg
+			}
+		return(res)
+	}
+)
 # ============================================================================
 # ASSOCIATED ROUTINES
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
