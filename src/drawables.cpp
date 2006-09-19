@@ -68,7 +68,17 @@ SEXP drawShapes(SEXP rimage, SEXP drawable) {
         }
         switch(shape) {
             case 1: {
-                error("not implemented yet");
+				objects.push_back(DrawableTextAntialias(true));
+				SEXP labelSlot = GET_SLOT(drawable, mkString("label"));
+				int nobjects = LENGTH(dataSlot) / 2;
+				double x, y;
+				char * str;
+				for (int i = 0; i < nobjects; i++) {
+					x = data[i];
+					y = data[i + nobjects];
+					str = CHAR(STRING_ELT(labelSlot, i));
+					objects.push_back(DrawableText(x, y, str));
+				}				
             }; break;
             /* circle */
             case 2: {
