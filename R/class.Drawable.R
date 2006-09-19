@@ -120,6 +120,30 @@ DrawableEllipse <-function(x1, y1, x2, y2, sgrad = 0, egrad = 360) {
     }
     return(new("DrawableEllipse", x = matrix(c(x1, y1, x2, y2, sgrad, egrad), ncol = 6, nrow = length(x1))))
 }
+# ============================================================================
+setClass("DrawableText",
+    contains = "Drawable",
+    representation(
+		label       = "character"
+	),   
+    prototype(
+        x           = matrix(0, ncol = 2, nrow = 1),
+		label       = "undefined"
+    ),
+    validity = function(object) {
+        if (dim(object@x)[2] != 2) return(FALSE)
+		if (dim(object@x)[1] != length(object@label)) return(FALSE)
+		return(TRUE)
+    }
+)
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+DrawableText <- function(x, y, label) {
+    if (missing(x) || missing(y) || missing(label))
+        stop("Please x-y coordinates and labels")
+    if (length(x) != length(y) || length(x) != length(label))
+        stop("Vectors of coordinates and labels must be of the same length")
+    return(new("DrawableText", x = matrix(c(x, y), ncol = 2, nrow = length(x)), label = label))
+}
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # FOR INTERNAL USE BY THE DEVELOPERS ONLY (segmentation fault risk!)
 .draw <- function(x, drawable, modify = TRUE) {

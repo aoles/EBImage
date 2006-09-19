@@ -7,13 +7,13 @@
 \alias{DrawableRect}
 \alias{DrawableEllipse}
 \alias{DrawableLine}
-%\alias{DrawableText}
+\alias{DrawableText}
 \alias{Drawable-class}
 \alias{DrawableCircle-class}
 \alias{DrawableRect-class}
 \alias{DrawableEllipse-class}
 \alias{DrawableLine-class}
-%\alias{DrawableText-class}
+\alias{DrawableText-class}
 
 \concept{image analysis}
 \concept{image processing}
@@ -37,6 +37,7 @@
         \item{\code{DrawableRect(x1, y1, x2, y2)}:}{Default constructor for rectangles.}
         \item{\code{DrawableEllipse(x1, y1, x2, y2, sgrad = 0, egrad = 360)}:}{Default constructor for ellipses.}
         \item{\code{DrawableLine(x1, y1, x2, y2)}:}{Default constructor for lines.}
+        \item{\code{DrawableText(x, y, label)}:}{Ouputs text labels.}
     }
 }
 
