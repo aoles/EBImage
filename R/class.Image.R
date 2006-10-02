@@ -550,6 +550,15 @@ setMethod("tile", signature(x = "Image", width = "numeric"),
 		return(res)
 	}
 )
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod("entropy", signature(x = "Image"),
+	function(x, ...) {
+		## in tools.R
+		if (!x@rgb)
+			return(entropy(x@.Data))
+		return(entropy(toGray(x)@.Data))
+	}
+)
 # ============================================================================
 # ASSOCIATED ROUTINES
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
