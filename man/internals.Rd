@@ -40,6 +40,8 @@
 \alias{toX11char,Image-method}
 \alias{toX11char,ANY-method}
 \alias{tile,Image,numeric-method}
+\alias{entropy,ANY-method}
+\alias{entropy,Image-method}
 
 \title{
     Internals
