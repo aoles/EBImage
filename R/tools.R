@@ -18,22 +18,25 @@
 # -------------------------------------------------------------------------
 
 setMethod("entropy", signature(x = "ANY"),
-	function(x, ...) {
+	function(x, n=512, method="hist", ...) {
 		N <- length(x)
-		if (N <= 1) return(0)
-#		if (N < 1000 || sd(x) == 0) {
-#			Px <- hist(x, 512, plot=FALSE)$counts / N
-#			warning("'hist' is used to evaluate densities instead of 'density'")
-#		}
-#		else {
-			dens <- density(x)#, adjust=0.01)
-			npts <- length(dens$y) - 1
-			Px <- dens$y[1:npts] * diff(dens$x)
-#		}
+		if (N <= 1) {
+		    warning("too few observations (< 2), entropy is zero")
+		    return(0)
+		}
+		if (sd(x) == 0) {
+		    warning("no variation in data, entropy is zero")
+    		return(0)
+		}
+        if (method[1] == "hist") {
+			Px <- hist(x, breaks=n, plot=FALSE, ...)$counts / N
+		}
+		else {
+			dens <- density(x, n=n, ...)
+			Px <- dens$y[1:(n-1)] * diff(dens$x)
+		}
 		Px <- Px[Px > 0]
-		if (length(Px) > 0)
-			return(-sum(Px * log2(Px)))
-		else
-			return(0)
+		if (length(Px) == 0) return(0)
+    	return(-sum(Px * log2(Px)))
 	}
 )

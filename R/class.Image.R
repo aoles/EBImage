@@ -552,11 +552,15 @@ setMethod("tile", signature(x = "Image", width = "numeric"),
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("entropy", signature(x = "Image"),
-	function(x, ...) {
-		## in tools.R
-		if (!x@rgb)
-			return(entropy(x@.Data))
-		return(entropy(toGray(x)@.Data))
+	function(x, n=512, method="hist", ...) {
+	    if (x@rgb) x <- toGray(x)
+	    nvals <- dim(x)[3]
+        if (nvals == 1)
+    		## in tools.R
+            return(entropy(x@.Data, n, method, ...))	    
+        res <- numeric(nvals)
+        for (i in 1:nvals) res[i] <- entropy((x[,,i])@.Data, n, method, ...)
+        return(res)
 	}
 )
 # ============================================================================
