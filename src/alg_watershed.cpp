@@ -12,9 +12,9 @@ See: alg_watershed.h for license
 #include <vector>
 #include <iostream>
 
-const int OBJ_NCOL = 6; // number of columns in the 'objects' matrix of ws return
+const int OBJ_NCOL = 12; // number of columns in the 'objects' matrix of ws return
 const double BG = 0;
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  this class represents and stores one single detected object, indices of
  its pixels in 'pixels', indices or borders in 'borders' and of those on
  the image edges in 'edges'. ok indicates if the object should be deleted
@@ -136,7 +136,7 @@ SEXP ws_objects(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
             double * val = &(REAL(objMtx[i])[0]);
             /* put values into the object matrix and update maxs */
             for (int j = 0; j < nobj; j++) {
-                Point ci = objects[j].centre();                
+                Point ci = objects[j].centre();
                 val[j           ] = ci.x;
                 val[j +     nobj] = ci.y;
                 val[j + 2 * nobj] = objects[j].pixels.size();
@@ -151,6 +151,53 @@ SEXP ws_objects(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
                 if (objects[j].borders.size() > maxbrd)
                     maxbrd = objects[j].borders.size();
                 val[j + 5 * nobj] = objects[j].edges.size();
+
+                /* calculate further descriptors: modify OBJ_NCOL = 6 if not included */
+                /* 1. effective radius, effr */
+                double effr = sqrt(objects[j].pixels.size() / M_PI);
+                val[j + 6 * nobj] = effr;
+                /* 2. ratio of pixels beyond the effr, farpix */
+                /* 3. ratio of intensity beyond the effr to total intensity */
+                double farpix = 0;
+                double farint = 0;
+                for (unsigned k = 0; k < objects[j].pixels.size(); k++)
+                    if (dist(objects[j].pixels[k], ci) > effr) {
+                        farpix += 1.0;
+                        if (refdata)
+                            farint += refdata[getindex(objects[j].pixels[k], size.x)];
+                    }
+                if (objects[j].pixels.size() > 0)
+                    farpix /= objects[j].pixels.size();
+                if (intens > 0)
+                    farint /= intens;
+                val[j + 7 * nobj] = farpix;
+                val[j + 8 * nobj] = farint;
+                /* 4. mean distance to perimeter pts by effr*/
+                double permean = 0;
+                for (unsigned k = 0; k < objects[j].borders.size(); k++)
+                    permean += dist(objects[j].borders[k], ci);
+                if (objects[j].borders.size() > 0)
+                    permean /= objects[j].borders.size();
+                if (effr > 0)
+                    val[j + 9 * nobj] = permean / effr;
+                else
+                    val[j + 9 * nobj] = permean;
+                /* 5. perimeter pt distance sd by effr */
+                double persd = 0;
+                for (unsigned k = 0; k < objects[j].borders.size(); k++) {
+                    double bdist = dist(objects[j].borders[k], ci) - permean;
+                    persd += bdist * bdist;
+                }
+                if (objects[j].borders.size() > 0)
+                    persd = sqrt(persd / objects[j].borders.size());
+                if (effr > 0)
+                    persd /= effr;
+                val[j + 10 * nobj] = persd;
+                /* 6. per/2p by effr */
+                if (effr > 0)
+                    val[j + 11 * nobj] = objects[j].borders.size() / effr / (2.0 * M_PI);
+                else
+                    val[j + 11 * nobj] = 0.0;
             }
             /* create matrix of pixel indexes with max size */
             PROTECT(pxsDim[i] = allocVector(INTSXP, 2));
@@ -215,7 +262,7 @@ SEXP ws_objects(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
         error(error_.what());
     }
     if (nprotect > 0)
-        UNPROTECT(nprotect);  
+        UNPROTECT(nprotect);
     return res;
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -260,7 +307,7 @@ SEXP ws_paint(SEXP x, SEXP img, SEXP cols, SEXP dofill, SEXP doborders, SEXP opa
                 int index;
                 for (int j = 0; j < nobj; j++) {
                     for (int k = 0; k < npxs; k++)
-                        if ((index = pixels[j + k * nobj]) != NA_INTEGER) 
+                        if ((index = pixels[j + k * nobj]) != NA_INTEGER)
                             imgdata[index] += newcol[j];
                 }
                 delete[] newcol;
@@ -271,7 +318,7 @@ SEXP ws_paint(SEXP x, SEXP img, SEXP cols, SEXP dofill, SEXP doborders, SEXP opa
                 int index;
                 for (int j = 0; j < nobj; j++) {
                     for (int k = 0; k < nbrd; k++)
-                        if ((index = borders[j + k * nobj]) != NA_INTEGER) 
+                        if ((index = borders[j + k * nobj]) != NA_INTEGER)
                             imgdata[index] = col[j];
                 }
             }
@@ -282,7 +329,7 @@ SEXP ws_paint(SEXP x, SEXP img, SEXP cols, SEXP dofill, SEXP doborders, SEXP opa
     }
     return img;
 }
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  creates stacks of images of objects from the ws function, uses img as reference
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 SEXP ws_images(SEXP x, SEXP img) {
@@ -356,7 +403,7 @@ SEXP ws_images(SEXP x, SEXP img) {
             for (j = 0; j < nobj; j++) {
                 // TODO bg color to add here
                 MagickImage image(Geometry(dx + 1, dy + 1), "black");
-                
+
                 int ddx = (min[j].x + max[j].x - dx) / 2; // x' = x - ddx
                 int ddy = (min[j].y + max[j].y - dy) / 2; // y' = y - ddy
                 int index;
@@ -370,7 +417,7 @@ SEXP ws_images(SEXP x, SEXP img) {
                     pt = getpoint(index, size.x);
                     pt.x = pt.x - ddx;
                     pt.y = pt.y - ddy;
-                    image.pixelColor(pt.x, pt.y, dot.pixelColor(0, 0));                                   
+                    image.pixelColor(pt.x, pt.y, dot.pixelColor(0, 0));
                 }
                 image.opacity(OpaqueOpacity);
                 if (rgb)
@@ -395,10 +442,10 @@ SEXP ws_images(SEXP x, SEXP img) {
         error(error_.what());
     }
     if (nprotect > 0)
-        UNPROTECT(nprotect);  
+        UNPROTECT(nprotect);
     return res;
 }
-/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  runs watershed detection algorithm for the data of a single image,
  returns results in objects
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
@@ -413,7 +460,7 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
     /* DistMap will be negated (-1*) and this is its minimum value then */
     int mindata = 0;
     /* negate data: BG will be 0, positive will be index of objects */
-    /* this conversion to int is needed to ensure that when we later on go by incrememting d by 1 we 
+    /* this conversion to int is needed to ensure that when we later on go by incrememting d by 1 we
        do not miss values between 0 and 1, i,e, we set 0 = 0, 0.x = 1 */
     for (i = 0; i < npts; i++) {
         data[i] = -ceil(data[i]);
@@ -429,9 +476,9 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
     /* note: d's are negative */
     for (int d = mindata; d < 0; d++) {
         /* help variables for loops t ospeed them up, c-style, but fast */
-/*        Point pti, objcentre; 
+/*        Point pti, objcentre;
         bool seeded, edgypt; double objdist, objdist0, val;
-        int ix, iy, objind, perimeterpt; 
+        int ix, iy, objind, perimeterpt;
         unsigned int objind0, io;
 */
         /* main sub-loop through indexes that left */
@@ -479,14 +526,14 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
                         /* if it is not the first object - it is also a perimeter point */
                         if (seeded >= 0) {
                             border = true;
-                            // add a border point to the object we do not consider any more 
+                            // add a border point to the object we do not consider any more
                             objects[seeded].borders.push_back(pti);
                         }
                         seeded = objind;
                     }
                 } /* iy */
             } /* ix */
-            /* it is not neighbouring any object, but maube it is close enough anyway 
+            /* it is not neighbouring any object, but maybe it is close enough anyway
                THE ABOVE IS much FASTER, therefore this is only run if the above does not
                show anything */
             if (seeded < 0) {
@@ -498,15 +545,15 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
                         seededdist = objdist;
                         if (seeded >= 0) {
                             border = true;
-                            // add a border point to the object we do not consider any more 
+                            // add a border point to the object we do not consider any more
                             objects[seeded].borders.push_back(pti);
                         }
                         seeded = j;
                     }
-                }      
+                }
             }
             if (seeded < 0) {
-                /* start a new object if its radius (determined by the highest dm value) 
+                /* start a new object if its radius (determined by the highest dm value)
                    is larger than minradius and if we are allowed to create new seeds */
                 if (fabs(data[iindex]) >= minradius && !noNewObjects) {
                     objects.push_back(TheFeature());
@@ -530,10 +577,10 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
             /* puts last element instead of this, removes last and keeps i  */
             pxs[i] = pxs.back();
             pxs.pop_back();
-        } // i 
+        } // i
     } // d
     if (objects.size() < 1) return;
-    /* mark small and edgy objects */ 
+    /* mark small and edgy objects */
     for (i = 0; i < objects.size(); i++) {
         if (objects[i].borders.size() == 0) {
             objects[i].ok = false;
@@ -546,7 +593,7 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
         if (objects[i].pixels.size() < M_PI * minradius * minradius)
             objects[i].ok = false;
     }
-    /* at this point currently detected border pixels played their role and 
+    /* at this point currently detected border pixels played their role and
     are deleted, they are redetected more accurately at the end */
     for (i = 0; i < objects.size(); i++)
         objects[i].borders.clear();
@@ -565,8 +612,8 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
                     /* combine j into i and delete j */
                     combiFound = true;
                     objects[j].ok = false;
-                    /* mark image part of the old object with the new number - 
-                    does not matter it will not correspond to the object later 
+                    /* mark image part of the old object with the new number -
+                    does not matter it will not correspond to the object later
                     (when objects are reshuffled) - it will be unique and we
                     need a unique number to map the borders */
                     Point ptk;
@@ -595,10 +642,40 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
         objects[i] = objects.back();
         objects.pop_back();
     }
-    /* redetect borders: pay attention - image now has numbers that do not 
+    /* reset pixels that have less than 2 neighbouring pixels in main dirs
+    to remove long 1-pixel tails*/
+    for (i = 0; i < objects.size(); i++) {
+        Point ptj, tmp; double val; int nnghb;
+        vector<Point>::iterator it = objects[i].pixels.begin();
+        do {
+            ptj = *it;
+            val = data[getindex(ptj, size.x)];
+            nnghb = 0;
+            tmp = ptj;
+            tmp.x = ptj.x - 1;
+            if (tmp.x >= 0)
+                if (data[getindex(tmp, size.x)] == val) nnghb += 1;
+            tmp.x = ptj.x + 1;
+            if (tmp.x < size.x)
+                if (data[getindex(tmp, size.x)] == val) nnghb += 1;
+            tmp = ptj;
+            tmp.y = ptj.y - 1;
+            if (tmp.y >= 0)
+                if (data[getindex(tmp, size.x)] == val) nnghb += 1;
+            tmp.y = ptj.y + 1;
+            if (tmp.y < size.y)
+                if (data[getindex(tmp, size.x)] == val) nnghb += 1;
+            if (nnghb < 2) {
+                data[getindex(ptj, size.x)] = 0;
+                it = objects[i].pixels.erase(it);
+            }
+            else it++;
+        } while (it != objects[i].pixels.end());
+    }
+    /* redetect borders: pay attention - image now has numbers that do not
     correspond to object indecies, but they are unique */
     for (i = 0; i < objects.size(); i++) {
-        Point ptj; double val;
+        Point ptj; double val; int nnghb;
         for (j = 0; j < objects[i].pixels.size(); j++) {
             ptj = objects[i].pixels[j];
             val = data[getindex(ptj, size.x)];
@@ -624,5 +701,5 @@ void doWatershed(double * data, Point & size, double mindist, double minradius, 
                 }
         }
     }
-    // result is returned in objects 
-} 
+    // result is returned in objects
+}

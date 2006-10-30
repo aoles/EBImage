@@ -1,17 +1,17 @@
 # -------------------------------------------------------------------------
 # Watershed algorithm of object detection
 # Bundled with src/alg_watershed.{h,cpp}
- 
+
 # Copyright (c) 2006 Oleg Sklyar
 
 # This library is free software; you can redistribute it and/or
-# modify it under the terms of the GNU Lesser General Public License 
+# modify it under the terms of the GNU Lesser General Public License
 # as published by the Free Software Foundation; either version 2.1
-# of the License, or (at your option) any later version.          
+# of the License, or (at your option) any later version.
 
 # This library is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 # See the GNU Lesser General Public License for more details.
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
@@ -54,6 +54,12 @@
     if (!modify)
         x <- copy(x)
     res <- .CallEBImage("ws_objects", x, ref, seeds, c(mind, minr, ef))
+    dnames <- c("x", "y", "size", "int", "per", "edge", "effr", "acirc", "acircint", "extmean", "extsd", "per2pr")
+    if (nimg == 1)
+        colnames(res$objects) <- dnames
+    else {
+        for (i in 1:nimg) colnames(res[[i]]$objects) <- dnames
+    }
     return(res)
 }
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -98,9 +104,9 @@ wsPaint <- function(wsres, ref, opac=0.2, col="default", fill=TRUE, brds=TRUE) {
         if (nobj > 0) {
             mcol <- colRamp(((1:nobj) - 1) / (nobj - 1)) / 256
             cols[[i]] <- toRed(mcol[,1]) + toGreen(mcol[,2]) + toBlue(mcol[,3])
-        } 
-        else 
-            cols[[i]] = NULL    
+        }
+        else
+            cols[[i]] = NULL
     }
     fill <- as.logical(fill)
     brds <- as.logical(brds)
@@ -108,7 +114,7 @@ wsPaint <- function(wsres, ref, opac=0.2, col="default", fill=TRUE, brds=TRUE) {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Returns images for objects determined by ws function - a list of image stacks 
+# Returns images for objects determined by ws function - a list of image stacks
 # with one object per image
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 wsImages <- function(wsres, ref) {
