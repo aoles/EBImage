@@ -55,6 +55,7 @@
         x <- copy(x)
     res <- .CallEBImage("ws_objects", x, ref, seeds, c(mind, minr, ef))
     dnames <- c("x", "y", "size", "int", "per", "edge", "effr", "acirc", "acircint", "extmean", "extsd", "per2pr")
+    if (!is.list(res)) return(res)
     if (nimg == 1)
         colnames(res$objects) <- dnames
     else {
