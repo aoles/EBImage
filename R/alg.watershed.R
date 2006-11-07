@@ -44,7 +44,7 @@
             seeds <- NULL
         }
         if (nimg > 1) {
-            if (!is.list(seeds) || length(seeds)) {
+            if (!is.list(seeds) || length(seeds) != nimg) {
                 cat("'seeds' must be a list of 2D numeric matrices for a stack of images of the same length as the stack size. Ignoring 'seeds'\n")
                 seeds <- NULL
             }
