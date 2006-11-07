@@ -39,10 +39,25 @@
     }
     nimg <- dim(x)[[3]]
     if (!is.null(seeds)) {
-        if (nimg == 1 && !is.matrix(seeds))
-            stop("'seeds' must be a 2D numeric matrix for a single 2D image")
-        if (nimg > 1 && !is.list(seeds))
-            stop("'seeds' must be a list of 2D numeric matrices for a stack of images")
+        if (nimg == 1 && (!is.matrix(seeds) || is.integer(seeds))) {
+            cat("'seeds' must be a 2D numeric matrix for a single 2D image. Ignoring 'seeds'\n")
+            seeds <- NULL
+        }
+        if (nimg > 1) {
+            if (!is.list(seeds) || length(seeds)) {
+                cat("'seeds' must be a list of 2D numeric matrices for a stack of images of the same length as the stack size. Ignoring 'seeds'\n")
+                seeds <- NULL
+            }
+            else {
+                for (i in 1:length(seeds))
+                    if (!is.matrix(seeds[[i]]) || is.integer(seeds[[i]])) {
+                        cat("'seeds' must be a list of 2D numeric matrices. Ignoring 'seeds'\n")
+                        seeds <- NULL
+                        break
+                    }
+            }
+        }
+
     }
     mind <- as.double(mind)
     minr <- as.double(minr)
