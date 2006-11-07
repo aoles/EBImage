@@ -251,6 +251,7 @@ SEXP ws_objects(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
             res = items[0];
         /* clenup */
         delete[] items;
+        delete[] names;
         delete[] objMtx;
         delete[] objDim;
         delete[] pxsMtx;
