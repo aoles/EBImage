@@ -32,6 +32,11 @@ class TheFeature {
         };
         Point centre() {
             int ps = pixels.size();
+            if (ps <= _ind) {
+                _ind = -1;
+                _centre.x = 0;
+                _centre.y = 0;
+            }
             if (ps > _ind + 1)
                 for (int i = _ind + 1; i < ps; i++) {
                     _centre.x += pixels[i].x;
@@ -109,7 +114,8 @@ SEXP ws_objects(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
                 int npts = LENGTH(iseeds) / 2;
                 for (int j = 0; j < npts; j++) {
                     objects.push_back(TheFeature());
-                    objects[j].pixels.push_back(Point((int)pts[j], (int)pts[j + npts]));
+                    /* fixed -- added -1 in both because R uses 1-based indexing */
+                    objects[j].pixels.push_back(Point((int)pts[j] - 1, (int)pts[j + npts] -1));
                 }
             }
             /* get pointer to image data for ith image */
@@ -137,21 +143,29 @@ SEXP ws_objects(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
             /* put values into the object matrix and update maxs */
             for (int j = 0; j < nobj; j++) {
                 Point ci = objects[j].centre();
-                val[j           ] = ci.x;
-                val[j +     nobj] = ci.y;
+                /* important to add +1 since R uses 1-based indexing */
+                val[j           ] = ci.x + 1;
+                val[j +     nobj] = ci.y + 1;
                 val[j + 2 * nobj] = objects[j].pixels.size();
                 if (objects[j].pixels.size() > maxpxs)
                     maxpxs = objects[j].pixels.size();
                 double intens = 0;
                 if (refdata)
-                    for (unsigned int k = 0; k < objects[j].pixels.size(); k++)
-                        intens += refdata[getindex(objects[j].pixels[k], size.x)];
+                    for (unsigned int k = 0; k < objects[j].pixels.size(); k++) {
+                        if (i == 3) {
+                        }
+                        /* just to be sure we check index range, although it MUST be in the range */
+                        unsigned int kind = getindex(objects[j].pixels[k], size.x);
+                        if (kind >= size.x * size.y)
+                            cout << "Not so bad for now, but inform the developer that wsObjects still produces pixels outside of image bounds\n";
+                        else
+                            intens += refdata[kind];
+                    }
                 val[j + 3 * nobj] = intens;
                 val[j + 4 * nobj] = objects[j].borders.size();
                 if (objects[j].borders.size() > maxbrd)
                     maxbrd = objects[j].borders.size();
                 val[j + 5 * nobj] = objects[j].edges.size();
-
                 /* calculate further descriptors: modify OBJ_NCOL = 6 if not included */
                 /* 1. effective radius, effr */
                 double effr = sqrt(objects[j].pixels.size() / M_PI);
@@ -163,8 +177,13 @@ SEXP ws_objects(SEXP rimage, SEXP ref, SEXP seeds, SEXP params) {
                 for (unsigned k = 0; k < objects[j].pixels.size(); k++)
                     if (dist(objects[j].pixels[k], ci) > effr) {
                         farpix += 1.0;
-                        if (refdata)
-                            farint += refdata[getindex(objects[j].pixels[k], size.x)];
+                        if (refdata) {
+                            unsigned int kind = getindex(objects[j].pixels[k], size.x);
+                            if (kind >= size.x * size.y)
+                                cout << "Not so bad for now, but inform the developer that wsObjects still produces pixels outside of image bounds\n";
+                            else
+                                farint += refdata[kind];
+                        }
                     }
                 if (objects[j].pixels.size() > 0)
                     farpix /= objects[j].pixels.size();

@@ -22,7 +22,7 @@ Point:: Point(const Point& obj) {
 }
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 Point getpoint(const int & index, const int & xsize) {
-    Point res(0, index / xsize);
+    Point res(0, (int)floor(index / xsize));
     res.x = index - res.y * xsize;
     return res;
 }
