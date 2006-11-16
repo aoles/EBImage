@@ -1,16 +1,16 @@
 # -------------------------------------------------------------------------
 # Class Image, definition and methods
- 
+
 # Copyright (c) 2005 Oleg Sklyar
 
 # This library is free software; you can redistribute it and/or
-# modify it under the terms of the GNU Lesser General Public License 
+# modify it under the terms of the GNU Lesser General Public License
 # as published by the Free Software Foundation; either version 2.1
-# of the License, or (at your option) any later version.          
+# of the License, or (at your option) any later version.
 
 # This library is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 # See the GNU Lesser General Public License for more details.
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
@@ -110,11 +110,12 @@ setMethod("copy", signature(x = "Image"),
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("display", signature(object = "Image"),
-    function(object) {
+    function(object, no.GTK=FALSE) {
+        no.GTK <- as.logical(no.GTK)
         if (!isCorrectType(object))
-            invisible(.CallEBImage("displayImages", correctType(object), FALSE))
+            invisible(.CallEBImage("displayImages", correctType(object), no.GTK))
         else
-            invisible(.CallEBImage("displayImages", object, FALSE))
+            invisible(.CallEBImage("displayImages", object, no.GTK))
     }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -517,51 +518,51 @@ setMethod("write.image", signature(object = "Image", files = "character"),
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("tile", signature(x = "Image", width = "numeric"),
-	function(x, width = 5, fg = "yellow", bg = "black", ...) {
-		width = width[1]
-		if (width <= 0)
-			stop("width must be a positive integer")
-		.dim <- dim(x)
-		if (length(.dim) != 3)
-			stop("function can be applied to 3D images only")
-		if (.dim[3] == 1)
-			return(x)
-		nrow <- as.integer((.dim[3] - 1) / width) + 1
-		if (x@rgb) {
-			fg <- toRGB(fg)
-			bg <- toRGB(bg)
-		}
-		else {
-			fg <- toGray(fg)
-			bg <- toRGB(bg)
-		}
-		res <- Image(fg, c((.dim[1] + 1) * width - 1, (.dim[2] + 1) * nrow - 1, 1), rgb = x@rgb)
-		for (i in 1:width) 
-			for (j in 1:nrow) {
-					starti <- (i-1) * (.dim[1] + 1) + 1
-					endi <- starti + .dim[1] - 1
-					startj <- (j-1) * (.dim[2] + 1) + 1
-					endj <- startj + .dim[2] - 1
-				if (i + (j-1) * width <= .dim[3])
-					res[starti:endi, startj:endj, 1] <- x[,, i + (j-1) * width]
-				else
-					res[starti:endi, startj:endj, 1] <- bg
-			}
-		return(res)
-	}
+    function(x, width = 5, fg = "yellow", bg = "black", ...) {
+        width = width[1]
+        if (width <= 0)
+            stop("width must be a positive integer")
+        .dim <- dim(x)
+        if (length(.dim) != 3)
+            stop("function can be applied to 3D images only")
+        if (.dim[3] == 1)
+            return(x)
+        nrow <- as.integer((.dim[3] - 1) / width) + 1
+        if (x@rgb) {
+            fg <- toRGB(fg)
+            bg <- toRGB(bg)
+        }
+        else {
+            fg <- toGray(fg)
+            bg <- toRGB(bg)
+        }
+        res <- Image(fg, c((.dim[1] + 1) * width - 1, (.dim[2] + 1) * nrow - 1, 1), rgb = x@rgb)
+        for (i in 1:width)
+            for (j in 1:nrow) {
+                    starti <- (i-1) * (.dim[1] + 1) + 1
+                    endi <- starti + .dim[1] - 1
+                    startj <- (j-1) * (.dim[2] + 1) + 1
+                    endj <- startj + .dim[2] - 1
+                if (i + (j-1) * width <= .dim[3])
+                    res[starti:endi, startj:endj, 1] <- x[,, i + (j-1) * width]
+                else
+                    res[starti:endi, startj:endj, 1] <- bg
+            }
+        return(res)
+    }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("entropy", signature(x = "Image"),
-	function(x, n=512, method="hist", ...) {
-	    if (x@rgb) x <- toGray(x)
-	    nvals <- dim(x)[3]
+    function(x, n=512, method="hist", ...) {
+        if (x@rgb) x <- toGray(x)
+        nvals <- dim(x)[3]
         if (nvals == 1)
-    		## in tools.R
-            return(entropy(x@.Data, n, method, ...))	    
+            ## in tools.R
+            return(entropy(x@.Data, n, method, ...))
         res <- numeric(nvals)
         for (i in 1:nvals) res[i] <- entropy((x[,,i])@.Data, n, method, ...)
         return(res)
-	}
+    }
 )
 # ============================================================================
 # ASSOCIATED ROUTINES
