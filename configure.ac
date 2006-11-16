@@ -20,16 +20,20 @@ else
     AC_MSG_ERROR("Cannot find ImageMagick (Magick++)")
 fi
 
-AC_CHECK_PROG(pkgfound, [pkg-config --cflags gtk+-2.0], yes, no)
+AC_CHECK_PROG(pkgfound, [pkg-config --version], yes, no)
 if test "$pkgfound" = "yes"; then
-    echo Compiling with GTK+ support
-    COMPILERFLAGS="`pkg-config --cflags gtk+-2.0`"
-    CXXFLAGS="-DUSEGTK ${COMPILERFLAGS} ${CXXFLAGS}"
-    LIBS="`pkg-config --libs gtk+-2.0`"
-    LIBS="${LIBS} ${LFLAGS}"
-    LFLAGS="${LIBS}"
-else
+    if `pkg-config --cflags gtk+-2.0 > /dev/null` ; then
+        echo Compiling with GTK+ support
+        COMPILERFLAGS="`pkg-config --cflags gtk+-2.0`"
+        CXXFLAGS="-DUSEGTK ${COMPILERFLAGS} ${CXXFLAGS}"
+        LIBS="`pkg-config --libs gtk+-2.0`"
+        LIBS="${LIBS} ${LFLAGS}"
+        LFLAGS="${LIBS}"
+    else
     echo Compiling without GTK+ support
+    fi
+else
+    echo Package Config not found
 fi
 
 if test -z "${R_HOME}"; then
