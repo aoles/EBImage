@@ -1702,8 +1702,8 @@ echo "$as_me: error: \"Cannot find ImageMagick (Magick++)\"" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
-# Extract the first word of "pkg-config --cflags gtk+-2.0", so it can be a program name with args.
-set dummy pkg-config --cflags gtk+-2.0; ac_word=$2
+# Extract the first word of "pkg-config --version", so it can be a program name with args.
+set dummy pkg-config --version; ac_word=$2
 { echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
 if test "${ac_cv_prog_pkgfound+set}" = set; then
@@ -1741,14 +1741,18 @@ fi
 
 
 if test "$pkgfound" = "yes"; then
-    echo Compiling with GTK+ support
-    COMPILERFLAGS="`pkg-config --cflags gtk+-2.0`"
-    CXXFLAGS="-DUSEGTK ${COMPILERFLAGS} ${CXXFLAGS}"
-    LIBS="`pkg-config --libs gtk+-2.0`"
-    LIBS="${LIBS} ${LFLAGS}"
-    LFLAGS="${LIBS}"
-else
+    if `pkg-config --cflags gtk+-2.0 > /dev/null` ; then
+        echo Compiling with GTK+ support
+        COMPILERFLAGS="`pkg-config --cflags gtk+-2.0`"
+        CXXFLAGS="-DUSEGTK ${COMPILERFLAGS} ${CXXFLAGS}"
+        LIBS="`pkg-config --libs gtk+-2.0`"
+        LIBS="${LIBS} ${LFLAGS}"
+        LFLAGS="${LIBS}"
+    else
     echo Compiling without GTK+ support
+    fi
+else
+    echo Package Config not found
 fi
 
 if test -z "${R_HOME}"; then
