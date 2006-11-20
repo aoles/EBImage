@@ -79,9 +79,9 @@ void mage_gtkDisplay(SEXP rimage) {
 }
 
 gboolean onWinDestroy(GtkWidget *, GdkEvent *, gpointer); // "destroy-event"
-gboolean onZoomInPress(GtkButton *, gpointer); // "button-press-event"
-gboolean onZoomOutPress(GtkButton *, gpointer); // "button-press-event"
-gboolean onZoomOnePress(GtkButton *, gpointer); // "button-press-event"
+gboolean onZoomInPress(GtkToolButton *, gpointer); // "button-press-event"
+gboolean onZoomOutPress(GtkToolButton *, gpointer); // "button-press-event"
+gboolean onZoomOnePress(GtkToolButton *, gpointer); // "button-press-event"
 //gboolean onZoomOutPress(GtkWidget *widget,GdkEventButton *event, gpointer user_data) // "button-press-event"
 
 struct TheWindow {
@@ -117,29 +117,48 @@ void theGtkDisplay(SEXP rimage) {
     winptr->img = GTK_IMAGE(img);
     winptr->gdkpx = gdkpx;
 
-    GtkWidget * btnZoomIn = gtk_button_new_with_label("Zoom in");
-    g_signal_connect(G_OBJECT(btnZoomIn), "pressed", G_CALLBACK(onZoomInPress), winptr);
-    GtkWidget * btnZoomOut = gtk_button_new_with_label("Zoom out");
-    g_signal_connect(G_OBJECT(btnZoomOut), "pressed", G_CALLBACK(onZoomOutPress), winptr);
-    GtkWidget * btnZoomOne = gtk_button_new_with_label("1:1");
-    g_signal_connect(G_OBJECT(btnZoomOne), "pressed", G_CALLBACK(onZoomOnePress), winptr);
-
+    // create general horizontal lyout with a toolbar and add it to the window
     GtkWidget * vbox = gtk_vbox_new (FALSE, 0);
-    GtkWidget * hbtnbox = gtk_hbutton_box_new ();
     gtk_container_add (GTK_CONTAINER (wnd), vbox);
-    gtk_box_pack_start (GTK_BOX (vbox), hbtnbox, FALSE, FALSE, 0);
-    gtk_container_add (GTK_CONTAINER (hbtnbox), btnZoomIn);
-    gtk_container_add (GTK_CONTAINER (hbtnbox), btnZoomOut);
-    gtk_container_add (GTK_CONTAINER (hbtnbox), btnZoomOne);
+    // create toolbar and push it to layout
+    GtkWidget * tbar = gtk_toolbar_new ();
+    gtk_box_pack_start (GTK_BOX (vbox), tbar, FALSE, FALSE, 0);
+    // create scrollbox that occupies and extends and push it to layout
     GtkWidget * scroll = gtk_scrolled_window_new (NULL, NULL);
-    gtk_scrolled_window_add_with_viewport ((GtkScrolledWindow *)scroll, img);
     gtk_box_pack_start (GTK_BOX (vbox), scroll, TRUE, TRUE, 5);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+
+    // FILL in toolbar
+//    gtk_toolbar_set_style (GTK_TOOLBAR (toolbar1), GTK_TOOLBAR_ICONS);
+    GtkIconSize icsize = gtk_toolbar_get_icon_size (GTK_TOOLBAR (tbar));
+    GtkWidget * btnZoomIn = (GtkWidget*) gtk_tool_button_new( gtk_image_new_from_stock("gtk-zoom-in", icsize), "Zoom in");
+    gtk_container_add (GTK_CONTAINER (tbar), btnZoomIn);
+    g_signal_connect(G_OBJECT(btnZoomIn), "clicked", G_CALLBACK(onZoomInPress), winptr);
+    GtkWidget * btnZoomOut = (GtkWidget*) gtk_tool_button_new( gtk_image_new_from_stock("gtk-zoom-out", icsize), "Zoom in");
+    gtk_container_add (GTK_CONTAINER (tbar), btnZoomOut);
+    g_signal_connect(G_OBJECT(btnZoomOut), "clicked", G_CALLBACK(onZoomOutPress), winptr);
+    GtkWidget * btnZoomOne = (GtkWidget*) gtk_tool_button_new( gtk_image_new_from_stock("gtk-yes", icsize), "Zoom in");
+    gtk_container_add (GTK_CONTAINER (tbar), btnZoomOne);
+    g_signal_connect(G_OBJECT(btnZoomOne), "clicked", G_CALLBACK(onZoomOnePress), winptr);
+
+    // FILL in scroll
+    gtk_scrolled_window_add_with_viewport (GTK_SCROLLED_WINDOW (scroll), img);
+
+
 
 //    gtk_container_add(GTK_CONTAINER (wnd), btnZoomIn);
 //    gtk_container_add(GTK_CONTAINER (wnd), img);
 
     // now let's add a callback that will unref the pixbuf when the window is closed, "destroy-event"
     g_signal_connect(G_OBJECT(wnd), "delete-event", G_CALLBACK(onWinDestroy), winptr);
+
+    int sw = gdk_screen_get_width( gdk_screen_get_default ());
+    int sh = gdk_screen_get_height( gdk_screen_get_default ());
+    int w = (dim[0] + 20 < sw - 20)?(dim[0] + 20):(sw - 20);
+    int h = (dim[1] + 80 < sh - 20)?(dim[1] + 80):(sh - 20);
+
+
+    gtk_window_resize (GTK_WINDOW(wnd), w, h);
 
     gtk_widget_show_all(wnd);
     gdk_flush();
@@ -153,7 +172,7 @@ gboolean onWinDestroy(GtkWidget * wnd, GdkEvent * event, gpointer winptr) {
     return FALSE;
 }
 
-gboolean onZoomInPress(GtkButton * btn, gpointer winptr) {
+gboolean onZoomInPress(GtkToolButton * btn, gpointer winptr) {
     TheWindow * winstruct = (TheWindow *)winptr;
     int w = gdk_pixbuf_get_width(gtk_image_get_pixbuf(winstruct->img));
     int h = gdk_pixbuf_get_height(gtk_image_get_pixbuf(winstruct->img));
@@ -165,7 +184,7 @@ gboolean onZoomInPress(GtkButton * btn, gpointer winptr) {
     return TRUE;
 }
 
-gboolean onZoomOutPress(GtkButton * btn, gpointer winptr) {
+gboolean onZoomOutPress(GtkToolButton * btn, gpointer winptr) {
     TheWindow * winstruct = (TheWindow *)winptr;
     int w = gdk_pixbuf_get_width(gtk_image_get_pixbuf(winstruct->img));
     int h = gdk_pixbuf_get_height(gtk_image_get_pixbuf(winstruct->img));
@@ -173,14 +192,14 @@ gboolean onZoomOutPress(GtkButton * btn, gpointer winptr) {
     GdkPixbuf * newpx = gdk_pixbuf_scale_simple(winstruct->gdkpx, (int)(w*0.8), (int)(h*0.8), GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(winstruct->img, newpx);
     g_object_unref(newpx);
-    gtk_window_resize (winstruct->wnd, 100, 20);
+//    gtk_window_resize (winstruct->wnd, 100, 20);
     gdk_flush();
     return TRUE;
 }
-gboolean onZoomOnePress(GtkButton * btn, gpointer winptr) {
+gboolean onZoomOnePress(GtkToolButton * btn, gpointer winptr) {
     TheWindow * winstruct = (TheWindow *)winptr;
     gtk_image_set_from_pixbuf(winstruct->img, winstruct->gdkpx);
-    gtk_window_resize (winstruct->wnd, 100, 20);
+//    gtk_window_resize (winstruct->wnd, 100, 20);
     gdk_flush();
     return TRUE;
 }
