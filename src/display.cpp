@@ -107,7 +107,7 @@ void theGtkDisplay(SEXP rimage) {
         image.write(0, 0, dim[0], dim[1], "RGBA", CharPixel, gdk_pixbuf_get_pixels(gdkpx));
     GtkWidget * wnd = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 //    gtk_container_set_border_width (GTK_CONTAINER (wnd), 10);
-    gtk_window_set_resizable(GTK_WINDOW(wnd), FALSE);
+//    gtk_window_set_resizable(GTK_WINDOW(wnd), FALSE);
 
     gtk_window_set_title(GTK_WINDOW(wnd), "GTK+ R-Image display");
     GtkWidget * img = gtk_image_new_from_pixbuf(gdkpx);
@@ -127,11 +127,13 @@ void theGtkDisplay(SEXP rimage) {
     GtkWidget * vbox = gtk_vbox_new (FALSE, 0);
     GtkWidget * hbtnbox = gtk_hbutton_box_new ();
     gtk_container_add (GTK_CONTAINER (wnd), vbox);
-    gtk_box_pack_start (GTK_BOX (vbox), img, TRUE, TRUE, 0);
     gtk_box_pack_start (GTK_BOX (vbox), hbtnbox, FALSE, FALSE, 0);
     gtk_container_add (GTK_CONTAINER (hbtnbox), btnZoomIn);
     gtk_container_add (GTK_CONTAINER (hbtnbox), btnZoomOut);
     gtk_container_add (GTK_CONTAINER (hbtnbox), btnZoomOne);
+    GtkWidget * scroll = gtk_scrolled_window_new (NULL, NULL);
+    gtk_scrolled_window_add_with_viewport ((GtkScrolledWindow *)scroll, img);
+    gtk_box_pack_start (GTK_BOX (vbox), scroll, TRUE, TRUE, 5);
 
 //    gtk_container_add(GTK_CONTAINER (wnd), btnZoomIn);
 //    gtk_container_add(GTK_CONTAINER (wnd), img);
