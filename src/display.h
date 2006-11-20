@@ -17,12 +17,6 @@ See the GNU Lesser General Public License for more details.
 LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 ------------------------------------------------------------------------- */
-#ifdef USEGTK
-    #include <gtk/gtk.h>
-    #include "R_ext/eventloop.h"
-    #include <gdk/gdkx.h>
-#endif
-
 #include "common.h"
 
 extern "C" {
