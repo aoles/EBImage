@@ -156,7 +156,7 @@ void theGtkDisplay(SEXP rimage) {
     int sh = gdk_screen_get_height( gdk_screen_get_default ());
     int w = (dim[0] + 20 < sw - 20)?(dim[0] + 20):(sw - 20);
     int h = (dim[1] + 80 < sh - 20)?(dim[1] + 80):(sh - 20);
-
+    if (w < 150) w = 150;
 
     gtk_window_resize (GTK_WINDOW(wnd), w, h);
 
