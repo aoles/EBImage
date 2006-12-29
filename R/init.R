@@ -1,4 +1,3 @@
-# -------------------------------------------------------------------------
 # Package initialization code
 
 # Copyright (c) 2006 Oleg Sklyar
@@ -15,30 +14,9 @@
 # See the GNU Lesser General Public License for more details.
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
-# -------------------------------------------------------------------------
-.CallEBImage <- function(name, ...) {
-    .Call(name, ..., PACKAGE = "EBImage")
-}
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-verboseEBImage <- function(verbose = TRUE) {
-    .CallEBImage("setVerbose", as.logical(verbose))
-    invisible(FALSE)
-}
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-updateEBImageDev <- function() {
-    install.packages("EBImage", repos="http://www.bioconductor.org/packages/1.9/bioc")
-    cat("\n\nPlease re-load the library!\n\n")
-}
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-updateEBImage <- function() {
-    install.packages("EBImage", repos="http://www.ebi.ac.uk/huber-srv/data/Rrepos")
-    cat("\n\nPlease re-load the library!\n\n")
-}
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-.onLoad <- function(lib, pkg) {
-    ## use useDynLib("EBImage") in NAMESPACE instead
-    ## library.dynam("EBImage", pkg, lib)
+.onLoad <- function (lib, pkg) {
     require("methods")
-    verboseEBImage(FALSE)
-    cat(paste("... EBImage", packageDescription("EBImage",fields="Version"),"...\n"))
+    require("utils")
+    cat ( paste("... EBImage", packageDescription("EBImage",fields="Version"), "...\n") )
 }

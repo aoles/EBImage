@@ -1,4 +1,3 @@
-# -------------------------------------------------------------------------
 # Class Image, definition and methods
 
 # Copyright (c) 2005 Oleg Sklyar
@@ -15,570 +14,506 @@
 # See the GNU Lesser General Public License for more details.
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
-# -------------------------------------------------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-setClass("Image",
-    representation(
-        rgb        = "logical"
+Grayscale <- as.integer (0)
+TrueColor  <- as.integer (1)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setClass ("Image",
+    representation (
+        colormode    = "integer",    ## 0 - gray, 1 - RGB etc
+        filename     = "character", 
+        compression  = "character",  ## 
+        resolution   = "numeric",    ## length = 2 ## lost in jpeg, pixels per inch
+        filter       = "character",  ## filter for sampling
+        features     = "list"
     ),
-    prototype(
-        rgb      = FALSE
+    prototype (
+        colormode    = Grayscale,
+        filename     = "no-name",
+        compression  = "LZW",     
+        resolution   = c(2.5e+6, 2.5e+6), ## 1 px per 1um in pixels per inch
+        filter       = "lanczos",
+        features     = list()
+        
     ),
     contains = "array"
 )
 
-# ============================================================================
-# generics for internal use only
-setGeneric(".normalize",    function(object, ...) standardGeneric(".normalize"))
-setGeneric(".as.integer",   function(x, ...)      standardGeneric(".as.integer"))
-setGeneric(".as.double",    function(x, ...)      standardGeneric(".as.double"))
-setGeneric("correctType",   function(object)      standardGeneric("correctType"))
-setGeneric("isCorrectType", function(object)      standardGeneric("isCorrectType"))
-
-# ============================================================================
-# CONSTRUCTORS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Image <- function(data = array(0, c(1, 1, 1)), dim = NULL, rgb = FALSE) {
-    if (is.null(dim)) {
-        if (!is.array(data))
-            stop("Convert data to array of 2 or 3 dimensions or specify argument dim")
-        dim = dim(data)
+Image <- function (data=0.5, dim=c(200,200), colormode=Grayscale, ...) {
+    if ( is.null(dim) ) {
+        if ( !is.array(data) )
+            stop ( .("supply dim or convert data to 2D or 3D array") )
+        dim = dim (data)
     }
-    if (length(dim) == 2)
-        dim <- c(dim, 1)
-    if (length(dim) != 3)
-        stop("Argument dim must be of length 2 (single images) or 3 (stacks)")
-    new("Image", rgb = rgb, .Data =
-      array(if (rgb) as.integer(data) else as.double(data), dim))
-}
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-is.validImage <- function(x) {
-    if (!is(x, "Image")) {
-        warning("Argument is not of class Image\n")
-        return(FALSE)
-    }
-    if (length(dim(x)) != 3) {
-        warning("Object class is Image, but data have wrong dimensionality: must be 3")
-        return(FALSE)
-    }
-    return(TRUE)
-}
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("assert", signature(object = "Image"),
-    function(object, object2, ...) {
-        if (missing(object2))
-            return(is.validImage(object))
-        if (!is.validImage(object) || !is.validImage(object2))
-            return(FALSE)
-        res <- TRUE
-        eq <- (dim(object) == dim(object2))
-        if (length(which(eq)) != 3) {
-            warning("Images have different sizes in one or several dimensions")
-            res <- FALSE
-        }
-        if (object@rgb != object2@rgb) {
-            warning("Images have different color modes")
-            res <- FALSE
-        }
-        return(res)
-    }
-)
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-.copyHeader <- function(x, newClass = "Image", rgb = FALSE) {
-    if (!assert(x))
-        stop("Wrong class of argument x, Image expected")
-    if (rgb)
-        res = new(newClass, .Data = integer(0), rgb = TRUE)
+    if ( length(dim) == 2 )
+        dim <- c (dim, 1)
+    if ( length(dim) != 3 )
+        stop( .("length(dim) must be 2 for single images or 3 for stacks") )
+    if (colormode == TrueColor)
+        return ( new("Image", colormode=TrueColor, .Data=array( as.integer(data), dim), ... ) )
     else
-        res = new(newClass, .Data = double(0), rgb = FALSE)
-    # copy all fields here except data and rgb
-    return(res)
+        return ( new("Image", colormode=Grayscale, .Data=array( as.double(data), dim), ... ) )
 }
 
-# ============================================================================
-# METHODS
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("copy", signature(x = "Image"),
+setMethod ("colorMode", signature (x="Image"),
+    function (x, ...) x@colormode
+)
+setReplaceMethod ("colorMode", signature (x="Image", value="numeric"),
+    function (x, ..., value) {
+        if ( value == x@colormode ) return (x)
+        if ( value == TrueColor ) return ( channel(x, "RGB") )
+        if ( value == Grayscale ) return ( channel(x, "gray") )
+        # on any other unsupported value
+        return (x)
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("features", signature (x="Image"),
+    function (x, ...) x@features
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("fileName", signature (x="Image"),
+    function (x, ...) x@filename
+)
+setReplaceMethod ("fileName", signature (x="Image", value="character"),
+    function (x, ..., value) {
+        x@filename <- value
+        return (x)
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("compression", signature (x="Image"),
+    function (x, ...) x@compression
+)
+setReplaceMethod ("compression", signature (x="Image", value="character"),
+    function (x, ..., value) {
+        value <- toupper (value)
+        if ( switch (EXPR=value, NONE=, LZW=, ZIP=, JPEG=, BZIP=, GROUP4=, FALSE, TRUE) )
+            stop ( .("wrong compression type. Please specify, NONE, LZW, ZIP, JPEG, BZIP or GROUP4") )
+        x@compression <- value
+        return (x)
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("resolution", signature (x="Image"),
+    function (x, ...) x@resolution
+)
+setReplaceMethod ("resolution", signature (x="Image", value="numeric"),
+    function (x, ..., value) {
+        if ( length(value) != 2 )
+            stop ( .("resolution attribute needs 2 values, for x and y in pixels per inch") )
+        if ( any( value <= 0 ) )
+            stop ( .("resolution must be positive") )
+        x@resolution <- value
+        return (x)
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("sampleFilter", signature (x="Image"),
+    function (x, ...) x@filter
+)
+setReplaceMethod ("sampleFilter", signature (x="Image", value="character"),
+    function (x, ..., value) {
+        value <- tolower (value)
+        if ( switch (EXPR=value, point=, box=, triangle=, hermite=, hanning=,
+                hamming=, blackman=, gaussian=, quadratic=, cubic=, catrom=, mitchell=, 
+                lanczos=, bessel=, sinc=FALSE, TRUE) )
+            stop ( paste( .("wrong filter type. Possible values are:"), "point, box, triangle, hermite, hanning, hamming, blackman, gaussian, quadratic, cubic, catrom, mitchell, lanczos, bessel, sinc") ) 
+        x@filter <- value
+        return (x)
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("imageData", signature (x="Image"),
+    function (x, ...) x@.Data
+)
+setReplaceMethod ("imageData", signature (x="Image", value="matrix"),
+    function (x, ..., value) {
+        dim (value) <- c( dim(value), 1)
+        x@.Data <- value
+        return (x)
+    }
+)
+setReplaceMethod ("imageData", signature (x="Image", value="array"),
+    function (x, ..., value) {
+        diml <- length ( dim(value) )
+        if ( diml < 2 || diml > 3 )
+            stop ( .("supplied array must be 2 or 3 dimensional") )
+        if ( diml == 2 )
+        dim (value) <- c( dim(value), 1)
+        x@.Data <- value
+        return (x)
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+is.Image <- function (x) {
+    if ( !is(x, "Image") ) return (FALSE)
+    if ( length( dim(x) ) != 3) return (FALSE)
+    return (TRUE)
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("assert", signature (x="Image", y="Image"),
+    function (x, y, strict=FALSE, ...) {
+        n <- 2
+        if ( !missing(strict) )
+            if ( strict )
+                n <- 3
+        if ( any( dim(x)[1:n] != dim(y)[1:n] ) || colorMode(x) != colorMode(y) ) return (FALSE)
+        return (TRUE)        
+    }
+)
+setMethod ("assert", signature (x="Image", y="missing"),
+    function (x, y, ...) is.Image (x)
+)
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+stopIfNotImage <- function (x) {
+    if ( !is(x, "Image") )
+        stop ( .("argument must be of class 'Image'") )
+    if ( length( dim(x) ) != 3)
+        stop ( .("array dimensions for the object of class 'Image' must be 3") )
+    invisible (NULL) 
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("header", signature(x="Image"),
+    function (x, ...) {
+        if ( x@colormode == TrueColor )
+            return ( new("Image", colormode=TrueColor, .Data=integer(0), filename=fileName(x),
+                compression=compression(x), resolution=resolution(x),
+                filter=sampleFilter(x), features=features(x) ) )
+        return ( new("Image", colormode=Grayscale, .Data=numeric(0), filename=fileName(x),
+            compression=compression(x), resolution=resolution(x),
+            filter=sampleFilter(x), features=features(x) ) )
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("copy", signature (x="Image"),
+    function (x, ...) {
+        res = header (x)
+        if ( x@colormode == TrueColor )
+            res@.Data = array (as.integer(x@.Data), dim(x@.Data) )
+        else
+            res@.Data = array (as.double(x@.Data), dim(x@.Data) )
+        return(res)
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod (".isCorrectType", signature(x="Image"),
+    function (x) {
+        if ( x@colormode == TrueColor && !is.integer(x) ) {
+            warning( .("RGB image data stored as numeric") )
+            return (FALSE)
+        }
+        if ( x@colormode == Grayscale && !is.double(x)) {
+            warning( .("grayscale image data stored as integer") )
+            return (FALSE)
+        }
+        return (TRUE)
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod (".correctType", signature(x="Image"),
     function(x) {
-        res = .copyHeader(x, class(x), rgb = x@rgb)
-        if (x@rgb)
-            res@.Data = array(as.integer(x@.Data), dim(x))
-        else
-            res@.Data = array(as.double(x@.Data), dim(x))
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("display", signature(object = "Image"),
-    function(object, no.GTK=FALSE) {
-        no.GTK <- as.logical(no.GTK)
-        if (!isCorrectType(object))
-            invisible(.CallEBImage("displayImages", correctType(object), no.GTK))
-        else
-            invisible(.CallEBImage("displayImages", object, no.GTK))
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("channels", signature(object = "Image"),
-    function(object) {
-        res = list();
-        if (!isCorrectType(object))
-            object = correctType(object)
-        res$red = getRed(object)
-        res$green = getGreen(object)
-        res$blue = getBlue(object)
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("toGray", signature(object = "Image"),
-    function(object) {
-        if (!object@rgb)
-            return(copy(object))
-        if (!isCorrectType(object))
-            tmp = .CallEBImage("any2gray", correctType(object))
-        else
-            tmp = .CallEBImage("any2gray", object)
-        res = .copyHeader(object, class(object), FALSE)
-        res@.Data = array(tmp, dim(object))
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("toRGB", signature(object = "Image"),
-    function(object) {
-        if (object@rgb)
-            return(copy(object))
-        if (!isCorrectType(object))
-            tmp = .CallEBImage("any2rgb", correctType(object))
-        else
-            tmp = .CallEBImage("any2rgb", object)
-        res = .copyHeader(object, class(object), TRUE)
-        res@.Data = array(tmp, dim(object))
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("toX11char", signature(object = "Image"),
-    function(object) {
-        return(.CallEBImage("any2X11char", object@.Data))
+        if ( x@colormode == TrueColor && !is.integer(x) )
+            x@.Data = array (as.integer(x@.Data), dim(x@.Data) )
+        if ( x@colormode == Grayscale && !is.double(x) )
+            x@.Data = array (as.double(x@.Data), dim(x@.Data) )
+        return (x)
     }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("add2RGB", signature(x = "Image", y = "ANY"),
-    function(x, y) {
-        if (length(y) != length(x))
-            stop("length mismatch")
-        if (!isCorrectType(x))
-            tmp = .CallEBImage("add2rgb", correctType(x), y)
-        else
-            tmp = .CallEBImage("any2rgb", x, y)
-        res = .copyHeader(x, class(x), TRUE)
-        res@.Data = array(tmp, dim(x))
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("sub2RGB", signature(x = "Image", y = "ANY"),
-    function(x, y) {
-        if (length(y) != length(x))
-            stop("length mismatch")
-        if (!isCorrectType(x))
-            tmp = .CallEBImage("sub2rgb", correctType(x), y)
-        else
-            tmp = .CallEBImage("sub2rgb", x, y)
-        res = .copyHeader(x, class(x), TRUE)
-        res@.Data = array(tmp, dim(x))
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("scale2RGB", signature(x = "Image", mult = "numeric"),
-    function(x, mult) {
-        if (!isCorrectType(x))
-            tmp = .CallEBImage("scale2rgb", correctType(x), mult)
-        else
-            tmp = .CallEBImage("scale2rgb", x, mult)
-        res = .copyHeader(x, class(x), TRUE)
-        res@.Data = array(tmp, dim(x))
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("toRed", signature(object = "Image"),
-    function(object) {
-        if (!isCorrectType(object))
-            tmp = .CallEBImage("asred", correctType(object))
-        else
-            tmp = .CallEBImage("asred", object)
-        res = .copyHeader(object, class(object), TRUE)
-        res@.Data = array(tmp, dim(object))
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("toGreen", signature(object = "Image"),
-    function(object) {
-        if (!isCorrectType(object))
-            tmp = .CallEBImage("asgreen", correctType(object))
-        else
-            tmp = .CallEBImage("asgreen", object)
-        res = .copyHeader(object, class(object), TRUE)
-        res@.Data = array(tmp, dim(object))
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("toBlue", signature(object = "Image"),
-    function(object) {
-        if (!isCorrectType(object))
-            tmp = .CallEBImage("asblue", correctType(object))
-        else
-            tmp = .CallEBImage("asblue", object)
-        res = .copyHeader(object, class(object), TRUE)
-        res@.Data = array(tmp, dim(object))
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("getRed", signature(object = "Image"),
-    function(object) {
-        if (!object@rgb)
-            return(copy(object))
-        if (!isCorrectType(object))
-            tmp = .CallEBImage("getred", correctType(object))
-        else
-            tmp = .CallEBImage("getred", object)
-        res = .copyHeader(object, class(object), FALSE)
-        res@.Data = array(tmp, dim(object))
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("getGreen", signature(object = "Image"),
-    function(object) {
-        if (!object@rgb)
-            return(copy(object))
-        if (!isCorrectType(object))
-            tmp = .CallEBImage("getgreen", correctType(object))
-        else
-            tmp = .CallEBImage("getgreen", object)
-        res = .copyHeader(object, class(object), FALSE)
-        res@.Data = array(tmp, dim(object))
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("getBlue", signature(object = "Image"),
-    function(object) {
-        if (!object@rgb)
-            return(copy(object))
-        if (!isCorrectType(object))
-            tmp = .CallEBImage("getblue", correctType(object))
-        else
-            tmp = .CallEBImage("getblue", object)
-        res = .copyHeader(object, class(object), FALSE)
-        res@.Data = array(tmp, dim(object))
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod(".normalize", signature(object = "Image"),
-    function(object, from = 0, to = 1.0, independent = FALSE, modify = TRUE) {
-        if (object@rgb)
-            stop("Function supports grayscale images only")
-        if (!modify) {
-            res = copy(object)
-            return(.CallEBImage("normalizeImages", res, as.double(c(from, to)), independent))
-        }
-        else
-            invisible(.CallEBImage("normalizeImages", object, as.double(c(from, to)), independent))
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("normalize", signature(object = "Image"),
-    function(object, from = 0, to = 1.0, independent = FALSE) {
-        .normalize(object, from, to, independent, modify = FALSE)
+setMethod ("display", signature(x="Image"),
+    function (x, no.GTK=FALSE, ...) {
+        if ( !.isCorrectType(x) )
+            x <- .correctType (x)
+        invisible ( .DoCall("lib_display", x, as.logical(no.GTK) ) )
     }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("[", signature(x = "Image", i = "missing", j = "missing"),
-    function(x, i, j, k, ..., drop) {
-        if (missing(k))
-            return(x)
-        tmp = x@.Data[ , , k, drop = FALSE]
-        if(is.array(tmp)) {
-            res = .copyHeader(x, "Image", x@rgb)
-            res@.Data = tmp
-            return(res)
-        }
+setMethod ("write.image", signature(x="Image", files="character"),
+    function (x, files, quality, ...) {
+        if ( missing(quality) )
+            quality <- 90
         else
-            return(tmp)
+            quality <- as.integer (quality)
+        if ( quality < 1 || quality > 100 )
+            stop ( .("quality value is given in % between 1 and 100") )
+        if ( !.isCorrectType(x) )
+            x <- .correctType (x)
+        invisible ( .DoCall("lib_writeImages", x, as.character(files), as.integer(quality) ) )
     }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("[", signature(x = "Image", i = "numeric", j = "missing"),
-    function(x, i, j, k, ..., drop) {
-        if (missing(k)) {
-            warning("using index [int], cannot distinguish from [int,,ANY], use [int,1:dim(x)[2],ANY] otherwise")
-            tmp = x@.Data[i, drop = FALSE]
-        }
+setMethod ("write.image", signature(x="Image", files="missing"),
+    function (x, files, quality, ...) {
+        if ( missing(quality) )
+            quality <- 90
+        else
+            quality <- as.integer (quality)
+        if ( quality < 1 || quality > 100 )
+            stop ( .("quality value is given in % between 1 and 100") )
+        if ( !.isCorrectType(x) )
+            x <- .correctType (x)
+        invisible ( .DoCall("lib_writeImages", x, fileName(x), as.integer(quality) ) )
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+read.image <- function(files, colormode=Grayscale, ...) {
+    .DoCall ("lib_readImages", as.character(files), as.integer(colormode) )
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+choose.image <- function() {
+    .DoCall ("lib_chooseImages")
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("[", signature(x="Image", i="missing", j="missing"),
+    function (x, i, j, k, ..., drop) {
+        if ( missing(k) )
+            return (x)
+        tmp <- x@.Data[ , , k, drop=FALSE]
+        if ( !is.array(tmp) ) return (tmp)
+        res <- header (x)
+        imageData (res) <- tmp
+        return (res)
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("[", signature(x="Image", i="numeric", j="missing"),
+    function (x, i, j, ..., drop) {
+        ## Is it correct on all R versions: args takes only ... arguments!
+        ## so we can use it to decide between [i] and [i,,k]
+        ## why are we getting: 
+        ## FIXME: Error in a[1, , ] : argument is missing, with no default
+        args <- list(...)
+        print (length(args))
+        if ( length(args) == 0 )
+            tmp = x@.Data[i, drop=FALSE]
         else {
-            tmp = x@.Data[i, , k, drop = FALSE]
+            tmp = x@.Data[i, , ..., drop=FALSE]
         }
-        if(is.array(tmp)) {
-            res = .copyHeader(x, "Image", x@rgb)
-            res@.Data = tmp
-            return(res)
-        }
-        else
-            return(tmp)
+        if ( !is.array(tmp) ) return (tmp)
+        res <- header (x)
+        imageData (res) <- tmp
+        return (res)
     }
 )
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("[", signature(x = "Image", i = "missing", j = "numeric"),
+setMethod ("[", signature(x="Image", i="missing", j="numeric"),
     function(x, i, j, k, ..., drop) {
         if (missing(k))
             k = 1:(dim(x@.Data)[3])
-        tmp = x@.Data[ , j, k, drop = FALSE]
-        if(is.array(tmp)) {
-            res = .copyHeader(x, "Image", x@rgb)
-            res@.Data = tmp
-            return(res)
-        }
-        else
-            return(tmp)
+        tmp = x@.Data[ , j, k, drop=FALSE]
+        if ( !is.array(tmp) ) return (tmp)
+        res <- header (x)
+        imageData (res) <- tmp
+        return (res)
     }
 )
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("[", signature(x = "Image", i = "numeric", j = "numeric"),
-    function(x, i, j, k, ..., drop) {
+setMethod ("[", signature(x="Image", i="numeric", j="numeric"),
+    function (x, i, j, k, ..., drop) {
         if (missing(k))
-            k = 1:(dim(x@.Data)[3])
+            k = 1:( dim(x@.Data)[3] )
         tmp = x@.Data[i, j, k, drop = FALSE]
-        if(is.array(tmp)) {
-            res = .copyHeader(x, "Image", x@rgb)
-            res@.Data = tmp
-            return(res)
-        }
-        else
-            return(tmp)
+        if ( !is.array(tmp) ) return (tmp)
+        res <- header (x)
+        imageData (res) <- tmp
+        return (res)
     }
 )
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("[", signature(x = "Image", i = "array", j = "missing"),
-    function(x, i, j, ..., drop) {
-        #tmp = callGeneric(x@.Data, i, drop = FALSE)
-        tmp = x@.Data[i, drop = FALSE]
-        if(is.array(tmp)) {
-            res = .copyHeader(x, class(x), x@rgb)
-            res@.Data = tmp
-            return(res)
-        }
-        else
-            return(tmp)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("[", signature(x = "Image", i = "logical", j = "missing"),
-    function(x, i, j, ..., drop) {
-        #tmp = callGeneric(x@.Data, i, drop = FALSE)
-        tmp = x@.Data[i, drop = FALSE]
-        if(is.array(tmp)) {
-            res = .copyHeader(x, class(x), x@rgb)
-            res@.Data = tmp
-            return(res)
-        }
-        else
-            return(tmp)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("show", signature(object = "Image"),
-    function(object) {
-        print(object)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("print", signature(x = "Image"),
-    function(x, data = FALSE, ...) {
-        if (data) {
-            print(x@.Data)
-        }
-        else {
-            d = dim(x)
-            if (x@rgb)
-                cat(paste("Image (RGB, 8bit/col): ", d[3], " image(s) of ", d[1], "x", d[2], "\n", sep =""))
-            else
-                cat(paste("Image (grayscale, double): ", d[3], " image(s) of ", d[1], "x", d[2], "\n", sep =""))
-            partial = rep(FALSE, 3)
-            dmax = c(10, 5, 2)
-            for(j in 1:3)
-                if (d[j] > dmax[j]) {
-                    d[j] = dmax[j]
-                    partial[j] = TRUE
-                }
-            if(any(partial))
-                cat("Showing ")
-            if(any(partial[1:2]))
-                cat(sprintf("rows 1:%d and columns 1:%d of ", d[1], d[2]))
-            if(partial[3])
-                cat(sprintf("images 1:%d\n", d[3]))
-            if(any(partial))
-                cat("\n")
-            print(x@.Data[1:d[1], 1:d[2], 1:d[3]], digits=3)
-            # if (!x@rgb)
-            #     print(summary(as.numeric(x@.Data)))
-        }
-        invisible(NULL)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod(".as.integer", signature(x = "Image"),
-    function(x, ...) {
-        if (!x@rgb)
-            stop("Function supports RGB images only")
-        if (!is.integer(x))
-            x@.Data = array(as.integer(x@.Data), dim(x@.Data))
-        return(x)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod(".as.double", signature(x = "Image"),
-    function(x, ...) {
-        if (x@rgb)
-            stop("Function supports grayscale images only")
-        if (!is.double(x))
-            x@.Data = array(as.double(x@.Data), dim(x@.Data))
-        return(x)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("as.array", signature(x = "Image"),
-    function(x) {
-        return(x@.Data)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("isCorrectType", signature(object = "Image"),
-    function(object) {
-        if (object@rgb && !is.integer(object)) {
-            warning("RGB image with data of non-integer type")
-            return(FALSE)
-        }
-        if (!object@rgb && !is.double(object)) {
-            warning("grayscale image with data of non-double type")
-            return(FALSE)
-        }
-        return(TRUE)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("correctType", signature(object = "Image"),
-    function(object) {
-        if (object@rgb && !is.integer(object))
-            object = .as.integer(object)
-        else
-            if (!object@rgb && !is.double(object))
-                object = .as.double(object)
-        return(object)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("summary", signature(object = "Image"),
-    function(object, ...) {
-        if (object@rgb)
-            stop("Function supports grayscale images only")
-        summary(as.numeric(object@.Data))
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("plot.image", signature(x = "Image"),
-    function(x, xlab = "", ylab = "", axes = FALSE, ...) {
-        if (x@rgb)
-            stop("Function defined for grayscale images only. Use display() instead")
-        .dim <- dim(x)
-        X <- 1:.dim[[1]]
-        Y <- 1:.dim[[2]]
-        asp <- .dim[[2]]/.dim[[1]]
-        graphics:::image(x = X, y = Y, z = matrix(x[,,1], .dim[1:2]), asp=asp, col = gray((0:255)/255), axes=axes, xlab=xlab, ylab=ylab,  ...)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("write.image", signature(object = "Image", files = "character"),
-    function(object, files) {
-        files = as.character(files)
-        if (!isCorrectType(object))
-            object = correctType(object)
-        invisible(.CallEBImage("writeImages", object, files))
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("tile", signature(x = "Image", width = "numeric"),
-    function(x, width = 5, fg = "yellow", bg = "black", ...) {
-        width = width[1]
-        if (width <= 0)
-            stop("width must be a positive integer")
-        .dim <- dim(x)
-        if (length(.dim) != 3)
-            stop("function can be applied to 3D images only")
-        if (.dim[3] == 1)
-            return(x)
-        nrow <- as.integer((.dim[3] - 1) / width) + 1
-        if (x@rgb) {
-            fg <- toRGB(fg)
-            bg <- toRGB(bg)
-        }
-        else {
-            fg <- toGray(fg)
-            bg <- toRGB(bg)
-        }
-        res <- Image(fg, c((.dim[1] + 1) * width - 1, (.dim[2] + 1) * nrow - 1, 1), rgb = x@rgb)
-        for (i in 1:width)
-            for (j in 1:nrow) {
-                    starti <- (i-1) * (.dim[1] + 1) + 1
-                    endi <- starti + .dim[1] - 1
-                    startj <- (j-1) * (.dim[2] + 1) + 1
-                    endj <- startj + .dim[2] - 1
-                if (i + (j-1) * width <= .dim[3])
-                    res[starti:endi, startj:endj, 1] <- x[,, i + (j-1) * width]
-                else
-                    res[starti:endi, startj:endj, 1] <- bg
-            }
-        return(res)
-    }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("entropy", signature(x = "Image"),
-    function(x, n=512, method="hist", ...) {
-        if (x@rgb) x <- toGray(x)
-        nvals <- dim(x)[3]
-        if (nvals == 1)
-            ## in tools.R
-            return(entropy(x@.Data, n, method, ...))
-        res <- numeric(nvals)
-        for (i in 1:nvals) res[i] <- entropy((x[,,i])@.Data, n, method, ...)
-        return(res)
-    }
-)
-# ============================================================================
-# ASSOCIATED ROUTINES
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-read.image <- function(files, rgb = FALSE) {
-    files = as.character(files)
-    if (length(files) < 1)
-        stop("At least one file/URL must be supplied")
-    rgb = as.logical(rgb)[[1]]
-    return(.CallEBImage("readImages", files, rgb))
-}
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ping.image <- function(files, show.comments = FALSE) {
-    files = as.character(files)
-    if (length(files) < 1)
-        stop("At least one file/URL must be supplied")
-    invisible(.CallEBImage("pingImages", files, as.logical(show.comments)))
-}
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("[", signature(x="Image", i="array", j="missing"),
+    function (x, i, j, k, ..., drop) {
+        if ( !missing(k) )
+            stop ( .("array index cannot be combined with any other index") )
+        tmp = x@.Data[i, drop=FALSE]
+        if ( !is.array(tmp) ) return (tmp)
+        res <- header (x)
+        imageData (res) <- tmp
+        return (res)
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("[", signature(x="Image", i="logical", j="missing"),
+    function (x, i, j, k, ..., drop) {
+        if ( !missing(k) )
+            stop ( .("logical index cannot be combined with any other index") )
+        tmp = x@.Data[i, drop=FALSE]
+        if ( !is.array(tmp) ) return (tmp)
+        res <- header (x)
+        imageData (res) <- tmp
+        return (res)
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod("print", signature(x="Image"),
+    function(x, ...) {
+        if ( length( features(x) ) > 0 )
+            cat ("\n'Image' with annotated object data\n")
+        else
+            cat ("\n'Image'\n")
+        if ( colorMode(x) == TrueColor ) {
+            cat ("  colorMode()   : TrueColor\n")
+            cat ("  storage class : integer 3D array, 8-bit/color RGB-, no Alpha\n")
+        }
+        if ( colorMode(x) == Grayscale ) {
+            cat ("  colorMode()   : Grayscale\n")
+            cat ("  storage class : numeric 3D array, writable images in range [0..1]\n")
+        }
+        dimx = dim (x)
+        if ( dimx[3] > 1 )
+            cat ( sprintf ("  dim()         : %dx%d, %d image(s)\n", dimx[1], dimx[2], dimx[3]) )
+        else
+            cat ( sprintf ("  dim()         : %dx%d\n", dimx[1], dimx[2]) )
+        cat ( sprintf ("  fileName()    : %s \n", fileName(x) ) )
+        cat ( sprintf ("  compression() : %s \n", compression(x) ) )
+        cat ( sprintf ("  resolution()  : dx = %.1f, dy = %.1f \n", resolution(x)[1], resolution(x)[2]) )
+        cat ( sprintf ("  sampleFilter(): %s \n", sampleFilter(x) ) )
+
+        if ( length( features(x) ) > 0 ) {
+            cat ( "\n  Object data: features()\n" )
+            print ( x@features )
+            return ( invisible(NULL) )
+        }
+
+        partial <- rep(FALSE, 3)
+        dmax <- c(5, 6, 3)
+        for (i in 1:3) {
+            if ( dimx[i] > dmax[i]) {
+                dimx[i] <- dmax[i]
+                partial[i] = TRUE
+            }
+        }
+        cat ( sprintf("\n  imageData() subset [1:%d, 1:%d, 1:%d]:\n", dimx[1], dimx[2], dimx[3]) )
+        print ( x@.Data[ 1:dimx[1], 1:dimx[2], 1:dimx[3] ], digits=3 )
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("show", signature(object="Image"),
+    function (object) print (object)
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("as.array", signature(x="Image"),
+    function (x) imageData (x)
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("as.matrix", signature(x="Image"),
+    function (x) {
+        if ( dim(x)[3] > 1 )
+            stop ( .("cannot coerce multiple images to matrix") )
+        return ( matrix( imageData(x), dim(x)[1:2] ) )
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("image", signature(x = "Image"),
+    function(x, i, xlab = "", ylab = "", axes = FALSE, col=gray ((0:255) / 255), ...) {
+        dimx <- dim (x)
+        if ( missing(i) ) {
+            if ( dimx[3] > 1 )
+                warning ( .("missing i for an image stack, assuming i=1") )
+            i <- 1
+        }
+        i <- as.integer ( i[1] )
+        if ( i < 1 || i > dimx[3] )
+            stop ( .("index i out of range") )
+        if ( any(dimx == 0) )
+            stop ( .("image size is zero, nothing to plot") )
+        X <- 1:dimx[1]
+        Y <- 1:dimx[2]
+        Z <- as.matrix ( x[,,i] )[, rev(Y)]
+        asp <- dimx[2] / dimx[1]
+        graphics:::image (x=X, y=Y, z=Z, asp=asp, col=col, axes=axes, xlab=xlab, ylab=ylab, ...)
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("channel", signature(x="Image", mode="character"),
+    function (x, mode, ...) {
+        mode <- tolower (mode)
+        if ( mode == "grey" ) mode = "gray"
+        modeNo <- switch (EXPR=mode, rgb=0, gray=1, red=2, green=3, 
+                blue=4, asred=5, asgreen=6, asblue=7, x11=8, -1)
+        if ( modeNo < 0 )
+            stop ( paste(.("wrong conversion mode. Please specify one of"), "rgb, gray, grey, red, green, blue, asred, asgreen, asblue, x11") ) 
+        resData <- .DoCall("lib_channel", x@.Data, as.integer(modeNo) )
+        if ( is.null(resData) )
+            stop ( .("could not convert colors, NULL result") )
+        resData [ which( is.na(x) ) ] = NA
+        resData <- array (resData, dim(x) )
+        if ( mode == "x11" ) return (resData)
+        res <- header (x)
+        res@colormode = switch (EXPR=mode, rgb=, asred=, asgreen=, asblue=TrueColor, Grayscale)
+        res@.Data <- resData
+        return (res)
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("hist", signature(x="Image"),
+    function (x, breaks=255, main=paste("Image histogram. Total", length(x), "pixels"), xlab="colors", ...) {
+        if ( xlab == "colors" ) {
+            if ( colorMode(x) == Grayscale ) 
+                xlab = "Shades of gray, 0: black, 1: white"
+            if ( colorMode(x) == TrueColor )
+                xlab = "RGB values, non-informative"
+        }
+        graphics:::hist ( imageData(x), breaks=breaks, main=main, xlab=xlab, ...)
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("combine", signature(x="Image", y="Image"),
+    function (x, y, ...) {
+        if ( !assert(x, y) )
+            stop ( .("images must have the same size and color mode") )
+        nz <- dim(x)[3] + dim(y)[3]
+        args <- list ( ... )
+        if ( length(args) > 0 ) {
+            for (i in seq_along(args ) ) {
+                stopIfNotImage ( args[[i]] )
+                if ( !assert(x, args[[i]]) )
+                    stop ( .("images must have the same size and color mode") )
+                nz <- nz + dim(args[[i]])[3]
+            }
+        }
+        res <- header (x)
+        if ( colorMode(x) == TrueColor )
+            res@.Data <- array ( as.integer( c(x, y, ...) ), c( dim(x)[1:2], nz ) )
+        else
+            res@.Data <- array ( c(x, y, ...), c( dim(x)[1:2], nz ) )
+        return (res)
+    }
+)
