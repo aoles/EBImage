@@ -1,0 +1,5 @@
+GTK_BASEPATH=c:/mingw
+PKG_CFLAGS= -g -O2 -DWIN32 -DUSE_GTK -DGLIB_GETTEXT -I/c/imagemagick/include -Ic:/imagemagick/include -mms-bitfields -I$(GTK_BASEPATH)/include/gtk-2.0 -I$(GTK_BASEPATH)/lib/gtk-2.0/include -I$(GTK_BASEPATH)/include/atk-1.0 -I$(GTK_BASEPATH)/include/cairo -I$(GTK_BASEPATH)/include/pango-1.0 -I$(GTK_BASEPATH)/include/glib-2.0 -I$(GTK_BASEPATH)/lib/glib-2.0/include -I$(GTK_BASEPATH)/include/libglade-2.0 -I$(GTK_BASEPATH)/include/libxml2 -I$(GTK_BASEPATH)/include
+PKG_CXXFLAGS= $(PKG_CFLAGS)
+PKG_LIBS= -shared -L/c/imagemagick -Lc:/imagemagick -lCORE_RL_magick_ -L$(GTK_BASEPATH)/lib -lgtk-win32-2.0 -lgdk-win32-2.0 -latk-1.0 -lgdk_pixbuf-2.0 -lpangowin32-1.0 -lpangocairo-1.0 -lpango-1.0 -lcairo -lgobject-2.0 -lgmodule-2.0 -lglib-2.0 -lintl -liconv -lgdi32
+

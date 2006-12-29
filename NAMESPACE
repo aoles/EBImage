@@ -1,27 +1,27 @@
 useDynLib(EBImage)
 export(
-    Image, read.image, ping.image,
-
-    blur, contrast, despeckle, edge, enhance, equalize,
-    colorGamma, gaussFilter, medianFilter, mod, reduceNoise,
-    rotate, sample.image, zoom.image, segment,
-    shade, sharpen, solarize, trim,
-    spread, unsharpMask, noise, entropy,
-    
-    distMap, thresh, wsObjects, wsPaint, wsImages, 
-    mErode, mDilate, mOpen, mClose, mKernel,
-
-    draw, DrawableCircle, DrawableLine, DrawableRect, DrawableEllipse, DrawableText,
-    
-    updateEBImage, updateEBImageDev
+    Image, is.Image, stopIfNotImage, read.image, choose.image,
+    TrueColor, Grayscale, morphKern 
 )
 exportClasses(
-    Image, Drawable, DrawableCircle, DrawableLine, DrawableRect, DrawableEllipse, DrawableText
+    Image
 )
 exportMethods(
-    assert, copy, write.image, display, channels, normalize,
-    as.array, summary, "[", show, print, plot.image,
+    copy, display, write.image, header, assert, image, combine,
+    as.array, as.matrix, print, show, "[", channel, hist,
 
-    toGray, toRGB, toX11char, toRed, toGreen, toBlue, getRed, getGreen, getBlue, 
-    add2RGB, sub2RGB, scale2RGB, tile
+    features,
+    colorMode, "colorMode<-",
+    fileName, "fileName<-", 
+    compression, "compression<-",
+    resolution, "resolution<-",
+    sampleFilter, "sampleFilter<-",
+    imageData, "imageData<-",
+
+    blur, gblur, contrast, denoise, despeckle, edge, enhance, equalize,
+    cgamma, mediansmooth, noise, resize, rotate, resample, segment,
+    sharpen, umask, thresh, athresh, cthresh, affinet, modulate, negate, 
+    normalize, normalize2, fill, flip, flop, erode, dilate, opening, closing,
+    distmap, watershed
+    
 )
