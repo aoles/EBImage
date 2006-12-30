@@ -26,9 +26,9 @@ lib_erode_dilate (SEXP x, SEXP kernel, SEXP iters, SEXP what) {
     
     /* value to reset the checked part t */
     if ( INTEGER(what)[0] == ERODE )
-        resetTo = 0.0; /* checking foreground, reseting to 0 */
-    else
         resetTo = 1.0; /* checking background, reseting to 1 */
+    else
+        resetTo = 0.0; /* checking foreground, reseting to 0 */
     dim = INTEGER ( GET_DIM(x) );
     size.x = dim[0];
     size.y = dim[1];

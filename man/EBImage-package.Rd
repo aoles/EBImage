@@ -41,41 +41,41 @@
 
 %\alias{channel}
 
-\alias{cgamma}
-\alias{contrast}
-\alias{enhance}
-\alias{equalize}
-\alias{modulate}
+%\alias{cgamma}
+%\alias{contrast}
+%\alias{enhance}
+%\alias{equalize}
+%\alias{modulate}
 
-\alias{flip}
-\alias{flop}
-\alias{resample}
-\alias{resize}
-\alias{rotate}
-\alias{affinet}
+%\alias{flip}
+%\alias{flop}
+%\alias{resample}
+%\alias{resize}
+%\alias{rotate}
+%\alias{affinet}
 
-\alias{dilate}
-\alias{closing}
-\alias{erode}
-\alias{morphKern}
-\alias{opening}
+%\alias{dilate}
+%\alias{closing}
+%\alias{erode}
+%\alias{morphKern}
+%\alias{opening}
 
-\alias{negate}
-\alias{normalize}
-\alias{normalize2}
+%\alias{negate}
+%\alias{normalize}
+%\alias{normalize2}
 
-\alias{mediansmooth}
-\alias{blur}
-\alias{denoise}
-\alias{despeckle}
-\alias{gblur}
-\alias{noise}
-\alias{sharpen}
-\alias{umask}
+%\alias{mediansmooth}
+%\alias{blur}
+%\alias{denoise}
+%\alias{despeckle}
+%\alias{gblur}
+%\alias{noise}
+%\alias{sharpen}
+%\alias{umask}
 
-\alias{edge}
-\alias{fill}
-\alias{segment}
+%\alias{edge}
+%\alias{fill}
+%\alias{segment}
 
 %\alias{thresh}
 %\alias{athresh}
@@ -91,7 +91,7 @@
 \title{EBImage package overview and changelog}
 
 \description{
-  \code{EBImage} is image processing and analysis package for R. It is being
+  \code{EBImage} is the image processing and analysis package for R. It is being
   created primarily to enable automated analysis of large sets of 
   cytomicroscopy images, e.g. results of automated microscopy screens.
 
@@ -101,7 +101,7 @@
   implemented natively. These include distance maps, adaptive thresholding, 
   object counting, watershed transformation etc.
 
-  Image data are stored in objects of \code{\link{Image-class}}. The class 
+  Image data are stored in objects of \code{\link{Image-class}}. This S4 class 
   is derived from \code{\link{array}} and inherits all of its properties and
   S3 methods, like mathematical operations on arrays, subsetting, histograms 
   etc. Image processing and analysis routines require objects of 
@@ -109,6 +109,15 @@
 }
 
 \details{
+
+  The package provides many image filters (image processing routines) that can
+  be subdivided into the following categories: colour and image enhancement
+  (e.g. \code{\link{enhance}, \link{contrast}}), sharpening and noise reduction
+  (e.g. \code{\link{denoise}, \link{despeckle}}), image transformation (e.g.
+  \code{\link{rotate}, \link{resize}}), image segmentation (e.g. 
+  \code{\link{watershed}, \link{edge}, \link{segment}, \link{thresh}}),
+  image morphology (e.g. \code{\link{dilate}, \link{opening}, \link{distmap}}), 
+  and colour normalization (\code{\link{normalize}}).
 
 }
 

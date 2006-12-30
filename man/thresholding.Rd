@@ -22,30 +22,28 @@
 
 }
 
-\arguments{
+\section{ Arguments}{ \describe{
 
-  \item{x}{An object of \code{\link{Image-class}}. For \code{thresh} it must be
+  \item{\code{x}}{An object of \code{\link{Image-class}}. For \code{thresh} it must be
     in the \code{\link{Grayscale}} mode. }
 
-  \item{w}{ Adaptive threshold frame width in pixel. } 
+  \item{\code{w, h}}{ Thresholding frame width and height in pixel. } 
 
-  \item{h}{ Adaptive threshold frame height in pixel. } 
+  \item{\code{offset}}{ Threshold offset from the mean value. }
 
-  \item{offset}{ Threshold offset from the mean value. }
-
-  \item{threshold}{ Threshold value for channel thresholding (uniform). }
+  \item{\code{threshold}}{ Threshold value for channel thresholding (uniform). }
 
   \item{...}{ Reserved for future use. }
 
-}
+} }
 
-\value{
+\section{ Value}{
 
   A new instance of \code{\link{Image-class}} in the same color mode as input.
     
 }
 
-\details{
+\section{ Details}{
 
   If \code{thresh} and \code{athresh} are adaptive thresholind functions.
   While \code{athresh} can be used on both \code{\link{Grayscale}} and 
