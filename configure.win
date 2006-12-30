@@ -1,0 +1,23 @@
+## Delete the file manually to recompile, and place the new file instead
+
+## If the file is present the package is considered to be precompiled!
+## This however does not mean you do not need ImageMagick and GTK+ libraries:
+## you do need them as they are dynamically linked!
+
+## This script assumes that a MSYS is installed and contains at least
+## such commands as if, [, rm, and mv -- all those are not Windows ones
+
+if [ -f "inst/winlibs/EBImage.dll" ] ; then
+  rm -rf src
+  mv inst/winlibs inst/libs
+  echo "+-----------------------------------------------+"
+  echo "|        USING PRECOMPILED WINDOWS DLL          |"
+  echo "+-----------------------------------------------+"
+  echo "| To recompile, delete inst/winlibs/EBImage.dll |"
+  echo "| After compilation, replace this file with new |"
+  echo "+-----------------------------------------------+"
+  echo "| Ensure that you have ImageMagick DLL's and    |"
+  echo "| GTK+-v2 DLL's in your PATH to run the package |"
+  echo "+-----------------------------------------------+"
+fi
+  
