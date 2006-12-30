@@ -256,6 +256,7 @@ setMethod ("negate", signature(x="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## FIXME: normalize, add independent or similar option
 setMethod ("normalize", signature(x="Image"),
     function (x, from=0, to=1, ...) {
         if ( colorMode(x) != Grayscale )
