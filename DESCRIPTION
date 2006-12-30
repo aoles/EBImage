@@ -1,12 +1,12 @@
 Package: EBImage
-Version: 1.9.12
-Date: 29 Dec 2006
+Version: 1.9.13
+Date: 30 Dec 2006
 Title: Image processing and analysis toolkit for R
 Author: Oleg Sklyar
 Maintainer: Oleg Sklyar <osklyar@ebi.ac.uk>
-SystemRequirements: Windows/UNIX/Linux/MacOS; ImageMagick-dev (> 6.0.0); recommended GTK+-2.0-dev. See INSTALL (in the package root) for details
+SystemRequirements: Windows/UNIX/Linux/MacOS; ImageMagick-dev (> 6.2.0); recommended GTK+-2.0-dev. See INSTALL (in the package root) for details
 Depends: R (>= 2.4.0), methods, utils
-Description: Image processing and analysis toolkit for R (image IO, conversion, display, processing)
+Description: Image processing and analysis toolkit for R. Pre-release 2.0
 License: LGPL
 Copyright: Oleg Sklyar, 2005-2007
 SaveImage: yes

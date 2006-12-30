@@ -197,7 +197,7 @@ setMethod ("sharpen", signature(x="Image"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("umask", signature(x="Image"),
-    function (x, r=0, s=0.5, amount=5, t=2,...) {
+    function (x, r=0, s=0.5, amount=5, t=2, ...) {
         if ( r <= s && r != 0 )
             warning ( .("for reasonable results, 'r' should be larger than 's'") )
         if ( r < 0 || s <= 0 || amount < 0 || t < 0 )
