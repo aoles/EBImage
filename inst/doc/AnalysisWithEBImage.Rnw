@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{Image analysis with EBImage}
+%\VignetteIndexEntry{EBImage: image processing and analysis toolkit for R}
 %\VignetteDepends{}
 %\VignetteKeywords{image processing, visualization}
 %\VignettePackage{EBImage}
@@ -158,7 +158,7 @@ One can think of this code as of a naive but fast and effective version of the {
 \begin{figure}
 \vspace*{.1in}
 \begin{center}
-\scalebox{0.3}{\includegraphics{umask.jpg}}
+\scalebox{0.75}{\includegraphics{umask.jpg}}
 \end{center}
 \caption{\label{figure:sharpening}
     Implementation of a simple {\em unsharp mask} filter: (a) source image, (b) blurred colour-scaled image, (c) sharpened image after normalization}
@@ -173,7 +173,7 @@ The following code demonstrates how grayscale images recorded using three differ
 \begin{figure}
 \vspace*{.1in}
 \begin{center}
-\scalebox{0.3}{\includegraphics{channels.jpg}}
+\scalebox{0.75}{\includegraphics{channels.jpg}}
 \end{center}
 \caption{\label{figure:channels}
     Composing a false-colour image (d) from a set of grayscale microscopy images for three different luminescent compounds: (a) -- DAPI, (b) -- tubulin and (c) -- phalloidin
@@ -209,7 +209,7 @@ A schematic implementation is illustrated in the following example code and in F
 \begin{figure}
 \vspace*{.1in}
 \begin{center}
-\scalebox{0.3}{\includegraphics{analysis.jpg}}
+\scalebox{0.75}{\includegraphics{analysis.jpg}}
 \end{center}
 \caption{\label{figure:analysis}
 Illustration of the object detection algorithm: (a) -- {\em sqrt}-brightened combined image of nuclei (DAPI from Figure~\ref{figure:channels}{\bf a}) and cells (phalloidin from Figure~\ref{figure:channels}{\bf c}); (b) -- image {\bf a} after {\em blur} and {\em adaptive thresholding}; (c) -- image {\bf b} after morphological {\em opening} followed by {\em closing}; (d) -- normalized {\em distance map} generated from image {\bf c}; (e) -- outlines of cells detected using \Rfunction{watershed} drawn on top of the RGB image from Figure~\ref{figure:channels}{\bf d}; (f) -- colour-mapped cells and nuclei as detected with \Rfunction{watershed} (one unique colour per object)
