@@ -80,14 +80,16 @@
 }
 
 \examples{
-  cl <- channel("pink","rgb")
-  r <- channel( channel(cl, "red"), "asred")
-  g <- channel( channel("pink", "green"), "asgreen")
-  b <- channel( channel(cl, "blue"), "asblue")
-  rgb <- r + g + b
-  print( rgb == cl )
-  clg <- channel(cl, "gray")
-  print( channel(cl, "x11"))
+  if ( interactive() ) {
+    cl <- channel("pink","rgb")
+    r <- channel( channel(cl, "red"), "asred")
+    g <- channel( channel("pink", "green"), "asgreen")
+    b <- channel( channel(cl, "blue"), "asblue")
+    rgb <- r + g + b
+    print( rgb == cl )
+    clg <- channel(cl, "gray")
+    print( channel(cl, "x11"))
+  }
 
 }
 

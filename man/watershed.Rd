@@ -14,9 +14,9 @@
 }
 
 \section{ Usage }{
-
-  \code{watershed(x, ref=NULL, do.detect=TRUE, ext=1, alg="exclude", ..., verbose=FALSE)}
-
+  \preformatted{
+    watershed(x, ref=NULL, do.detect=TRUE, ext=1, alg="exclude", ..., verbose=FALSE)
+  }
 }
 
 \section{ Arguments }{ \describe{
@@ -83,6 +83,23 @@
 
 \references{
     \emph{ImageMagick}: \url{http://www.imagemagick.org}.
+}
+
+\examples{
+  if ( interactive() ) {
+    ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
+    a <- read.image( paste(ddir, c("A04w0.jpg", "A04w1.jpg"), sep="/") )
+    t <- thresh( a, 50, 50, 0.03 )
+    t <- closing( t, morphKern(7) )
+    dm <- distmap(t, 0.0)
+    x <- watershed(dm, ref=a, ext=2)
+    \dontrun{this will print all the detected objects}
+    print(x)
+    res <- combine( a[,,1], normalize(x[,,1]), a[,,2], normalize(x[,,2]) )
+    \dontrun{this will display a set of 4 images:}
+    \dontrun{each segmented, x, after the original, a}
+    display(res)
+  }
 }
 
 \author{

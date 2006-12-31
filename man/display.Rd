@@ -11,9 +11,9 @@
 }
 
 \section{Usage}{
-
-  \code{display(x, no.GTK=FALSE, ...)}
-
+  \preformatted{
+    display(x, no.GTK=FALSE, ...)
+  }
 }
 
 \section{ Arguments }{ \describe{
@@ -58,6 +58,10 @@
 
 \author{
     Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
+}
+
+\examples{
+  \dontrun{see ?watershed for examples}
 }
 
 \keyword{file}

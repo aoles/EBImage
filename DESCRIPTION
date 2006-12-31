@@ -1,6 +1,6 @@
 Package: EBImage
-Version: 1.9.13
-Date: 30 Dec 2006
+Version: 1.9.14
+Date: 31 Dec 2006
 Title: Image processing and analysis toolkit for R
 Author: Oleg Sklyar
 Maintainer: Oleg Sklyar <osklyar@ebi.ac.uk>

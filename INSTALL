@@ -58,7 +58,8 @@ If you plan to compile the package from source, first follow R instructions on
 compiling Windows packages and install all the necessary tools. In this case
 it is recommended to install MinGW and MSYS into c:\mingw as this path is hard 
 coded into src/Makevars.win of my package (or you will need to edit this file)
-You do NOT need MinGW or MSYS if you install the binary package.
+You do NOT need MinGW or MSYS if you install the binary package. For the binary 
+package, just install the following two packages so that the library could function.
 
 2.1 Installing ImageMagick
 

@@ -15,16 +15,13 @@
 }
 
 \section{ Usage }{
-  \code{cgamma(x, level=1, ...)}
-  
-  \code{contrast(x, sharpen=TRUE, )}
-  
-  \code{enhance(x, ...)}
-  
-  \code{equalize(x, ...)}
-  
-  \code{modulate(x, value=100, ...)}
-  
+  \preformatted{
+    cgamma(x, level=1, ...)
+    contrast(x, sharpen=TRUE, )
+    enhance(x, ...)
+    equalize(x, ...)
+    modulate(x, value=100, ...)
+  }
 }
 
 \section{ Arguments }{ \describe{

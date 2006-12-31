@@ -91,10 +91,14 @@
 }
 
 \examples{
+  if ( interactive() ) {
+    ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
+    a <- read.image( paste(ddir, c("A04w0.jpg", "A04w1.jpg"), sep="/") )
     url <- c("http://www.google.com/intl/en/images/logo.gif")
-    \dontrun{im <- read.image (url, TrueColor)}
+    im <- read.image (url, TrueColor)
     \dontrun{write.image (im, "googlelogo.tif")}
     \dontrun{im1 <- channel ( choose.image(), "gray")}
+  }
 }
 
 \keyword{file}

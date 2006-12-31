@@ -18,19 +18,15 @@
 
 
 \section{ Usage }{
-  \code{Image(data=0.5, dim=c(200,200), colormode=Grayscale, ...)}
-
-  \code{copy(x, ...)}
-  
-  \code{combine(x, y, ...)}
-  
-  \code{header(x, ...)}
-
-  \code{assert(x, y, strict=FALSE, ...)}
-  
-  \code{is.Image(x)}
-  
-  \code{stopIfNotImage(x)}
+  \preformatted{
+    Image(data=0.5, dim=c(200,200), colormode=Grayscale, ...)
+    copy(x, ...)
+    combine(x, y, ...)
+    header(x, ...)
+    assert(x, y, strict=FALSE, ...)
+    is.Image(x)
+    stopIfNotImage(x)
+  }
 }
 
 \section{ Arguments }{ \describe{

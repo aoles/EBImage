@@ -13,13 +13,11 @@
 }
 
 \section{ Usage }{
-
-  \code{thresh(x, w=5, h=5, offset=0.01, ...)}
-  
-  \code{athresh(x, w=10, h=10, offset=0, ...)}
-  
-  \code{cthresh(x, threshold=0, ...)}
-
+  \preformatted{
+    thresh(x, w=5, h=5, offset=0.01, ...)
+    athresh(x, w=10, h=10, offset=0, ...)
+    cthresh(x, threshold=0, ...)
+  }
 }
 
 \section{ Arguments}{ \describe{
@@ -75,8 +73,9 @@
     Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
 }
 
-%\examples{
-%}
+\examples{
+  \dontrun{see ?watershed for examples}
+}
 
 \keyword{file}
 

@@ -2,8 +2,9 @@
 
 \docType{class}
 
-\alias{hist,Image-method}
-\alias{image,Image-method}
+\alias{hist.Image}
+\alias{print.Image}
+\alias{image.Image}
 \alias{[,Image-method}
 
 \concept{image processing}
