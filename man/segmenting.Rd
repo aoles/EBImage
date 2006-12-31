@@ -14,13 +14,11 @@
 }
 
 \section{ Usage }{
-
-  \code{edge(x, r=0, ...)}
-  
-  \code{segment(x, cl=10, s=1.5, ...)}
-
-  \code{fill(x, col, xoff, yoff, fuzz=10, method="floodfill", ...)} \#\# FIXME: still not implemented, unclear API
-  
+  \preformatted{
+    edge(x, r=0, ...)
+    segment(x, cl=10, s=1.5, ...)
+    fill(x, col, xoff, yoff, fuzz=10, method="floodfill", ...) ## FIXME: still not implemented, unclear API
+  }
 }
 
 \section{ Arguments }{ \describe{

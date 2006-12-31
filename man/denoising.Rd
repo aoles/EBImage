@@ -18,24 +18,19 @@
 }
 
 \section{ Usage }{
+  \preformatted{
+    denoise(x, r=0, ...)
+    mediansmooth(x, r=2, ...)
+    despeckle(x, ...)
 
-  \code{denoise(x, r=0, ...)}
-  
-  \code{despeckle(x, ...)}
-  
-  \code{sharpen(x, r=0, s=0.5, ...)}
-  
-  \code{umask(x, r=0, s=0.5, amount=5, t=2, ...)}
+    sharpen(x, r=0, s=0.5, ...)
+    umask(x, r=0, s=0.5, amount=5, t=2, ...)
 
-  \code{mediansmooth(x, r=2, ...)}
-  
-  \code{blur(x, r=0, s=0.5, ...)}
-  
-  \code{gblur(x, r=0, s=0.5, ...)}
-  
-  \code{noise(x, type="gaussian", ...)}
-  
-  
+    blur(x, r=0, s=0.5, ...)
+    gblur(x, r=0, s=0.5, ...)
+
+    noise(x, type="gaussian", ...)
+  }
 }
 
 \section{ Arguments }{ \describe{

@@ -13,12 +13,11 @@
 }
 
 \section{ Usage }{
-
-  \code{negate(x, ...)}
-  
-  \code{normalize(x, from=0, to=1, ...)}
-
-  \code{normalize2(x, ...)}
+  \preformatted{
+    negate(x, ...)
+    normalize(x, from=0, to=1, ...)
+    normalize2(x, ...)
+  }
   
 }
 
@@ -62,6 +61,10 @@
 
 \author{
     Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
+}
+
+\examples{
+  \dontrun{see ?watershed for examples}
 }
 
 \keyword{file}

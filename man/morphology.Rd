@@ -15,16 +15,14 @@
 }
 
 \section{ Usage }{
+  \preformatted{
+    dilate(x, kern=morphKern(5), iter=1, ...)
+    erode(x, kern=morphKern(5), iter=1, ...)
+    opening(x, kern=morphKern(5), iter=1, ...)
+    closing(x, kern=morphKern(5), iter=1, ...)
 
-  \code{dilate(x, kern=morphKern(5), iter=1, ...)}
-  
-  \code{erode(x, kern=morphKern(5), iter=1, ...)}
-
-  \code{opening(x, kern=morphKern(5), iter=1, ...)}
-  
-  \code{closing(x, kern=morphKern(5), iter=1, ...)}
-
-  \code{morphKern(size=5, shape="round")}
+    morphKern(size=5, shape="round")
+  }
 }
 
 \section{ Arguments }{ \describe{
@@ -84,6 +82,10 @@
 
 \author{
     Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
+}
+
+\examples{
+  \dontrun{see ?watershed for examples}
 }
 
 \keyword{file}

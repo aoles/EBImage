@@ -12,9 +12,9 @@
 }
 
 \section{ Usage }{
-
-  \code{distmap(x, tolerance=0.05, minBG=0.05, strict=FALSE, ...)}
-
+  \preformatted{
+    distmap(x, tolerance=0.05, minBG=0.05, strict=FALSE, ...)
+  }
 }
 
 \section{ Arguments }{ \describe{
@@ -77,6 +77,11 @@
 \author{
     Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
 }
+
+\examples{
+  \dontrun{see ?watershed for examples}
+}
+
 
 \keyword{file}
 

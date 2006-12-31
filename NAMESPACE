@@ -1,14 +1,14 @@
 useDynLib(EBImage)
 export(
     Image, is.Image, stopIfNotImage, read.image, choose.image,
-    TrueColor, Grayscale, morphKern 
+    TrueColor, Grayscale, morphKern, hist.Image, image.Image, print.Image
 )
 exportClasses(
     Image
 )
 exportMethods(
-    copy, display, write.image, header, assert, image, combine,
-    as.array, as.matrix, print, show, "[", channel, hist,
+    copy, display, write.image, header, assert, combine,
+    as.array, as.matrix, show, "[", channel,
 
     features,
     colorMode, "colorMode<-",

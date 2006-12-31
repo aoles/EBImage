@@ -11,7 +11,8 @@ See: ../LICENSE for license, LGPL
 #define N_FEATURES 6
 
 /* will assign features field to the argument, modifying argument */
-/* used in watershed and other routines */
+/* used in watershed and other routines. We assume that supplied x is
+ALREADY a duplicate of that sent from R, so we modify it */
 void assign_features (SEXP x, SEXP ref) {
     SEXP features, * fm, * dm;
     int nx, ny, nz, nprotect, im, i, j, nobj, obj, perdone;
@@ -24,12 +25,10 @@ void assign_features (SEXP x, SEXP ref) {
     nz = INTEGER ( GET_DIM(x) )[2];
     nprotect = 0;
 
-    PROTECT ( features = allocVector(VECSXP, nz) ); 
-    nprotect++;
-    SET_SLOT (x, mkString("features"), features);
-
     /* will be freed automatically */
     fm = (SEXP *) R_alloc (nz, sizeof(SEXP) );
+    for ( im = 0; im < nz; im++ )
+        fm[im] = R_NilValue;
     dm = (SEXP *) R_alloc (nz, sizeof(SEXP) );
     
     refdata = NULL;
@@ -42,6 +41,7 @@ void assign_features (SEXP x, SEXP ref) {
         nobj = 0;
         for ( i = 0; i < nx * ny; i++ )
             if ( data[i] > nobj ) nobj = data[i];
+        if ( nobj < 1 ) continue;
         /* create features matrix */
         PROTECT ( fm[im] = allocVector(REALSXP, nobj * N_FEATURES) );
         nprotect++;
@@ -57,8 +57,10 @@ void assign_features (SEXP x, SEXP ref) {
         /* go through pixels and collect descriptors */
         for ( i = 0; i < nx; i++ )
             for ( j = 0; j < ny; j++ ) {
-                obj = (int) data[i + j * nx];
+                obj = data[i + j * nx];
                 if ( obj < 1 ) continue;
+                /* all indexes were 1, 2, 3, but C has 0-based indexes!!! */
+                obj--;
                 /* update x (+0), y (+1) */
                 fmdata [obj] += i;
                 fmdata [obj + nobj] += j;
@@ -67,22 +69,22 @@ void assign_features (SEXP x, SEXP ref) {
                 /* per (+3) */
                 perdone = 0;
                 if ( i > 0 )
-                    if ( (int) data [i - 1 + j * nx] != obj ) {
+                    if ( (int) data [i - 1 + j * nx] != obj + 1 ) { /* +1 because obj-- above */
                         perdone = 1;
                         fmdata [obj + 3 * nobj] += 1.0;
                     }
                 if ( j > 0 && !perdone )
-                    if ( (int) data [i + (j - 1) * nx] != obj ) {
+                    if ( (int) data [i + (j - 1) * nx] != obj + 1 ) { /* +1 because obj-- above */
                         perdone = 1;
                         fmdata [obj + 3 * nobj] += 1.0;
                     }
                 if ( i < nx - 1 && !perdone )
-                    if ( (int) data [i + 1 + j * nx] != obj ) {
+                    if ( (int) data [i + 1 + j * nx] != obj + 1 ) { /* +1 because obj-- above */
                         perdone = 1;
                         fmdata [obj + 3 * nobj] += 1.0;
                     }
                 if ( j < ny - 1 && !perdone )
-                    if ( (int) data [i + (j + 1) * nx] != obj ) {
+                    if ( (int) data [i + (j + 1) * nx] != obj + 1 ) { /* +1 because obj-- above */
                         perdone = 1;
                         fmdata [obj + 3 * nobj] += 1.0;
                     }
@@ -99,9 +101,13 @@ void assign_features (SEXP x, SEXP ref) {
                 fmdata [obj] = floor (fmdata [obj] / fmdata [obj + 2 * nobj] * 10.0) / 10.0;
                 fmdata [obj + nobj] = floor (fmdata [obj + nobj] / fmdata [obj + 2 * nobj] * 10.0) / 10.0;
             }        
-        /* put fm into the list */
-        SET_VECTOR_ELT (features, im, fm[im] );
     }
+    PROTECT ( features = allocVector(VECSXP, nz) );
+    nprotect++;
+    /* put fm into the list */
+    for ( im = 0; im < nz; im++ )
+        SET_VECTOR_ELT (features, im, fm[im] );
+    SET_SLOT (x, mkString("features"), features);
     UNPROTECT(nprotect);
 }
 

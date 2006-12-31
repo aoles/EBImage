@@ -7,8 +7,6 @@
 \alias{[,Image,numeric,numeric-method}
 \alias{[,Image,array,missing-method}
 \alias{[,Image,logical,missing-method}
-\alias{image}
-\alias{hist}
 \alias{affinet,Image-method}
 \alias{as.array,Image-method}
 \alias{as.matrix,Image-method}
@@ -55,7 +53,6 @@
 \alias{normalize2,Image-method}
 \alias{normalize,Image-method}
 \alias{opening,Image-method}
-\alias{print,Image-method}
 \alias{resample,Image-method}
 \alias{resize,Image-method}
 \alias{resolution,Image-method}

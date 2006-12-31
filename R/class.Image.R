@@ -375,48 +375,46 @@ setMethod ("[", signature(x="Image", i="logical", j="missing"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("print", signature(x="Image"),
-    function(x, ...) {
-        if ( length( features(x) ) > 0 )
-            cat ("\n'Image' with annotated object data\n")
-        else
-            cat ("\n'Image'\n")
-        if ( colorMode(x) == TrueColor ) {
-            cat ("  colorMode()   : TrueColor\n")
-            cat ("  storage class : integer 3D array, 8-bit/color RGB-, no Alpha\n")
-        }
-        if ( colorMode(x) == Grayscale ) {
-            cat ("  colorMode()   : Grayscale\n")
-            cat ("  storage class : numeric 3D array, writable images in range [0..1]\n")
-        }
-        dimx = dim (x)
-        if ( dimx[3] > 1 )
-            cat ( sprintf ("  dim()         : %dx%d, %d image(s)\n", dimx[1], dimx[2], dimx[3]) )
-        else
-            cat ( sprintf ("  dim()         : %dx%d\n", dimx[1], dimx[2]) )
-        cat ( sprintf ("  fileName()    : %s \n", fileName(x) ) )
-        cat ( sprintf ("  compression() : %s \n", compression(x) ) )
-        cat ( sprintf ("  resolution()  : dx = %.1f, dy = %.1f \n", resolution(x)[1], resolution(x)[2]) )
-        cat ( sprintf ("  sampleFilter(): %s \n", sampleFilter(x) ) )
-
-        if ( length( features(x) ) > 0 ) {
-            cat ( "\n  Object data: features()\n" )
-            print ( x@features )
-            return ( invisible(NULL) )
-        }
-
-        partial <- rep(FALSE, 3)
-        dmax <- c(5, 6, 3)
-        for (i in 1:3) {
-            if ( dimx[i] > dmax[i]) {
-                dimx[i] <- dmax[i]
-                partial[i] = TRUE
-            }
-        }
-        cat ( sprintf("\n  imageData() subset [1:%d, 1:%d, 1:%d]:\n", dimx[1], dimx[2], dimx[3]) )
-        print ( x@.Data[ 1:dimx[1], 1:dimx[2], 1:dimx[3] ], digits=3 )
+print.Image <- function(x, ...) {
+    if ( length( features(x) ) > 0 )
+        cat ("\n'Image' with annotated object data\n")
+    else
+        cat ("\n'Image'\n")
+    if ( colorMode(x) == TrueColor ) {
+        cat ("  colorMode()   : TrueColor\n")
+        cat ("  storage class : integer 3D array, 8-bit/color RGB-, no Alpha\n")
     }
-)
+    if ( colorMode(x) == Grayscale ) {
+        cat ("  colorMode()   : Grayscale\n")
+        cat ("  storage class : numeric 3D array, writable images in range [0..1]\n")
+    }
+    dimx = dim (x)
+    if ( dimx[3] > 1 )
+        cat ( sprintf ("  dim()         : %dx%d, %d image(s)\n", dimx[1], dimx[2], dimx[3]) )
+    else
+        cat ( sprintf ("  dim()         : %dx%d\n", dimx[1], dimx[2]) )
+    cat ( sprintf ("  fileName()    : %s \n", fileName(x) ) )
+    cat ( sprintf ("  compression() : %s \n", compression(x) ) )
+    cat ( sprintf ("  resolution()  : dx = %.1f, dy = %.1f \n", resolution(x)[1], resolution(x)[2]) )
+    cat ( sprintf ("  sampleFilter(): %s \n", sampleFilter(x) ) )
+
+    if ( length( features(x) ) > 0 ) {
+        cat ( "\n  Object data: features()\n" )
+        print ( x@features )
+        return ( invisible(NULL) )
+    }
+
+    partial <- rep(FALSE, 3)
+    dmax <- c(5, 6, 3)
+    for (i in 1:3) {
+        if ( dimx[i] > dmax[i]) {
+            dimx[i] <- dmax[i]
+            partial[i] = TRUE
+        }
+    }
+    cat ( sprintf("\n  imageData() subset [1:%d, 1:%d, 1:%d]:\n", dimx[1], dimx[2], dimx[3]) )
+    print ( x@.Data[ 1:dimx[1], 1:dimx[2], 1:dimx[3] ], digits=3 )
+}
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("show", signature(object="Image"),
@@ -438,26 +436,24 @@ setMethod ("as.matrix", signature(x="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("image", signature(x = "Image"),
-    function(x, i, xlab = "", ylab = "", axes = FALSE, col=gray ((0:255) / 255), ...) {
-        dimx <- dim (x)
-        if ( missing(i) ) {
-            if ( dimx[3] > 1 )
-                warning ( .("missing i for an image stack, assuming i=1") )
-            i <- 1
-        }
-        i <- as.integer ( i[1] )
-        if ( i < 1 || i > dimx[3] )
-            stop ( .("index i out of range") )
-        if ( any(dimx == 0) )
-            stop ( .("image size is zero, nothing to plot") )
-        X <- 1:dimx[1]
-        Y <- 1:dimx[2]
-        Z <- as.matrix ( x[,,i] )[, rev(Y)]
-        asp <- dimx[2] / dimx[1]
-        graphics:::image (x=X, y=Y, z=Z, asp=asp, col=col, axes=axes, xlab=xlab, ylab=ylab, ...)
+image.Image <- function(x, i, xlab = "", ylab = "", axes = FALSE, col=gray ((0:255) / 255), ...) {
+    dimx <- dim (x)
+    if ( missing(i) ) {
+        if ( dimx[3] > 1 )
+            warning ( .("missing i for an image stack, assuming i=1") )
+        i <- 1
     }
-)
+    i <- as.integer ( i[1] )
+    if ( i < 1 || i > dimx[3] )
+        stop ( .("index i out of range") )
+    if ( any(dimx == 0) )
+        stop ( .("image size is zero, nothing to plot") )
+    X <- 1:dimx[1]
+    Y <- 1:dimx[2]
+    Z <- as.matrix ( x[,,i] )[, rev(Y)]
+    asp <- dimx[2] / dimx[1]
+    graphics:::image (x=X, y=Y, z=Z, asp=asp, col=col, axes=axes, xlab=xlab, ylab=ylab, ...)
+}
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("channel", signature(x="Image", mode="character"),
@@ -482,17 +478,15 @@ setMethod ("channel", signature(x="Image", mode="character"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("hist", signature(x="Image"),
-    function (x, breaks=255, main=paste("Image histogram. Total", length(x), "pixels"), xlab="colors", ...) {
-        if ( xlab == "colors" ) {
-            if ( colorMode(x) == Grayscale ) 
-                xlab = "Shades of gray, 0: black, 1: white"
-            if ( colorMode(x) == TrueColor )
-                xlab = "RGB values, non-informative"
-        }
-        graphics:::hist ( imageData(x), breaks=breaks, main=main, xlab=xlab, ...)
+hist.Image <- function (x, breaks=255, main=paste("Image histogram. Total", length(x), "pixels"), xlab="colors", ...) {
+    if ( xlab == "colors" ) {
+        if ( colorMode(x) == Grayscale ) 
+            xlab = "Shades of gray, 0: black, 1: white"
+        if ( colorMode(x) == TrueColor )
+            xlab = "RGB values, non-informative"
     }
-)
+    graphics:::hist ( imageData(x), breaks=breaks, main=main, xlab=xlab, ...)
+}
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("combine", signature(x="Image", y="Image"),

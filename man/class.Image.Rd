@@ -40,10 +40,10 @@
 }
 
 \section{ Constants }{
-
-  \code{Grayscale = 0}
-
-  \code{TrueColor = 1}
+  \preformatted{
+    Grayscale = as.integer(0)
+    TrueColor = as.integer(1)
+  }
 }
 
 \section{ Accessor methods and slots }{
@@ -146,7 +146,7 @@
 
 \seealso{ 
   \code{
-    \link{Image}, \link{image,Image-method}, \link{display}, \link{channel}
+    \link{Image}, \link{image.Image}, \link{display}, \link{channel}
   }
 }
 

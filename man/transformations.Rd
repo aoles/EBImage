@@ -18,17 +18,14 @@
 }
 
 \section{ Usage }{
-  \code{affinet(x, sx=0, rx=0, ry=0, sy=0, tx=0, ty=0, ...)}
-  
-  \code{flip(x, ...)}
-  
-  \code{flop(x, ...)}
-  
-  \code{resample(x, w, h, ...)}
-  
-  \code{resize(x, w, h, blur=1, ...)}
-  
-  \code{rotate(x, angle=90, ...)}
+  \preformatted{
+    affinet(x, sx=0, rx=0, ry=0, sy=0, tx=0, ty=0, ...)
+    flip(x, ...)
+    flop(x, ...)
+    resample(x, w, h, ...)
+    resize(x, w, h, blur=1, ...)
+    rotate(x, angle=90, ...)
+  }
 }
 
 \section{ Arguments }{ \describe{
