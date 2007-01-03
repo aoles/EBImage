@@ -62,7 +62,9 @@
   will contain the following columns (subject ot change, will be extended):
   \code{'x', 'y', 'size', 'per', 'int', 'edge'} with one row per every single
   detected object.
-    
+  
+  If \code{do.detect} is set to \code{FALSE} or in case the segmented image was
+  changes, objects can be re-detected with \code{\link{objectImage}}.
 }
 
 \section{ Details }{
@@ -77,7 +79,7 @@
 
 \seealso{
   \code{
-    \link{Image-class}, \link{distmap}, \link{thresh}
+    \link{Image-class}, \link{distmap}, \link{thresh}, \link{objectImage}
   }
 }
 
@@ -92,7 +94,8 @@
     t <- thresh( a, 50, 50, 0.03 )
     t <- closing( t, morphKern(7) )
     dm <- distmap(t, 0.0)
-    x <- watershed(dm, ref=a, ext=2)
+    x <- watershed(dm, ext=2, do.detect=FALSE)
+    x <- objectImage(x, ref=a)
     \dontrun{this will print all the detected objects}
     print(x)
     res <- combine( a[,,1], normalize(x[,,1]), a[,,2], normalize(x[,,2]) )

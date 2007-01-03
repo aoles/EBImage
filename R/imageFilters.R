@@ -423,3 +423,16 @@ setMethod ("watershed", signature(x="Image"),
     }
 )
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("objectImage", signature(x="Image", ref="Image"),
+    function (x, ref, ...) {
+        if ( !assert(x, ref, strict=TRUE) )
+            stop ( .("'x' and 'ref' must be of the same size and color mode") )
+        return ( .DoCall ("lib_assignFeatures", x, ref) )
+    }
+)
+
+setMethod ("objectImage", signature(x="Image", ref="NULL"),
+    function (x, ref, ...) .DoCall ("lib_assignFeatures", x, NULL)
+)
+

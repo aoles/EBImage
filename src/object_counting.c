@@ -10,6 +10,18 @@ See: ../LICENSE for license, LGPL
 #define BG 0.0
 #define N_FEATURES 6
 
+/*----------------------------------------------------------------------- */
+SEXP
+lib_assignFeatures (SEXP x, SEXP ref) {
+    SEXP res;
+
+    PROTECT ( res = Rf_duplicate(x) );
+    assign_features (res, ref);
+    UNPROTECT (1);
+    return res;    
+};
+
+/*----------------------------------------------------------------------- */
 /* will assign features field to the argument, modifying argument */
 /* used in watershed and other routines. We assume that supplied x is
 ALREADY a duplicate of that sent from R, so we modify it */
@@ -19,7 +31,8 @@ void assign_features (SEXP x, SEXP ref) {
     double * data, * refdata, * fmdata;
     
     if ( !isImage(x) ) return;
-
+    if ( !isImage(ref) && ref != R_NilValue ) return;
+    
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
     nz = INTEGER ( GET_DIM(x) )[2];
