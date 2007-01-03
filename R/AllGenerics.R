@@ -83,9 +83,12 @@ setGeneric ("erode",          function (x, ...)        standardGeneric("erode") 
 setGeneric ("dilate",         function (x, ...)        standardGeneric("dilate") )
 setGeneric ("opening",        function (x, ...)        standardGeneric("opening") )
 setGeneric ("closing",        function (x, ...)        standardGeneric("closing") )
+
+## object detection and related
 setGeneric ("distmap",        function (x, ...)        standardGeneric("distmap") )
 setGeneric ("watershed",      function (x, ...)        standardGeneric("watershed") )
-setGeneric ("objectImage",    function (x, ref, ...)   standardGeneric("objectImage") )
+setGeneric ("getObjects",     function (x, ref, ...)   standardGeneric("getObjects") )
+setGeneric ("paintObjects",   function (x, tgt, ...)   standardGeneric("paintObjects") )
 
 ## in this package defined for Image (class.Image.R), ANY (in tools.R)
 setGeneric ("channel",        function (x, mode, ...)  standardGeneric("channel") )

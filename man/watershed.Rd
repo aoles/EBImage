@@ -64,7 +64,7 @@
   detected object.
   
   If \code{do.detect} is set to \code{FALSE} or in case the segmented image was
-  changes, objects can be re-detected with \code{\link{objectImage}}.
+  changes, objects can be re-detected with \code{\link{getObjects}}.
 }
 
 \section{ Details }{
@@ -79,7 +79,7 @@
 
 \seealso{
   \code{
-    \link{Image-class}, \link{distmap}, \link{thresh}, \link{objectImage}
+    \link{Image-class}, \link{distmap}, \link{thresh}, \link{getObjects}
   }
 }
 
@@ -95,13 +95,16 @@
     t <- closing( t, morphKern(7) )
     dm <- distmap(t, 0.0)
     x <- watershed(dm, ext=2, do.detect=FALSE)
-    x <- objectImage(x, ref=a)
+    x <- getObjects(x, ref=a)
     \dontrun{this will print all the detected objects}
     print(x)
     res <- combine( a[,,1], normalize(x[,,1]), a[,,2], normalize(x[,,2]) )
     \dontrun{this will display a set of 4 images:}
     \dontrun{each segmented, x, after the original, a}
     display(res)
+    \dontrun{paint different objects in TrueColor}
+    q <- paintObjects(x, channel(a, "rgb") )
+    display(q)
   }
 }
 

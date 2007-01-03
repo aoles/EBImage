@@ -22,6 +22,86 @@ lib_assignFeatures (SEXP x, SEXP ref) {
 };
 
 /*----------------------------------------------------------------------- */
+/* will paint features on the target image with given colors and opacs    */
+SEXP
+lib_paintFeatures (SEXP x, SEXP tgt, SEXP _opac, SEXP _col) {
+    SEXP res;
+    Image * image, * colors;
+    PixelPacket * pixelPtr, * colorPtr;
+    int nprotect, nx, ny, nz, im, i, j, tgtmode, index;
+    double * data, * imdata, * opac;
+    
+    if ( !isImage(x) || !isImage(tgt) ) return tgt;
+    
+    nx = INTEGER ( GET_DIM(x) )[0];
+    ny = INTEGER ( GET_DIM(x) )[1];
+    nz = INTEGER ( GET_DIM(x) )[2];
+    nprotect = 0;
+
+    PROTECT ( res = Rf_duplicate(tgt) );
+    nprotect++;
+
+    tgtmode = INTEGER ( GET_SLOT(tgt, mkString("colormode") ) )[0];
+    opac = REAL (_opac);
+    /* will keep colors in a small image -- easier to access - 3 values */
+    colors = vector2image1D (_col);
+    colorPtr = SetImagePixels (colors, 0, 0, 3, 1);
+    for ( i = 0; i < 3; i++ ) {
+        colorPtr[i].red *= opac[i];
+        colorPtr[i].green *= opac[i];
+        colorPtr[i].blue *= opac[i];
+    }
+
+    for ( im = 0; im < nz; im++ ) {
+        imdata = &( REAL(x)[ im * nx * ny ] );
+        for ( j = 0; j < ny; j++ ) {
+            data = &( REAL(x)[ im * nx * ny + j * nx ] );
+            image = NULL;
+            if ( tgtmode == MODE_RGB )
+                image = int2image1D ( &(INTEGER(res)[ im * nx * ny + j * nx ]), nx );
+            if ( tgtmode == MODE_GRAY )
+                image = double2image1D ( &(REAL(res)[ im * nx * ny + j * nx ]), nx );
+            if ( image == NULL ) continue;
+            for ( i = 0; i < nx; i++ ) {
+                if ( data[i] <= 0 ) continue;
+                pixelPtr = SetImagePixels (image, i, 0, 1, 1);
+                index = 1;
+                if ( data[i] < 1.0 || i < 1 || i > nx - 2 || j < 1 || j > ny - 2 )
+                    /* pixel is contact */
+                    index = 2;
+                else
+                    /* check if pixel is border, edge is same as contact */
+                if ( imdata[ i - 1 + j * nx ] != data[i] || imdata[ i + 1 + j * nx ] != data[i] ||
+                    imdata[ i + (j - 1) * nx ] != data[i] || imdata[ i + (j + 1) * nx ] != data[i] )
+                    index = 0;
+                if ( pixelPtr->red + colorPtr[index].red < QuantumRange )
+                    pixelPtr->red += colorPtr[index].red;
+                else
+                    pixelPtr->red = QuantumRange;
+                if ( pixelPtr->green + colorPtr[index].green < QuantumRange )
+                    pixelPtr->green += colorPtr[index].green;
+                else
+                    pixelPtr->green = QuantumRange;
+                if ( pixelPtr->blue + colorPtr[index].blue < QuantumRange )
+                    pixelPtr->blue += colorPtr[index].blue;
+                else
+                    pixelPtr->blue = QuantumRange;
+            }
+            if ( tgtmode == MODE_RGB )
+                image1D2int (image, &(INTEGER(res)[ im * nx * ny + j * nx ]), nx );
+            if ( tgtmode == MODE_GRAY )
+                image1D2double (image, &(REAL(res)[ im * nx * ny + j * nx ]), nx );
+            DestroyImage (image);
+        }
+    }
+
+    DestroyImage (colors);
+
+    UNPROTECT (nprotect);
+    return res;    
+}
+
+/*----------------------------------------------------------------------- */
 /* will assign features field to the argument, modifying argument */
 /* used in watershed and other routines. We assume that supplied x is
 ALREADY a duplicate of that sent from R, so we modify it */
