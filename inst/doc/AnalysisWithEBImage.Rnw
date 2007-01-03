@@ -234,10 +234,8 @@ Illustration of the object detection algorithm: (a) -- {\em sqrt}-brightened com
 +  x2 <- watershed(d, seeds=seeds)
 +  rgb <- channel(i1, "asgreen") + channel(i2, "asred")
 +  rgb <- rgb + channel(i3, "asblue")
-+  e <- fdraw(x2, ref=rgb, fill=F)
-+ ## FIXME: fdraw still to be ported from wsPaint
-+  f <- fdraw(x2, ref=i3, opac=0.15)
-+  f <- fdraw(x1, ref=f,  opac=0.15)
++  e <- objectPaint(x2, rgb, opac=c(0.4, 0, 0))
++  f <- objectPaint(x1, objectPaint(x2, i3) )
 + }
 \end{verbatim}
 %$

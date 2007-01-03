@@ -81,6 +81,7 @@ SEXP         lib_filterThresh (SEXP, SEXP);             /* filters_thresh.c */
 SEXP         lib_distMap (SEXP, SEXP, SEXP, SEXP);      /* filters_distmap.c */
 SEXP         lib_filterInvWS (SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);  /* filters_watershed.c */
 SEXP         lib_assignFeatures (SEXP, SEXP);            /* object_counting.c */
+SEXP         lib_paintFeatures (SEXP, SEXP, SEXP, SEXP); /* -"- */
 
 /* library exports and internal functions */
 Image *      sexp2Magick (SEXP);                  /* conversions.c */
@@ -91,7 +92,11 @@ PointXY      pointFromIndex (const int, const int);           /* -"- */
 int          indexFromPoint (const PointXY, const int);       /* -"- */
 int          indexFromXY (const int, const int, const int);   /* -"- */
 void         assign_features (SEXP, SEXP);                    /* object_counting.c */
-
+Image *      int2image1D (int *, int);                        /* colors.c */
+Image *      double2image1D (double *, int);                  /* colors.c */
+void         image1D2double (Image *, double *, int);         /* colors.c */
+void         image1D2int (Image *, int *, int);               /* colors.c */
+Image *      vector2image1D (SEXP);                           /* colors.c */
 #ifdef USE_GTK
 void         _doIter (void *);                    /* tools.c */
 GdkPixbuf *  newPixbufFromImages (Image *, int);  /* conversions.c */

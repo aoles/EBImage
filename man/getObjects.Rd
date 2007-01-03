@@ -1,6 +1,6 @@
-\name{objectImage}
+\name{getObjects}
 
-\alias{objectImage}
+\alias{getObjects}
 
 \concept{object detection}
 
@@ -44,7 +44,7 @@
 
 \seealso{
   \code{
-    \link{Image-class}, \link{watershed}
+    \link{Image-class}, \link{watershed}, \link{paintObjects}
   }
 }
 

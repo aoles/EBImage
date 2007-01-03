@@ -113,6 +113,37 @@ vector2image1D (SEXP x) {
 }
 
 /*----------------------------------------------------------------------- */
+Image * 
+int2image1D (int * x, int nvals) {
+    Image * res;
+    ExceptionInfo exception;
+
+    res = NULL;
+    GetExceptionInfo (&exception);
+    res = ConstituteImage (nvals, 1, "RGBp", CharPixel, x, &exception );
+    CatchException (&exception);
+    if ( res != NULL )
+        SetImageOpacity (res, 0);
+    return res;
+}
+
+/*----------------------------------------------------------------------- */
+Image * 
+double2image1D (double * x, int nvals) {
+    Image * res;
+    ExceptionInfo exception;
+
+    res = NULL;
+    GetExceptionInfo (&exception);
+    res = ConstituteImage (nvals, 1, "I", DoublePixel, x, &exception );
+    CatchException (&exception);
+    if ( res != NULL )
+        SetImageOpacity (res, 0);
+    return res;
+}
+
+
+/*----------------------------------------------------------------------- */
 SEXP 
 image1D2REAL (Image * image, int what) {
     SEXP res;
@@ -150,6 +181,18 @@ image1D2REAL (Image * image, int what) {
 }
 
 /*----------------------------------------------------------------------- */
+void
+image1D2double (Image * image, double * tgt, int nvals) {
+    ExceptionInfo exception;
+    
+    if ( image == NULL ) return;
+
+    GetExceptionInfo (&exception);
+    DispatchImage (image, 0, 0, nvals, 1, "I", DoublePixel, tgt, &exception );
+    CatchException (&exception);
+}
+
+/*----------------------------------------------------------------------- */
 SEXP 
 image1D2INTEGER (Image * image, int what) {
     SEXP res;
@@ -184,6 +227,18 @@ image1D2INTEGER (Image * image, int what) {
 
     UNPROTECT (nprotect);
     return res;
+}
+
+/*----------------------------------------------------------------------- */
+void
+image1D2int (Image * image, int * tgt, int nvals) {
+    ExceptionInfo exception;
+    
+    if ( image == NULL ) return;
+
+    GetExceptionInfo (&exception);
+    DispatchImage (image, 0, 0, nvals, 1, "RGBp", CharPixel, tgt, &exception );
+    CatchException (&exception);
 }
 
 /*----------------------------------------------------------------------- */
