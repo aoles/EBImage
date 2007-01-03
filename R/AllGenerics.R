@@ -85,6 +85,7 @@ setGeneric ("opening",        function (x, ...)        standardGeneric("opening"
 setGeneric ("closing",        function (x, ...)        standardGeneric("closing") )
 setGeneric ("distmap",        function (x, ...)        standardGeneric("distmap") )
 setGeneric ("watershed",      function (x, ...)        standardGeneric("watershed") )
+setGeneric ("objectImage",    function (x, ref, ...)   standardGeneric("objectImage") )
 
 ## in this package defined for Image (class.Image.R), ANY (in tools.R)
 setGeneric ("channel",        function (x, mode, ...)  standardGeneric("channel") )

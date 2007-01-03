@@ -66,6 +66,8 @@
 \alias{thresh,Image-method}
 \alias{umask,Image-method}
 \alias{watershed,Image-method}
+\alias{objectImage,Image,Image-method}
+\alias{objectImage,Image,NULL-method}
 \alias{write.image,Image,character-method}
 \alias{write.image,Image,missing-method}
 

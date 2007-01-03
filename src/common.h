@@ -80,7 +80,7 @@ SEXP         lib_erode_dilate (SEXP, SEXP, SEXP, SEXP); /* filters_morph.c */
 SEXP         lib_filterThresh (SEXP, SEXP);             /* filters_thresh.c */
 SEXP         lib_distMap (SEXP, SEXP, SEXP, SEXP);      /* filters_distmap.c */
 SEXP         lib_filterInvWS (SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);  /* filters_watershed.c */
-
+SEXP         lib_assignFeatures (SEXP, SEXP);            /* object_counting.c */
 
 /* library exports and internal functions */
 Image *      sexp2Magick (SEXP);                  /* conversions.c */
