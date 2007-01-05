@@ -101,7 +101,7 @@ After starting the installation wizard, you can select the default settings and 
 
 If you are planning to compile \Rpackage{EBImage} from source, select during the installation that you want development files to be installed as well of. In this case, it is strongly recommended to install \lib{ImageMagick} into a path that does not contain spaces. The recommended, and hard coded into \code{.\\src\\Makevars.win} is \code{c:\\ImageMagick}. If select another location, please be sure to update this file.
 
-\subsection{Installing ImageMagick}
+\subsection{Installing GTK+}
 
 It is recommended to use the \lib{GladeWin32} project, \url{http://gladewin32.sf.net} for the source of \lib{GTK+} installer. The \url{www.gtk.org} site has its own installers, but the above one is an all-in-one installation which perfectly fits the needs of \Rpackage{EBImage}. Please download the latest available release of \emph{Gtk+/Win32 Development Environment} if you are planning to recompile the package from source, or \emph{Gtk+/Win32 
 Runtime Environment} if you are just planning to use the binary. For the binary installation just run the installer and accept the default suggestions: the installer will register all environmental variables for you.
@@ -110,7 +110,7 @@ Please ensure now that the installer added the path to \lib{GTK+} \code{\\bin} d
 
 If you are planning to compile \Rpackage{EBImage} from source, install \lib{GTK+} into a path that does not contain spaces. It is strongly recommended to use the same directory where you installed MSYS and MinGW, namely \code{c:\\mingw}. This directory is hard coded into \code{.\\src\\Makevars.win} and you will need to modify this file if installing \lib{GTK+} elsewhere.
 
-\subsection{Installing ImageMagick}
+\subsection{Installing the package}
 
 The binary package can be installed now using the R menu command to install a package from a local file.
 
