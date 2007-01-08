@@ -8,8 +8,6 @@
 \alias{[,Image,array,missing-method}
 \alias{[,Image,logical,missing-method}
 \alias{affinet,Image-method}
-\alias{as.array,Image-method}
-\alias{as.matrix,Image-method}
 \alias{assert,Image,Image-method}
 \alias{assert,Image,missing-method}
 \alias{athresh,Image-method}
@@ -68,6 +66,7 @@
 \alias{watershed,Image-method}
 \alias{getObjects,Image,Image-method}
 \alias{getObjects,Image,NULL-method}
+\alias{combineObjects,Image-method}
 \alias{paintObjects,Image,Image-method}
 \alias{write.image,Image,character-method}
 \alias{write.image,Image,missing-method}

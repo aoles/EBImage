@@ -15,7 +15,7 @@
 
 \section{ Usage }{
   \preformatted{
-    watershed(x, ref=NULL, do.detect=TRUE, ext=1, alg="exclude", ..., verbose=FALSE)
+    watershed(x, ext=1, alg="exclude", ..., verbose=FALSE)
   }
 }
 
@@ -23,12 +23,6 @@
 
   \item{\code{x}}{An object of \code{\link{Image-class}} in the 
     \code{\link{Grayscale}} mode. }
-
-  \item{\code{ref}}{If \code{do.detect} is set to \code{TRUE}, this should
-    be a reference image to calculate intensity of objects. }
-
-  \item{\code{do.detect}}{ A logical value indicating if object feature 
-    detection should be performed after the watershed transformation. } 
 
   \item{\code{ext}}{ Extension of neighboring pixels. Recommended values 1 or 
     2. If \code{alg} is supplied a value \code{'exclude'} this will also
@@ -55,16 +49,6 @@
   object are assigned the value of \code{0.5}. To preview the results visually, 
   use \code{\link{display}( \link{normalize}(result) )}.
   
-  If \code{do.detect} is set to \code{TRUE} then the resulting image will 
-  contain a non-empty list of matrixes (one per image in stack) with image
-  descriptors. This list can be accessed using \code{\link{features}(result)}
-  accessor method of the \code{\link{Image-class}}. Every matrix in the list
-  will contain the following columns (subject ot change, will be extended):
-  \code{'x', 'y', 'size', 'per', 'int', 'edge'} with one row per every single
-  detected object.
-  
-  If \code{do.detect} is set to \code{FALSE} or in case the segmented image was
-  changes, objects can be re-detected with \code{\link{getObjects}}.
 }
 
 \section{ Details }{
@@ -94,17 +78,20 @@
     t <- thresh( a, 50, 50, 0.03 )
     t <- closing( t, morphKern(7) )
     dm <- distmap(t, 0.0)
-    x <- watershed(dm, ext=2, do.detect=FALSE)
-    x <- getObjects(x, ref=a)
-    \dontrun{this will print all the detected objects}
-    print(x)
+    x <- watershed(dm, ext=1)
     res <- combine( a[,,1], normalize(x[,,1]), a[,,2], normalize(x[,,2]) )
     \dontrun{this will display a set of 4 images:}
     \dontrun{each segmented, x, after the original, a}
     display(res)
-    \dontrun{paint different objects in TrueColor}
-    q <- paintObjects(x, channel(a, "rgb") )
-    display(q)
+    \dontrun{paint and display different objects in TrueColor}
+    display(paintObjects(x, channel(a, "rgb")))
+    \dontrun{this will modify detected objects combining some of them}
+    x <- combineObjects(x, fraction=0.2)
+    x <- getObjects(x, ref=a)
+    \dontrun{this will print all the detected objects}
+    print(x)
+    \dontrun{paint and display combined objects for comparison}
+    display(paintObjects(x, channel(a, "rgb")))
   }
 }
 

@@ -40,8 +40,6 @@ setGeneric ("display",        function (x, ...)        standardGeneric("display"
 setGeneric ("header",         function (x, ...)        standardGeneric("header") )
 setGeneric ("write.image",    function (x, files, quality, ...) standardGeneric("write.image") )
 setGeneric ("assert",         function (x, y, ...)     standardGeneric("assert") )
-setGeneric ("as.array",       function (x)             standardGeneric("as.array") )
-setGeneric ("as.matrix",      function (x, ...)        standardGeneric("as.matrix") )
 setGeneric ("combine",        function (x, y, ...)     standardGeneric("combine") )
 
 ## image filters (imageFilters.R)
@@ -89,6 +87,7 @@ setGeneric ("distmap",        function (x, ...)        standardGeneric("distmap"
 setGeneric ("watershed",      function (x, ...)        standardGeneric("watershed") )
 setGeneric ("getObjects",     function (x, ref, ...)   standardGeneric("getObjects") )
 setGeneric ("paintObjects",   function (x, tgt, ...)   standardGeneric("paintObjects") )
+setGeneric ("combineObjects", function (x, ...)        standardGeneric("combineObjects") )
 
 ## in this package defined for Image (class.Image.R), ANY (in tools.R)
 setGeneric ("channel",        function (x, mode, ...)  standardGeneric("channel") )

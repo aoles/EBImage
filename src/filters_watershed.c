@@ -18,7 +18,7 @@ See: ../LICENSE for license, LGPL
 /* will generate ObjectImage as result */
 /*----------------------------------------------------------------------- */
 SEXP
-lib_filterInvWS (SEXP x, SEXP ref, SEXP _dodetect, SEXP _alg, SEXP _ext, SEXP _verbose) {
+lib_filterInvWS (SEXP x, SEXP _alg, SEXP _ext, SEXP _verbose) {
     SEXP res, indexSXP;
     int nprotect, im, i, iend, j, ix, jy, npx, nx, ny, nz, * index, index1, marker, progress, counter, verbose, ext, alg;
     double * src, * tgt, thisBe, el, mel;
@@ -148,10 +148,6 @@ lib_filterInvWS (SEXP x, SEXP ref, SEXP _dodetect, SEXP _alg, SEXP _ext, SEXP _v
         Rprintf(" *\n");
     }
 
-    /* assign features */
-    if ( INTEGER(_dodetect)[0] )
-        assign_features (res, ref);
-    
     UNPROTECT (nprotect);
     return res;
 }
