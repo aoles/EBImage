@@ -41,7 +41,7 @@ setGeneric ("header",         function (x, ...)        standardGeneric("header")
 setGeneric ("write.image",    function (x, files, quality, ...) standardGeneric("write.image") )
 setGeneric ("assert",         function (x, y, ...)     standardGeneric("assert") )
 setGeneric ("as.array",       function (x)             standardGeneric("as.array") )
-setGeneric ("as.matrix",      function (x)             standardGeneric("as.matrix") )
+setGeneric ("as.matrix",      function (x, ...)        standardGeneric("as.matrix") )
 setGeneric ("combine",        function (x, y, ...)     standardGeneric("combine") )
 
 ## image filters (imageFilters.R)

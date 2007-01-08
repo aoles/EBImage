@@ -428,7 +428,7 @@ setMethod ("as.array", signature(x="Image"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("as.matrix", signature(x="Image"),
-    function (x) {
+    function (x, ...) {
         if ( dim(x)[3] > 1 )
             stop ( .("cannot coerce multiple images to matrix") )
         return ( matrix( imageData(x), dim(x)[1:2] ) )
