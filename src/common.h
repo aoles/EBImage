@@ -36,10 +36,7 @@ LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 /* GTK+ includes */
 #ifdef USE_GTK
 #   include <gtk/gtk.h>
-//#   include <glib.h>
-//#   include <glib-object.h>
 #   include <gdk/gdk.h>
-//#   include <gdk-pixbuf/gdk-pixbuf.h>
 #   ifdef WIN32
         typedef unsigned long ulong;
         extern  __declspec(dllimport) void (* R_tcldo) ();
@@ -68,40 +65,42 @@ extern "C" {
 #endif
 
 /* R-lib exports to use with .Call */
-SEXP         lib_ (SEXP);                               /* tools.c - _( in R messages */
-SEXP         lib_readImages (SEXP, SEXP);               /* io.c */
-SEXP         lib_writeImages (SEXP, SEXP, SEXP);        /* -"- */
-SEXP         lib_chooseImages ();                       /* -"- */
-SEXP         lib_display (SEXP, SEXP);                  /* display.c */
-SEXP         lib_channel (SEXP, SEXP);                  /* colors.c - extract color channels etc */
-SEXP         lib_filterMagick (SEXP, SEXP, SEXP);       /* filters_magick.c */
-SEXP         lib_filterFill (SEXP, SEXP, SEXP, SEXP, SEXP); /* -"- */
-SEXP         lib_erode_dilate (SEXP, SEXP, SEXP, SEXP); /* filters_morph.c */
-SEXP         lib_filterThresh (SEXP, SEXP);             /* filters_thresh.c */
-SEXP         lib_distMap (SEXP, SEXP, SEXP, SEXP);      /* filters_distmap.c */
-SEXP         lib_filterInvWS (SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);  /* filters_watershed.c */
-SEXP         lib_assignFeatures (SEXP, SEXP);            /* object_counting.c */
-SEXP         lib_paintFeatures (SEXP, SEXP, SEXP, SEXP); /* -"- */
+SEXP         lib_ (SEXP);                                           /* tools.c, _() for R    */
+SEXP         lib_readImages (SEXP, SEXP);                           /* io.c                  */
+SEXP         lib_writeImages (SEXP, SEXP, SEXP);                    /* -"-                   */
+SEXP         lib_chooseImages ();                                   /* -"-                   */
+SEXP         lib_display (SEXP, SEXP);                              /* display.c             */
+SEXP         lib_channel (SEXP, SEXP);                              /* colors.c              */
+SEXP         lib_filterMagick (SEXP, SEXP, SEXP);                   /* filters_magick.c      */
+SEXP         lib_filterFill (SEXP, SEXP, SEXP, SEXP, SEXP);         /* -"-                   */
+SEXP         lib_erode_dilate (SEXP, SEXP, SEXP, SEXP);             /* filters_morph.c       */
+SEXP         lib_filterThresh (SEXP, SEXP);                         /* filters_thresh.c      */
+SEXP         lib_distMap (SEXP, SEXP, SEXP, SEXP);                  /* filters_distmap.c     */
+SEXP         lib_filterInvWS (SEXP, SEXP, SEXP, SEXP);              /* filters_watershed.c   */
+SEXP         lib_assignFeatures (SEXP, SEXP);                       /* object_counting.c     */
+SEXP         lib_paintFeatures (SEXP, SEXP, SEXP, SEXP);            /* -"-                   */
+SEXP         lib_combineFeatures (SEXP, SEXP, SEXP);                /* -"-                   */
 
 /* library exports and internal functions */
-Image *      sexp2Magick (SEXP);                  /* conversions.c */
-SEXP         magick2SEXP (Image *, int);          /* conversions.c */
-int          isImage (SEXP);                                 /* tools.c */
-double       distanceXY (const PointXY, const PointXY);       /* -"- */
-PointXY      pointFromIndex (const int, const int);           /* -"- */
-int          indexFromPoint (const PointXY, const int);       /* -"- */
-int          indexFromXY (const int, const int, const int);   /* -"- */
-void         assign_features (SEXP, SEXP);                    /* object_counting.c */
-Image *      int2image1D (int *, int);                        /* colors.c */
-Image *      double2image1D (double *, int);                  /* colors.c */
-void         image1D2double (Image *, double *, int);         /* colors.c */
-void         image1D2int (Image *, int *, int);               /* colors.c */
-Image *      vector2image1D (SEXP);                           /* colors.c */
+Image *      sexp2Magick (SEXP);                                    /* conversions.c         */
+SEXP         magick2SEXP (Image *, int);                            /* -"-                   */
+int          isImage (SEXP);                                        /* tools.c               */
+double       distanceXY (const PointXY, const PointXY);             /* -"-                   */
+PointXY      pointFromIndex (const int, const int);                 /* -"-                   */
+int          indexFromPoint (const PointXY, const int);             /* -"-                   */
+int          indexFromXY (const int, const int, const int);         /* -"-                   */
+void         assign_features (SEXP, SEXP);                          /* object_counting.c     */
+Image *      int2image1D (int *, int);                              /* colors.c              */
+Image *      double2image1D (double *, int);                        /* -"-                   */
+void         image1D2double (Image *, double *, int);               /* -"-                   */
+void         image1D2int (Image *, int *, int);                     /* -"-                   */
+Image *      vector2image1D (SEXP);                                 /* -"-                   */
+
 #ifdef USE_GTK
-void         _doIter (void *);                    /* tools.c */
-GdkPixbuf *  newPixbufFromImages (Image *, int);  /* conversions.c */
+void         _doIter (void *);                                      /* tools.c               */
+GdkPixbuf *  newPixbufFromImages (Image *, int);                    /* conversions.c         */
 #ifdef WIN32
-void         _doIterWin32 ();                     /* tools.c */
+void         _doIterWin32 ();                                       /* tools.c               */
 #endif
 #endif
 

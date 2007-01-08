@@ -8,7 +8,9 @@ exportClasses(
 )
 exportMethods(
     copy, display, write.image, header, assert, combine,
-    as.array, as.matrix, show, "[", channel,
+    show, "[", channel,
+
+    ## FIXME: as.array, as.matrix, ## incompatibility with R < 2.4.1
 
     features,
     colorMode, "colorMode<-",
@@ -22,6 +24,6 @@ exportMethods(
     cgamma, mediansmooth, noise, resize, rotate, resample, segment,
     sharpen, umask, thresh, athresh, cthresh, affinet, modulate, negate, 
     normalize, normalize2, fill, flip, flop, erode, dilate, opening, closing,
-    distmap, watershed, getObjects, paintObjects
+    distmap, watershed, getObjects, paintObjects, combineObjects
     
 )

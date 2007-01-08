@@ -14,7 +14,7 @@
 
 \section{ Usage }{
   \preformatted{
-    objectImage(x, ref, ...)
+    getObjects(x, ref, ...)
   }
 }
 
@@ -44,7 +44,8 @@
 
 \seealso{
   \code{
-    \link{Image-class}, \link{watershed}, \link{paintObjects}
+    \link{Image-class}, \link{watershed}, \link{paintObjects}, 
+    \link{combineObjects}
   }
 }
 

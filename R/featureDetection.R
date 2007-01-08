@@ -30,31 +30,15 @@ setMethod ("distmap", signature(x="Image"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("watershed", signature(x="Image"),
-    function (x, ref=NULL, do.detect=TRUE, ext=1, alg="exclude", ..., verbose=FALSE) {
+    function (x, ext=1, alg="exclude", ..., verbose=FALSE) {
         if ( colorMode(x) != Grayscale )
             stop ( .("only Grayscale images are supported, use 'channel' to convert") )
-        if ( is.Image(ref) )
-            if ( colorMode(ref) != Grayscale )
-                stop ( .("only Grayscale images are supported in 'ref', use 'channel' to convert") )
-        if ( !is.null(ref) && !is.Image(ref) )
-            stop ( .("'ref' can be either an image of the same size as 'x' or a NULL") )
-        if ( is.Image(ref) )
-            if ( !assert(x, ref, strict=TRUE) )
-                stop ( .("'ref' can be either an image of the same size as 'x' or a NULL") )
         alg <- switch(EXPR=tolower(alg), exclude=0, steepest=1, smooth=2, -1)
         if ( alg < 0 )
             stop ( .("possible values for 'alg' are 'exclude', 'steepest' and 'smooth'") )
         if ( as.integer(ext) < 1 )
             stop ( .("ext must be a positive integer value") )
-        res <- .DoCall("lib_filterInvWS", x, ref, as.integer(do.detect), as.integer(alg), as.integer(ext), as.integer(verbose) )
-        if ( is.Image(res) && do.detect ) {
-            ## set colnames for features
-            for ( i in 1:length(res@features) ) 
-                if ( is.matrix( res@features[[i]] ) )
-                    if ( ncol(res@features[[i]] ) == 6 )
-                       colnames( res@features[[i]] ) <- c("x", "y", "size", "per", "int", "edge")
-        }
-        return (res)
+        return( .DoCall("lib_filterInvWS", x, as.integer(alg), as.integer(ext), as.integer(verbose) ) )
     }
 )
 
@@ -65,7 +49,15 @@ setMethod ("getObjects", signature(x="Image", ref="Image"),
             stop ( .("only Grayscale images are supported, use 'channel' to convert") )
         if ( !assert(x, ref, strict=TRUE) )
             stop ( .("'x' and 'ref' must be of the same size and color mode") )
-        return ( .DoCall ("lib_assignFeatures", x, ref) )
+        res <- .DoCall ("lib_assignFeatures", x, ref)
+        if ( is.Image(res) ) {
+            ## set colnames for features
+            for ( i in 1:length(res@features) ) 
+                if ( is.matrix( res@features[[i]] ) )
+                    if ( ncol(res@features[[i]] ) == 6 )
+                       colnames( res@features[[i]] ) <- c("x", "y", "size", "per", "int", "edge")
+        }
+        return (res)
     }
 )
 
@@ -73,7 +65,15 @@ setMethod ("getObjects", signature(x="Image", ref="NULL"),
     function (x, ref, ...) {
         if ( colorMode(x) != Grayscale )
             stop ( .("only Grayscale images are supported, use 'channel' to convert") )
-        return ( .DoCall ("lib_assignFeatures", x, NULL) )
+        res <- .DoCall ("lib_assignFeatures", x, NULL)
+        if ( is.Image(res) && do.detect ) {
+            ## set colnames for features
+            for ( i in 1:length(res@features) ) 
+                if ( is.matrix( res@features[[i]] ) )
+                    if ( ncol(res@features[[i]] ) == 6 )
+                       colnames( res@features[[i]] ) <- c("x", "y", "size", "per", "int", "edge")
+        }
+        return (res)
     }
 )
 
@@ -89,5 +89,18 @@ setMethod ("paintObjects", signature(x="Image", tgt="Image"),
         if ( any(opac < 0) || any(opac > 1) )
             stop ( .("all opacity values must be in the range [0,1]") )
         return ( .DoCall("lib_paintFeatures", x, tgt, as.numeric(opac), as.character(col)) )
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("combineObjects", signature(x="Image"),
+    function (x, ext=1, fraction=0.3, ...) {
+        if ( colorMode(x) != Grayscale )
+            stop ( .("only Grayscale images are supported, use 'channel' to convert") )
+        if ( as.integer(ext) < 1 )
+            stop ( .("ext must be a positive integer value") )
+        if ( fraction <= 0 || fraction > 1 )
+            stop ( .("'fraction' must be in the range (0,1]") )
+        return ( .DoCall("lib_combineFeatures", x, as.integer(ext), as.numeric(fraction) ) )
     }
 )

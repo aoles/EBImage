@@ -30,10 +30,12 @@
       assign the full dataset. If image was put through the object detection
       algorithm a summary of detected objects will be printed instead of data. }
 
-    \item{\code{as.array(x)} and \code{as.matrix(x)} }{ Return image data in the
-      corresponding format. \code{as.array} is essentially the same as 
-      \code{imageData}. }
+    \item{\code{as.array(x)}}{ Removed to avoid incompatibilities with R < 2.5. 
+      Use \code{\link{imageData}} instead. }
   
+    \item{\code{as.matrix(x, ...)}}{ Removed to avoid incompatibilities with 
+      R < 2.5. Use \code{as.matrix(\link{imageData}(x))} instead. }
+
     \item{\code{hist(x, ...)}}{ Slightly modyfied to better suit the 
       assumed grayscale data range \code{[0,1]}.  }
 

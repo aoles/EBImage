@@ -422,18 +422,20 @@ setMethod ("show", signature(object="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("as.array", signature(x="Image"),
-    function (x) imageData (x)
-)
+## FIXME: as.matrix causes incompatibility with R < 2.4.1, as.array disabled as well, use imageData()
+#setMethod ("as.array", signature(x="Image"),
+#    function (x) imageData (x)
+#)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("as.matrix", signature(x="Image"),
-    function (x, ...) {
-        if ( dim(x)[3] > 1 )
-            stop ( .("cannot coerce multiple images to matrix") )
-        return ( matrix( imageData(x), dim(x)[1:2] ) )
-    }
-)
+## FIXME: as.matrix causes incompatibility with R < 2.4.1, use imageData(as.matrix())
+#setMethod ("as.matrix", signature(x="Image"),
+#    function (x, ...) {
+#        if ( dim(x)[3] > 1 )
+#            stop ( .("cannot coerce multiple images to matrix") )
+#        return ( matrix( imageData(x), dim(x)[1:2] ) )
+#    }
+#)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 image.Image <- function(x, i, xlab = "", ylab = "", axes = FALSE, col=gray ((0:255) / 255), ...) {
@@ -450,7 +452,7 @@ image.Image <- function(x, i, xlab = "", ylab = "", axes = FALSE, col=gray ((0:2
         stop ( .("image size is zero, nothing to plot") )
     X <- 1:dimx[1]
     Y <- 1:dimx[2]
-    Z <- as.matrix ( x[,,i] )[, rev(Y)]
+    Z <- as.matrix ( imageData(x[,,i]) )[, rev(Y)]
     asp <- dimx[2] / dimx[1]
     graphics:::image (x=X, y=Y, z=Z, asp=asp, col=col, axes=axes, xlab=xlab, ylab=ylab, ...)
 }
