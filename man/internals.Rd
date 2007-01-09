@@ -64,9 +64,13 @@
 \alias{thresh,Image-method}
 \alias{umask,Image-method}
 \alias{watershed,Image-method}
+\alias{assignObjects,Image,Image-method}
+\alias{assignObjects,Image,missing-method}
+\alias{matchObjects,Image,Image-method}
 \alias{getObjects,Image,Image-method}
-\alias{getObjects,Image,NULL-method}
+\alias{getObjects,Image,missing-method}
 \alias{combineObjects,Image-method}
+\alias{rmObjects,Image,list-method}
 \alias{paintObjects,Image,Image-method}
 \alias{write.image,Image,character-method}
 \alias{write.image,Image,missing-method}

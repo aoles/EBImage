@@ -85,9 +85,12 @@ setGeneric ("closing",        function (x, ...)        standardGeneric("closing"
 ## object detection and related
 setGeneric ("distmap",        function (x, ...)        standardGeneric("distmap") )
 setGeneric ("watershed",      function (x, ...)        standardGeneric("watershed") )
+setGeneric ("assignObjects",  function (x, ref, ...)   standardGeneric("assignObjects") )
 setGeneric ("getObjects",     function (x, ref, ...)   standardGeneric("getObjects") )
 setGeneric ("paintObjects",   function (x, tgt, ...)   standardGeneric("paintObjects") )
 setGeneric ("combineObjects", function (x, ...)        standardGeneric("combineObjects") )
+setGeneric ("matchObjects",   function (x, ref, ...)   standardGeneric("matchObjects") )
+setGeneric ("rmObjects",      function (x, index, ...) standardGeneric("rmObjects") )
 
 ## in this package defined for Image (class.Image.R), ANY (in tools.R)
 setGeneric ("channel",        function (x, mode, ...)  standardGeneric("channel") )

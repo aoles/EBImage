@@ -8,7 +8,10 @@ See: ../LICENSE for license, LGPL
 
 /*----------------------------------------------------------------------- */
 #define BG 0.0
-#define N_FEATURES 6
+#define N_FEATURES     5
+#define N_ALL_FEATURES 6
+
+int ALL_FEATURES = 1;
 
 /*----------------------------------------------------------------------- */
 /* will paint features on the target image with given colors and opacs    */
@@ -96,23 +99,22 @@ lib_assignFeatures (SEXP x, SEXP ref) {
     SEXP res;
 
     PROTECT ( res = Rf_duplicate(x) );
-    assign_features (res, ref);
+
+    SET_SLOT (res, mkString("features"), lib_get_features (res, ref) );  
+
     UNPROTECT (1);
     return res;    
 };
 
 /*----------------------------------------------------------------------- */
-/* will assign features field to the argument, modifying argument
-   used in watershed and other routines. We assume that supplied x is
-   ALREADY a duplicate of that sent from R, so we modify it */
-void 
-assign_features (SEXP x, SEXP ref) {
+SEXP 
+lib_get_features (SEXP x, SEXP ref) {
     SEXP features, * fm, * dm;
     int nx, ny, nz, nprotect, im, i, j, nobj, obj, perdone;
     double * data, * refdata, * fmdata;
     
-    if ( !isImage(x) ) return;
-    if ( !isImage(ref) && ref != R_NilValue ) return;
+    if ( !isImage(x) ) return R_NilValue;
+    if ( !isImage(ref) && ref != R_NilValue ) return R_NilValue;
     
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
@@ -137,16 +139,26 @@ assign_features (SEXP x, SEXP ref) {
             if ( data[i] > nobj ) nobj = data[i];
         if ( nobj < 1 ) continue;
         /* create features matrix */
-        PROTECT ( fm[im] = allocVector(REALSXP, nobj * N_FEATURES) );
+        if ( ALL_FEATURES )
+            PROTECT ( fm[im] = allocVector(REALSXP, nobj * N_ALL_FEATURES) );
+        else
+            PROTECT ( fm[im] = allocVector(REALSXP, nobj * N_FEATURES) );
         nprotect++;
         fmdata = REAL (fm[im]);
-        for ( i = 0; i < nobj * N_FEATURES; i++ )
-            fmdata [i] = 0.0;
+        if ( ALL_FEATURES )
+            for ( i = 0; i < nobj * N_ALL_FEATURES; i++ )
+                fmdata [i] = 0.0;
+        else
+            for ( i = 0; i < nobj * N_FEATURES; i++ )
+                fmdata [i] = 0.0;
         /* set dimensions of the feature matrix */
         PROTECT ( dm[im] = allocVector(INTSXP, 2) );
         nprotect++;
         INTEGER ( dm[im] )[0] = nobj;
-        INTEGER ( dm[im] )[1] = N_FEATURES;
+        if ( ALL_FEATURES )
+            INTEGER ( dm[im] )[1] = N_ALL_FEATURES;
+        else
+            INTEGER ( dm[im] )[1] = N_FEATURES;
         SET_DIM ( fm[im], dm[im] );
         /* go through pixels and collect descriptors */
         for ( i = 0; i < nx; i++ )
@@ -182,12 +194,14 @@ assign_features (SEXP x, SEXP ref) {
                         perdone = 1;
                         fmdata [obj + 3 * nobj] += 1.0;
                     }
-                /* int (+4)  */
-                if ( refdata && ref != R_NilValue ) 
-                    fmdata [obj + 4 * nobj] += refdata [i + j * nx];
-                /* edge (+5) */
+                /* edge (+4) */
                 if ( i == 0 || j == 0 || i == nx - 1 || j == ny - 1 )
-                    fmdata [obj + 5 * nobj] += 1.0;
+                    fmdata [obj + 4 * nobj] += 1.0;
+                if ( ALL_FEATURES ) {
+                    /* int (+5)  */
+                    if ( refdata && ref != R_NilValue ) 
+                        fmdata [obj + 5 * nobj] += refdata [i + j * nx];
+                }
                     
             }
         for ( obj = 0; obj < nobj; obj++ )
@@ -201,25 +215,17 @@ assign_features (SEXP x, SEXP ref) {
     /* put fm into the list */
     for ( im = 0; im < nz; im++ )
         SET_VECTOR_ELT (features, im, fm[im] );
-    SET_SLOT (x, mkString("features"), features);
+/*    SET_SLOT (x, mkString("features"), features); */
     UNPROTECT(nprotect);
-}
-
-/*----------------------------------------------------------------------- */
-/* takes an indexed image and reindexes it removing indexes that do not have
-   corresponding objects. We assume that supplied x is
-   ALREADY a duplicate of that sent from R, so we modify it */
-   
-void
-remap_features (SEXP x) {
-
+    return features;
 }
 
 /*----------------------------------------------------------------------- */
 SEXP
-lib_combineFeatures (SEXP x, SEXP _ext, SEXP _factor) {
+lib_combineFeatures (SEXP x, SEXP _ext, SEXP _factor, SEXP _seeds) {
     SEXP res, features;
-    int nprotect, nx, ny, nz, im, i, j, ix, jy, nobj, ext, from, to, * index, obj, leave;
+    int nprotect, nx, ny, nz, im, i, j, ix, jy, nobj, ext, from, 
+        to, * index, obj, leave, * seeds, nseeds, isseed;
     double * data, * ftrs, * corr, per, factor, lfactor;
     
     if ( !isImage(x) ) return x;
@@ -238,10 +244,13 @@ lib_combineFeatures (SEXP x, SEXP _ext, SEXP _factor) {
     nprotect++;
 
     /* we need this to know about perimeters etc of currently existing objects */
-    assign_features (res, R_NilValue);
+    ALL_FEATURES = 0;
+    PROTECT (features = lib_get_features (res, R_NilValue) );  
+    nprotect++;
+    ALL_FEATURES = 1;
     
     /* if we were not able to determine features correctly, do nothing */
-    if ( LENGTH( GET_SLOT (res, mkString("features") ) ) != nz ) {
+    if ( LENGTH( features ) != nz ) {
         UNPROTECT (nprotect);
         return x;
     }
@@ -256,9 +265,8 @@ lib_combineFeatures (SEXP x, SEXP _ext, SEXP _factor) {
         /* nothing to combine */
         if ( nobj < 2 ) continue;
         /* check if features correspond to objects */
-        features = VECTOR_ELT( GET_SLOT (res, mkString("features") ), im);
-        if ( LENGTH( features ) != nobj * N_FEATURES ) continue;
-        ftrs = REAL (features);
+        if ( LENGTH( VECTOR_ELT(features, im) ) != nobj * N_FEATURES ) continue;
+        ftrs = REAL( VECTOR_ELT(features, im) );
         /* allocate a square matrix of nobj*nobj which serves as a correlation
         matrix, this is NOT freed automatically  */
         corr = (double *) Calloc (nobj * nobj, double );
@@ -302,14 +310,20 @@ lib_combineFeatures (SEXP x, SEXP _ext, SEXP _factor) {
         /* reset the diag of the corr matrix -- these will now indicate substitutions */
         for ( ix = 0; ix < nobj; ix++ )
             corr [ix + ix * nobj] = ix;
-/* FIXME :debug output 
-
-for(ix=0;ix<nobj;ix++)
-  for(jy=0;jy<nobj;jy++)
-    if (corr[ix+jy*nobj]>0)
-      Rprintf("%d:%d - %f\n",ix,jy,corr[ix+jy*nobj]);
-
-*/
+        /* if we have seeds, reset <to> fields to 0 for all that are not in seeds */
+        if ( _seeds != R_NilValue ) {
+            seeds = INTEGER( VECTOR_ELT(_seeds, im) );
+            nseeds = LENGTH( VECTOR_ELT(_seeds, im) );
+            for ( jy = 0; jy < nobj; jy++ ) {
+                isseed = 0;
+                for ( i = 0; i < nseeds && !isseed; i++ )
+                    if ( jy + 1 == seeds[i] ) isseed = 1;
+                if ( !isseed ) {
+                    for ( ix = 0; ix < nobj; ix++ )
+                        corr[ix + jy * nobj] = 0;
+                }
+            }
+        }
         /* combine objects with the largest corr to their counterparts */
         /* for each object ix search if it can be combined with jy */
         do {
@@ -325,41 +339,29 @@ for(ix=0;ix<nobj;ix++)
                         to = jy;
                     }
                 }
-            if ( from < 0 || to < 0 || from == to || lfactor < factor ) continue;
+            if ( from < 0 || to < 0 || from == to || lfactor < factor ) break;
             /* set that from points to to ot to where to points is not otherwise already set */
             if ( corr[to + to * nobj] != from )
                 corr [from + from * nobj] = corr[to + to * nobj];
             /* set all that point to from to point to whereever from points now */
             /* set also corr for all this from to 0 so we do not pick this one any more */
-/* FIXME :debug output 
-
-Rprintf("%d: Substitution: %d to %d (level: %f)\n",im+1,from,to,lfactor);
-Rprintf("%d: now %d points to %d\n", im+1,from, (int)corr[from+from*nobj]);
-
-*/
             corr [to + from * nobj] = 0;
             corr [from + to * nobj] = 0;
             for ( jy = 0; jy < nobj; jy++ )
                 if ( jy != from && jy != to ) {
                     corr [from + jy * nobj] = 0; 
-                    if ( corr[jy + jy * nobj] == from ) {
+                    if ( corr[jy + jy * nobj] == from )
                         corr[jy + jy * nobj] = corr[from + from * nobj];
-/* FIXME :debug output 
-
-Rprintf("%d: now %d points to %d\n", im+1,jy, (int)corr[from+from*nobj]);
-
-*/
-                    }
                 }
         } while ( lfactor >= factor && from >= 0 && to != from);
-        
+
         /* reset the index */
         index = (int *) Calloc (nobj, int );
-        to = 0;
+        j = 0;
         for ( i = 0; i < nobj; i++ ) {
             if ( corr[i + i * nobj] == i ) {
-                index [i] = to;
-                to++;
+                index [i] = j;
+                j++;
             }
             else
                 index [i] = -1;
@@ -370,6 +372,7 @@ Rprintf("%d: now %d points to %d\n", im+1,jy, (int)corr[from+from*nobj]);
         }
         /* we got index, do not need corr any more */
         Free (corr);
+
         /* reset image values according to new index */
         for ( i = 0; i < nx * ny; i++ ) {
             if ( data[i] < 0.9 ) continue;
@@ -380,23 +383,163 @@ Rprintf("%d: now %d points to %d\n", im+1,jy, (int)corr[from+from*nobj]);
         for ( i = 0; i < nx; i++ )
             for ( j = 0; j < ny; j++ ) {
                 if ( data[ i + j * nx ] < 0.1 || data[ i + j * nx ] > 0.9 ) continue;
-                obj = 0;
+                obj = -1;
                 leave = 0;
                 for ( ix = i - ext; ix <= i + ext && !leave; ix++ )
                     for ( jy = j - ext; jy <= j + ext && !leave; jy++ ) {
                         if ( ix < 0 || jy < 0 || ix >= nx || jy >= ny || (ix == i && jy == j) ) continue;
-                        if ( data[ ix + jy * nx] < 0.9) continue;
-                        if ( obj == 0 ) 
+                        if ( 0.1 < data[ ix + jy * nx] && data[ ix + jy * nx] < 0.9) continue;
+                        if ( obj <= 0 ) 
                             obj = data[ ix + jy * nx];
                         else
-                            if ( obj != data[ ix + jy * nx] ) leave = 1;
+                            if ( obj > 0 && obj != data[ ix + jy * nx] ) leave = 1;
                     }
-                if ( obj > 0 && !leave ) 
+                if ( obj >= 0 && !leave ) 
                     data [i + j * nx] = obj;
             }
         
     }
     
+    SET_SLOT (res, mkString("features"), allocVector(VECSXP, 0) );
+
+    UNPROTECT (nprotect);
+    return res;
+}
+
+/*----------------------------------------------------------------------- */
+SEXP
+lib_matchFeatures (SEXP x, SEXP ref) {
+    SEXP res, xf, * indexes;
+    int nprotect, nx, ny, nz, i, ix, jy, im, nobj;
+    double * data, * ftrs;
+    
+    if ( !isImage(x) || !isImage(ref) ) return x;
+    
+    nx = INTEGER ( GET_DIM(x) )[0];
+    ny = INTEGER ( GET_DIM(x) )[1];
+    nz = INTEGER ( GET_DIM(x) )[2];
+    nprotect = 0;
+
+    PROTECT (res = allocVector(VECSXP, nz) );
+    nprotect++;
+    indexes = (SEXP *) R_alloc (nz, sizeof(SEXP) );
+    
+    /* we need this to know centres of objects in x */
+    ALL_FEATURES = 0;
+    PROTECT (xf = lib_get_features (x, R_NilValue) );
+    nprotect++;
+    ALL_FEATURES = 1;
+
+    for ( im = 0; im < nz; im++ ) {
+        /* get image data */
+        data = &( REAL(x)[ im * nx * ny ] );
+        /* get number of objects -- max index */
+        nobj = 0;
+        for ( i = 0; i < nx * ny; i++ )
+            if ( data[i] > nobj ) nobj = data[i];
+        /* create results vector */
+        PROTECT ( indexes[im] = allocVector(INTSXP, nobj) );
+        nprotect++;
+        /* add it to res */
+        SET_VECTOR_ELT (res, im, indexes[im] );
+        if ( nobj < 1 ) continue;
+        /* check if features correspond to objects */
+        if ( LENGTH( VECTOR_ELT(xf, im) ) != nobj * N_FEATURES ) continue;
+        ftrs = REAL( VECTOR_ELT(xf, im) );
+        /* reset data to ref */
+        data = &( REAL(ref)[ im * nx * ny ] );
+
+        /* scan through objects, collect indexes */
+        for ( i = 0; i < nobj; i++ ) {
+            ix = ftrs [i];
+            jy = ftrs [i + nobj];
+            INTEGER (indexes[im])[i] = NA_INTEGER;
+            if ( ix >= 0 && jy >= 0 && ix < nx && jy < ny )
+                if ( data[ix + jy * nx] > 0.9 )
+                    INTEGER (indexes[im])[i] = (int)data[ix + jy * nx];
+                
+        }
+    }
+    
+    UNPROTECT (nprotect);
+    return res;    
+}
+
+/*----------------------------------------------------------------------- */
+SEXP
+lib_deleteFeatures (SEXP x, SEXP _index, SEXP _ext) {
+    SEXP res, index;
+    int nprotect, nx, ny, nz, i, j, ix, jy, im, nobj, * indexes, found, ext, leave, obj;
+    double * data;
+    
+    if ( !isImage(x) ) return x;
+    
+    nx = INTEGER ( GET_DIM(x) )[0];
+    ny = INTEGER ( GET_DIM(x) )[1];
+    nz = INTEGER ( GET_DIM(x) )[2];
+    nprotect = 0;
+
+    ext = INTEGER (_ext)[0];
+    if ( ext < 1 ) return x;
+    
+
+    PROTECT ( res = Rf_duplicate(x) );
+    nprotect++;
+
+    for ( im = 0; im < nz; im++ ) {
+        /* get image data */
+        data = &( REAL(res)[ im * nx * ny ] );
+        index = VECTOR_ELT (_index, im);
+        /* get number of objects -- max index */
+        nobj = 0;
+        for ( i = 0; i < nx * ny; i++ )
+            if ( data[i] > nobj ) nobj = data[i];
+        indexes = (int *) Calloc (nobj, int );
+        for ( i = 0; i < nobj; i++ ) {
+            found = 0;
+            for ( j = 0; j < LENGTH(index) && !found; j++ )
+                if ( i + 1 == INTEGER(index)[j] )
+                    found = 1;
+            if ( found )
+                indexes[i] = 0;
+            else
+                indexes[i] = i + 1;
+        }
+        /* shring indexes */
+        j = 1;
+        for ( i = 0; i < nobj; i++ ) {
+            if ( indexes[i] > 0 ) {
+                indexes[i] = j;
+                j++;
+            }
+        }
+        /* reset image */
+        for ( i = 0; i < nx * ny; i++ ) {
+            if ( data[i] < 0.9 ) continue;
+            data [i] = indexes[ (int)data[i] - 1 ];
+        }
+        Free (indexes);
+        
+        /* reset borders if left after deleting objects */
+        for ( i = 0; i < nx; i++ )
+            for ( j = 0; j < ny; j++ ) {
+                if ( data[ i + j * nx ] < 0.1 || data[ i + j * nx ] > 0.9 ) continue;
+                obj = -1;
+                leave = 0;
+                for ( ix = i - ext; ix <= i + ext && !leave; ix++ )
+                    for ( jy = j - ext; jy <= j + ext && !leave; jy++ ) {
+                        if ( ix < 0 || jy < 0 || ix >= nx || jy >= ny || (ix == i && jy == j) ) continue;
+                        if ( 0.1 < data[ ix + jy * nx] && data[ ix + jy * nx] < 0.9) continue;
+                        if ( obj <= 0 ) 
+                            obj = data[ ix + jy * nx];
+                        else
+                            if ( obj > 0 && obj != data[ ix + jy * nx] ) leave = 1;
+                    }
+                if ( obj >= 0 && !leave ) 
+                    data [i + j * nx] = obj;
+            }
+        
+    }
     SET_SLOT (res, mkString("features"), allocVector(VECSXP, 0) );
 
     UNPROTECT (nprotect);

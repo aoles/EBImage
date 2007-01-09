@@ -1,6 +1,7 @@
 \name{combineObjects}
 
 \alias{combineObjects}
+\alias{rmObjects}
 
 \concept{object detection}
 
@@ -14,7 +15,8 @@
 
 \section{ Usage }{
   \preformatted{
-    combineObjects(x, ext=1, fraction=0.3, ...) 
+    combineObjects(x, ext=1, fraction=0.3, seeds=NULL, ...) 
+    rmObjects(x, index, ext=1, ...)
   }
 }
 
@@ -24,9 +26,20 @@
     \code{\link{Grayscale}} mode with integer-absed object encoding, as
     returned by \code{\link{watershed}}. }
 
-  \item{\code{ref}}{A reference grayscale image to calculate object intensity. 
-    Can be \code{NULL}. }
+  \item{\code{ext}}{ Extension of neighboring pixels used in object detection.
+    Should match the value supplied to \code{\link{watershed}}. } 
 
+  \item{\code{ext}}{ Fraction of border pixels contacting the neighbouring
+    object (from the perimeter) to consider the object for combining. }
+
+  \item{\code{seeds}}{ A list of integer indexes (one vector per image) with
+    indexes of existing objects that should serve as seeds -- the program will
+    try to combine objects to the given one. The list can be obtained
+    by calling to \code{\link{matchObjects}}. }
+
+  \item{\code{index}}{ A list of indexes of objects to remove, in the same format
+    as \code{seeds}. }
+    
   \item{\code{...}}{ Reserved for future use. }
 }}
 
