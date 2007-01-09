@@ -22,8 +22,11 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_distMap",        (DL_FUNC) &lib_distMap,        4},
     {"lib_filterInvWS",    (DL_FUNC) &lib_filterInvWS,    4},
     {"lib_assignFeatures", (DL_FUNC) &lib_assignFeatures, 2},
+    {"lib_get_features",   (DL_FUNC) &lib_get_features,   2},
     {"lib_paintFeatures",  (DL_FUNC) &lib_paintFeatures,  4},
-    {"lib_combineFeatures",(DL_FUNC) &lib_combineFeatures,3},
+    {"lib_combineFeatures",(DL_FUNC) &lib_combineFeatures,4},
+    {"lib_matchFeatures",  (DL_FUNC) &lib_matchFeatures,  2},
+    {"lib_deleteFeatures", (DL_FUNC) &lib_deleteFeatures, 3},
     
     /* add above all R-lib functions from common.h */
     {NULL, NULL, 0}

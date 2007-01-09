@@ -79,7 +79,10 @@ SEXP         lib_distMap (SEXP, SEXP, SEXP, SEXP);                  /* filters_d
 SEXP         lib_filterInvWS (SEXP, SEXP, SEXP, SEXP);              /* filters_watershed.c   */
 SEXP         lib_assignFeatures (SEXP, SEXP);                       /* object_counting.c     */
 SEXP         lib_paintFeatures (SEXP, SEXP, SEXP, SEXP);            /* -"-                   */
-SEXP         lib_combineFeatures (SEXP, SEXP, SEXP);                /* -"-                   */
+SEXP         lib_combineFeatures (SEXP, SEXP, SEXP, SEXP);          /* -"-                   */
+SEXP         lib_matchFeatures (SEXP, SEXP);                        /* -"-                   */
+SEXP         lib_get_features (SEXP, SEXP);                         /* -"-                   */
+SEXP         lib_deleteFeatures (SEXP, SEXP, SEXP);                 /* -"-                   */
 
 /* library exports and internal functions */
 Image *      sexp2Magick (SEXP);                                    /* conversions.c         */
@@ -89,7 +92,6 @@ double       distanceXY (const PointXY, const PointXY);             /* -"-      
 PointXY      pointFromIndex (const int, const int);                 /* -"-                   */
 int          indexFromPoint (const PointXY, const int);             /* -"-                   */
 int          indexFromXY (const int, const int, const int);         /* -"-                   */
-void         assign_features (SEXP, SEXP);                          /* object_counting.c     */
 Image *      int2image1D (int *, int);                              /* colors.c              */
 Image *      double2image1D (double *, int);                        /* -"-                   */
 void         image1D2double (Image *, double *, int);               /* -"-                   */

@@ -43,7 +43,7 @@ setMethod ("watershed", signature(x="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("getObjects", signature(x="Image", ref="Image"),
+setMethod ("assignObjects", signature(x="Image", ref="Image"),
     function (x, ref, ...) {
         if ( colorMode(x) != Grayscale )
             stop ( .("only Grayscale images are supported, use 'channel' to convert") )
@@ -55,23 +55,58 @@ setMethod ("getObjects", signature(x="Image", ref="Image"),
             for ( i in 1:length(res@features) ) 
                 if ( is.matrix( res@features[[i]] ) )
                     if ( ncol(res@features[[i]] ) == 6 )
-                       colnames( res@features[[i]] ) <- c("x", "y", "size", "per", "int", "edge")
+                       colnames( res@features[[i]] ) <- c("x", "y", "size", "per", "edge", "int")
         }
         return (res)
     }
 )
 
-setMethod ("getObjects", signature(x="Image", ref="NULL"),
+setMethod ("assignObjects", signature(x="Image", ref="missing"),
     function (x, ref, ...) {
         if ( colorMode(x) != Grayscale )
             stop ( .("only Grayscale images are supported, use 'channel' to convert") )
         res <- .DoCall ("lib_assignFeatures", x, NULL)
-        if ( is.Image(res) && do.detect ) {
+        if ( is.Image(res) ) {
             ## set colnames for features
             for ( i in 1:length(res@features) ) 
                 if ( is.matrix( res@features[[i]] ) )
                     if ( ncol(res@features[[i]] ) == 6 )
-                       colnames( res@features[[i]] ) <- c("x", "y", "size", "per", "int", "edge")
+                       colnames( res@features[[i]] ) <- c("x", "y", "size", "per", "edge", "int")
+        }
+        return (res)
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("getObjects", signature(x="Image", ref="Image"),
+    function (x, ref, ...) {
+        if ( colorMode(x) != Grayscale )
+            stop ( .("only Grayscale images are supported, use 'channel' to convert") )
+        if ( !assert(x, ref, strict=TRUE) )
+            stop ( .("'x' and 'ref' must be of the same size and color mode") )
+        res <- .DoCall ("lib_get_features", x, ref)
+        if ( is.list(res) ) {
+            ## set colnames for features
+            for ( i in 1:length(res) ) 
+                if ( is.matrix( res[[i]] ) )
+                    if ( ncol(res[[i]] ) == 6 )
+                       colnames( res[[i]] ) <- c("x", "y", "size", "per", "edge", "int")
+        }
+        return (res)
+    }
+)
+
+setMethod ("getObjects", signature(x="Image", ref="missing"),
+    function (x, ref, ...) {
+        if ( colorMode(x) != Grayscale )
+            stop ( .("only Grayscale images are supported, use 'channel' to convert") )
+        res <- .DoCall ("lib_get_features", x, NULL)
+        if ( is.list(res) ) {
+            ## set colnames for features
+            for ( i in 1:length(res) ) 
+                if ( is.matrix( res[[i]] ) )
+                    if ( ncol(res[[i]] ) == 6 )
+                       colnames( res[[i]] ) <- c("x", "y", "size", "per", "edge", "int")
         }
         return (res)
     }
@@ -94,13 +129,39 @@ setMethod ("paintObjects", signature(x="Image", tgt="Image"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("combineObjects", signature(x="Image"),
-    function (x, ext=1, fraction=0.3, ...) {
+    function (x, ext=1, fraction=0.3, seeds=NULL,...) {
         if ( colorMode(x) != Grayscale )
             stop ( .("only Grayscale images are supported, use 'channel' to convert") )
         if ( as.integer(ext) < 1 )
             stop ( .("ext must be a positive integer value") )
         if ( fraction <= 0 || fraction > 1 )
             stop ( .("'fraction' must be in the range (0,1]") )
-        return ( .DoCall("lib_combineFeatures", x, as.integer(ext), as.numeric(fraction) ) )
+        if ( !is.null(seeds) )
+            seeds <- lapply ( as.list(seeds), as.integer )
+        return ( .DoCall("lib_combineFeatures", x, as.integer(ext), as.numeric(fraction), seeds ) )
     }
 )
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("matchObjects", signature(x="Image", ref="Image"),
+    function (x, ref, ...) {
+        if ( colorMode(x) != Grayscale )
+            stop ( .("only Grayscale images are supported, use 'channel' to convert") )
+        if ( !assert(x, ref, strict=TRUE) )
+            stop ( .("'x' and 'ref' must be of the same size and both Grayscale") )
+        return ( .DoCall ("lib_matchFeatures", x, ref) )
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("rmObjects", signature(x="Image", index="list"),
+    function (x, index, ext=1, ...) {
+        if ( colorMode(x) != Grayscale )
+            stop ( .("only Grayscale images are supported, use 'channel' to convert") )
+        if ( as.integer(ext) < 1 )
+            stop ( .("ext must be a positive integer value") )
+        index <- lapply (index, as.integer)
+        return ( .DoCall ("lib_deleteFeatures", x, index, as.integer(ext) ) )
+    }
+)
+

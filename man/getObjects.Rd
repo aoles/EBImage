@@ -1,6 +1,7 @@
 \name{getObjects}
 
 \alias{getObjects}
+\alias{assignObjects}
 
 \concept{object detection}
 
@@ -14,6 +15,7 @@
 
 \section{ Usage }{
   \preformatted{
+    assignObjects(x, ref, ...)
     getObjects(x, ref, ...)
   }
 }
@@ -32,14 +34,15 @@
 
 \section{ Value }{
 
-  An unmodified image of \code{\link{Image-class}} containing a non-empty 
-  list of matrixes (one per image in stack) with image
+  For \code{assignObjects} an unmodified image of \code{\link{Image-class}} 
+  containing a non-empty list of matrixes (one per image in stack) with image
   descriptors. This list can be accessed using \code{\link{features}(result)}
   accessor method of the \code{\link{Image-class}}. Every matrix in the list
   will contain the following columns (subject ot change, will be extended):
   \code{'x', 'y', 'size', 'per', 'int', 'edge'} with one row per every single
   detected object.
-    
+
+  \code{getObjects} returns the list of feature matrices as a separate object.    
 }
 
 \seealso{
