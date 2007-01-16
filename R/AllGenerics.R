@@ -31,6 +31,7 @@ setGeneric ("imageData",      function (x, ...)        standardGeneric("imageDat
 setGeneric ("imageData<-",    function (x, ..., value) standardGeneric("imageData<-") )
 ## ObjectImage property accessor methods
 setGeneric ("features",       function (x, ...)        standardGeneric("features") )
+setGeneric ("features<-",     function (x, ..., value) standardGeneric("features<-") )
 
 ## in this package defined for Image and ObjectImage only (class.Image.R)
 setGeneric ("copy",           function (x, ...)        standardGeneric("copy") )
@@ -85,7 +86,6 @@ setGeneric ("closing",        function (x, ...)        standardGeneric("closing"
 ## object detection and related
 setGeneric ("distmap",        function (x, ...)        standardGeneric("distmap") )
 setGeneric ("watershed",      function (x, ...)        standardGeneric("watershed") )
-setGeneric ("assignObjects",  function (x, ref, ...)   standardGeneric("assignObjects") )
 setGeneric ("getObjects",     function (x, ref, ...)   standardGeneric("getObjects") )
 setGeneric ("paintObjects",   function (x, tgt, ...)   standardGeneric("paintObjects") )
 setGeneric ("combineObjects", function (x, ...)        standardGeneric("combineObjects") )

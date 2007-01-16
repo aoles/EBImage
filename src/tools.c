@@ -13,6 +13,12 @@ distanceXY (const PointXY pt1, const PointXY pt2) {
 }
 
 /*----------------------------------------------------------------------- */
+double
+distancexy (int x1, int y1, int x2, int y2) {
+    return sqrt ( (long double)( (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) ) );
+}
+
+/*----------------------------------------------------------------------- */
 PointXY
 pointFromIndex (const int index, const int xsize) {
     PointXY res;

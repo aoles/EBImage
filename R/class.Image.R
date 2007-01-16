@@ -73,11 +73,6 @@ setReplaceMethod ("colorMode", signature (x="Image", value="numeric"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("features", signature (x="Image"),
-    function (x, ...) x@features
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("fileName", signature (x="Image"),
     function (x, ...) x@filename
 )

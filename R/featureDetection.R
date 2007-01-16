@@ -43,37 +43,22 @@ setMethod ("watershed", signature(x="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("assignObjects", signature(x="Image", ref="Image"),
-    function (x, ref, ...) {
-        if ( colorMode(x) != Grayscale )
-            stop ( .("only Grayscale images are supported, use 'channel' to convert") )
-        if ( !assert(x, ref, strict=TRUE) )
-            stop ( .("'x' and 'ref' must be of the same size and color mode") )
-        res <- .DoCall ("lib_assignFeatures", x, ref)
-        if ( is.Image(res) ) {
-            ## set colnames for features
-            for ( i in 1:length(res@features) ) 
-                if ( is.matrix( res@features[[i]] ) )
-                    if ( ncol(res@features[[i]] ) == 6 )
-                       colnames( res@features[[i]] ) <- c("x", "y", "size", "per", "edge", "int")
-        }
-        return (res)
-    }
+setMethod ("features", signature (x="Image"),
+    function (x, ...) x@features
 )
 
-setMethod ("assignObjects", signature(x="Image", ref="missing"),
-    function (x, ref, ...) {
-        if ( colorMode(x) != Grayscale )
-            stop ( .("only Grayscale images are supported, use 'channel' to convert") )
-        res <- .DoCall ("lib_assignFeatures", x, NULL)
-        if ( is.Image(res) ) {
-            ## set colnames for features
-            for ( i in 1:length(res@features) ) 
-                if ( is.matrix( res@features[[i]] ) )
-                    if ( ncol(res@features[[i]] ) == 6 )
-                       colnames( res@features[[i]] ) <- c("x", "y", "size", "per", "edge", "int")
-        }
-        return (res)
+setReplaceMethod ("features", signature (x="Image", value="list"),
+    function (x, ..., value) {
+        error = FALSE
+        if ( !is.list(value) )
+            stop ( .("'value' must be a list") )
+        if ( length(value) != dim(x)[3] ) 
+            stop ( .("'value' length must be the same as number of images") )
+        for ( i in 1:length(value) )
+            if ( !is.matrix(value[[i]]) && !is.null(value[[i]]) )
+                stop ( .("all list items must be matrices") )
+        x@features <- value
+        return (x)
     }
 )
 
@@ -84,13 +69,13 @@ setMethod ("getObjects", signature(x="Image", ref="Image"),
             stop ( .("only Grayscale images are supported, use 'channel' to convert") )
         if ( !assert(x, ref, strict=TRUE) )
             stop ( .("'x' and 'ref' must be of the same size and color mode") )
-        res <- .DoCall ("lib_get_features", x, ref)
+        res <- .DoCall ("lib_getFeatures", x, ref)
         if ( is.list(res) ) {
             ## set colnames for features
             for ( i in 1:length(res) ) 
                 if ( is.matrix( res[[i]] ) )
-                    if ( ncol(res[[i]] ) == 6 )
-                       colnames( res[[i]] ) <- c("x", "y", "size", "per", "edge", "int")
+                    if ( ncol(res[[i]] ) == 11 )
+                       colnames( res[[i]] ) <- c("x", "y", "size", "per", "image.border", "effr", "intensity", "acirc", "per.mean", "per.sd", "per.by.2.pi.effr")
         }
         return (res)
     }
@@ -100,13 +85,13 @@ setMethod ("getObjects", signature(x="Image", ref="missing"),
     function (x, ref, ...) {
         if ( colorMode(x) != Grayscale )
             stop ( .("only Grayscale images are supported, use 'channel' to convert") )
-        res <- .DoCall ("lib_get_features", x, NULL)
+        res <- .DoCall ("lib_getFeatures", x, NULL)
         if ( is.list(res) ) {
             ## set colnames for features
             for ( i in 1:length(res) ) 
                 if ( is.matrix( res[[i]] ) )
-                    if ( ncol(res[[i]] ) == 6 )
-                       colnames( res[[i]] ) <- c("x", "y", "size", "per", "edge", "int")
+                    if ( ncol(res[[i]] ) == 11 )
+                       colnames( res[[i]] ) <- c("x", "y", "size", "per", "image.border", "effr", "intensity", "acirc", "per.mean", "per.sd", "per.by.2.pi.effr")
         }
         return (res)
     }

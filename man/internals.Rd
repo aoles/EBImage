@@ -34,6 +34,7 @@
 \alias{equalize,Image-method}
 \alias{erode,Image-method}
 \alias{features,Image-method}
+\alias{features<-,Image,list-method}
 \alias{fileName,Image-method}
 \alias{fileName<-,Image,character-method}
 \alias{fill,Image-method}
@@ -64,8 +65,6 @@
 \alias{thresh,Image-method}
 \alias{umask,Image-method}
 \alias{watershed,Image-method}
-\alias{assignObjects,Image,Image-method}
-\alias{assignObjects,Image,missing-method}
 \alias{matchObjects,Image,Image-method}
 \alias{getObjects,Image,Image-method}
 \alias{getObjects,Image,missing-method}

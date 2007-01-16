@@ -8,7 +8,6 @@
 \alias{colorMode<-}
 \alias{compression}
 \alias{compression<-}
-\alias{features}
 \alias{fileName}
 \alias{fileName<-}
 \alias{imageData}

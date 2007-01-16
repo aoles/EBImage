@@ -196,9 +196,7 @@ The following code demonstrates how grayscale images recorded using three differ
 
 Consider an experiment in which images like in Figure~\ref{figure:channels} were recorded for each of $\approx$ 20,000 genes, using a whole-genome RNAi library to test the effect of gene knock-down on cell viability and appearance. Among the image descriptors of interest are the number, position, size, shape and the fluorescent intensities of cells and nuclei. 
 
-As a side effect of the watershed transform, the function \Rfunction{watershed}, \Rpackage{EBImage} identifies separable objects in an image. For this particular purpose it is advisable to use the result of the distance map transform (\Rfunction{distmap}) as input. Object descriptors are returned as a composite part of the resulting image accessible by the accessor method \Rfunction{features}. One can see that an image has data of detected object by printing it (typing its name and hitting \code{Enter}): this information will be included in the object description. The features are a list of matrices, one per image frame, each containing different objects in its rows and different object descriptors in the columns. If a reference grayscale image was supplied to the watershed routine, object gray value intensities will be calculated as well.
-
-\emph{FIXME: borders and other related stuff present in the previous version of EBImage is currently under development (porting) and should be in the package in a couple of days. Until then function names are unknown.}
+As a side effect of the watershed transform, the function \Rfunction{watershed}, \Rpackage{EBImage} identifies separable objects in an image. For this particular purpose it is advisable to use the result of the distance map transform (\Rfunction{distmap}) as input. Object descriptors can be obtained by calling \Rfunction{getObjects} on the result. One can see that an image has data of detected object by printing it (typing its name and hitting \code{Enter}): this information will be included in the object description. The features are a list of matrices, one per image frame, each containing different objects in its rows and different object descriptors in the columns. If a reference grayscale image was supplied to the watershed routine, object gray value intensities will be calculated as well.
 
 For every gene, the image analysis workflow looks, therefore, as follows: load and normalize images, perform image segmentation, enhance the segmented images by morphological opening and closing, generate distance maps and use them to identify cells and nuclei and to extract image descriptors, and, finally, generate image previews with the identified objects marked. 
 
@@ -230,8 +228,10 @@ Illustration of the object detection algorithm: (a) -- {\em sqrt}-brightened com
 +  C <- closing(C, morphKern(7))
 +  d <- distmap(C)  # shown normalized
 + ## x1 <- watershed(...) # nuclei detection
++  features(x1) <- getObjects(x1, i1)
 +  seeds <- features(x1)[[1]][,1:2]
 +  x2 <- watershed(d, seeds=seeds)
++  features(x2) <- getObjects(x2, i3)
 +  rgb <- channel(i1, "asgreen") + channel(i2, "asred")
 +  rgb <- rgb + channel(i3, "asblue")
 +  e <- objectPaint(x2, rgb, opac=c(0.4, 0, 0))

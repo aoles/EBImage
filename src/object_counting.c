@@ -9,9 +9,7 @@ See: ../LICENSE for license, LGPL
 /*----------------------------------------------------------------------- */
 #define BG 0.0
 #define N_FEATURES     5
-#define N_ALL_FEATURES 6
-
-int ALL_FEATURES = 1;
+#define N_ALL_FEATURES     11
 
 /*----------------------------------------------------------------------- */
 /* will paint features on the target image with given colors and opacs    */
@@ -95,26 +93,174 @@ lib_paintFeatures (SEXP x, SEXP tgt, SEXP _opac, SEXP _col) {
 
 /*----------------------------------------------------------------------- */
 SEXP
-lib_assignFeatures (SEXP x, SEXP ref) {
-    SEXP res;
-
-    PROTECT ( res = Rf_duplicate(x) );
-
-    SET_SLOT (res, mkString("features"), lib_get_features (res, ref) );  
-
-    UNPROTECT (1);
-    return res;    
+lib_getFeatures (SEXP x, SEXP ref) {
+    return get_all_features (x, ref);  
 };
 
 /*----------------------------------------------------------------------- */
 SEXP 
-lib_get_features (SEXP x, SEXP ref) {
-    SEXP features, * fm, * dm;
-    int nx, ny, nz, nprotect, im, i, j, nobj, obj, perdone;
-    double * data, * refdata, * fmdata;
+get_all_features (SEXP x, SEXP ref) {
+    SEXP res, features, * fm, * dm;
+    double * ftrs, * data, * refdata, * fmdata, thisdistance;
+    int nprotect, nx, ny, nz, i, j, im, nobj, obj, isper;
     
     if ( !isImage(x) ) return R_NilValue;
     if ( !isImage(ref) && ref != R_NilValue ) return R_NilValue;
+    
+    nx = INTEGER ( GET_DIM(x) )[0];
+    ny = INTEGER ( GET_DIM(x) )[1];
+    nz = INTEGER ( GET_DIM(x) )[2];
+    nprotect = 0;
+    
+     /* will be freed automatically */
+    fm = (SEXP *) R_alloc (nz, sizeof(SEXP) );
+    for ( im = 0; im < nz; im++ )
+        fm[im] = R_NilValue;
+    dm = (SEXP *) R_alloc (nz, sizeof(SEXP) );
+   
+    PROTECT ( features = get_features(x) );
+    nprotect++;
+
+    for ( im = 0; im < nz; im++ ) {
+        if ( VECTOR_ELT(features, im) == R_NilValue ) continue;
+        /* get image data */
+        data = &( REAL(x)[ im * nx * ny ] );
+        if ( ref != R_NilValue )
+            refdata = &( REAL(ref)[ im * nx * ny ] );
+        else
+            refdata = NULL;
+        /* get number of objects -- max index */
+        nobj = 0;
+        for ( i = 0; i < nx * ny; i++ )
+            if ( data[i] > nobj ) nobj = data[i];
+        /* nothing to do */
+        if ( nobj < 1 ) continue;
+        /* check if features correspond to objects */
+        if ( LENGTH( VECTOR_ELT(features, im) ) != nobj * N_FEATURES ) continue;
+        ftrs = REAL( VECTOR_ELT(features, im) );
+        /* create features matrix */
+        PROTECT ( fm[im] = allocVector(REALSXP, nobj * N_ALL_FEATURES) );
+        nprotect++;
+        fmdata = REAL (fm[im]);
+        for ( obj = 0; obj < nobj; obj++ ) 
+            for ( j = 0; j < N_ALL_FEATURES; j++ ) {
+                if ( j < N_FEATURES )
+                    fmdata [obj + j * nobj] = ftrs [obj + j * nobj];
+                else
+                /* get effr +5 */
+                if ( j == 5 )
+                    fmdata [obj + j * nobj] = sqrt (fmdata [obj + 2 * nobj] / M_PI );
+                else
+                    fmdata [obj + j * nobj] = 0;
+            }
+        /* set dimensions of the feature matrix */
+        PROTECT ( dm[im] = allocVector(INTSXP, 2) );
+        nprotect++;
+        INTEGER ( dm[im] )[0] = nobj;
+        INTEGER ( dm[im] )[1] = N_ALL_FEATURES;
+        SET_DIM ( fm[im], dm[im] );
+        /* go through pixels and collect descriptors, step 1 */
+        for ( i = 0; i < nx; i++ )
+            for ( j = 0; j < ny; j++ ) {
+                obj = data[i + j * nx];
+                if ( obj < 1 ) continue;
+                /* all indexes were 1, 2, 3, but C has 0-based indexes!!! */
+                obj--;
+                // i + 1, j + 1 because of R-based indexes in coordinates
+                thisdistance = distancexy(i + 1, j + 1, fmdata[obj], fmdata[obj + nobj]);
+                /* int +6 */
+                if ( refdata ) 
+                    fmdata [obj + 6 * nobj] += refdata [i + j * nx];
+                /* acirc +7 */
+                if ( thisdistance > fmdata[obj + 5 * nobj] ) 
+                    fmdata [obj + 7 * nobj] += 1.0; 
+                /* is it a perimeter point */
+                isper = 0;
+                if ( i > 0 )
+                    if ( (int) data [i - 1 + j * nx] != obj + 1 ) /* +1 because obj-- above */
+                        isper = 1;
+                if ( j > 0 && !isper )
+                    if ( (int) data [i + (j - 1) * nx] != obj + 1 ) /* +1 because obj-- above */
+                        isper = 1;
+                if ( i < nx - 1 && !isper )
+                    if ( (int) data [i + 1 + j * nx] != obj + 1 )  /* +1 because obj-- above */
+                        isper = 1;
+                if ( j < ny - 1 && !isper )
+                    if ( (int) data [i + (j + 1) * nx] != obj + 1 ) /* +1 because obj-- above */
+                        isper = 1;
+                if ( isper ) {
+                    /* mean distance to perimeter +8 */
+                    fmdata [obj + 8 * nobj] += thisdistance;
+                }
+            }
+        /* update perimetr mean */
+        for ( obj = 0; obj < nobj; obj++ )
+            if ( fmdata[obj + 3 * nobj] != 0 )
+                fmdata [obj + 8 * nobj] /= fmdata [obj + 3 * nobj];
+        /* go through pixels and collect descriptors, step 2 */
+        for ( i = 0; i < nx; i++ )
+            for ( j = 0; j < ny; j++ ) {
+                obj = data[i + j * nx];
+                if ( obj < 1 ) continue;
+                /* all indexes were 1, 2, 3, but C has 0-based indexes!!! */
+                obj--;
+                /* is it a perimeter point */
+                isper = 0;
+                if ( i > 0 )
+                    if ( (int) data [i - 1 + j * nx] != obj + 1 ) /* +1 because obj-- above */
+                        isper = 1;
+                if ( j > 0 && !isper )
+                    if ( (int) data [i + (j - 1) * nx] != obj + 1 ) /* +1 because obj-- above */
+                        isper = 1;
+                if ( i < nx - 1 && !isper )
+                    if ( (int) data [i + 1 + j * nx] != obj + 1 )  /* +1 because obj-- above */
+                        isper = 1;
+                if ( j < ny - 1 && !isper )
+                    if ( (int) data [i + (j + 1) * nx] != obj + 1 ) /* +1 because obj-- above */
+                        isper = 1;
+                if ( isper ) {
+                    // i + 1, j + 1 because of R-based indexes in coordinates
+                    thisdistance = distancexy(i + 1, j + 1, fmdata[obj], fmdata[obj + nobj]) - fmdata [obj + 8 * nobj];
+                    /* perimeter pt SD by effr +9 */
+                    fmdata [obj + 9 * nobj] += thisdistance * thisdistance;
+                }
+            }
+        /* update new values that must be scaled by size or perimeter; round values */
+        for ( obj = 0; obj < nobj; obj++ ) {
+            if ( fmdata[obj + 2 * nobj] != 0 )
+                fmdata [obj + 7 * nobj] /= fmdata [obj + 2 * nobj];
+            if ( fmdata[obj + 3 * nobj] != 0 )
+                fmdata [obj + 9 * nobj] = sqrt (fmdata [obj + 9 * nobj] / fmdata [obj + 3 * nobj]);
+            if ( fmdata[obj + 5 * nobj] != 0 ) {
+                fmdata [obj + 9 * nobj] /= fmdata[obj + 5 * nobj];
+                /* per/2p by effr +10 */
+                fmdata [obj + 10 * nobj] = fmdata[obj + 3 * nobj] / ( 2.0 * M_PI * fmdata[obj + 5 * nobj] );
+            }
+            /* round */
+            for ( j = 5; j <= 10; j++ )
+                fmdata[obj + j * nobj] = floor (fmdata[obj + j * nobj] * 1000.0) / 1000.0;
+        }
+    }
+
+    PROTECT ( res = allocVector(VECSXP, nz) );
+    nprotect++;
+
+    /* put fm into the list */
+    for ( im = 0; im < nz; im++ )
+        SET_VECTOR_ELT (res, im, fm[im] );
+
+    UNPROTECT (nprotect);
+    return res;
+}
+
+/*----------------------------------------------------------------------- */
+SEXP 
+get_features (SEXP x) {
+    SEXP res, * fm, * dm;
+    int nx, ny, nz, nprotect, im, i, j, nobj, obj, isper;
+    double * data, * fmdata;
+    
+    if ( !isImage(x) ) return R_NilValue;
     
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
@@ -127,38 +273,25 @@ lib_get_features (SEXP x, SEXP ref) {
         fm[im] = R_NilValue;
     dm = (SEXP *) R_alloc (nz, sizeof(SEXP) );
     
-    refdata = NULL;
     for ( im = 0; im < nz; im++ ) {
         /* get image data */
         data = &( REAL(x)[ im * nx * ny ] );
-        if ( ref != R_NilValue )
-            refdata = &( REAL(ref)[ im * nx * ny ] );
         /* get number of objects -- max index */
         nobj = 0;
         for ( i = 0; i < nx * ny; i++ )
             if ( data[i] > nobj ) nobj = data[i];
         if ( nobj < 1 ) continue;
         /* create features matrix */
-        if ( ALL_FEATURES )
-            PROTECT ( fm[im] = allocVector(REALSXP, nobj * N_ALL_FEATURES) );
-        else
-            PROTECT ( fm[im] = allocVector(REALSXP, nobj * N_FEATURES) );
+        PROTECT ( fm[im] = allocVector(REALSXP, nobj * N_FEATURES) );
         nprotect++;
         fmdata = REAL (fm[im]);
-        if ( ALL_FEATURES )
-            for ( i = 0; i < nobj * N_ALL_FEATURES; i++ )
-                fmdata [i] = 0.0;
-        else
-            for ( i = 0; i < nobj * N_FEATURES; i++ )
-                fmdata [i] = 0.0;
+        for ( i = 0; i < nobj * N_FEATURES; i++ )
+            fmdata [i] = 0.0;
         /* set dimensions of the feature matrix */
         PROTECT ( dm[im] = allocVector(INTSXP, 2) );
         nprotect++;
         INTEGER ( dm[im] )[0] = nobj;
-        if ( ALL_FEATURES )
-            INTEGER ( dm[im] )[1] = N_ALL_FEATURES;
-        else
-            INTEGER ( dm[im] )[1] = N_FEATURES;
+        INTEGER ( dm[im] )[1] = N_FEATURES;
         SET_DIM ( fm[im], dm[im] );
         /* go through pixels and collect descriptors */
         for ( i = 0; i < nx; i++ )
@@ -168,56 +301,48 @@ lib_get_features (SEXP x, SEXP ref) {
                 /* all indexes were 1, 2, 3, but C has 0-based indexes!!! */
                 obj--;
                 /* update x (+0), y (+1) */
-                fmdata [obj] += i;
-                fmdata [obj + nobj] += j;
+                fmdata [obj] += i + 1; // +1 because of R-based indexes
+                fmdata [obj + nobj] += j + 1; // +1 because of R-based indexes
                 /* size (+2) */
                 fmdata [obj + 2 * nobj] += 1.0;
-                /* per (+3) */
-                perdone = 0;
+                /* is it a perimeter point */
+                isper = 0;
                 if ( i > 0 )
-                    if ( (int) data [i - 1 + j * nx] != obj + 1 ) { /* +1 because obj-- above */
-                        perdone = 1;
-                        fmdata [obj + 3 * nobj] += 1.0;
-                    }
-                if ( j > 0 && !perdone )
-                    if ( (int) data [i + (j - 1) * nx] != obj + 1 ) { /* +1 because obj-- above */
-                        perdone = 1;
-                        fmdata [obj + 3 * nobj] += 1.0;
-                    }
-                if ( i < nx - 1 && !perdone )
-                    if ( (int) data [i + 1 + j * nx] != obj + 1 ) { /* +1 because obj-- above */
-                        perdone = 1;
-                        fmdata [obj + 3 * nobj] += 1.0;
-                    }
-                if ( j < ny - 1 && !perdone )
-                    if ( (int) data [i + (j + 1) * nx] != obj + 1 ) { /* +1 because obj-- above */
-                        perdone = 1;
-                        fmdata [obj + 3 * nobj] += 1.0;
-                    }
+                    if ( (int) data [i - 1 + j * nx] != obj + 1 ) /* +1 because obj-- above */
+                        isper = 1;
+                if ( j > 0 && !isper )
+                    if ( (int) data [i + (j - 1) * nx] != obj + 1 ) /* +1 because obj-- above */
+                        isper = 1;
+                if ( i < nx - 1 && !isper )
+                    if ( (int) data [i + 1 + j * nx] != obj + 1 )  /* +1 because obj-- above */
+                        isper = 1;
+                if ( j < ny - 1 && !isper )
+                    if ( (int) data [i + (j + 1) * nx] != obj + 1 ) /* +1 because obj-- above */
+                        isper = 1;
+                /* per (+3) */
+                if ( isper )
+                    fmdata [obj + 3 * nobj] += 1.0;
                 /* edge (+4) */
                 if ( i == 0 || j == 0 || i == nx - 1 || j == ny - 1 )
                     fmdata [obj + 4 * nobj] += 1.0;
-                if ( ALL_FEATURES ) {
-                    /* int (+5)  */
-                    if ( refdata && ref != R_NilValue ) 
-                        fmdata [obj + 5 * nobj] += refdata [i + j * nx];
-                }
-                    
             }
         for ( obj = 0; obj < nobj; obj++ )
-            if ( fmdata[obj + 2 * nobj] > 0 ) {
+            if ( fmdata[obj + 2 * nobj] != 0 ) {
+                /* x */
                 fmdata [obj] = floor (fmdata [obj] / fmdata [obj + 2 * nobj] * 10.0) / 10.0;
+                /* y */
                 fmdata [obj + nobj] = floor (fmdata [obj + nobj] / fmdata [obj + 2 * nobj] * 10.0) / 10.0;
-            }        
+            }
     }
-    PROTECT ( features = allocVector(VECSXP, nz) );
+    PROTECT ( res = allocVector(VECSXP, nz) );
     nprotect++;
+
     /* put fm into the list */
     for ( im = 0; im < nz; im++ )
-        SET_VECTOR_ELT (features, im, fm[im] );
-/*    SET_SLOT (x, mkString("features"), features); */
+        SET_VECTOR_ELT (res, im, fm[im] );
+
     UNPROTECT(nprotect);
-    return features;
+    return res;
 }
 
 /*----------------------------------------------------------------------- */
@@ -244,10 +369,8 @@ lib_combineFeatures (SEXP x, SEXP _ext, SEXP _factor, SEXP _seeds) {
     nprotect++;
 
     /* we need this to know about perimeters etc of currently existing objects */
-    ALL_FEATURES = 0;
-    PROTECT (features = lib_get_features (res, R_NilValue) );  
+    PROTECT (features = get_features (res) );  
     nprotect++;
-    ALL_FEATURES = 1;
     
     /* if we were not able to determine features correctly, do nothing */
     if ( LENGTH( features ) != nz ) {
@@ -256,6 +379,7 @@ lib_combineFeatures (SEXP x, SEXP _ext, SEXP _factor, SEXP _seeds) {
     }
     
     for ( im = 0; im < nz; im++ ) {
+        if ( VECTOR_ELT(features, im) == R_NilValue ) continue;
         /* get image data */
         data = &( REAL(res)[ im * nx * ny ] );
         /* get number of objects -- max index */
@@ -425,10 +549,8 @@ lib_matchFeatures (SEXP x, SEXP ref) {
     indexes = (SEXP *) R_alloc (nz, sizeof(SEXP) );
     
     /* we need this to know centres of objects in x */
-    ALL_FEATURES = 0;
-    PROTECT (xf = lib_get_features (x, R_NilValue) );
+    PROTECT (xf = get_features (x) );
     nprotect++;
-    ALL_FEATURES = 1;
 
     for ( im = 0; im < nz; im++ ) {
         /* get image data */
@@ -443,6 +565,7 @@ lib_matchFeatures (SEXP x, SEXP ref) {
         /* add it to res */
         SET_VECTOR_ELT (res, im, indexes[im] );
         if ( nobj < 1 ) continue;
+        if ( VECTOR_ELT(xf, im) == R_NilValue ) continue;
         /* check if features correspond to objects */
         if ( LENGTH( VECTOR_ELT(xf, im) ) != nobj * N_FEATURES ) continue;
         ftrs = REAL( VECTOR_ELT(xf, im) );
@@ -451,8 +574,8 @@ lib_matchFeatures (SEXP x, SEXP ref) {
 
         /* scan through objects, collect indexes */
         for ( i = 0; i < nobj; i++ ) {
-            ix = ftrs [i];
-            jy = ftrs [i + nobj];
+            ix = ftrs [i] - 1; // from R-based indexes
+            jy = ftrs [i + nobj] - 1; // from R-based indexes
             INTEGER (indexes[im])[i] = NA_INTEGER;
             if ( ix >= 0 && jy >= 0 && ix < nx && jy < ny )
                 if ( data[ix + jy * nx] > 0.9 )
