@@ -89,12 +89,12 @@
     \dontrun{this will modify detected objects combining some of them}
     x <- combineObjects(x, fraction=0.2)
     \dontrun{delete objects touching image edges}
-    x <- assignObjects(x, ref=a)
+    features(x) <- getObjects(x, ref=a)
     \dontrun{paint and display combined objects for comparison}
     display(paintObjects(x, channel(a, "rgb")))
     index <- lapply (features(x), function(x) which(x[,5] > 0) )
     x <- rmObjects(x, index)
-    x <- assignObjects(x, ref=a)
+    features(x) <- getObjects(x, ref=a)
     \dontrun{paint and display combined objects for comparison}
     display(paintObjects(x, channel(a, "rgb")))
     \dontrun{this will print all the detected objects}

@@ -77,11 +77,10 @@ SEXP         lib_erode_dilate (SEXP, SEXP, SEXP, SEXP);             /* filters_m
 SEXP         lib_filterThresh (SEXP, SEXP);                         /* filters_thresh.c      */
 SEXP         lib_distMap (SEXP, SEXP, SEXP, SEXP);                  /* filters_distmap.c     */
 SEXP         lib_filterInvWS (SEXP, SEXP, SEXP, SEXP);              /* filters_watershed.c   */
-SEXP         lib_assignFeatures (SEXP, SEXP);                       /* object_counting.c     */
-SEXP         lib_paintFeatures (SEXP, SEXP, SEXP, SEXP);            /* -"-                   */
+SEXP         lib_paintFeatures (SEXP, SEXP, SEXP, SEXP);            /* object_counting.c     */
 SEXP         lib_combineFeatures (SEXP, SEXP, SEXP, SEXP);          /* -"-                   */
 SEXP         lib_matchFeatures (SEXP, SEXP);                        /* -"-                   */
-SEXP         lib_get_features (SEXP, SEXP);                         /* -"-                   */
+SEXP         lib_getFeatures (SEXP, SEXP);                          /* -"-                   */
 SEXP         lib_deleteFeatures (SEXP, SEXP, SEXP);                 /* -"-                   */
 
 /* library exports and internal functions */
@@ -89,6 +88,7 @@ Image *      sexp2Magick (SEXP);                                    /* conversio
 SEXP         magick2SEXP (Image *, int);                            /* -"-                   */
 int          isImage (SEXP);                                        /* tools.c               */
 double       distanceXY (const PointXY, const PointXY);             /* -"-                   */
+double       distancexy (int, int, int, int);                       /* -"-                   */
 PointXY      pointFromIndex (const int, const int);                 /* -"-                   */
 int          indexFromPoint (const PointXY, const int);             /* -"-                   */
 int          indexFromXY (const int, const int, const int);         /* -"-                   */
@@ -97,6 +97,8 @@ Image *      double2image1D (double *, int);                        /* -"-      
 void         image1D2double (Image *, double *, int);               /* -"-                   */
 void         image1D2int (Image *, int *, int);                     /* -"-                   */
 Image *      vector2image1D (SEXP);                                 /* -"-                   */
+SEXP         get_features (SEXP);                                   /* object_counting.c     */
+SEXP         get_all_features (SEXP, SEXP);                         /* -"-                   */
 
 #ifdef USE_GTK
 void         _doIter (void *);                                      /* tools.c               */
