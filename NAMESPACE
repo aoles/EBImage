@@ -9,7 +9,7 @@ exportClasses(
     Image
 )
 exportMethods(
-    copy, display, write.image, header, assert, combine,
+    copy, display, animate, write.image, header, assert, combine,
     show, "[", channel,
 
     ## FIXME: as.array, as.matrix, ## incompatibility with R < 2.4.1

@@ -14,6 +14,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_chooseImages",   (DL_FUNC) &lib_chooseImages,   0},
     {"lib_writeImages",    (DL_FUNC) &lib_writeImages,    3},
     {"lib_display",        (DL_FUNC) &lib_display,        2},
+    {"lib_animate",        (DL_FUNC) &lib_animate,        1},
     {"lib_channel",        (DL_FUNC) &lib_channel,        2},
     {"lib_filterMagick",   (DL_FUNC) &lib_filterMagick,   3},
     {"lib_erode_dilate",   (DL_FUNC) &lib_erode_dilate,   4},
