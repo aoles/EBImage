@@ -244,6 +244,15 @@ setMethod ("display", signature(x="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("animate", signature(x="Image"),
+    function (x, ...) {
+        if ( !.isCorrectType(x) )
+            x <- .correctType (x)
+        invisible ( .DoCall("lib_animate", x ) )
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("write.image", signature(x="Image", files="character"),
     function (x, files, quality, ...) {
         if ( missing(quality) )

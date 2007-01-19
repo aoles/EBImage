@@ -70,6 +70,7 @@ SEXP         lib_readImages (SEXP, SEXP);                           /* io.c     
 SEXP         lib_writeImages (SEXP, SEXP, SEXP);                    /* -"-                   */
 SEXP         lib_chooseImages ();                                   /* -"-                   */
 SEXP         lib_display (SEXP, SEXP);                              /* display.c             */
+SEXP         lib_animate (SEXP);                                    /* -"-                   */
 SEXP         lib_channel (SEXP, SEXP);                              /* colors.c              */
 SEXP         lib_filterMagick (SEXP, SEXP, SEXP);                   /* filters_magick.c      */
 SEXP         lib_filterFill (SEXP, SEXP, SEXP, SEXP, SEXP);         /* -"-                   */

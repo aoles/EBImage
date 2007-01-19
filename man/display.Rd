@@ -1,6 +1,7 @@
 \name{display}
 
 \alias{display}
+\alias{animate}
 
 \concept{display}
 
@@ -13,6 +14,7 @@
 \section{Usage}{
   \preformatted{
     display(x, no.GTK=FALSE, ...)
+    animate(x, ...)
   }
 }
 
@@ -43,7 +45,11 @@
   It is not necessary supply the \code{no.GTK} argument if the library was
   compiled without \code{GTK+} support as an alternative method will be 
   selected by default.
-  
+
+  \code{animate} will use \code{ImageMagick} AnimateImages API function to 
+  animate a stack of images. This function is not available on Windows, same as
+  \code{display} using ImageMagick API is not available on Windows, because API
+  does not fully support this functionality.
 }
 
 \seealso{

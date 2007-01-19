@@ -15,6 +15,7 @@ int THREAD_ON = 0;
 
 /*----------------------------------------------------------------------- */
 void * _showInImageMagickWindow (void *);
+void * _animateInImageMagickWindow (void *);
 #ifdef USE_GTK
 void _showInGtkWindow (SEXP);
 #endif
@@ -47,6 +48,27 @@ lib_display(SEXP x, SEXP nogtk) {
 }
 
 /*----------------------------------------------------------------------- */
+SEXP
+lib_animate (SEXP x) {
+#ifndef WIN32
+    pthread_t res;
+#endif
+
+    if ( !isImage(x) )
+        error ( _("argument must be of class 'Image'") );
+
+#ifdef WIN32
+    error ( _("animate function is not available on Windows because it uses ImageMagick interactive display") );
+#else
+    if ( THREAD_ON )        
+        error ( _("cannot display concurent windows. Close currently displayed window first.") );
+    if ( pthread_create(&res, NULL, _animateInImageMagickWindow, (void *)x ) != 0 )
+        error ( _("cannot animate display thread") );
+#endif
+    return R_NilValue;
+}
+
+/*----------------------------------------------------------------------- */
 void *
 _showInImageMagickWindow (void * ptr) {
     SEXP x;
@@ -59,6 +81,25 @@ _showInImageMagickWindow (void * ptr) {
     image_info = CloneImageInfo ( (ImageInfo *)NULL );
     strcpy (image_info->filename, "\0");
     DisplayImages (image_info, images);
+    THREAD_ON = 0;
+    DestroyImageList (images);
+    DestroyImageInfo (image_info);
+    return NULL;
+}
+
+/*----------------------------------------------------------------------- */
+void *
+_animateInImageMagickWindow (void * ptr) {
+    SEXP x;
+    Image * images;
+    ImageInfo * image_info;
+        
+    x = (SEXP) ptr;
+    THREAD_ON = 1;
+    images = sexp2Magick (x);
+    image_info = CloneImageInfo ( (ImageInfo *)NULL );
+    strcpy (image_info->filename, "\0");
+    AnimateImages (image_info, images);
     THREAD_ON = 0;
     DestroyImageList (images);
     DestroyImageInfo (image_info);
