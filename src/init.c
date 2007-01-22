@@ -40,6 +40,30 @@ void
 #endif
 */
 R_init_EBImage (DllInfo * winDll) {
+#ifdef USE_GTK
+    /* argc, agrv global vars defined in common.h */
+/*
+    argc = 1;
+    argv = (char **) Calloc (1, char* );
+    argv[0] = Calloc (255, char );
+    strcpy (argv[0], "R session");
+*/
+    argc = 0;
+    argv = NULL;
+    GTK_OK = 0;
+    // initialize gtk, vars defined in common.h and initialised in init.c
+    if ( !gtk_init_check(&argc, &argv) )
+        warning ( _("failed to initialize GTK+, use 'read.image' instead") );
+    else {        
+        GTK_OK = 1;
+        // add R event handler to enable automatic window redraw
+#       ifndef WIN32
+        hdlr = addInputHandler(R_InputHandlers, ConnectionNumber(GDK_DISPLAY()), _doIter, -1);
+#       else
+        R_tcldo = _doIterWin32;
+#       endif
+    }
+#endif
     R_registerRoutines (winDll, NULL, libraryRCalls, NULL, NULL);
     R_useDynamicSymbols (winDll, FALSE);
     /* this initialization is not required on Linux */  
@@ -64,5 +88,9 @@ R_unload_EBImage (DllInfo * winDll) {
     if ( IsMagickInstantiated() )
         DestroyMagick();
 #   endif
+/*
+    Free (argv[0]);
+    Free (argv);
+*/
 }
 

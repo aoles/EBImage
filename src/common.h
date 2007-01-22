@@ -35,12 +35,16 @@ LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 /* GTK+ includes */
 #ifdef USE_GTK
-#   include <gtk/gtk.h>
+#   include <glib.h>
+#   include <glib-object.h>
 #   include <gdk/gdk.h>
+#   include <gdk-pixbuf/gdk-pixbuf.h>
+#   include <gtk/gtk.h>
 #   ifdef WIN32
         typedef unsigned long ulong;
         extern  __declspec(dllimport) void (* R_tcldo) ();
 #       include <sys/types.h>
+// FIXME: what is the next line doing?
 #       include <gdk/gdkwin32.h>
 #   else
 #       include "R_ext/eventloop.h"
@@ -102,11 +106,18 @@ SEXP         get_features (SEXP);                                   /* object_co
 SEXP         get_all_features (SEXP, SEXP);                         /* -"-                   */
 
 #ifdef USE_GTK
-void         _doIter (void *);                                      /* tools.c               */
-GdkPixbuf *  newPixbufFromImages (Image *, int);                    /* conversions.c         */
-#ifdef WIN32
-void         _doIterWin32 ();                                       /* tools.c               */
-#endif
+    /* global vars needed to initialise GTK, local vars were used before, caused
+      memory problems because they were freed before the function returned */
+    char ** argv;
+    int argc;
+    int GTK_OK;
+    void     _doIter (void *);                                      /* tools.c               */
+    GdkPixbuf * newPixbufFromImages (Image *, int);                 /* conversions.c         */
+#   ifdef WIN32
+    void     _doIterWin32 ();                                       /* tools.c               */
+#   else
+    InputHandler * hdlr;
+#   endif
 #endif
 
 /* will be substituted by gettext internationalisation */
