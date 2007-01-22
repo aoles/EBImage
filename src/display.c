@@ -122,12 +122,8 @@ typedef gpointer * ggpointer;
 /*----------------------------------------------------------------------- */
 void 
 _showInGtkWindow (SEXP x) {
-    int argc, nx, ny, nz, width, height;
+    int nx, ny, nz, width, height;
     SEXP dim;
-    char ** argv;
-#   ifndef WIN32
-    InputHandler * hdlr;
-#   endif
     Image * images;
     GdkPixbuf * pxbuf;
     GtkWidget * imgWG, * winWG, * vboxWG, * tbarWG, * scrollWG, 
@@ -136,21 +132,8 @@ _showInGtkWindow (SEXP x) {
     GtkIconSize iSize;
     gpointer ** winStr; /* 4 pointers, 0 - window, 1 - imageWG, 2 - images, *int - index of current image on display */
     
-    /* initialize gtk */
-    argc = 1;
-    argv = (char **) R_alloc (1, sizeof(char *) );
-    argv[0] = R_alloc (255, sizeof(char) );
-    strcpy (argv[0], "R session\0");
-
-    if ( !gtk_init_check(&argc, &argv) )
-        error ( _("failed to initialize GTK+. On Unix/Linux/Mac use display(x, TRUE) instead") );
-
-    /* add R event handler to enable automatic window redraw */
-#   ifndef WIN32
-    hdlr = addInputHandler(R_InputHandlers, ConnectionNumber(GDK_DISPLAY()), _doIter, -1);
-#   else
-    R_tcldo = _doIterWin32;
-#   endif
+    if ( !GTK_OK )
+        error ( _("failed to initialize GTK+, use 'read.image' instead") );
 
     /* get image in magick format and get image size */
     images = sexp2Magick (x);
