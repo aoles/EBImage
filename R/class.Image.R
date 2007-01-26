@@ -307,24 +307,23 @@ setMethod ("[", signature(x="Image", i="missing", j="missing"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("[", signature(x="Image", i="numeric", j="missing"),
-    function (x, i, j, ..., drop) {
-        ## Is it correct on all R versions: args takes only ... arguments!
-        ## so we can use it to decide between [i] and [i,,k]
-        ## why are we getting: 
-        ## FIXME: Error in a[1, , ] : argument is missing, with no default
-        args <- list(...)
-        print (length(args))
-        if ( length(args) == 0 )
-            tmp = x@.Data[i, drop=FALSE]
-        else {
-            tmp = x@.Data[i, , ..., drop=FALSE]
-        }
-        if ( !is.array(tmp) ) return (tmp)
-        res <- header (x)
-        imageData (res) <- tmp
-        return (res)
-    }
-)
+   function (x, i, j, ..., drop) {
+     ## Use nargs() to decide between [i], [i,] and [i,,k]
+     ## For [i], just return a numeric vector
+     ## For [i,], [i,,k], return subset Image objects
+     n = nargs()
+     if(n==2L) {
+       res= x@.Data[i]
+     } else {
+       res=header(x)
+       imageData(res) = if(n==3L) {
+         x@.Data[i,,,drop=FALSE]
+       } else {
+         x@.Data[i,,...,drop=FALSE]
+       }
+     }
+     return(res)
+   })
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("[", signature(x="Image", i="missing", j="numeric"),
