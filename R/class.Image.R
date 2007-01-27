@@ -313,9 +313,9 @@ setMethod ("[", signature(x="Image", i="numeric", j="missing"),
         ## For [i,,]/[i,,k], return subset Image objects
         ## For [i,] return error
         n <- nargs()
-        if ( n == 2L )
+        if ( n == 2 )
             return( x@.Data[i] )
-        if ( n != 4L )
+        if ( n != 4 )
             stop ( .("incorrect number of dimensions") )
         res <- header(x)
         imageData (res) <- x@.Data[i,,...,drop=FALSE]
