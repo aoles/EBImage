@@ -23,8 +23,8 @@ TrueColor  <- as.integer (1)
 setClass ("Image",
     representation (
         colormode    = "integer",    ## 0 - gray, 1 - RGB etc
-        filename     = "character", 
-        compression  = "character",  ## 
+        filename     = "character",
+        compression  = "character",  ##
         resolution   = "numeric",    ## length = 2 ## lost in jpeg, pixels per inch
         filter       = "character",  ## filter for sampling
         features     = "list"
@@ -32,11 +32,11 @@ setClass ("Image",
     prototype (
         colormode    = Grayscale,
         filename     = "no-name",
-        compression  = "LZW",     
+        compression  = "LZW",
         resolution   = c(2.5e+6, 2.5e+6), ## 1 px per 1um in pixels per inch
         filter       = "lanczos",
         features     = list()
-        
+
     ),
     contains = "array"
 )
@@ -120,9 +120,9 @@ setReplaceMethod ("sampleFilter", signature (x="Image", value="character"),
     function (x, ..., value) {
         value <- tolower (value)
         if ( switch (EXPR=value, point=, box=, triangle=, hermite=, hanning=,
-                hamming=, blackman=, gaussian=, quadratic=, cubic=, catrom=, mitchell=, 
+                hamming=, blackman=, gaussian=, quadratic=, cubic=, catrom=, mitchell=,
                 lanczos=, bessel=, sinc=FALSE, TRUE) )
-            stop ( paste( .("wrong filter type. Possible values are:"), "point, box, triangle, hermite, hanning, hamming, blackman, gaussian, quadratic, cubic, catrom, mitchell, lanczos, bessel, sinc") ) 
+            stop ( paste( .("wrong filter type. Possible values are:"), "point, box, triangle, hermite, hanning, hamming, blackman, gaussian, quadratic, cubic, catrom, mitchell, lanczos, bessel, sinc") )
         x@filter <- value
         return (x)
     }
@@ -166,7 +166,7 @@ setMethod ("assert", signature (x="Image", y="Image"),
             if ( strict )
                 n <- 3
         if ( any( dim(x)[1:n] != dim(y)[1:n] ) || colorMode(x) != colorMode(y) ) return (FALSE)
-        return (TRUE)        
+        return (TRUE)
     }
 )
 setMethod ("assert", signature (x="Image", y="missing"),
@@ -180,7 +180,7 @@ stopIfNotImage <- function (x) {
         stop ( .("argument must be of class 'Image'") )
     if ( length( dim(x) ) != 3)
         stop ( .("array dimensions for the object of class 'Image' must be 3") )
-    invisible (NULL) 
+    invisible (NULL)
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -307,23 +307,21 @@ setMethod ("[", signature(x="Image", i="missing", j="missing"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("[", signature(x="Image", i="numeric", j="missing"),
-   function (x, i, j, ..., drop) {
-     ## Use nargs() to decide between [i], [i,] and [i,,k]
-     ## For [i], just return a numeric vector
-     ## For [i,], [i,,k], return subset Image objects
-     n = nargs()
-     if(n==2L) {
-       res= x@.Data[i]
-     } else {
-       res=header(x)
-       imageData(res) = if(n==3L) {
-         x@.Data[i,,,drop=FALSE]
-       } else {
-         x@.Data[i,,...,drop=FALSE]
-       }
-     }
-     return(res)
-   })
+    function (x, i, j, ..., drop) {
+        ## Use nargs() to decide between [i], [i,] and [i,,]/[i,,k]
+        ## For [i], just return a numeric vector
+        ## For [i,,]/[i,,k], return subset Image objects
+        ## For [i,] return error
+        n <- nargs()
+        if ( n == 2L )
+            return( x@.Data[i] )
+        if ( n != 4L )
+            stop ( .("incorrect number of dimensions") )
+        res <- header(x)
+        imageData (res) <- x@.Data[i,,...,drop=FALSE]
+        return( res )
+   }
+)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("[", signature(x="Image", i="missing", j="numeric"),
@@ -465,10 +463,10 @@ setMethod ("channel", signature(x="Image", mode="character"),
     function (x, mode, ...) {
         mode <- tolower (mode)
         if ( mode == "grey" ) mode = "gray"
-        modeNo <- switch (EXPR=mode, rgb=0, gray=1, red=2, green=3, 
+        modeNo <- switch (EXPR=mode, rgb=0, gray=1, red=2, green=3,
                 blue=4, asred=5, asgreen=6, asblue=7, x11=8, -1)
         if ( modeNo < 0 )
-            stop ( paste(.("wrong conversion mode. Please specify one of"), "rgb, gray, grey, red, green, blue, asred, asgreen, asblue, x11") ) 
+            stop ( paste(.("wrong conversion mode. Please specify one of"), "rgb, gray, grey, red, green, blue, asred, asgreen, asblue, x11") )
         resData <- .DoCall("lib_channel", x@.Data, as.integer(modeNo) )
         if ( is.null(resData) )
             stop ( .("could not convert colors, NULL result") )
@@ -485,7 +483,7 @@ setMethod ("channel", signature(x="Image", mode="character"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 hist.Image <- function (x, breaks=255, main=paste("Image histogram. Total", length(x), "pixels"), xlab="colors", ...) {
     if ( xlab == "colors" ) {
-        if ( colorMode(x) == Grayscale ) 
+        if ( colorMode(x) == Grayscale )
             xlab = "Shades of gray, 0: black, 1: white"
         if ( colorMode(x) == TrueColor )
             xlab = "RGB values, non-informative"
