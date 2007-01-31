@@ -62,10 +62,10 @@ lib_channel (SEXP x, SEXP mode) {
             res = image1D2CHAR (image);
             break;
         default:
-            DestroyImage (image);
+            image = DestroyImage (image);
             error ( _("incorrect mode") );
     }
-    DestroyImage (image);
+    image = DestroyImage (image);
     return res;
 }
 

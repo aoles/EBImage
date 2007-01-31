@@ -154,8 +154,8 @@ lib_filterMagick (SEXP x, SEXP filter, SEXP parameters) {
                 image = CloneImage (image, 0, 0, 1, &exception);
                 break;
             default:
-                DestroyImage (images);
-                DestroyExceptionInfo (&exception);
+                images = DestroyImage (images);
+                /* DestroyExceptionInfo (&exception); */
                 error ( _("unsupported filter specified") );
         }
         if (exception.severity != UndefinedException) {
@@ -175,11 +175,11 @@ lib_filterMagick (SEXP x, SEXP filter, SEXP parameters) {
         RemoveFirstImageFromList (&images);
     }
 
-    DestroyImageList (images);
+    images = DestroyImageList (images);
 
     PROTECT ( res = magick2SEXP(newimages, mode) );
     SET_SLOT (res, mkString("features"), Rf_duplicate( GET_SLOT(x, mkString("features") ) ) );
-    DestroyImageList (newimages);
+    newimages = DestroyImageList (newimages);
     UNPROTECT (1);
     
     return res;    
@@ -210,7 +210,7 @@ lib_filterFill (SEXP x, SEXP colStrSXP, SEXP coords, SEXP methodSXP, SEXP fuzzSX
     QueryColorDatabase (str, &pp, &exception);
     if ( exception.severity != UndefinedException ) {
         CatchException (&exception);
-        DestroyImageList (images);
+        images = DestroyImageList (images);
         error ( _("cannot identify color") ); 
     }
     str = CHAR ( asChar(methodSXP) );
@@ -248,10 +248,10 @@ warning ("FIXME: the fill function does not seem to fill anything, no idea why\n
         RemoveFirstImageFromList (&images);
     }
 
-    DestroyImageList (images);
+    images = DestroyImageList (images);
 
     PROTECT ( res = magick2SEXP(newimages, mode) );
-    DestroyImageList (newimages);
+    newimages = DestroyImageList (newimages);
     UNPROTECT (1);
     
     return res;    

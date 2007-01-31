@@ -55,10 +55,10 @@ lib_readImages (SEXP files, SEXP mode) {
     }
     /* do not update image properties here because if no image was added to 
     the list it will cause segfault, or use GetImageListLength first to check size */
-    DestroyImageInfo (image_info);
+    image_info = DestroyImageInfo (image_info);
     /* convert image list into R object */
     res = magick2SEXP (images, _mode);
-    DestroyImageList (images);
+    images = DestroyImageList (images);
     return res;
 }
 
@@ -177,7 +177,7 @@ lib_writeImages (SEXP x, SEXP files, SEXP quality) {
         }    
     }
     
-    DestroyImageInfo (image_info);
-    DestroyImageList (images);
+    image_info = DestroyImageInfo (image_info);
+    images = DestroyImageList (images);
     return R_NilValue;
 }

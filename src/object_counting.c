@@ -81,11 +81,11 @@ lib_paintFeatures (SEXP x, SEXP tgt, SEXP _opac, SEXP _col) {
                 image1D2int (image, &(INTEGER(res)[ im * nx * ny + j * nx ]), nx );
             if ( tgtmode == MODE_GRAY )
                 image1D2double (image, &(REAL(res)[ im * nx * ny + j * nx ]), nx );
-            DestroyImage (image);
+            image = DestroyImage (image);
         }
     }
 
-    DestroyImage (colors);
+    colors = DestroyImage (colors);
 
     UNPROTECT (nprotect);
     return res;    
