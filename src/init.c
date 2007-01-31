@@ -27,7 +27,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_combineFeatures",(DL_FUNC) &lib_combineFeatures,4},
     {"lib_matchFeatures",  (DL_FUNC) &lib_matchFeatures,  2},
     {"lib_deleteFeatures", (DL_FUNC) &lib_deleteFeatures, 3},
-    
+
     /* add above all R-lib functions from common.h */
     {NULL, NULL, 0}
 };
@@ -53,8 +53,8 @@ R_init_EBImage (DllInfo * winDll) {
     GTK_OK = 0;
     // initialize gtk, vars defined in common.h and initialised in init.c
     if ( !gtk_init_check(&argc, &argv) )
-        warning ( _("failed to initialize GTK+, use 'read.image' instead") );
-    else {        
+        warning ( _("failed to initialize GTK+") );
+    else {
         GTK_OK = 1;
         // add R event handler to enable automatic window redraw
 #       ifndef WIN32
@@ -66,7 +66,7 @@ R_init_EBImage (DllInfo * winDll) {
 #endif
     R_registerRoutines (winDll, NULL, libraryRCalls, NULL, NULL);
     R_useDynamicSymbols (winDll, FALSE);
-    /* this initialization is not required on Linux */  
+    /* this initialization is not required on Linux */
     /* in fact I am not sure this is required on Windows! */
 #   ifdef WIN32
     InitializeMagick ("");
@@ -82,7 +82,7 @@ void
 #endif
 */
 R_unload_EBImage (DllInfo * winDll) {
-    /* this destroy is not required on Linux */  
+    /* this destroy is not required on Linux */
     /* in fact I am not sure this is required on Windows! */
 #   ifdef WIN32
     if ( IsMagickInstantiated() )

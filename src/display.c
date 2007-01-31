@@ -82,8 +82,8 @@ _showInImageMagickWindow (void * ptr) {
     strcpy (image_info->filename, "\0");
     DisplayImages (image_info, images);
     THREAD_ON = 0;
-    DestroyImageList (images);
-    DestroyImageInfo (image_info);
+    images = DestroyImageList (images);
+    image_info = DestroyImageInfo (image_info);
     return NULL;
 }
 
@@ -101,8 +101,8 @@ _animateInImageMagickWindow (void * ptr) {
     strcpy (image_info->filename, "\0");
     AnimateImages (image_info, images);
     THREAD_ON = 0;
-    DestroyImageList (images);
-    DestroyImageInfo (image_info);
+    images = DestroyImageList (images);
+    image_info = DestroyImageInfo (image_info);
     return NULL;
 }
 
@@ -220,8 +220,8 @@ onWinDestroy (GtkWidget * wnd, GdkEvent * event, gpointer ptr) {
     winStr = (gpointer **) ptr;
     g_free (winStr[3]);
     images = (Image *) winStr[2];
-    DestroyImageList (images);
     g_free (winStr);
+    images = DestroyImageList (images);
 /*    Rprintf ( _("R image display closed...\n") ); */
     return FALSE;
 }
