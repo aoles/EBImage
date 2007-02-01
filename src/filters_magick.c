@@ -74,7 +74,7 @@ lib_filterMagick (SEXP x, SEXP filter, SEXP parameters) {
                 break;
             case FLT_EDGE:
                 image = EdgeImage (image, par[0], &exception);
-                break;        
+                break;
             case FLT_ENHANCE:
                 image = EnhanceImage (image, &exception);
                 break;
@@ -98,7 +98,7 @@ lib_filterMagick (SEXP x, SEXP filter, SEXP parameters) {
                     case 4: image = AddNoiseImage (image, ImpulseNoise, &exception); break;
                     case 5: image = AddNoiseImage (image, LaplacianNoise, &exception); break;
                     case 6: image = AddNoiseImage (image, PoissonNoise, &exception); break;
-                    default: image = AddNoiseImage (image, GaussianNoise, &exception); 
+                    default: image = AddNoiseImage (image, GaussianNoise, &exception);
                 }
                 break;
             case FLT_RESIZE:
@@ -172,7 +172,9 @@ lib_filterMagick (SEXP x, SEXP filter, SEXP parameters) {
             newimages->x_resolution = images->x_resolution;
             newimages->y_resolution = images->y_resolution;
         }
+        image = GetFirstImageInList (images);
         RemoveFirstImageFromList (&images);
+        image = DestroyImage( image );
     }
 
     images = DestroyImageList (images);
@@ -181,8 +183,8 @@ lib_filterMagick (SEXP x, SEXP filter, SEXP parameters) {
     SET_SLOT (res, mkString("features"), Rf_duplicate( GET_SLOT(x, mkString("features") ) ) );
     newimages = DestroyImageList (newimages);
     UNPROTECT (1);
-    
-    return res;    
+
+    return res;
 }
 
 SEXP
@@ -211,7 +213,7 @@ lib_filterFill (SEXP x, SEXP colStrSXP, SEXP coords, SEXP methodSXP, SEXP fuzzSX
     if ( exception.severity != UndefinedException ) {
         CatchException (&exception);
         images = DestroyImageList (images);
-        error ( _("cannot identify color") ); 
+        error ( _("cannot identify color") );
     }
     str = CHAR ( asChar(methodSXP) );
     if ( strcmp (str, "floodfill") == 0 )
@@ -222,7 +224,7 @@ lib_filterFill (SEXP x, SEXP colStrSXP, SEXP coords, SEXP methodSXP, SEXP fuzzSX
     GetImageInfo (&iinfo);
     GetDrawInfo (&iinfo, &dinfo);
     dinfo.fill = pp;
-    
+
 warning ("FIXME: the fill function does not seem to fill anything, no idea why\n");
 
     for ( i = 0; i < nz; i++ ) {
@@ -245,7 +247,9 @@ warning ("FIXME: the fill function does not seem to fill anything, no idea why\n
             newimages->x_resolution = images->x_resolution;
             newimages->y_resolution = images->y_resolution;
         }
+        image = GetFirstImageInList (images);
         RemoveFirstImageFromList (&images);
+        image = DestroyImage( image );
     }
 
     images = DestroyImageList (images);
@@ -253,6 +257,6 @@ warning ("FIXME: the fill function does not seem to fill anything, no idea why\n
     PROTECT ( res = magick2SEXP(newimages, mode) );
     newimages = DestroyImageList (newimages);
     UNPROTECT (1);
-    
-    return res;    
+
+    return res;
 }
