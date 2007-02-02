@@ -182,8 +182,10 @@ lib_filterMagick (SEXP x, SEXP filter, SEXP parameters) {
     PROTECT ( res = magick2SEXP(newimages, mode) );
     SET_SLOT (res, mkString("features"), Rf_duplicate( GET_SLOT(x, mkString("features") ) ) );
     newimages = DestroyImageList (newimages);
-    UNPROTECT (1);
 
+    DestroyExceptionInfo(&exception);
+
+    UNPROTECT (1);
     return res;
 }
 
@@ -256,7 +258,9 @@ warning ("FIXME: the fill function does not seem to fill anything, no idea why\n
 
     PROTECT ( res = magick2SEXP(newimages, mode) );
     newimages = DestroyImageList (newimages);
-    UNPROTECT (1);
 
+    DestroyExceptionInfo(&exception);
+
+    UNPROTECT (1);
     return res;
 }
