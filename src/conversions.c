@@ -9,23 +9,23 @@ See: ../LICENSE for license, LGPL
 /*----------------------------------------------------------------------- */
 #define COMP_LENGTH 6
 
-const char * COMP_IDS [] = { 
+const char * COMP_IDS [] = {
     "NONE", "LZW", "ZIP", "JPEG", "BZIP", "GROUP4" };
 
-const CompressionType COMP_VALS [] = { 
-    NoCompression, LZWCompression, ZipCompression, 
+const CompressionType COMP_VALS [] = {
+    NoCompression, LZWCompression, ZipCompression,
     JPEGCompression, BZipCompression, Group4Compression };
 
 /*----------------------------------------------------------------------- */
 #define FLTR_LENGTH 15
 
 const char * FLTR_IDS [] = {
-    "point", "box", "triangle", "hermite", "hanning", 
-    "hamming", "blackman", "gaussian", "quadratic", "cubic", 
+    "point", "box", "triangle", "hermite", "hanning",
+    "hamming", "blackman", "gaussian", "quadratic", "cubic",
     "catrom", "mitchell", "lanczos", "bessel", "sinc" };
 
 const FilterTypes FLTR_VALS [] = {
-    PointFilter, BoxFilter, TriangleFilter, HermiteFilter, HanningFilter, 
+    PointFilter, BoxFilter, TriangleFilter, HermiteFilter, HanningFilter,
     HammingFilter, BlackmanFilter, GaussianFilter, QuadraticFilter, CubicFilter,
     CatromFilter, MitchellFilter, LanczosFilter, BesselFilter, SincFilter };
 
@@ -37,7 +37,7 @@ sexp2Magick (SEXP x) {
     ExceptionInfo exception;
     void * data;
     char * compressStr, * filterStr;
-    
+
     /* basic checks */
     if ( !isImage(x) )
         error ( _("argument must be of class 'Image'") );
@@ -67,7 +67,7 @@ sexp2Magick (SEXP x) {
             warning ( _("cannot convert the image") );
             continue;
         }
-        if ( colormode == MODE_RGB ) 
+        if ( colormode == MODE_RGB )
             SetImageType (image, TrueColorType);
         else
             SetImageType (image, GrayscaleType);
@@ -81,7 +81,7 @@ sexp2Magick (SEXP x) {
     /* copy attributes: filename */
     strcpy ( res->filename, CHAR( asChar( GET_SLOT(x, mkString("filename") ) ) ) );
     /* propagate to all images */
-    for ( i = 0; i < GetImageListLength(res); i++ ) {
+    for ( i = 0; i < (int) GetImageListLength(res); i++ ) {
         image = GetImageFromList (res, i);
         strcpy ( image->filename, CHAR( asChar( GET_SLOT(x, mkString("filename") ) ) ) );
     }
@@ -91,7 +91,7 @@ sexp2Magick (SEXP x) {
         if ( strcmp(compressStr, COMP_IDS[i]) == 0 ) {
             res->compression = COMP_VALS[i];
             /* propagate to all images */
-            for ( j = 0; j < GetImageListLength(res); j++ ) {
+            for ( j = 0; j < (int) GetImageListLength(res); j++ ) {
                 image = GetImageFromList (res, j);
                 image->compression = COMP_VALS[i];
             }
@@ -103,7 +103,7 @@ sexp2Magick (SEXP x) {
         if ( strcmp(filterStr, FLTR_IDS[i]) == 0 ) {
             res->filter = FLTR_VALS[i];
             /* propagate to all images */
-            for ( j = 0; j < GetImageListLength(res); j++ ) {
+            for ( j = 0; j < (int) GetImageListLength(res); j++ ) {
                 image = GetImageFromList (res, j);
                 image->filter = FLTR_VALS[i];
             }
@@ -113,12 +113,13 @@ sexp2Magick (SEXP x) {
     res->x_resolution = REAL ( GET_SLOT(x, mkString("resolution") ) )[0];
     res->y_resolution = REAL ( GET_SLOT(x, mkString("resolution") ) )[1];
     /* propagate to all images */
-    for ( i = 0; i < GetImageListLength(res); i++ ) {
+    for ( i = 0; i < (int) GetImageListLength(res); i++ ) {
         image = GetImageFromList (res, i);
         image->x_resolution = REAL ( GET_SLOT(x, mkString("resolution") ) )[0];
         image->y_resolution = REAL ( GET_SLOT(x, mkString("resolution") ) )[1];
     }
-    
+
+    DestroyExceptionInfo(&exception);
     return res;
 }
 
@@ -131,7 +132,7 @@ magick2SEXP (Image * images, int colormode) {
     void * data;
     ExceptionInfo exception;
     SEXP modeSlot, filenameSlot, compSlot, filterSlot, resSlot, features;
-    
+
     if ( images == (Image *)NULL )
         return R_NilValue;
 
@@ -201,7 +202,7 @@ magick2SEXP (Image * images, int colormode) {
     nprotect++;
     INTEGER (modeSlot)[0] = colormode;
     SET_SLOT (res, mkString("colormode"), modeSlot);
-    
+
     /* copy attributes: filename */
     PROTECT ( filenameSlot = allocVector(STRSXP, 1) );
     nprotect++;
@@ -231,11 +232,13 @@ magick2SEXP (Image * images, int colormode) {
     REAL (resSlot)[0] = images->x_resolution;
     REAL (resSlot)[1] = images->y_resolution;
     SET_SLOT (res, mkString("resolution"), resSlot);
-    
+
     PROTECT ( features = allocVector(VECSXP, 0) );
     nprotect++;
     SET_CLASS (features, mkString("list") );
     SET_SLOT (res, mkString("features"), features);
+
+    DestroyExceptionInfo(&exception);
 
     if ( nprotect > 0 )
         UNPROTECT (nprotect);
@@ -249,7 +252,7 @@ GdkPixbuf * newPixbufFromImages (Image * images, int index) {
     Image * image;
     int nx, ny;
     ExceptionInfo exception;
-    
+
     if ( images == NULL )
         return NULL;
     res = NULL;
@@ -265,8 +268,10 @@ GdkPixbuf * newPixbufFromImages (Image * images, int index) {
     if (exception.severity != UndefinedException) {
         CatchException (&exception);
         g_object_unref (res);
-        return NULL;
+        res = NULL;
     }
+
+    DestroyExceptionInfo(&exception);
     return res;
 }
 #endif

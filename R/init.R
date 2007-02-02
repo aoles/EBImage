@@ -18,6 +18,6 @@
 .onLoad <- function (lib, pkg) {
     require("methods")
     require("utils")
-    cat ( paste("... EBImage", packageDescription("EBImage",fields="Version"), "(2.0.RC) ...\n") )
-    cat (       "    The New Year 2007 Edition -- now also on Windows!\n");
+    if ( getOption("verbose") )
+        cat ( paste("  : EBImage", packageDescription("EBImage",fields="Version"), "(2.0.RC) :\n") )
 }

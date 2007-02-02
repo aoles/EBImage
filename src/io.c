@@ -43,7 +43,7 @@ lib_readImages (SEXP files, SEXP mode) {
         /* do not destroy image here */
         AppendImageToList (&images, image);
         if ( nappends == 0 ) {
-            /* set all attributes from the first image */ 
+            /* set all attributes from the first image */
             strcpy (images->filename, image->filename);
             images->compression = image->compression;
             images->filter = image->filter;
@@ -53,12 +53,15 @@ lib_readImages (SEXP files, SEXP mode) {
         }
         nappends++;
     }
-    /* do not update image properties here because if no image was added to 
+    /* do not update image properties here because if no image was added to
     the list it will cause segfault, or use GetImageListLength first to check size */
     image_info = DestroyImageInfo (image_info);
     /* convert image list into R object */
     res = magick2SEXP (images, _mode);
     images = DestroyImageList (images);
+
+    DestroyExceptionInfo(&exception);
+
     return res;
 }
 
@@ -75,26 +78,26 @@ lib_chooseImages () {
     GSList * fileNameList;
 
     if ( !GTK_OK )
-        error ( _("failed to initialize GTK+, use 'read.image' instead") );
+        error ( _("GTK+ was not properly initialised") );
 
     dialog = gtk_file_chooser_dialog_new ("Select images to read into the R session",
-				      NULL, //parent_window,
-				      GTK_FILE_CHOOSER_ACTION_OPEN,
-				      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-				      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
-				      NULL);  
+                      NULL, //parent_window,
+                      GTK_FILE_CHOOSER_ACTION_OPEN,
+                      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                      NULL);
     gtk_file_chooser_set_select_multiple ( GTK_FILE_CHOOSER(dialog), TRUE);
 //    GtkImage * preview;
 // CHECK   GtkFileFilter* gtk_file_filter_new
 // CHECK   gtk_file_chooser_set_preview_widget ( GTK_FILE_CHOOSER(dialog), preview);
 //     g_signal_connect (my_file_chooser, "update-preview", G_CALLBACK (update_preview_cb), preview);
-    
+
     res = R_NilValue;
     filename = R_NilValue;
     mode = R_NilValue;
     nprotect = 0;
     nfiles = 0;
-    
+
     if ( gtk_dialog_run( GTK_DIALOG(dialog) ) == GTK_RESPONSE_ACCEPT ) {
         fileNameList = gtk_file_chooser_get_filenames ( GTK_FILE_CHOOSER(dialog) );
         nfiles = g_slist_length (fileNameList);
@@ -129,7 +132,7 @@ lib_writeImages (SEXP x, SEXP files, SEXP quality) {
     Image * images, * image;
     ImageInfo *image_info;
     char * file;
-        
+
     /* basic checks */
     if ( !isImage(x) )
         error ( _("argument must be of class 'Image'") );
@@ -174,9 +177,9 @@ lib_writeImages (SEXP x, SEXP files, SEXP quality) {
             if ( WriteImage (image_info, image) == 0 )
                 warning ( _("cannot write image, check path and file name (UNIX home directories with ~ are not supported") );
             CatchException (&image->exception);
-        }    
+        }
     }
-    
+
     image_info = DestroyImageInfo (image_info);
     images = DestroyImageList (images);
     return R_NilValue;

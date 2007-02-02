@@ -34,26 +34,16 @@ static R_CallMethodDef libraryRCalls[] = {
 
 /*----------------------------------------------------------------------- */
 void
-/*
-#ifdef HAVE_VISIBILITY_ATTRIBUTE
-    __attribute__ ((visibility ("default")))
-#endif
-*/
 R_init_EBImage (DllInfo * winDll) {
 #ifdef USE_GTK
     /* argc, agrv global vars defined in common.h */
-/*
-    argc = 1;
-    argv = (char **) Calloc (1, char* );
-    argv[0] = Calloc (255, char );
-    strcpy (argv[0], "R session");
-*/
     argc = 0;
     argv = NULL;
     GTK_OK = 0;
     // initialize gtk, vars defined in common.h and initialised in init.c
+    gtk_disable_setlocale();
     if ( !gtk_init_check(&argc, &argv) )
-        warning ( _("failed to initialize GTK+") );
+        warning ( _("failed to initialize GTK+. GTK+ dependent functions will not work") );
     else {
         GTK_OK = 1;
         // add R event handler to enable automatic window redraw
@@ -76,11 +66,6 @@ R_init_EBImage (DllInfo * winDll) {
 }
 
 void
-/*
-#ifdef HAVE_VISIBILITY_ATTRIBUTE
-    __attribute__ ((visibility ("default")))
-#endif
-*/
 R_unload_EBImage (DllInfo * winDll) {
     /* this destroy is not required on Linux */
     /* in fact I am not sure this is required on Windows! */
@@ -88,9 +73,5 @@ R_unload_EBImage (DllInfo * winDll) {
     if ( IsMagickInstantiated() )
         DestroyMagick();
 #   endif
-/*
-    Free (argv[0]);
-    Free (argv);
-*/
 }
 

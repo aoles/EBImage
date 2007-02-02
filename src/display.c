@@ -31,15 +31,18 @@ lib_display(SEXP x, SEXP nogtk) {
 
 #ifdef USE_GTK
     if ( !LOGICAL(nogtk)[0] ) {
-        _showInGtkWindow (x);
+        if ( GTK_OK )
+            _showInGtkWindow (x);
+        else
+            error ( _("GTK+ was not properly initialised") );
         return R_NilValue;
     }
-#endif   
+#endif
 
 #ifdef WIN32
     error ( _("only GTK+ display is awailable on Windows") );
 #else
-    if ( THREAD_ON )        
+    if ( THREAD_ON )
         error ( _("cannot display concurent windows. Close currently displayed window first.") );
     if ( pthread_create(&res, NULL, _showInImageMagickWindow, (void *)x ) != 0 )
         error ( _("cannot create display thread") );
@@ -60,7 +63,7 @@ lib_animate (SEXP x) {
 #ifdef WIN32
     error ( _("animate function is not available on Windows because it uses ImageMagick interactive display") );
 #else
-    if ( THREAD_ON )        
+    if ( THREAD_ON )
         error ( _("cannot display concurent windows. Close currently displayed window first.") );
     if ( pthread_create(&res, NULL, _animateInImageMagickWindow, (void *)x ) != 0 )
         error ( _("cannot animate display thread") );
@@ -74,7 +77,7 @@ _showInImageMagickWindow (void * ptr) {
     SEXP x;
     Image * images;
     ImageInfo * image_info;
-        
+
     x = (SEXP) ptr;
     THREAD_ON = 1;
     images = sexp2Magick (x);
@@ -93,7 +96,7 @@ _animateInImageMagickWindow (void * ptr) {
     SEXP x;
     Image * images;
     ImageInfo * image_info;
-        
+
     x = (SEXP) ptr;
     THREAD_ON = 1;
     images = sexp2Magick (x);
@@ -120,18 +123,18 @@ gboolean onPrevImPress  (GtkToolButton *, gpointer);         // "button-press-ev
 typedef gpointer * ggpointer;
 
 /*----------------------------------------------------------------------- */
-void 
+void
 _showInGtkWindow (SEXP x) {
     int nx, ny, nz, width, height;
     SEXP dim;
     Image * images;
     GdkPixbuf * pxbuf;
-    GtkWidget * imgWG, * winWG, * vboxWG, * tbarWG, * scrollWG, 
+    GtkWidget * imgWG, * winWG, * vboxWG, * tbarWG, * scrollWG,
               * btnZoomInWG, * btnZoomOutWG, * btnZoomOneWG,
               * btnNextWG, * btnPrevWG;
     GtkIconSize iSize;
     gpointer ** winStr; /* 4 pointers, 0 - window, 1 - imageWG, 2 - images, *int - index of current image on display */
-    
+
     if ( !GTK_OK )
         error ( _("failed to initialize GTK+, use 'read.image' instead") );
 
@@ -142,7 +145,7 @@ _showInGtkWindow (SEXP x) {
     ny = INTEGER (dim)[1];
     nz = INTEGER (dim)[2];
 
-    /* create pixbuf from image data */    
+    /* create pixbuf from image data */
     pxbuf = newPixbufFromImages (images, 0);
     if ( pxbuf == NULL )
         error ( _("cannot copy image data to display window") );
@@ -151,13 +154,13 @@ _showInGtkWindow (SEXP x) {
     winStr = g_new ( ggpointer, 4 );
     winStr[3] = (gpointer *) g_new0 (int, 1);
     winStr[2] = (gpointer *) images;
-    
+
     /* create image display */
     imgWG = gtk_image_new_from_pixbuf (pxbuf);
     winStr[1] = (gpointer *) imgWG;
     g_object_unref (pxbuf);
     /* create main window */
-    winWG =  gtk_window_new (GTK_WINDOW_TOPLEVEL);   
+    winWG =  gtk_window_new (GTK_WINDOW_TOPLEVEL);
     winStr[0] = (gpointer *) winWG;
     gtk_window_set_title ( GTK_WINDOW(winWG), _("R image display") );
     /* set destroy event handler for the window */
@@ -176,7 +179,7 @@ _showInGtkWindow (SEXP x) {
     gtk_scrolled_window_set_policy ( GTK_SCROLLED_WINDOW(scrollWG), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     /* add image to scroll */
     gtk_scrolled_window_add_with_viewport ( GTK_SCROLLED_WINDOW(scrollWG), imgWG);
-    
+
     /* add zoom buttons */
     iSize = gtk_toolbar_get_icon_size ( GTK_TOOLBAR(tbarWG) );
     btnZoomInWG = (GtkWidget *) gtk_tool_button_new ( gtk_image_new_from_stock("gtk-zoom-in", iSize), _("Zoom in") );
@@ -227,14 +230,14 @@ onWinDestroy (GtkWidget * wnd, GdkEvent * event, gpointer ptr) {
 }
 
 /*----------------------------------------------------------------------- */
-gboolean 
+gboolean
 onZoomInPress (GtkToolButton * btn, gpointer ptr) {
     gpointer ** winStr;
     int width, height, index;
     GdkPixbuf * pxbuf, * newPxbuf;
     GtkImage * imgWG;
     Image * images;
-    
+
     winStr = (gpointer **) ptr;
     imgWG = GTK_IMAGE (winStr[1]);
     images = (Image *) winStr[2];
@@ -260,7 +263,7 @@ onZoomOutPress (GtkToolButton * btn, gpointer ptr) {
     GdkPixbuf * pxbuf, * newPxbuf;
     GtkImage * imgWG;
     Image * images;
-    
+
     winStr = (gpointer **) ptr;
     imgWG = GTK_IMAGE (winStr[1]);
     images = (Image *) winStr[2];
@@ -286,7 +289,7 @@ onZoomOnePress (GtkToolButton * btn, gpointer ptr) {
     GtkImage * imgWG;
     Image * images;
     int index;
-    
+
     winStr = (gpointer **) ptr;
     imgWG = GTK_IMAGE (winStr[1]);
     images = (Image *) winStr[2];
@@ -300,7 +303,7 @@ onZoomOnePress (GtkToolButton * btn, gpointer ptr) {
 }
 
 /*----------------------------------------------------------------------- */
-gboolean 
+gboolean
 onNextImPress (GtkToolButton * btn, gpointer ptr) {
     gpointer ** winStr;
     int width, height, nz, index;
@@ -314,10 +317,10 @@ onNextImPress (GtkToolButton * btn, gpointer ptr) {
 
     width = gdk_pixbuf_get_width ( gtk_image_get_pixbuf(imgWG) );
     height = gdk_pixbuf_get_height ( gtk_image_get_pixbuf(imgWG) );
-    
+
     nz = GetImageListLength (images);
     index = *(int *)winStr[3] + 1;
-    if ( index == nz ) 
+    if ( index == nz )
         return TRUE;
     pxbuf = newPixbufFromImages (images, index);
     *(int *)winStr[3] = index;
@@ -330,7 +333,7 @@ onNextImPress (GtkToolButton * btn, gpointer ptr) {
     return TRUE;
 }
 /*----------------------------------------------------------------------- */
-gboolean 
+gboolean
 onPrevImPress (GtkToolButton * btn, gpointer ptr) {
     gpointer ** winStr;
     int width, height, nz, index;
@@ -344,10 +347,10 @@ onPrevImPress (GtkToolButton * btn, gpointer ptr) {
 
     width = gdk_pixbuf_get_width ( gtk_image_get_pixbuf(imgWG) );
     height = gdk_pixbuf_get_height ( gtk_image_get_pixbuf(imgWG) );
-    
+
     nz = GetImageListLength (images);
     index = *(int *)winStr[3] - 1;
-    if ( index < 0 ) 
+    if ( index < 0 )
         return TRUE;
     pxbuf = newPixbufFromImages (images, index);
     *(int *)winStr[3] = index;
