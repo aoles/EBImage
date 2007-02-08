@@ -19,6 +19,9 @@ See the GNU Lesser General Public License for more details.
 LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 ------------------------------------------------------------------------- */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,8 +47,6 @@ LGPL license wording: http://www.gnu.org/licenses/lgpl.html
         typedef unsigned long ulong;
         extern  __declspec(dllimport) void (* R_tcldo) ();
 #       include <sys/types.h>
-// FIXME: what is the next line doing?
-#       include <gdk/gdkwin32.h>
 #   else
 #       include "R_ext/eventloop.h"
 #       include <gdk/gdkx.h>
@@ -63,10 +64,6 @@ LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 typedef struct {
     int x, y;
 } PointXY;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* R-lib exports to use with .Call */
 SEXP         lib_ (SEXP);                                           /* tools.c, _() for R    */
@@ -87,6 +84,7 @@ SEXP         lib_combineFeatures (SEXP, SEXP, SEXP, SEXP);          /* -"-      
 SEXP         lib_matchFeatures (SEXP, SEXP);                        /* -"-                   */
 SEXP         lib_getFeatures (SEXP, SEXP);                          /* -"-                   */
 SEXP         lib_deleteFeatures (SEXP, SEXP, SEXP);                 /* -"-                   */
+SEXP         lib_propagate (SEXP, SEXP, SEXP, SEXP, SEXP);          /* propagate.cpp         */
 
 /* library exports and internal functions */
 Image *      sexp2Magick (SEXP);                                    /* conversions.c         */

@@ -3,7 +3,8 @@ useDynLib(EBImage)
 ##importClassesFrom("base", "array", base.OK = TRUE)
 export(
     Image, is.Image, stopIfNotImage, read.image, choose.image,
-    TrueColor, Grayscale, morphKern, hist.Image, image.Image, print.Image
+    TrueColor, Grayscale, morphKern, hist.Image, image.Image, print.Image,
+    propagate
 )
 exportClasses(
     Image
@@ -16,7 +17,7 @@ exportMethods(
 
     features, "features<-",
     colorMode, "colorMode<-",
-    fileName, "fileName<-", 
+    fileName, "fileName<-",
     compression, "compression<-",
     resolution, "resolution<-",
     sampleFilter, "sampleFilter<-",
@@ -24,9 +25,9 @@ exportMethods(
 
     blur, gblur, contrast, denoise, despeckle, edge, enhance, equalize,
     cgamma, mediansmooth, noise, resize, rotate, resample, segment,
-    sharpen, umask, thresh, athresh, cthresh, affinet, modulate, negate, 
+    sharpen, umask, thresh, athresh, cthresh, affinet, modulate, negate,
     normalize, normalize2, fill, flip, flop, erode, dilate, opening, closing,
-    distmap, watershed, getObjects, paintObjects, combineObjects, 
-    matchObjects, rmObjects
-    
+    distmap, watershed, getObjects, paintObjects, combineObjects,
+    matchObjects, rmObjects, propagate
+
 )

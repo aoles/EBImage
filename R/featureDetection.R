@@ -52,7 +52,7 @@ setReplaceMethod ("features", signature (x="Image", value="list"),
         error = FALSE
         if ( !is.list(value) )
             stop ( .("'value' must be a list") )
-        if ( length(value) != dim(x)[3] ) 
+        if ( length(value) != dim(x)[3] )
             stop ( .("'value' length must be the same as number of images") )
         for ( i in 1:length(value) )
             if ( !is.matrix(value[[i]]) && !is.null(value[[i]]) )
@@ -72,7 +72,7 @@ setMethod ("getObjects", signature(x="Image", ref="Image"),
         res <- .DoCall ("lib_getFeatures", x, ref)
         if ( is.list(res) ) {
             ## set colnames for features
-            for ( i in 1:length(res) ) 
+            for ( i in 1:length(res) )
                 if ( is.matrix( res[[i]] ) )
                     if ( ncol(res[[i]] ) == 11 )
                        colnames( res[[i]] ) <- c("x", "y", "size", "per", "image.border", "effr", "intensity", "acirc", "per.mean", "per.sd", "per.by.2.pi.effr")
@@ -88,7 +88,7 @@ setMethod ("getObjects", signature(x="Image", ref="missing"),
         res <- .DoCall ("lib_getFeatures", x, NULL)
         if ( is.list(res) ) {
             ## set colnames for features
-            for ( i in 1:length(res) ) 
+            for ( i in 1:length(res) )
                 if ( is.matrix( res[[i]] ) )
                     if ( ncol(res[[i]] ) == 11 )
                        colnames( res[[i]] ) <- c("x", "y", "size", "per", "image.border", "effr", "intensity", "acirc", "per.mean", "per.sd", "per.by.2.pi.effr")
@@ -150,3 +150,25 @@ setMethod ("rmObjects", signature(x="Image", index="list"),
     }
 )
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("propagate", signature(x="Image"),
+    function (x, seeds, mask=NULL, lambda=0.005, ext=1, ...) {
+        if ( colorMode(x) != Grayscale )
+            stop( .("image for segmentation must be grayscale" ) )
+        if ( !assert(x, seeds, strict=TRUE) )
+            stop( .("dimensions of 'x', 'seeds' and 'mask' (if not NULL) must match") )
+        if ( colorMode(seeds) != Grayscale )
+            stop( .("'seeds' must be a grayscale image with every seed assigned a unique value, usually a 1-based integer") )
+        if ( !is.null(mask) ) {
+            if ( !assert(x, mask, strict=TRUE) )
+                stop( .("dimensions of 'x', 'seeds' and 'mask' (if not NULL) must match") )
+            if ( colorMode(mask) != Grayscale )
+                stop( .("'mask' must be a grayscale image or a NULL, non zero values indicate that pixel should be assigned to an object") )
+        }
+        if ( ext < 1 )
+            stop( .("'ext' must be a positive integer") )
+        if ( lambda < 0.0 )
+            stop( .("'lambda' must be non-negative") )
+        return( .DoCall( "lib_propagate", x, seeds, mask, as.integer(ext), as.numeric(lambda) ) )
+    }
+)

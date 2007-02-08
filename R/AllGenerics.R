@@ -92,6 +92,7 @@ setGeneric ("paintObjects",   function (x, tgt, ...)   standardGeneric("paintObj
 setGeneric ("combineObjects", function (x, ...)        standardGeneric("combineObjects") )
 setGeneric ("matchObjects",   function (x, ref, ...)   standardGeneric("matchObjects") )
 setGeneric ("rmObjects",      function (x, index, ...) standardGeneric("rmObjects") )
+setGeneric ("propagate",      function (x, ...)        standardGeneric("propagate") )
 
 ## in this package defined for Image (class.Image.R), ANY (in tools.R)
 setGeneric ("channel",        function (x, mode, ...)  standardGeneric("channel") )

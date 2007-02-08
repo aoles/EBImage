@@ -27,6 +27,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_combineFeatures",(DL_FUNC) &lib_combineFeatures,4},
     {"lib_matchFeatures",  (DL_FUNC) &lib_matchFeatures,  2},
     {"lib_deleteFeatures", (DL_FUNC) &lib_deleteFeatures, 3},
+    {"lib_propagate",      (DL_FUNC) &lib_propagate,      5},
 
     /* add above all R-lib functions from common.h */
     {NULL, NULL, 0}
