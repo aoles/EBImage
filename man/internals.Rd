@@ -74,11 +74,12 @@
 \alias{paintObjects,Image,Image-method}
 \alias{write.image,Image,character-method}
 \alias{write.image,Image,missing-method}
+\alias{propagate,Image-method}
 
 \title{ Internals }
 
 \description{
-   Aliases required for 'R CMD check' but those noone will ever search for. 
+   Aliases required for 'R CMD check' but those noone will ever search for.
    Here to prevent the mess of the index. The corresponding items have help
    aliases without method signature!
 }
