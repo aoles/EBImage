@@ -22,21 +22,21 @@
 \section{ Arguments }{ \describe{
 
   \item{\code{x}}{An object of \code{\link{Image-class}} to be segmented,
-    in the \code{\link{Grayscale}} mode with integer-absed object encoding, as
-    returned by \code{\link{watershed}}. }
+    in the \code{\link{Grayscale}} mode. }
 
   \item{\code{seeds}}{An object of \code{\link{Image-class}} of the same
     size as x in all three dimensions; in the \code{\link{Grayscale}} mode
-    with integer-absed object encoding, as returned by \code{\link{watershed}}.
+    with integer-based object encoding, as returned by \code{\link{watershed}}.
     This image provides seed points for object detection. }
 
   \item{\code{mask}}{An object of \code{\link{Image-class}} of the same
-    size as x in all three dimensions; in the \code{\link{Grayscale}}.
-    All zero locations will be excluded from object detection. }
+    size as x in all three dimensions; in the \code{\link{Grayscale}} mode.
+    All zero regions will be excluded from object detection. }
 
-  \item{\code{lambda}}{ A numeric value. The regulation parameter for the
-    distance calculations, larger lambda turn calculated distance to
-    Euclidian. }
+  \item{\code{lambda}}{ A numeric value. The regularisation parameter for the
+    distance calculations, determines the trade-off between the Euclidian distance in
+    the image plane and the contribution of the gradient of the values
+    in \code{x}. See details. }
 
   \item{\code{ext}}{ Extension of the neighborhood to estimate image
     gradient, in pixels in every direction from the central point, i.e.
@@ -60,27 +60,23 @@
   Voronoi regions for given seed points on a manifold with a metric
   controlled by local image features.
 
-  The metric is Riemannian metric defined in terms of the image I and
+  The metric is a Riemannian metric defined in terms of the image I and
   a regularization parameter lambda. With this metric the
   distance between pixels used to let the given seeds grow outwards
-  (propagate) is approximated by:
+  (propagate) is
 
   $d^2 = (grad(I)^2 + lambda * (dx^2 + dy^2)) / (lambda + 1)$
 
-  The gradient is calculated on a neighborhood of pixels (width of which
+  The gradient is calculated on a neighborhood of pixels (the width of which
   is controlled by the argument \code{ext}) to avoid relying on single
-  (noisy) pixels. Lambda regulated the weight of Euclidian distance
-  in image distance calculations on the image manifold. In case of large
-  lambda, d turns into Euclidian distance; for small lambda (< 0.005 for
-  intensity distributions in typical cell images), the distance will be
-  dominated by the local image gradients.
+  (noisy) pixels. Lambda controls the weight of the Euclidian distance
+  term. In case of large
+  lambda, d turns into Euclidian distance in the \code{(x,y)}-plane.
+  For small lambda, the distance will be dominated by the intensity gradient.
 
-  The underlying \code{C++} code is based on the code from CellProfiler
-  [1,3]. LGPL license was granted to use the part of CellProfiler's
-  code for the propagate function. Using LGPL with this package does not
-  grant you the rights to use CellProfiler's code directly under the
-  terms of LGPL: you may only reuse what you see in this package
-  under LGPL.
+  The underlying \code{C++} code is based on code from CellProfiler
+  [1,3]. An LGPL license was granted by Thouis Jones to use this part of CellProfiler's
+  code for the \code{propagate} function. 
 }
 
 \seealso{
@@ -128,11 +124,10 @@
 }
 
 \author{
-Copyright (C) of the original CellProfiler code: Anne Carpenter <carpenter@wi.mit.edu>, Thouis Jones <thouis@csail.mit.edu>, In Han Kang <inthek@mit.edu>.
+  Original CellProfiler code: Anne Carpenter <carpenter@wi.mit.edu>,
+  Thouis Jones <thouis@csail.mit.edu>, In Han Kang <inthek@mit.edu>.
 
-Copyright (C) of the EBImage implementation: Oleg Sklyar <osklyar@ebi.ac.uk> and Wolfgang Huber <huber@ebi.ac.uk>.
-
-If reusing the code for this function, please see comments in \code{src/propagate.cpp}
+  Port for this package: Oleg Sklyar <osklyar@ebi.ac.uk> and Wolfgang Huber <huber@ebi.ac.uk>.
 }
 
 \keyword{file}
