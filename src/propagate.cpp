@@ -4,12 +4,12 @@ Implementation of the Voronoi-based segmentation on image manifolds [2]
 The code below is based on the 'IdentifySecPropagateSubfunction.cpp'
 module (revision 3667) of CellProfiler [1,3]. CellProfiler is released
 under the terms of GPL, however the LGPL license was granted by T. Jones
-on Feb 7, 07 to use the propagate code (the above mentioned module) in
-this project. If you reuse this code under the LGPL terms, you cannot
+on Feb 7, 07 to use the code in the above file for this project. 
+
+If you reuse this code under the LGPL terms, you cannot
 apply the terms of LGPL to CellProfiler itself or any code derived from
 it, not even to the module for which LGPL was granted in this project.
-You are only allowed to reuse under LGPL the code, which you find in
-this project.
+You are only allowed to reuse under LGPL the code which you find here.
 
 [1] A. Carpenter, T.R. Jones, M.R. Lamprecht, C. Clarke, I.H. Kang,
     O. Friman, D. Guertin, J.H. Chang, R.A. Lindquist, J. Moffat,
@@ -208,7 +208,7 @@ deltaG ( double * src, int i1,  int j1, int i2,  int j2,
 
     double dEucl = (i2 - i1) * (i2 - i1) + (j2 - j1) * (j2 - j1);
     return sqrt( (dI * dI + lambda * dEucl) / (1.0 + lambda) );
-    /* CellProfiler has this formulae
+    /* CellProfiler uses this formula
         double dManh = abs(i2 - i1) + abs(j2 - j1);
         return sqrt( dI*dI + dManh * lambda * lambda);
     */
