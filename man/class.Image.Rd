@@ -154,7 +154,7 @@
 }
 
 \examples{
-  if (interactive) {
+  if ( interactive() ) {
     \dontrun{creates a new Grayscale image of shifted stripes}
     a <- Image( (0:100)*0.01, c(60,60) )
     print(a)
