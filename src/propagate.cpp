@@ -4,7 +4,7 @@ Implementation of the Voronoi-based segmentation on image manifolds [2]
 The code below is based on the 'IdentifySecPropagateSubfunction.cpp'
 module (revision 3667) of CellProfiler [1,3]. CellProfiler is released
 under the terms of GPL, however the LGPL license was granted by T. Jones
-on Feb 7, 07 to use the code in the above file for this project. 
+on Feb 7, 07 to use the code in the above file for this project.
 
 If you reuse this code under the LGPL terms, you cannot
 apply the terms of LGPL to CellProfiler itself or any code derived from
@@ -64,8 +64,6 @@ struct Pixel_compare {
 };
 
 typedef priority_queue<Pixel, vector<Pixel>, Pixel_compare> PixelQueue;
-
-/* } CellProfiler <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< */
 
 /* forward declaration: distance calculation function */
 inline double

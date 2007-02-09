@@ -15,7 +15,7 @@
   \preformatted{
     # S4 Method for Image-class
 
-    propagate(x, seeds, mask=NULL, lambda=0.005, ext=1, ...)
+    propagate(x, seeds, mask=NULL, lambda=0.005, ext=1)
   }
 }
 
@@ -42,7 +42,6 @@
     gradient, in pixels in every direction from the central point, i.e.
     ext=1 means a 3x3 neighborhood. }
 
-  \item{\code{...}}{ Reserved for future use. }
 }}
 
 \section{ Value }{
@@ -74,9 +73,6 @@
   lambda, d turns into Euclidian distance in the \code{(x,y)}-plane.
   For small lambda, the distance will be dominated by the intensity gradient.
 
-  The underlying \code{C++} code is based on code from CellProfiler
-  [1,3]. An LGPL license was granted by Thouis Jones to use this part of CellProfiler's
-  code for the \code{propagate} function. 
 }
 
 \seealso{
@@ -85,7 +81,53 @@
   }
 }
 
-\references{
+\examples{
+    if ( interactive() ) {
+      ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
+      a <- read.image( paste(ddir, c("A04w0.jpg", "A04w1.jpg"), sep="/") )
+      rgb <- channel(a[,,1],"asred") + channel(a[,,2],"asgreen")
+
+      \dontrun{detecting nuclei by watershed}
+      t <- thresh( blur(a[,,2], 4, 2), 15, 15)
+      t <- opening( closing(t, morphKern(9)) )
+      w <- watershed( distmap(t) )
+      w <- combineObjects(w, 0.4)
+
+      \dontrun{generating mask for propagate}
+      mask <- thresh( a[,,1], 50, 50, -0.01)
+      mask <- closing( mask, morphKern(13) )
+      mask <- opening( mask, morphKern(11) )
+      mask <- erode(mask)
+
+      \dontrun{propagate with the mask and gradient-driven metric}
+      wx <- propagate( a[,,1], w, mask, 0.0001, 2)
+      prev <- paintObjects(wx, paintObjects(w, rgb))
+      display(prev)
+
+      \dontrun{pure Voronoi: no mask and almost no gradient term in metric}
+      wx1 <- propagate( a[,,1], w, NULL, 1e8, 2)
+      prev1 <- paintObjects(wx1, rgb)
+      display(prev1)
+    }
+  }
+}
+
+\section{ Author }{
+  Original CellProfiler code: Anne Carpenter <carpenter@wi.mit.edu>,
+  Thouis Jones <thouis@csail.mit.edu>, In Han Kang <inthek@mit.edu>.
+
+  Port for this package: Oleg Sklyar <osklyar@ebi.ac.uk> and Wolfgang Huber <huber@ebi.ac.uk>.
+}
+
+\section{ License }{
+
+  The underlying \code{C++} code is based on code from CellProfiler
+  [1,3]. An LGPL license was granted by Thouis Jones to use this part
+  of CellProfiler's code for the \code{propagate} function.
+
+}
+
+\section{ References }{
     \code{[1]} \emph{A. Carpenter, T.R. Jones, M.R. Lamprecht, C. Clarke, I.H. Kang,
     O. Friman, D. Guertin, J.H. Chang, R.A. Lindquist, J. Moffat,
     P. Golland and D.M. Sabatini}, "CellProfiler: image analysis software
@@ -96,38 +138,6 @@
     CVBIA05 (535-543), 2005
 
     \code{[3]} CellProfiler: http://www.cellprofiler.org
-}
-
-\examples{
-    if ( interactive() ) {
-      ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
-      a <- read.image( paste(ddir, c("A04w0.jpg", "A04w1.jpg"), sep="/") )
-
-      \dontrun{detecting nuclei by watershed}
-      t <- thresh( blur(a[,,2], 4, 2), 15, 15)
-      t <- opening( closing(t, morphKern(9)) )
-      w <- watershed( distmap(t) )
-      w <- combineObjects(w, 1, 0.4)
-
-      \dontrun{generating mask for propagate}
-      mask <- thresh( a[,,1], 50, 50, -0.01)
-      mask <- closing( mask, morphKern(13) )
-      mask <- opening( mask, morphKern(11) )
-      mask <- erode(mask)
-      \dontrun{doing propagate}
-      wx <- propagate( a[,,1], w, mask, 0.0001, 2)
-      prev <- paintObjects(w, channel(a[,,1],"asred") + channel(a[,,2],"asgreen"))
-      prev <- paintObjects(wx, prev)
-      display(prev)
-    }
-  }
-}
-
-\author{
-  Original CellProfiler code: Anne Carpenter <carpenter@wi.mit.edu>,
-  Thouis Jones <thouis@csail.mit.edu>, In Han Kang <inthek@mit.edu>.
-
-  Port for this package: Oleg Sklyar <osklyar@ebi.ac.uk> and Wolfgang Huber <huber@ebi.ac.uk>.
 }
 
 \keyword{file}
