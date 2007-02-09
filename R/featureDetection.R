@@ -114,7 +114,7 @@ setMethod ("paintObjects", signature(x="Image", tgt="Image"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("combineObjects", signature(x="Image"),
-    function (x, ext=1, fraction=0.3, seeds=NULL,...) {
+    function (x, fraction=0.3, ext=1, seeds=NULL, ...) {
         if ( colorMode(x) != Grayscale )
             stop ( .("only Grayscale images are supported, use 'channel' to convert") )
         if ( as.integer(ext) < 1 )
