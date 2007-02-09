@@ -87,27 +87,29 @@
   }
 }
 
-\references{
-    \emph{ImageMagick}: \url{http://www.imagemagick.org}.
-}
-
 \examples{
   if ( interactive() ) {
+    ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
+    a <- read.image( paste(ddir, "A04w1.jpg", sep="/") )
+    w <- watershed( distmap( thresh(a, 10, 10) ) )
+    display( normalize(w) )
+
     \dontrun{Often one need to delete small objects, here is the}
     \dontrun{straightfoward way to construct an index}
-    ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
-    a <- read.image( paste(ddir, c("A04w0.jpg", "A04w1.jpg"), sep="/") )
-    t <- thresh( a, 50, 50, 0.03 )
-    t <- closing( t, morphKern(7) )
-    dm <- distmap(t, 0.0)
-    x <- watershed(dm, ext=1)
-    res <- combine( a[,,1], normalize(x[,,1]), a[,,2], normalize(x[,,2]) )
+    index <- lapply( getObjects(w), function(x) which( x[, "size"] < 30) )
 
+    \dontrun{now we delete these small objects}
+    w <- rmObjects( w, index )
+    display( normalize(w) )
+
+    \dontrun{and now we combine smaller objects to larger}
+    w <- combineObjects( w, 0.3 )
+    display( normalize(w) )
   }
 }
 
 \author{
-    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}
+    Oleg Sklyar: \email{osklyar@ebi.ac.uk}
 }
 
 \keyword{file}
