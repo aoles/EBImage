@@ -157,16 +157,17 @@
   if ( interactive() ) {
     \dontrun{creates a new Grayscale image of shifted stripes}
     a <- Image( (0:100)*0.01, c(60,60) )
-    print(a)
+    display( a )
+    print( a )
 
     \dontrun{converts image mode to TrueColor, compare print's}
     b <- a
-    colorMode(b) <- TrueColor
-    print(b)
+    colorMode( b ) <- TrueColor
+    print( b )
 
     \dontrun{fills values with brightness > 50\% with red}
-    b[ a > 0.5 ] = as.integer(255)
-    display(b)
+    b[ a > 0.5 ] = as.integer( 255 )
+    display( b )
   }
 }
 
