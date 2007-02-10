@@ -105,7 +105,7 @@ lib_propagate (SEXP x, SEXP seeds_, SEXP mask_, SEXP dx_, SEXP lambda_) {
             mask = NULL;
 
         PixelQueue pixel_queue;
-        double seed;
+        double seed, d;
         int index;
         bool masked;
         /* main algorithm */
@@ -135,9 +135,10 @@ lib_propagate (SEXP x, SEXP seeds_, SEXP mask_, SEXP dx_, SEXP lambda_) {
                     ii = i + ix[cntr];
                     jj = j + jy[cntr];
                     if ( ii < 0 || ii >= nx || jj < 0 || jj >= ny ) continue;
-                    /* FIXED: do we need to push those that are already assigned ??? */
+                    /* at this initialization step we do not push pixels on the queue which are
+                     * already assigned, i.e. which are seeds because their distance is 0 and cannot be smaller */
                     if ( tgt[ INDEX(ii, jj) ] > 0.9 ) continue;
-                    pixel_queue.push( Pixel( deltaG(src, i, j, ii, jj, nx, ny, lambda, dx), ii, jj, seed) );
+                    pixel_queue.push( Pixel(deltaG(src, i, j, ii, jj, nx, ny, lambda, dx), ii, jj, seed) );
                 }
             }
 
@@ -167,9 +168,20 @@ lib_propagate (SEXP x, SEXP seeds_, SEXP mask_, SEXP dx_, SEXP lambda_) {
                 ii = px.i + ix[cntr];
                 jj = px.j + jy[cntr];
                 if ( ii < 0 || ii >= nx || jj < 0 || jj >= ny ) continue;
-                /* FIXED: do we need to push those that are already assigned ??? */
-                if ( tgt[ INDEX(ii, jj) ] > 0.9 ) continue;
-                pixel_queue.push( Pixel(px.distance + deltaG(src, px.i, px.j, ii, jj, nx, ny, lambda, dx), ii, jj, px.seed) );
+                index = INDEX(ii, jj) ;
+                /* now we do not want to push onto the queue pixels that are already
+                 * assigned to the same seed, we only update their distance. pixels assigned
+                 * to other seeds are pushed up as their distance to this seed can be
+                 * smaller later on (in L.163 above). anyway this should be much faster than
+                 * CellProfile'r original algorithm as we do not resize the queue on
+                 * pixels that we are not going to reassign */
+                d = px.distance + deltaG(src, px.i, px.j, ii, jj, nx, ny, lambda, dx);
+                if ( tgt[ index ] == px.seed ) {
+                    if ( dists[ index ] > d )
+                        dists[ index ] = d;
+                    continue;
+                }
+                pixel_queue.push( Pixel(d, ii, jj, px.seed) );
             }
         }
     }
