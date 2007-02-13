@@ -1,3 +1,5 @@
+#include "filters_propagate.h"
+
 /* -------------------------------------------------------------------------
 Implementation of the Voronoi-based segmentation on image manifolds [2]
 
@@ -40,13 +42,12 @@ the authors of the algorithm and the code and provide the corresponding
 references!
 ------------------------------------------------------------------------- */
 
-#include "common.h"
-
-#define INDEX(i,j) ((i) + (j) * nx)
-
+#include <R_ext/Error.h>
 #include <queue>
 
 using namespace std;
+
+#define INDEX(i,j) ((i) + (j) * nx)
 
 class Pixel {
     public:

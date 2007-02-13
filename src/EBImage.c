@@ -4,12 +4,41 @@ Copyright (c) 2006 Oleg Sklyar
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
 
-#include "common.h"
+#include "tools.h"
+#include "conversions.h"
+#include "colors.h"
+#include "display.h"
+#include "io.h"
+#include "filters_distmap.h"
+#include "filters_magick.h"
+#include "filters_morph.h"
+#include "filters_propagate.h"
+#include "filters_watershed.h"
+#include "filters_thresh.h"
+#include "object_counting.h"
+
+#include <R.h>
+#include <Rdefines.h>
 #include <R_ext/Rdynload.h>
+#include <R_ext/Error.h>
+
+#include <magick/ImageMagick.h>
+
+/* GTK+ includes */
+#ifdef USE_GTK
+#   include <gtk/gtk.h>
+#   ifdef WIN32
+        typedef unsigned long ulong;
+        extern  __declspec(dllimport) void (* R_tcldo) ();
+#       include <sys/types.h>
+#   else
+#       include "R_ext/eventloop.h"
+#       include <gdk/gdkx.h>
+#   endif
+#endif
 
 /*----------------------------------------------------------------------- */
 static R_CallMethodDef libraryRCalls[] = {
-    {"lib_",               (DL_FUNC) &lib_,               1},
     {"lib_readImages",     (DL_FUNC) &lib_readImages,     2},
     {"lib_chooseImages",   (DL_FUNC) &lib_chooseImages,   0},
     {"lib_writeImages",    (DL_FUNC) &lib_writeImages,    3},
@@ -33,6 +62,20 @@ static R_CallMethodDef libraryRCalls[] = {
     {NULL, NULL, 0}
 };
 
+#ifdef USE_GTK
+void _doIter (void * userData) {
+    while ( gtk_events_pending() ) gtk_main_iteration();
+}
+#    ifdef WIN32
+void _doIterWin32 () {
+    _doIter (NULL);
+}
+#    endif
+#endif
+
+char ** argv;
+int argc;
+
 /*----------------------------------------------------------------------- */
 void
 R_init_EBImage (DllInfo * winDll) {
@@ -44,12 +87,12 @@ R_init_EBImage (DllInfo * winDll) {
     // initialize gtk, vars defined in common.h and initialised in init.c
     gtk_disable_setlocale();
     if ( !gtk_init_check(&argc, &argv) )
-        warning ( _("failed to initialize GTK+. GTK+ dependent functions will not work") );
+        warning ( "failed to initialize GTK+. GTK+ dependent functions will not work" );
     else {
         GTK_OK = 1;
         // add R event handler to enable automatic window redraw
 #       ifndef WIN32
-        hdlr = addInputHandler(R_InputHandlers, ConnectionNumber(GDK_DISPLAY()), _doIter, -1);
+        addInputHandler(R_InputHandlers, ConnectionNumber(GDK_DISPLAY()), _doIter, -1);
 #       else
         R_tcldo = _doIterWin32;
 #       endif
@@ -62,7 +105,7 @@ R_init_EBImage (DllInfo * winDll) {
 #   ifdef WIN32
     InitializeMagick ("");
     if ( !IsMagickInstantiated () )
-        error ( _("cannot initialize ImageMagick") );
+        error ( "cannot initialize ImageMagick" );
 #   endif
 }
 

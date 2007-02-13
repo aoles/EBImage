@@ -1,10 +1,27 @@
+#include "io.h"
+
 /* -------------------------------------------------------------------------
 Image I/O
 Copyright (c) 2006 Oleg Sklyar
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
 
-#include "common.h"
+#include "tools.h"
+#include "conversions.h"
+
+#include <R_ext/Error.h>
+#include <magick/ImageMagick.h>
+
+/* These are to use GTK */
+#ifdef USE_GTK
+#   include <gtk/gtk.h>
+#   ifdef WIN32
+        typedef unsigned long ulong;
+#       include <sys/types.h>
+#   else
+#       include <gdk/gdkx.h>
+#   endif
+#endif
 
 /*----------------------------------------------------------------------- */
 SEXP
@@ -17,10 +34,10 @@ lib_readImages (SEXP files, SEXP mode) {
     char * file;
 
     if ( LENGTH(files) < 1 )
-        error ( _("please supply at least one file name or URL") );
+        error ( "please supply at least one file name or URL" );
     _mode = INTEGER (mode)[0];
     if ( _mode < 0 || _mode > MAX_MODE )
-        error ( _("requested mode is not supported") );
+        error ( "requested mode is not supported" );
     image_info = (ImageInfo *) NULL;
     /* images loaded into image and moved into this list */
     images = NewImageList ();
@@ -37,7 +54,7 @@ lib_readImages (SEXP files, SEXP mode) {
         image = ReadImage (image_info, &exception);
         CatchException (&exception);
         if ( image == (Image *)NULL ) {
-            warning ( _("requested image not found or could not be loaded") );
+            warning ( "requested image not found or could not be loaded" );
             continue;
         }
         /* do not destroy image here */
@@ -69,7 +86,7 @@ lib_readImages (SEXP files, SEXP mode) {
 SEXP
 lib_chooseImages () {
 #ifndef USE_GTK
-    error ( _("'choose.image' is only available if package is compiled with GTK+ support" ) );
+    error ( "'choose.image' is only available if package is compiled with GTK+ support" );
     return R_NilValue;
 #else
     SEXP res, filename, mode;
@@ -78,7 +95,7 @@ lib_chooseImages () {
     GSList * fileNameList;
 
     if ( !GTK_OK )
-        error ( _("GTK+ was not properly initialised") );
+        error ("GTK+ was not properly initialised" );
 
     dialog = gtk_file_chooser_dialog_new ("Select images to read into the R session",
                       NULL, //parent_window,
@@ -112,7 +129,7 @@ lib_chooseImages () {
             INTEGER(mode)[0] = 1;
         }
         else
-            error ( _("no files were selected") );
+            error ( "no files were selected" );
         g_slist_free (fileNameList);
     }
     gtk_widget_destroy (dialog);
@@ -120,7 +137,7 @@ lib_chooseImages () {
         res = lib_readImages(filename, mode);
     UNPROTECT (nprotect);
     if ( res == R_NilValue )
-        error ( _("cancel pressed or no image could be loaded") );
+        error ( "cancel pressed or no image could be loaded" );
     return res;
 #endif
 }
@@ -135,16 +152,16 @@ lib_writeImages (SEXP x, SEXP files, SEXP quality) {
 
     /* basic checks */
     if ( !isImage(x) )
-        error ( _("argument must be of class 'Image'") );
+        error ( "argument must be of class 'Image'" );
     nz = INTEGER ( GET_DIM(x) )[2];
     nfiles = LENGTH (files);
     if ( nfiles != 1 && nfiles != nz)
-        error ( _("number of files must be 1, or equal to the size of the image stack") );
+        error ( "number of files must be 1, or equal to the size of the image stack" );
     images = sexp2Magick (x);
     if ( images == NULL )
-        error ( _("cannot write an empty image") );
+        error ( "cannot write an empty image" );
     if ( GetImageListLength (images) < 1 )
-        error ( _("cannot write an empty image") );
+        error ( "cannot write an empty image" );
     image_info = CloneImageInfo ( (ImageInfo *)NULL );
     /* set attributes in image_info*/
     image_info->compression = images->compression;
@@ -155,7 +172,7 @@ lib_writeImages (SEXP x, SEXP files, SEXP quality) {
         /* we want to overwrite the feature imported from SEXP image */
         strcpy (images->filename, image_info->filename);
         if ( WriteImage (image_info, images) == 0 )
-            error ( _("cannot write image, check path and file name (UNIX home directories with ~ are not supported)") );
+            error ( "cannot write image, check path and file name (UNIX home directories with ~ are not supported)" );
         CatchException (&images->exception);
     }
     else {
@@ -164,18 +181,18 @@ lib_writeImages (SEXP x, SEXP files, SEXP quality) {
             file = CHAR ( asChar( STRING_ELT(files, i) ) );
             image = GetImageFromList (images, i);
             if ( image == NULL ) {
-                warning ( _("cannot write an empty image, skipping") );
+                warning ( "cannot write an empty image, skipping" );
                 continue;
             }
             if ( GetImageListLength (image) < 1 ) {
-                warning ( _("cannot write an empty image, skipping") );
+                warning ( "cannot write an empty image, skipping" );
                 continue;
             }
             strcpy (image_info->filename, file);
             /* we want to overwrite the feature imported from SEXP image */
             strcpy (image->filename, image_info->filename);
             if ( WriteImage (image_info, image) == 0 )
-                warning ( _("cannot write image, check path and file name (UNIX home directories with ~ are not supported") );
+                warning ( "cannot write image, check path and file name (UNIX home directories with ~ are not supported" );
             CatchException (&image->exception);
         }
     }

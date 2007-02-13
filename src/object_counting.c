@@ -1,15 +1,24 @@
+#include "object_counting.h"
+
 /* -------------------------------------------------------------------------
 Counting objects determined in segmentations like watershed
 Copyright (c) 2006 Oleg Sklyar
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
 
-#include "common.h"
+#include "tools.h"
+#include "colors.h"
+#include <R_ext/Error.h>
+#include <magick/ImageMagick.h>
 
 /*----------------------------------------------------------------------- */
 #define BG 0.0
 #define N_FEATURES     5
 #define N_ALL_FEATURES     11
+
+/* forward declarations */
+SEXP get_all_features (SEXP, SEXP);
+SEXP get_features (SEXP);
 
 /*----------------------------------------------------------------------- */
 /* will paint features on the target image with given colors and opacs    */
@@ -20,9 +29,9 @@ lib_paintFeatures (SEXP x, SEXP tgt, SEXP _opac, SEXP _col) {
     PixelPacket * pixelPtr, * colorPtr;
     int nprotect, nx, ny, nz, im, i, j, tgtmode, index;
     double * data, * imdata, * opac;
-    
+
     if ( !isImage(x) || !isImage(tgt) ) return tgt;
-    
+
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
     nz = INTEGER ( GET_DIM(x) )[2];
@@ -88,36 +97,36 @@ lib_paintFeatures (SEXP x, SEXP tgt, SEXP _opac, SEXP _col) {
     colors = DestroyImage (colors);
 
     UNPROTECT (nprotect);
-    return res;    
+    return res;
 }
 
 /*----------------------------------------------------------------------- */
 SEXP
 lib_getFeatures (SEXP x, SEXP ref) {
-    return get_all_features (x, ref);  
+    return get_all_features (x, ref);
 };
 
 /*----------------------------------------------------------------------- */
-SEXP 
+SEXP
 get_all_features (SEXP x, SEXP ref) {
     SEXP res, features, * fm, * dm;
     double * ftrs, * data, * refdata, * fmdata, thisdistance;
     int nprotect, nx, ny, nz, i, j, im, nobj, obj, isper;
-    
+
     if ( !isImage(x) ) return R_NilValue;
     if ( !isImage(ref) && ref != R_NilValue ) return R_NilValue;
-    
+
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
     nz = INTEGER ( GET_DIM(x) )[2];
     nprotect = 0;
-    
+
      /* will be freed automatically */
     fm = (SEXP *) R_alloc (nz, sizeof(SEXP) );
     for ( im = 0; im < nz; im++ )
         fm[im] = R_NilValue;
     dm = (SEXP *) R_alloc (nz, sizeof(SEXP) );
-   
+
     PROTECT ( features = get_features(x) );
     nprotect++;
 
@@ -142,7 +151,7 @@ get_all_features (SEXP x, SEXP ref) {
         PROTECT ( fm[im] = allocVector(REALSXP, nobj * N_ALL_FEATURES) );
         nprotect++;
         fmdata = REAL (fm[im]);
-        for ( obj = 0; obj < nobj; obj++ ) 
+        for ( obj = 0; obj < nobj; obj++ )
             for ( j = 0; j < N_ALL_FEATURES; j++ ) {
                 if ( j < N_FEATURES )
                     fmdata [obj + j * nobj] = ftrs [obj + j * nobj];
@@ -169,11 +178,11 @@ get_all_features (SEXP x, SEXP ref) {
                 // i + 1, j + 1 because of R-based indexes in coordinates
                 thisdistance = distancexy(i + 1, j + 1, fmdata[obj], fmdata[obj + nobj]);
                 /* int +6 */
-                if ( refdata ) 
+                if ( refdata )
                     fmdata [obj + 6 * nobj] += refdata [i + j * nx];
                 /* acirc +7 */
-                if ( thisdistance > fmdata[obj + 5 * nobj] ) 
-                    fmdata [obj + 7 * nobj] += 1.0; 
+                if ( thisdistance > fmdata[obj + 5 * nobj] )
+                    fmdata [obj + 7 * nobj] += 1.0;
                 /* is it a perimeter point */
                 isper = 0;
                 if ( i > 0 )
@@ -254,14 +263,14 @@ get_all_features (SEXP x, SEXP ref) {
 }
 
 /*----------------------------------------------------------------------- */
-SEXP 
+SEXP
 get_features (SEXP x) {
     SEXP res, * fm, * dm;
     int nx, ny, nz, nprotect, im, i, j, nobj, obj, isper;
     double * data, * fmdata;
-    
+
     if ( !isImage(x) ) return R_NilValue;
-    
+
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
     nz = INTEGER ( GET_DIM(x) )[2];
@@ -272,7 +281,7 @@ get_features (SEXP x) {
     for ( im = 0; im < nz; im++ )
         fm[im] = R_NilValue;
     dm = (SEXP *) R_alloc (nz, sizeof(SEXP) );
-    
+
     for ( im = 0; im < nz; im++ ) {
         /* get image data */
         data = &( REAL(x)[ im * nx * ny ] );
@@ -349,12 +358,12 @@ get_features (SEXP x) {
 SEXP
 lib_combineFeatures (SEXP x, SEXP _ext, SEXP _factor, SEXP _seeds) {
     SEXP res, features;
-    int nprotect, nx, ny, nz, im, i, j, ix, jy, nobj, ext, from, 
+    int nprotect, nx, ny, nz, im, i, j, ix, jy, nobj, ext, from,
         to, * index, obj, leave, * seeds, nseeds, isseed;
     double * data, * ftrs, * corr, per, factor, lfactor;
-    
+
     if ( !isImage(x) ) return x;
-    
+
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
     nz = INTEGER ( GET_DIM(x) )[2];
@@ -362,22 +371,22 @@ lib_combineFeatures (SEXP x, SEXP _ext, SEXP _factor, SEXP _seeds) {
 
     ext = INTEGER (_ext)[0];
     if ( ext < 1 ) return x;
-    
+
     factor = REAL (_factor)[0];
-    
+
     PROTECT ( res = Rf_duplicate(x) );
     nprotect++;
 
     /* we need this to know about perimeters etc of currently existing objects */
-    PROTECT (features = get_features (res) );  
+    PROTECT (features = get_features (res) );
     nprotect++;
-    
+
     /* if we were not able to determine features correctly, do nothing */
     if ( LENGTH( features ) != nz ) {
         UNPROTECT (nprotect);
         return x;
     }
-    
+
     for ( im = 0; im < nz; im++ ) {
         if ( VECTOR_ELT(features, im) == R_NilValue ) continue;
         /* get image data */
@@ -403,7 +412,7 @@ lib_combineFeatures (SEXP x, SEXP _ext, SEXP _factor, SEXP _seeds) {
                 /* reset the diag of the corr matrix as all found objects go there at each step */
                 for ( ix = 0; ix < nobj; ix++ )
                     corr [ix + ix * nobj] = 0;
-                /* scan a square this+-ext and add objects, put number of all found objects into 
+                /* scan a square this+-ext and add objects, put number of all found objects into
                    the diagonal of the corr matrix*/
                 for ( ix = i - ext; ix <= i + ext; ix++ )
                     for ( jy = j - ext; jy <= j + ext; jy++ ) {
@@ -473,7 +482,7 @@ lib_combineFeatures (SEXP x, SEXP _ext, SEXP _factor, SEXP _seeds) {
             corr [from + to * nobj] = 0;
             for ( jy = 0; jy < nobj; jy++ )
                 if ( jy != from && jy != to ) {
-                    corr [from + jy * nobj] = 0; 
+                    corr [from + jy * nobj] = 0;
                     if ( corr[jy + jy * nobj] == from )
                         corr[jy + jy * nobj] = corr[from + from * nobj];
                 }
@@ -513,17 +522,17 @@ lib_combineFeatures (SEXP x, SEXP _ext, SEXP _factor, SEXP _seeds) {
                     for ( jy = j - ext; jy <= j + ext && !leave; jy++ ) {
                         if ( ix < 0 || jy < 0 || ix >= nx || jy >= ny || (ix == i && jy == j) ) continue;
                         if ( 0.1 < data[ ix + jy * nx] && data[ ix + jy * nx] < 0.9) continue;
-                        if ( obj <= 0 ) 
+                        if ( obj <= 0 )
                             obj = data[ ix + jy * nx];
                         else
                             if ( obj > 0 && obj != data[ ix + jy * nx] ) leave = 1;
                     }
-                if ( obj >= 0 && !leave ) 
+                if ( obj >= 0 && !leave )
                     data [i + j * nx] = obj;
             }
-        
+
     }
-    
+
     SET_SLOT (res, mkString("features"), allocVector(VECSXP, 0) );
 
     UNPROTECT (nprotect);
@@ -536,9 +545,9 @@ lib_matchFeatures (SEXP x, SEXP ref) {
     SEXP res, xf, * indexes;
     int nprotect, nx, ny, nz, i, ix, jy, im, nobj;
     double * data, * ftrs;
-    
+
     if ( !isImage(x) || !isImage(ref) ) return x;
-    
+
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
     nz = INTEGER ( GET_DIM(x) )[2];
@@ -547,7 +556,7 @@ lib_matchFeatures (SEXP x, SEXP ref) {
     PROTECT (res = allocVector(VECSXP, nz) );
     nprotect++;
     indexes = (SEXP *) R_alloc (nz, sizeof(SEXP) );
-    
+
     /* we need this to know centres of objects in x */
     PROTECT (xf = get_features (x) );
     nprotect++;
@@ -580,12 +589,12 @@ lib_matchFeatures (SEXP x, SEXP ref) {
             if ( ix >= 0 && jy >= 0 && ix < nx && jy < ny )
                 if ( data[ix + jy * nx] > 0.9 )
                     INTEGER (indexes[im])[i] = (int)data[ix + jy * nx];
-                
+
         }
     }
-    
+
     UNPROTECT (nprotect);
-    return res;    
+    return res;
 }
 
 /*----------------------------------------------------------------------- */
@@ -594,9 +603,9 @@ lib_deleteFeatures (SEXP x, SEXP _index, SEXP _ext) {
     SEXP res, index;
     int nprotect, nx, ny, nz, i, j, ix, jy, im, nobj, * indexes, found, ext, leave, obj;
     double * data;
-    
+
     if ( !isImage(x) ) return x;
-    
+
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
     nz = INTEGER ( GET_DIM(x) )[2];
@@ -604,7 +613,7 @@ lib_deleteFeatures (SEXP x, SEXP _index, SEXP _ext) {
 
     ext = INTEGER (_ext)[0];
     if ( ext < 1 ) return x;
-    
+
 
     PROTECT ( res = Rf_duplicate(x) );
     nprotect++;
@@ -642,7 +651,7 @@ lib_deleteFeatures (SEXP x, SEXP _index, SEXP _ext) {
             data [i] = indexes[ (int)data[i] - 1 ];
         }
         Free (indexes);
-        
+
         /* reset borders if left after deleting objects */
         for ( i = 0; i < nx; i++ )
             for ( j = 0; j < ny; j++ ) {
@@ -653,15 +662,15 @@ lib_deleteFeatures (SEXP x, SEXP _index, SEXP _ext) {
                     for ( jy = j - ext; jy <= j + ext && !leave; jy++ ) {
                         if ( ix < 0 || jy < 0 || ix >= nx || jy >= ny || (ix == i && jy == j) ) continue;
                         if ( 0.1 < data[ ix + jy * nx] && data[ ix + jy * nx] < 0.9) continue;
-                        if ( obj <= 0 ) 
+                        if ( obj <= 0 )
                             obj = data[ ix + jy * nx];
                         else
                             if ( obj > 0 && obj != data[ ix + jy * nx] ) leave = 1;
                     }
-                if ( obj >= 0 && !leave ) 
+                if ( obj >= 0 && !leave )
                     data [i + j * nx] = obj;
             }
-        
+
     }
     SET_SLOT (res, mkString("features"), allocVector(VECSXP, 0) );
 

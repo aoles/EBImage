@@ -1,12 +1,14 @@
+#include "filters_watershed.h"
+
 /* -------------------------------------------------------------------------
 Watershed transform for Image
 Copyright (c) 2006 Oleg Sklyar
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
 
-#include "common.h"
+#include "tools.h"
+#include <R_ext/Error.h>
 
-/*----------------------------------------------------------------------- */
 #define BG 0.0
 #define PROGRESS_MAX 60.0
 
@@ -23,7 +25,7 @@ lib_filterInvWS (SEXP x, SEXP _alg, SEXP _ext, SEXP _verbose) {
     int nprotect, im, i, iend, j, ix, jy, npx, nx, ny, nz, * index, index1, marker, progress, counter, verbose, ext, alg;
     double * src, * tgt, thisBe, el, mel;
     PointXY pt;
-    
+
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
     nz = INTEGER ( GET_DIM(x) )[2];
@@ -33,9 +35,9 @@ lib_filterInvWS (SEXP x, SEXP _alg, SEXP _ext, SEXP _verbose) {
     nprotect++;
     PROTECT ( indexSXP = allocVector(INTSXP, nx * ny) );
     nprotect++;
-    
+
     index = INTEGER (indexSXP);
-    
+
     ext = INTEGER (_ext)[0];
     alg = INTEGER (_alg)[0];
     verbose = INTEGER (_verbose)[0];
@@ -48,7 +50,7 @@ lib_filterInvWS (SEXP x, SEXP _alg, SEXP _ext, SEXP _verbose) {
 
         src = &( REAL(x)[ im * nx * ny ] );
         tgt = &( REAL(res)[ im * nx * ny ] );
-        /* generate pixel index and negate the image -- filling wells */ 
+        /* generate pixel index and negate the image -- filling wells */
         for ( i = 0; i < nx * ny; i++ ) {
             index [i] = i;
             tgt [i] *= -1.0;
@@ -84,7 +86,7 @@ lib_filterInvWS (SEXP x, SEXP _alg, SEXP _ext, SEXP _verbose) {
                 for ( j = i; j <= iend && npx > 0; ) {
                     if ( tgt[ index[j] ] >= 0 ) { /* already assigned in this while loop */
                         j++;
-                        continue; 
+                        continue;
                     }
                     /* check neighbours and if exist only 1 -- assigned, if more than 1 - assign 0.5 */
                     thisBe = -1;
@@ -100,7 +102,7 @@ lib_filterInvWS (SEXP x, SEXP _alg, SEXP _ext, SEXP _verbose) {
                             if ( tgt[index1] > 0.9 ) {
                                 switch (alg) {
                                 case EXCLUDE: /* FIXME: find a way to keep border at 1 pixel with ext > 1 */
-                                    if ( thisBe > 0 && thisBe != tgt[index1] ) 
+                                    if ( thisBe > 0 && thisBe != tgt[index1] )
                                         thisBe = 0.5;
                                     else
                                         thisBe = tgt [index1];
@@ -130,7 +132,7 @@ lib_filterInvWS (SEXP x, SEXP _alg, SEXP _ext, SEXP _verbose) {
                 for ( j = i; j <= iend && npx > 0; j++) {
                     if ( tgt[ index[j] ] >= 0 ) continue; /* already assigned in this while loop */
                     /* as we think we assigned all neighbours in the previous loop
-                       we can create new seed here */                
+                       we can create new seed here */
                     tgt[ index[j] ] = marker;
                     marker += 1;
                     npx--;
@@ -140,7 +142,7 @@ lib_filterInvWS (SEXP x, SEXP _alg, SEXP _ext, SEXP _verbose) {
             /* move index point behind this plato */
             i = iend + 1;
         }
-    
+
     } /* ******* LOOP through images **************************************** */
     if ( verbose ) {
         for ( ; progress < PROGRESS_MAX; progress++)

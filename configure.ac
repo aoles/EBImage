@@ -14,10 +14,10 @@ if test "$magickfound" = "yes"; then
         LINKERFLAGS="${LINKERFLAGS} `Magick-config --libs`"
         LIBS="${LINKERFLAGS} ${LIBS} ${LFLAGS}"
     else
-        AC_MSG_ERROR("Cannot find ImageMagick-devel (Magick-devel)")
+        AC_MSG_ERROR("ImageMagick-devel NOT FOUND")
     fi
 else
-    AC_MSG_ERROR("Cannot find ImageMagick (MagickCore)")
+    AC_MSG_ERROR("ImageMagick NOT FOUND")
 fi
 
 AC_CHECK_PROG(pkgfound, [pkg-config --version], yes, no)
@@ -26,15 +26,16 @@ if test "$pkgfound" = "yes"; then
         echo Compiling with GTK+ support
         COMPILERFLAGS="`pkg-config --cflags gtk+-2.0`"
         CFLAGS="-DUSE_GTK -DGLIB_GETTEXT ${COMPILERFLAGS} ${CFLAGS}"
-        CXXFLAGS="-DUSE_GTK -DGLIB_GETTEXT ${COMPILERFLAGS} ${CXXFLAGS}"
+        ## DO NOT ADD GTK keys to g++, that code does not use it
+        ## CXXFLAGS="-DUSE_GTK -DGLIB_GETTEXT ${COMPILERFLAGS} ${CXXFLAGS}"
         LINKERFLAGS="`pkg-config --libs gtk+-2.0`"
         LIBS="${LINKERFLAGS} ${LIBS} ${LFLAGS}"
         LFLAGS="${LIBS}"
     else
-    echo Compiling without GTK+ support
+    echo 'GTK+2.0' NOT FOUND: compiling without GTK+
     fi
 else
-    echo 'pkg-config' not found, compiling without GTK+ support
+    echo 'PKG-CONFIG' NOT FOUND: compiling without GTK+
 fi
 
 if test -z "${R_HOME}"; then
