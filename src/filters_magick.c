@@ -1,10 +1,16 @@
+#include "filters_magick.h"
+
 /* -------------------------------------------------------------------------
 Image filters from Magick
 Copyright (c) 2006 Oleg Sklyar
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
 
-#include "common.h"
+#include "tools.h"
+#include "conversions.h"
+
+#include <R_ext/Error.h>
+#include <magick/ImageMagick.h>
 
 /*----------------------------------------------------------------------- */
 #define FLT_BLUR        0
@@ -155,8 +161,8 @@ lib_filterMagick (SEXP x, SEXP filter, SEXP parameters) {
                 break;
             default:
                 images = DestroyImage (images);
-                /* DestroyExceptionInfo (&exception); */
-                error ( _("unsupported filter specified") );
+                DestroyExceptionInfo (&exception);
+                error ( "unsupported filter specified" );
         }
         if (exception.severity != UndefinedException) {
             CatchException (&exception);
@@ -215,7 +221,8 @@ lib_filterFill (SEXP x, SEXP colStrSXP, SEXP coords, SEXP methodSXP, SEXP fuzzSX
     if ( exception.severity != UndefinedException ) {
         CatchException (&exception);
         images = DestroyImageList (images);
-        error ( _("cannot identify color") );
+        DestroyExceptionInfo (&exception);
+        error ( "cannot identify color" );
     }
     str = CHAR ( asChar(methodSXP) );
     if ( strcmp (str, "floodfill") == 0 )

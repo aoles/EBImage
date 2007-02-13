@@ -1,10 +1,14 @@
+#include "conversions.h"
+
 /* -------------------------------------------------------------------------
 Image conversions between MagickCore and R
 Copyright (c) 2006 Oleg Sklyar
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
 
-#include "common.h"
+#include "tools.h"
+
+#include <R_ext/Error.h>
 
 /*----------------------------------------------------------------------- */
 #define COMP_LENGTH 6
@@ -40,7 +44,7 @@ sexp2Magick (SEXP x) {
 
     /* basic checks */
     if ( !isImage(x) )
-        error ( _("argument must be of class 'Image'") );
+        error ( "argument must be of class 'Image'" );
     dim = INTEGER ( GET_DIM(x) );
     nx = dim[0];
     ny = dim[1];
@@ -64,7 +68,7 @@ sexp2Magick (SEXP x) {
             continue;
         }
         if ( image == (Image *)NULL ) {
-            warning ( _("cannot convert the image") );
+            warning ( "cannot convert the image" );
             continue;
         }
         if ( colormode == MODE_RGB )
@@ -141,7 +145,7 @@ magick2SEXP (Image * images, int colormode) {
         return R_NilValue;
 
     if ( colormode < 0 || colormode > MAX_MODE )
-        error ( _("requested colormode is not supported") );
+        error ( "requested colormode is not supported" );
 
     res = R_NilValue;
     nprotect = 0;
@@ -150,7 +154,7 @@ magick2SEXP (Image * images, int colormode) {
     nx = image->columns;
     ny = image->rows;
     if ( nx * ny * nz == 0 ) {
-        warning ( _("image size is zero") );
+        warning ( "image size is zero" );
         return R_NilValue;
     }
     GetExceptionInfo(&exception);
@@ -169,7 +173,7 @@ magick2SEXP (Image * images, int colormode) {
     for ( i = 0; i < nz; i++ ) {
         image = GetImageFromList (images, i);
         if ( image->columns != nx || image->rows != ny )
-            warning ( _("image size differs from that of the first one in the stack") );
+            warning ( "image size differs from that of the first one in the stack" );
         dx = image->columns < nx ? image->columns : nx;
         dy = image->rows < ny ? image->rows : ny;
         SetImageOpacity (image, 0);
@@ -244,34 +248,3 @@ magick2SEXP (Image * images, int colormode) {
         UNPROTECT (nprotect);
     return res;
 }
-
-#ifdef USE_GTK
-/*----------------------------------------------------------------------- */
-GdkPixbuf * newPixbufFromImages (Image * images, int index) {
-    GdkPixbuf * res;
-    Image * image;
-    int nx, ny;
-    ExceptionInfo exception;
-
-    if ( images == NULL )
-        return NULL;
-    res = NULL;
-    image = GetImageFromList (images, index);
-    nx = image->columns;
-    ny = image->rows;
-    GetExceptionInfo(&exception);
-    res = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8, nx, ny);
-    if ( GetImageType(images, &exception) == GrayscaleType )
-        DispatchImage (image, 0, 0, nx, ny, "IIIA", CharPixel, gdk_pixbuf_get_pixels(res), &exception);
-    else
-        DispatchImage (image, 0, 0, nx, ny, "RGBA", CharPixel, gdk_pixbuf_get_pixels(res), &exception);
-    if (exception.severity != UndefinedException) {
-        CatchException (&exception);
-        g_object_unref (res);
-        res = NULL;
-    }
-
-    DestroyExceptionInfo(&exception);
-    return res;
-}
-#endif

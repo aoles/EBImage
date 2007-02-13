@@ -1,11 +1,13 @@
+#include "colors.h"
+
 /* -------------------------------------------------------------------------
 Image conversions between MagickCore and R
 Copyright (c) 2006 Oleg Sklyar
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
 
-#include "common.h"
 #include <Rgraphics.h>
+#include <R_ext/Error.h>
 
 /*----------------------------------------------------------------------- */
 #define RGBA  0
@@ -25,11 +27,11 @@ SEXP image1D2INTEGER (Image *, int);
 SEXP image1D2CHAR (Image *);
 
 /*----------------------------------------------------------------------- */
-SEXP 
+SEXP
 lib_channel (SEXP x, SEXP mode) {
     SEXP res;
     Image * image;
-    
+
     image = vector2image1D (x);
 
     res = R_NilValue;
@@ -63,14 +65,14 @@ lib_channel (SEXP x, SEXP mode) {
             break;
         default:
             image = DestroyImage (image);
-            error ( _("incorrect mode") );
+            error ( "incorrect mode" );
     }
     image = DestroyImage (image);
     return res;
 }
 
 /*----------------------------------------------------------------------- */
-Image * 
+Image *
 vector2image1D (SEXP x) {
     Image * res;
     int nvals;
@@ -91,7 +93,7 @@ vector2image1D (SEXP x) {
         GetImageInfo (&info);
         res = AllocateImage (&info);
         if ( SetImageExtent(res, nvals, 1) == MagickFalse )
-            error ( _("cannot allocate memory") );
+            error ( "cannot allocate memory" );
         QueryColorDatabase ("black", &res->background_color, &exception);
         if (exception.severity != UndefinedException)
             CatchException (&exception);
@@ -113,7 +115,7 @@ vector2image1D (SEXP x) {
 }
 
 /*----------------------------------------------------------------------- */
-Image * 
+Image *
 int2image1D (int * x, int nvals) {
     Image * res;
     ExceptionInfo exception;
@@ -128,7 +130,7 @@ int2image1D (int * x, int nvals) {
 }
 
 /*----------------------------------------------------------------------- */
-Image * 
+Image *
 double2image1D (double * x, int nvals) {
     Image * res;
     ExceptionInfo exception;
@@ -144,13 +146,13 @@ double2image1D (double * x, int nvals) {
 
 
 /*----------------------------------------------------------------------- */
-SEXP 
+SEXP
 image1D2REAL (Image * image, int what) {
     SEXP res;
     int nprotect, nvals;
     double * data;
     ExceptionInfo exception;
-    
+
     if ( image == NULL ) return R_NilValue;
     res = R_NilValue;
     nprotect = 0;
@@ -184,7 +186,7 @@ image1D2REAL (Image * image, int what) {
 void
 image1D2double (Image * image, double * tgt, int nvals) {
     ExceptionInfo exception;
-    
+
     if ( image == NULL ) return;
 
     GetExceptionInfo (&exception);
@@ -193,13 +195,13 @@ image1D2double (Image * image, double * tgt, int nvals) {
 }
 
 /*----------------------------------------------------------------------- */
-SEXP 
+SEXP
 image1D2INTEGER (Image * image, int what) {
     SEXP res;
     int nprotect, nvals;
     int * data;
     ExceptionInfo exception;
-    
+
     if ( image == NULL ) return R_NilValue;
     res = R_NilValue;
     nprotect = 0;
@@ -233,7 +235,7 @@ image1D2INTEGER (Image * image, int what) {
 void
 image1D2int (Image * image, int * tgt, int nvals) {
     ExceptionInfo exception;
-    
+
     if ( image == NULL ) return;
 
     GetExceptionInfo (&exception);
@@ -253,8 +255,8 @@ image1D2CHAR (Image * image) {
     nprotect = 0;
     nvals = image->columns;
     PROTECT (res = allocVector(STRSXP, nvals) );
-    nprotect++;    
-    
+    nprotect++;
+
     for ( i = 0; i < image->columns; i++ ) {
         pp = GetOnePixel (image, i, 0);
         strcpy (pixelStr, "#");
@@ -266,7 +268,7 @@ image1D2CHAR (Image * image) {
         strcat (pixelStr, component);
         SET_STRING_ELT ( res, i, mkChar( pixelStr ) );
     }
-    
+
     UNPROTECT (nprotect);
     return res;
 }

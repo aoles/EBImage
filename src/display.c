@@ -1,14 +1,31 @@
+#include "display.h"
+
 /* -------------------------------------------------------------------------
 Image conversions between MagickCore and R
 Copyright (c) 2006 Oleg Sklyar
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
 
-#include "common.h"
+#include "tools.h"
+#include "conversions.h"
+
 #include <R_ext/Memory.h>
+#include <R_ext/Error.h>
+#include <magick/ImageMagick.h>
 
 #ifndef WIN32
 #   include <pthread.h>
+#endif
+
+/* These are to use GTK */
+#ifdef USE_GTK
+#   include <gtk/gtk.h>
+#   ifdef WIN32
+        typedef unsigned long ulong;
+#       include <sys/types.h>
+#   else
+#       include <gdk/gdkx.h>
+#   endif
 #endif
 
 int THREAD_ON = 0;
@@ -18,6 +35,7 @@ void * _showInImageMagickWindow (void *);
 void * _animateInImageMagickWindow (void *);
 #ifdef USE_GTK
 void _showInGtkWindow (SEXP);
+GdkPixbuf * newPixbufFromImages (Image *, int);
 #endif
 /*----------------------------------------------------------------------- */
 SEXP
@@ -27,25 +45,25 @@ lib_display(SEXP x, SEXP nogtk) {
 #endif
 
     if ( !isImage(x) )
-        error ( _("argument must be of class 'Image'") );
+        error ( "argument must be of class 'Image'" );
 
 #ifdef USE_GTK
     if ( !LOGICAL(nogtk)[0] ) {
         if ( GTK_OK )
             _showInGtkWindow (x);
         else
-            error ( _("GTK+ was not properly initialised") );
+            error ( "GTK+ was not properly initialised" );
         return R_NilValue;
     }
 #endif
 
 #ifdef WIN32
-    error ( _("only GTK+ display is awailable on Windows") );
+    error ( "only GTK+ display is awailable on Windows" );
 #else
     if ( THREAD_ON )
-        error ( _("cannot display concurent windows. Close currently displayed window first.") );
+        error ( "cannot display concurent windows. Close currently displayed window first." );
     if ( pthread_create(&res, NULL, _showInImageMagickWindow, (void *)x ) != 0 )
-        error ( _("cannot create display thread") );
+        error ( "cannot create display thread" );
 #endif
     return R_NilValue;
 }
@@ -58,15 +76,15 @@ lib_animate (SEXP x) {
 #endif
 
     if ( !isImage(x) )
-        error ( _("argument must be of class 'Image'") );
+        error ( "argument must be of class 'Image'" );
 
 #ifdef WIN32
-    error ( _("animate function is not available on Windows because it uses ImageMagick interactive display") );
+    error ( "animate function is not available on Windows because it uses ImageMagick interactive display" );
 #else
     if ( THREAD_ON )
-        error ( _("cannot display concurent windows. Close currently displayed window first.") );
+        error ( "cannot display concurent windows. Close currently displayed window first." );
     if ( pthread_create(&res, NULL, _animateInImageMagickWindow, (void *)x ) != 0 )
-        error ( _("cannot animate display thread") );
+        error ( "cannot animate display thread" );
 #endif
     return R_NilValue;
 }
@@ -136,7 +154,7 @@ _showInGtkWindow (SEXP x) {
     gpointer ** winStr; /* 4 pointers, 0 - window, 1 - imageWG, 2 - images, *int - index of current image on display */
 
     if ( !GTK_OK )
-        error ( _("failed to initialize GTK+, use 'read.image' instead") );
+        error ( "failed to initialize GTK+, use 'read.image' instead" );
 
     /* get image in magick format and get image size */
     images = sexp2Magick (x);
@@ -148,7 +166,7 @@ _showInGtkWindow (SEXP x) {
     /* create pixbuf from image data */
     pxbuf = newPixbufFromImages (images, 0);
     if ( pxbuf == NULL )
-        error ( _("cannot copy image data to display window") );
+        error ( "cannot copy image data to display window" );
 
     /* create window structure */
     winStr = g_new ( ggpointer, 4 );
@@ -162,7 +180,7 @@ _showInGtkWindow (SEXP x) {
     /* create main window */
     winWG =  gtk_window_new (GTK_WINDOW_TOPLEVEL);
     winStr[0] = (gpointer *) winWG;
-    gtk_window_set_title ( GTK_WINDOW(winWG), _("R image display") );
+    gtk_window_set_title ( GTK_WINDOW(winWG), "R image display" );
     /* set destroy event handler for the window */
     g_signal_connect ( G_OBJECT(winWG), "delete-event", G_CALLBACK(onWinDestroy), winStr );
 
@@ -182,10 +200,10 @@ _showInGtkWindow (SEXP x) {
 
     /* add zoom buttons */
     iSize = gtk_toolbar_get_icon_size ( GTK_TOOLBAR(tbarWG) );
-    btnZoomInWG = (GtkWidget *) gtk_tool_button_new ( gtk_image_new_from_stock("gtk-zoom-in", iSize), _("Zoom in") );
+    btnZoomInWG = (GtkWidget *) gtk_tool_button_new ( gtk_image_new_from_stock("gtk-zoom-in", iSize), "Zoom in" );
     gtk_container_add ( GTK_CONTAINER(tbarWG), btnZoomInWG);
     g_signal_connect ( G_OBJECT(btnZoomInWG), "clicked", G_CALLBACK(onZoomInPress), winStr);
-    btnZoomOutWG = (GtkWidget *) gtk_tool_button_new ( gtk_image_new_from_stock("gtk-zoom-out", iSize), _("Zoom out") );
+    btnZoomOutWG = (GtkWidget *) gtk_tool_button_new ( gtk_image_new_from_stock("gtk-zoom-out", iSize), "Zoom out" );
     gtk_container_add ( GTK_CONTAINER(tbarWG), btnZoomOutWG);
     g_signal_connect ( G_OBJECT(btnZoomOutWG), "clicked", G_CALLBACK(onZoomOutPress), winStr);
     btnZoomOneWG = (GtkWidget *) gtk_tool_button_new ( gtk_image_new_from_stock("gtk-yes", iSize), "1:1");
@@ -194,10 +212,10 @@ _showInGtkWindow (SEXP x) {
 
     /* add browsing buttons */
     if ( nz > 1 ) {
-        btnPrevWG = (GtkWidget *) gtk_tool_button_new ( gtk_image_new_from_stock("gtk-go-back", iSize), _("Previous") );
+        btnPrevWG = (GtkWidget *) gtk_tool_button_new ( gtk_image_new_from_stock("gtk-go-back", iSize), "Previous" );
         gtk_container_add ( GTK_CONTAINER(tbarWG), btnPrevWG);
         g_signal_connect ( G_OBJECT(btnPrevWG), "clicked", G_CALLBACK(onPrevImPress), winStr);
-        btnNextWG = (GtkWidget *) gtk_tool_button_new ( gtk_image_new_from_stock("gtk-go-forward", iSize), _("Next") );
+        btnNextWG = (GtkWidget *) gtk_tool_button_new ( gtk_image_new_from_stock("gtk-go-forward", iSize), "Next" );
         gtk_container_add ( GTK_CONTAINER(tbarWG), btnNextWG);
         g_signal_connect ( G_OBJECT(btnNextWG), "clicked", G_CALLBACK(onNextImPress), winStr);
     }
@@ -361,6 +379,35 @@ onPrevImPress (GtkToolButton * btn, gpointer ptr) {
     g_object_unref (pxbuf);
     gdk_flush();
     return TRUE;
+}
+
+/*----------------------------------------------------------------------- */
+GdkPixbuf * newPixbufFromImages (Image * images, int index) {
+    GdkPixbuf * res;
+    Image * image;
+    int nx, ny;
+    ExceptionInfo exception;
+
+    if ( images == NULL )
+        return NULL;
+    res = NULL;
+    image = GetImageFromList (images, index);
+    nx = image->columns;
+    ny = image->rows;
+    GetExceptionInfo(&exception);
+    res = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8, nx, ny);
+    if ( GetImageType(images, &exception) == GrayscaleType )
+        DispatchImage (image, 0, 0, nx, ny, "IIIA", CharPixel, gdk_pixbuf_get_pixels(res), &exception);
+    else
+        DispatchImage (image, 0, 0, nx, ny, "RGBA", CharPixel, gdk_pixbuf_get_pixels(res), &exception);
+    if (exception.severity != UndefinedException) {
+        CatchException (&exception);
+        g_object_unref (res);
+        res = NULL;
+    }
+
+    DestroyExceptionInfo(&exception);
+    return res;
 }
 
 #endif

@@ -21,7 +21,8 @@
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 . <- function (string) {
-    .DoCall ("lib_", as.character(string) )
+  ##    .DoCall ("lib_", as.character(string) )
+  return (string)
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,3 +1,5 @@
+#include "filters_thresh.h"
+
 /* -------------------------------------------------------------------------
 Adaptive thresholding, magick-independent implementation
 Uses mean value estimated on a square frame, to speed up calculations
@@ -8,7 +10,7 @@ Copyright (c) 2006 Oleg Sklyar
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
 
-#include "common.h"
+#include <R_ext/Error.h>
 
 #define BG 0.0
 #define FG 1.0
@@ -31,7 +33,7 @@ lib_filterThresh (SEXP x, SEXP param) {
     nz = dim[2];
     nprotect = 0;
     nFramePix = (2 * dx + 1) * (2 * dx + 1);
-    
+
     PROTECT ( res = Rf_duplicate(x) );
     nprotect++;
 
@@ -41,7 +43,7 @@ lib_filterThresh (SEXP x, SEXP param) {
         for ( yi = dy; yi < ny - dy; yi++ ) {
             sum = 0.0;
             for ( xi = dx; xi < nx - dx; xi++ ) {
-                if ( xi == dx) { 
+                if ( xi == dx) {
                 /* first position in a row -- collect new sum */
                     for ( u = xi - dx; u <= xi + dx; u++ )
                         for ( v = yi - dy; v <= yi + dy; v++ )
@@ -88,9 +90,9 @@ lib_filterThresh (SEXP x, SEXP param) {
                 else /* thresh current pixel only */
                     tgt [xi + yi * nx] = ( src [xi + yi * nx] < mean ) ? BG : FG;
             }
-        }    
+        }
     }
-    
+
     UNPROTECT (nprotect);
     return res;
 }

@@ -1,3 +1,5 @@
+#include "filters_distmap.h"
+
 /* -------------------------------------------------------------------------
 Distance map transform for Image
 
@@ -5,7 +7,7 @@ Copyright (c) 2006 Oleg Sklyar
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
 
-#include "common.h"
+#include <R_ext/Error.h>
 
 #define BG 0.0
 
@@ -18,7 +20,7 @@ lib_distMap (SEXP x, SEXP tolerance, SEXP minBG, SEXP strict) {
     SEXP res;
     int nprotect, i, nx, ny, nz;
     double tol, minimumBG;
-    
+
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
     nz = INTEGER ( GET_DIM(x) )[2];
@@ -27,14 +29,14 @@ lib_distMap (SEXP x, SEXP tolerance, SEXP minBG, SEXP strict) {
     nprotect = 0;
     PROTECT ( res = Rf_duplicate(x) );
     nprotect++;
-    
+
     for ( i = 0; i < nz; i++ ) {
         if ( !do_distMap ( &( REAL(res)[ i * nx * ny ] ), nx, ny, tol, minimumBG, INTEGER(strict)[0] ) ) {
             UNPROTECT (nprotect);
-            error ( _("background constitutes less than 5 percent of the image") );
+            error ( "background constitutes less than 5 percent of the image" );
         }
     }
-    
+
     UNPROTECT (nprotect);
     return res;
 }
@@ -46,14 +48,14 @@ lib_distMap (SEXP x, SEXP tolerance, SEXP minBG, SEXP strict) {
     if ( d < data [xi + yi * nx] ) data [xi + yi * nx] = d; \
     if ( d < maxd ) d += 1.0; \
   } )
-  
+
 int
 do_distMap (double * data, int nx, int ny, double tolerance, double minBG, int strict) {
     int xi, yi, u, v, done, found, nBG;
     double d, tmpd;
     double maxd;
 
-    /* full diagonal */    
+    /* full diagonal */
     maxd = sqrt ( nx * nx + ny * ny);
     nBG = 0;
     /* scan through rows to guess the maximum possible distances within rows */
@@ -64,7 +66,7 @@ do_distMap (double * data, int nx, int ny, double tolerance, double minBG, int s
         for ( xi = 0; xi < nx; xi++ ) {
             /* if background, set as such and reset d to 1 */
             if ( data[xi + yi * nx] <= tolerance ) {
-                d = 1.0; 
+                d = 1.0;
                 data [xi + yi * nx] = BG;
                 nBG++;;
                 continue;
@@ -110,7 +112,7 @@ do_distMap (double * data, int nx, int ny, double tolerance, double minBG, int s
                     if ( xi + u < nx && yi - v >= 0 && !done )
                         if ( data [xi + u + (yi - v) * nx] == BG ) found = 1;
                     if ( found ) {
-                        tmpd = sqrt ( u * u + v * v ); 
+                        tmpd = sqrt ( u * u + v * v );
                         if ( tmpd < 1.9 && !strict ) tmpd = 1.0;
                         if ( tmpd < data [xi + yi * nx] )
                             data [xi + yi * nx] = tmpd;

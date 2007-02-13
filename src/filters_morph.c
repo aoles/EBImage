@@ -1,12 +1,13 @@
+#include "filters_morph.h"
+
 /* -------------------------------------------------------------------------
 Morphological filters for Image
 Copyright (c) 2006 Oleg Sklyar
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
 
-#include "common.h"
-
-/*----------------------------------------------------------------------- */
+#include "tools.h"
+#include <R_ext/Error.h>
 
 #define ERODE  0
 #define DILATE 1
@@ -23,7 +24,7 @@ lib_erode_dilate (SEXP x, SEXP kernel, SEXP iters, SEXP what) {
     int * dim, * kern;
     PointXY size, ksize, pt;
     SEXP res;
-    
+
     /* value to reset the checked part t */
     if ( INTEGER(what)[0] == ERODE )
         resetTo = 1.0; /* checking background, reseting to 1 */
@@ -38,10 +39,10 @@ lib_erode_dilate (SEXP x, SEXP kernel, SEXP iters, SEXP what) {
     ksize.y = INTEGER ( GET_DIM(kernel) )[1];
     nt = INTEGER (iters)[0];
     nprotect = 0;
-    
+
     PROTECT ( res = Rf_duplicate(x) );
     nprotect++;
-    
+
     for ( i = 0; i < nz; i++ ) {
         tgt = &( REAL(res)[i * size.x * size.y] );
         src = &( REAL(x)[i * size.x * size.y] );
@@ -60,10 +61,10 @@ lib_erode_dilate (SEXP x, SEXP kernel, SEXP iters, SEXP what) {
 
 
 /*----------------------------------------------------------------------- */
-int 
+int
 _match (int * kernel, PointXY * ksize, double * data, PointXY * dsize, PointXY * at, double mismatch) {
     int i, j, xx, yy, kcx, kcy;
-    
+
     kcx = ksize->x / 2;
     kcy = ksize->y / 2;
     for ( i = -kcx; i <= kcx; i++ )
