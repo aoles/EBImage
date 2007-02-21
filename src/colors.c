@@ -257,7 +257,7 @@ image1D2CHAR (Image * image) {
     PROTECT (res = allocVector(STRSXP, nvals) );
     nprotect++;
 
-    for ( i = 0; i < image->columns; i++ ) {
+    for ( i = 0; i < (int)image->columns; i++ ) {
         pp = GetOnePixel (image, i, 0);
         strcpy (pixelStr, "#");
         sprintf (component, "%02X", ScaleQuantumToChar(pp.red) );
