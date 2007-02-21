@@ -24,11 +24,11 @@
 
 \section{ Arguments }{ \describe{
 
-  \item{\code{x}}{An object of \code{\link{Image-class}} in the 
+  \item{\code{x}}{An object of \code{\link{Image-class}} in the
     \code{\link{Grayscale}} mode with integer-absed object encoding, as
     returned by \code{\link{watershed}}. }
 
-  \item{\code{ref}}{A reference grayscale image to calculate object intensity. 
+  \item{\code{ref}}{A reference grayscale image to calculate object intensity.
     Can be \code{NULL}. }
 
   \item{\code{...}}{ Reserved for future use. }
@@ -36,18 +36,17 @@
 
 \section{ Value }{
 
-  \code{getObjects} returns a list of matrixes (one per image in stack) with 
+  \code{getObjects} returns a list of matrixes (one per image in stack) with
   image descriptors. This list can be stored with the image using the set
   function \code{features<-} and retrieved from the object using the corresponding
-  get function \code{features}. Every matrix in the list will contain 
-  named columns of features starting with object position, size, perimeter etc. 
+  get function \code{features}. Every matrix in the list will contain
+  named columns of features starting with object position, size, perimeter etc.
   with one row per object detected.
 }
 
 \seealso{
   \code{
-    \link{Image-class}, \link{watershed}, \link{paintObjects}, 
-    \link{combineObjects}
+    \link{Image-class}, \link{watershed}, \link{paintObjects}
   }
 }
 
@@ -61,7 +60,7 @@
 }
 
 \author{
-    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
+    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}
 }
 
 \keyword{file}

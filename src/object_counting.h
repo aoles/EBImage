@@ -10,9 +10,8 @@ extern "C" {
 
 SEXP lib_paintFeatures (SEXP, SEXP, SEXP, SEXP);
 SEXP lib_getFeatures (SEXP, SEXP);
-SEXP lib_combineFeatures (SEXP, SEXP, SEXP, SEXP);
 SEXP lib_matchFeatures (SEXP, SEXP);
-SEXP lib_deleteFeatures (SEXP, SEXP, SEXP);
+SEXP lib_deleteFeatures (SEXP, SEXP);
 
 #ifdef __cplusplus
 };

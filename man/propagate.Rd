@@ -91,7 +91,6 @@
       t <- thresh( blur(a[,,2], 4, 2), 15, 15)
       t <- opening( closing(t, morphKern(9)) )
       w <- watershed( distmap(t) )
-      w <- combineObjects(w, 0.4)
 
       \dontrun{generating mask for propagate}
       mask <- thresh( a[,,1], 50, 50, -0.01)

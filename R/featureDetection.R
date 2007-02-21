@@ -30,15 +30,14 @@ setMethod ("distmap", signature(x="Image"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("watershed", signature(x="Image"),
-    function (x, ext=1, alg="exclude", ..., verbose=FALSE) {
+    function (x, tolerance=1, ext=1, ...) {
         if ( colorMode(x) != Grayscale )
             stop ( .("only Grayscale images are supported, use 'channel' to convert") )
-        alg <- switch(EXPR=tolower(alg), exclude=0, steepest=1, smooth=2, -1)
-        if ( alg < 0 )
-            stop ( .("possible values for 'alg' are 'exclude', 'steepest' and 'smooth'") )
-        if ( as.integer(ext) < 1 )
-            stop ( .("ext must be a positive integer value") )
-        return( .DoCall("lib_filterInvWS", x, as.integer(alg), as.integer(ext), as.integer(verbose) ) )
+        if ( tolerance < 0 )
+            stop ( .("'tolerance' must be a non-negative numeric") )
+        if ( ext < 1 )
+            stop ( .("'ext' must be a positive integer") )
+        return( .DoCall("lib_filterInvWS", x, as.numeric(tolerance), as.integer(ext) ) )
     }
 )
 
@@ -113,21 +112,6 @@ setMethod ("paintObjects", signature(x="Image", tgt="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("combineObjects", signature(x="Image"),
-    function (x, fraction=0.3, ext=1, seeds=NULL, ...) {
-        if ( colorMode(x) != Grayscale )
-            stop ( .("only Grayscale images are supported, use 'channel' to convert") )
-        if ( as.integer(ext) < 1 )
-            stop ( .("ext must be a positive integer value") )
-        if ( fraction <= 0 || fraction > 1 )
-            stop ( .("'fraction' must be in the range (0,1]") )
-        if ( !is.null(seeds) )
-            seeds <- lapply ( as.list(seeds), as.integer )
-        return ( .DoCall("lib_combineFeatures", x, as.integer(ext), as.numeric(fraction), seeds ) )
-    }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("matchObjects", signature(x="Image", ref="Image"),
     function (x, ref, ...) {
         if ( colorMode(x) != Grayscale )
@@ -140,13 +124,11 @@ setMethod ("matchObjects", signature(x="Image", ref="Image"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("rmObjects", signature(x="Image", index="list"),
-    function (x, index, ext=1, ...) {
+    function (x, index, ...) {
         if ( colorMode(x) != Grayscale )
             stop ( .("only Grayscale images are supported, use 'channel' to convert") )
-        if ( as.integer(ext) < 1 )
-            stop ( .("ext must be a positive integer value") )
         index <- lapply (index, as.integer)
-        return ( .DoCall ("lib_deleteFeatures", x, index, as.integer(ext) ) )
+        return ( .DoCall ("lib_deleteFeatures", x, index ) )
     }
 )
 

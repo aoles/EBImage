@@ -69,7 +69,6 @@
 \alias{matchObjects,Image,Image-method}
 \alias{getObjects,Image,Image-method}
 \alias{getObjects,Image,missing-method}
-\alias{combineObjects,Image-method}
 \alias{rmObjects,Image,list-method}
 \alias{paintObjects,Image,Image-method}
 \alias{write.image,Image,character-method}

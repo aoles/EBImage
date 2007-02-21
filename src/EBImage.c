@@ -50,12 +50,11 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_filterThresh",   (DL_FUNC) &lib_filterThresh,   2},
     {"lib_filterFill",     (DL_FUNC) &lib_filterFill,     5},
     {"lib_distMap",        (DL_FUNC) &lib_distMap,        4},
-    {"lib_filterInvWS",    (DL_FUNC) &lib_filterInvWS,    4},
+    {"lib_filterInvWS",    (DL_FUNC) &lib_filterInvWS,    3},
     {"lib_getFeatures",    (DL_FUNC) &lib_getFeatures,    2},
     {"lib_paintFeatures",  (DL_FUNC) &lib_paintFeatures,  4},
-    {"lib_combineFeatures",(DL_FUNC) &lib_combineFeatures,4},
     {"lib_matchFeatures",  (DL_FUNC) &lib_matchFeatures,  2},
-    {"lib_deleteFeatures", (DL_FUNC) &lib_deleteFeatures, 3},
+    {"lib_deleteFeatures", (DL_FUNC) &lib_deleteFeatures, 2},
     {"lib_propagate",      (DL_FUNC) &lib_propagate,      5},
 
     /* add above all R-lib functions from common.h */
