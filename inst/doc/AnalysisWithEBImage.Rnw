@@ -11,7 +11,7 @@
 \oddsidemargin -0.04cm   % read Lamport p.163
 \evensidemargin -0.04cm  % same as oddsidemargin but for left-hand pages
 \textwidth 16.59cm
-\textheight 21.94cm 
+\textheight 21.94cm
 
 \usepackage{color}
 \usepackage{hyperref}
@@ -48,7 +48,7 @@
 
 \title{Analysing Microscopy Screens with \Rpackage{EBImage}}
 \author{Oleg Sklyar and Wolfgang Huber\\
-    \emph{European Bioinformatics Institute - EMBL}\\ 
+    \emph{European Bioinformatics Institute - EMBL}\\
     \emph{Wellcome Trust Genome Campus}\\
     \emph{Cambridge CB10 1SD, England}\\
     \email{osklyar@ebi.ac.uk} }
@@ -104,7 +104,7 @@ As mentioned above, for input/output operations \Rpackage{EBImage} uses \lib{Ima
 > write.image(img)
 \end{verbatim}
 
-If the output format does not support multiple frames (stacks), \lib{ImageMagick} will automatically extend the provided filename with counter suffixes \code{-0, -1, ...} placed either before or after the file extension depending on your installation of \lib{ImageMagick}. Alternatively, one can specify the same number of files as image frames in call to \Rfunction{write.image} or \Rfunction{fileName}. File names supplied to \Rfunction{write.image} will take precedence over 
+If the output format does not support multiple frames (stacks), \lib{ImageMagick} will automatically extend the provided filename with counter suffixes \code{-0, -1, ...} placed either before or after the file extension depending on your installation of \lib{ImageMagick}. Alternatively, one can specify the same number of files as image frames in call to \Rfunction{write.image} or \Rfunction{fileName}. File names supplied to \Rfunction{write.image} will take precedence over
 
 Besides operations on local image files, anonymous HTTP and FTP protocols are supported. The package can read from both and it can write to FTP only. These protocols are supported internally by \lib{ImageMagick} and do not use \R{} connections.
 
@@ -127,7 +127,7 @@ In some cases users may want to use the generic \R{} \Rfunction{image} function,
 
 The \lib{ImageMagick} library provides a number of image processing routines, so called {\em filters}. Many of those are ported to \R{} in \Rpackage{EBImage}. The missing ones can be added as opportunity arises. Additional image processing routines implementing distance map and watershed transforms and others have been added to the package to power our work on cell-based assays.
 
-Filters are implemented as \lib{S4} methods for class \Rclass{Image}. The return value is usually an object of class \Rclass{Image} as well. One can divide all the filters into four categories: image enhancement, segmentation and transformation, and colour correction. Some examples are listed below. 
+Filters are implemented as \lib{S4} methods for class \Rclass{Image}. The return value is usually an object of class \Rclass{Image} as well. One can divide all the filters into four categories: image enhancement, segmentation and transformation, and colour correction. Some examples are listed below.
 
 \begin{description}
     \setlength{\itemsep}{0in}
@@ -194,13 +194,13 @@ The following code demonstrates how grayscale images recorded using three differ
 \section*{Analysing an RNAi screen}
 %------------------------------------------------------------
 
-Consider an experiment in which images like in Figure~\ref{figure:channels} were recorded for each of $\approx$ 20,000 genes, using a whole-genome RNAi library to test the effect of gene knock-down on cell viability and appearance. Among the image descriptors of interest are the number, position, size, shape and the fluorescent intensities of cells and nuclei. 
+Consider an experiment in which images like in Figure~\ref{figure:channels} were recorded for each of $\approx$ 20,000 genes, using a whole-genome RNAi library to test the effect of gene knock-down on cell viability and appearance. Among the image descriptors of interest are the number, position, size, shape and the fluorescent intensities of cells and nuclei.
 
 As a side effect of the watershed transform, the function \Rfunction{watershed}, \Rpackage{EBImage} identifies separable objects in an image. For this particular purpose it is advisable to use the result of the distance map transform (\Rfunction{distmap}) as input. Object descriptors can be obtained by calling \Rfunction{getObjects} on the result. One can see that an image has data of detected object by printing it (typing its name and hitting \code{Enter}): this information will be included in the object description. The features are a list of matrices, one per image frame, each containing different objects in its rows and different object descriptors in the columns. If a reference grayscale image was supplied to the watershed routine, object gray value intensities will be calculated as well.
 
-For every gene, the image analysis workflow looks, therefore, as follows: load and normalize images, perform image segmentation, enhance the segmented images by morphological opening and closing, generate distance maps and use them to identify cells and nuclei and to extract image descriptors, and, finally, generate image previews with the identified objects marked. 
+For every gene, the image analysis workflow looks, therefore, as follows: load and normalize images, perform image segmentation, enhance the segmented images by morphological opening and closing, generate distance maps and use them to identify cells and nuclei and to extract image descriptors, and, finally, generate image previews with the identified objects marked.
 
-Object descriptors can then be analysed statistically to cluster genes by their phenotypic effect, generate a list of genes that should be studied further in more detail (hit list), e.~g. genes that have a specific phenotypic effect of interest, etc. The image previews can be used to verify and audit the performance of the algorithm through visual inspection. 
+Object descriptors can then be analysed statistically to cluster genes by their phenotypic effect, generate a list of genes that should be studied further in more detail (hit list), e.~g. genes that have a specific phenotypic effect of interest, etc. The image previews can be used to verify and audit the performance of the algorithm through visual inspection.
 
 A schematic implementation is illustrated in the following example code and in Figure~\ref{figure:analysis}. Here we omit the step of nuclei detection (object \Robject{x1}), from where the matrix of nuclei coordinates (object \Robject{seeds}) is retrieved to serve as starting points for the cell detection. The nuclei detection is done analogously to the cell detection without specifying starting points, seeds.
 
@@ -229,13 +229,12 @@ Illustration of the object detection algorithm: (a) -- {\em sqrt}-brightened com
 +  d <- distmap(C)  # shown normalized
 + ## x1 <- watershed(...) # nuclei detection
 +  features(x1) <- getObjects(x1, i1)
-+  seeds <- features(x1)[[1]][,1:2]
-+  x2 <- watershed(d, seeds=seeds)
++  x2 <- propagate(x1, a, d)
 +  features(x2) <- getObjects(x2, i3)
 +  rgb <- channel(i1, "asgreen") + channel(i2, "asred")
 +  rgb <- rgb + channel(i3, "asblue")
-+  e <- objectPaint(x2, rgb, opac=c(0.4, 0, 0))
-+  f <- objectPaint(x1, objectPaint(x2, i3) )
++  e <- paintObjects(x2, rgb)
++  f <- paintObjects(x1, paintObejcts(x2, i3) )
 + }
 \end{verbatim}
 %$
@@ -298,7 +297,7 @@ Parts of this text for older versions of \Rpackage{EBImage} were used in \R{}-Ne
 %\bibitem[Jones et al.(2005)]{R:Jones:2005}
 %    T.~R.~Jones and A.~E.~Carpenter and P.~Golland.
 %    \newblock Voronoi-based segmentation of cells on image manifolds.
-%    \newblock {\em ICCV Workshop on Computer Vision for Biomedical 
+%    \newblock {\em ICCV Workshop on Computer Vision for Biomedical
 %    Image Applications}, 535--543, 2005 (conference proceedings).
 
 %\bibitem[Lotufo and Zampirolli(2001)]{R:Lotufo+Zampirolli:2001}

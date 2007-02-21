@@ -15,7 +15,7 @@
 
 \section{ Usage }{
   \preformatted{
-    watershed(x, ext=1, alg="exclude", ..., verbose=FALSE)
+    watershed(x, tolerance=1, ext=1)
   }
 }
 
@@ -24,37 +24,34 @@
   \item{\code{x}}{An object of \code{\link{Image-class}} in the
     \code{\link{Grayscale}} mode. }
 
-  \item{\code{ext}}{ Extension of neighboring pixels. Recommended values 1 or
-    2. If \code{alg} is supplied a value \code{'exclude'} this will also
-    determine the width of border exclusion. }
+  \item{\code{tolerance}}{ The minimum height of the object in the units of image
+    intensity between its highest point (seed) and the point where it
+    contacts another object (checked for every contact pixel). If the
+    height is smaller than the tolerance, the object will be combined with
+    one of its neighbors, which is the highest. It is assumed that the
+    function is run on a distance map, therefore the default value
+    is 1. If running the function on an original grayscale image with
+    intensity range \code{[0,1]} one should modify this value, down to 0.1
+    or other which is image specific. }
 
-  \item{\code{alg}}{ Algorithm to assign pixels that have more than one
-    neighboring object. Possible values are: \code{'exclude'} to exclude such
-    pixels from all objects; \code{'steepest'} to assign to the object
-    corresponding to the pixel with maximium intensity difference from the
-    one in question; \code{'smooth'} -- to assign to the least steep. }
+  \item{\code{ext}}{ Extension of the neighborhood for the detection
+    of neighboring objects. Higher value smoothes out small objects. }
 
-  \item{\code{verbose}}{ The watershed algorithm can be very lengthy on
-    noisy images. This argument spcifies if a progress bar should be
-    displayed during the detection. }
-
-  \item{\code{...}}{ Reserved for future use. }
 }}
 
 \section{ Value }{
 
   An object of \code{\link{Image-class}} in the \code{\link{Grayscale}} with
-  separate objects indexed be positive integers starting from 1. If \code{alg}
-  was set to \code{'exclude'} pixels that are in contact with more than one
-  object are assigned the value of \code{0.5}. To preview the results visually,
-  use \code{\link{display}( \link{normalize}(result) )}.
+  separate objects indexed be positive integers starting from 1. To preview
+  the results visually, use \code{\link{display}( \link{normalize}(result) )}
+  or use it in combination with \code{\link{paintObjects}}.
 
 }
 
 \section{ Details }{
 
   The algorithm identifies and separates objects that stand out of the
-  background (zero), in other words to use the water fill the source image
+  background (zero), in other words to use the water fill, the source image
   is flipped upside down and the resulting valleys (values with higher
   intensities) are filled in first until another object or background is met.
   The deepest valleys (pixels with highest intensity) become indexed first.
@@ -82,9 +79,6 @@
     w <- rmObjects(w, index)
     display( normalize(w) )
 
-    \dontrun{and now we combine oversegmented}
-    w <- combineObjects( w )
-    display( normalize(w) )
   }
 }
 

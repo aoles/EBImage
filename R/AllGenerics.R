@@ -89,7 +89,6 @@ setGeneric ("distmap",        function (x, ...)        standardGeneric("distmap"
 setGeneric ("watershed",      function (x, ...)        standardGeneric("watershed") )
 setGeneric ("getObjects",     function (x, ref, ...)   standardGeneric("getObjects") )
 setGeneric ("paintObjects",   function (x, tgt, ...)   standardGeneric("paintObjects") )
-setGeneric ("combineObjects", function (x, ...)        standardGeneric("combineObjects") )
 setGeneric ("matchObjects",   function (x, ref, ...)   standardGeneric("matchObjects") )
 setGeneric ("rmObjects",      function (x, index, ...) standardGeneric("rmObjects") )
 setGeneric ("propagate",      function (x, ...)        standardGeneric("propagate") )

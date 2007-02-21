@@ -354,192 +354,7 @@ get_features (SEXP x) {
     return res;
 }
 
-/*----------------------------------------------------------------------- */
-SEXP
-lib_combineFeatures (SEXP x, SEXP _ext, SEXP _factor, SEXP _seeds) {
-    SEXP res, features;
-    int nprotect, nx, ny, nz, im, i, j, ix, jy, nobj, ext, from,
-        to, * index, obj, leave, * seeds, nseeds, isseed;
-    double * data, * ftrs, * corr, per, factor, lfactor;
-
-    if ( !isImage(x) ) return x;
-
-    nx = INTEGER ( GET_DIM(x) )[0];
-    ny = INTEGER ( GET_DIM(x) )[1];
-    nz = INTEGER ( GET_DIM(x) )[2];
-    nprotect = 0;
-
-    ext = INTEGER (_ext)[0];
-    if ( ext < 1 ) return x;
-
-    factor = REAL (_factor)[0];
-
-    PROTECT ( res = Rf_duplicate(x) );
-    nprotect++;
-
-    /* we need this to know about perimeters etc of currently existing objects */
-    PROTECT (features = get_features (res) );
-    nprotect++;
-
-    /* if we were not able to determine features correctly, do nothing */
-    if ( LENGTH( features ) != nz ) {
-        UNPROTECT (nprotect);
-        return x;
-    }
-
-    for ( im = 0; im < nz; im++ ) {
-        if ( VECTOR_ELT(features, im) == R_NilValue ) continue;
-        /* get image data */
-        data = &( REAL(res)[ im * nx * ny ] );
-        /* get number of objects -- max index */
-        nobj = 0;
-        for ( i = 0; i < nx * ny; i++ )
-            if ( data[i] > nobj ) nobj = data[i];
-        /* nothing to combine */
-        if ( nobj < 2 ) continue;
-        /* check if features correspond to objects */
-        if ( LENGTH( VECTOR_ELT(features, im) ) != nobj * N_FEATURES ) continue;
-        ftrs = REAL( VECTOR_ELT(features, im) );
-        /* allocate a square matrix of nobj*nobj which serves as a correlation
-        matrix, this is NOT freed automatically  */
-        corr = (double *) Calloc (nobj * nobj, double );
-        for ( i = 0; i < nobj * nobj; i++ )
-            corr [i] = 0;
-        /* loop through all 0.1 < val < 0.9 -- edge pixels and add correlations */
-        for ( i = 0; i < nx; i++ )
-            for ( j = 0; j < ny; j++ ) {
-                if ( data[ i + j * nx ] < 0.1 || data[ i + j * nx ] > 0.9 ) continue;
-                /* reset the diag of the corr matrix as all found objects go there at each step */
-                for ( ix = 0; ix < nobj; ix++ )
-                    corr [ix + ix * nobj] = 0;
-                /* scan a square this+-ext and add objects, put number of all found objects into
-                   the diagonal of the corr matrix*/
-                for ( ix = i - ext; ix <= i + ext; ix++ )
-                    for ( jy = j - ext; jy <= j + ext; jy++ ) {
-                        if ( ix < 0 || jy < 0 || ix >= nx || jy >= ny || (ix == i && jy == j) ) continue;
-                        obj = data [ix + jy * nx];
-                        if ( obj < 1 ) continue;
-                        /* all indexes were 1, 2, 3, but C has 0-based indexes!!! */
-                        obj--;
-                        corr [ obj + obj * nobj ] = 1;
-                    }
-                /* add correlations to the matrix */
-                for ( ix = 0; ix < nobj; ix++) {
-                    if ( corr[ix + ix * nobj] < 1 ) continue;
-                    for ( jy = 0; jy < nobj; jy++ ) {
-                        if ( ix == jy || corr[jy + jy * nobj] < 1 ) continue;
-                        corr [ ix + jy * nobj ] += 1;
-                    }
-                }
-            }
-        /* substitute corr values with corr / (ext * per) */
-        for ( ix = 0; ix < nobj; ix ++ ) {
-            per = ftrs [ix + 3 * nobj];
-            if ( per == 0.0 ) continue;
-            for ( jy = 0; jy < nobj; jy++ )
-                if ( ix != jy )
-                    corr [ix + jy * nobj] /= (double)(per * ext);
-        }
-        /* reset the diag of the corr matrix -- these will now indicate substitutions */
-        for ( ix = 0; ix < nobj; ix++ )
-            corr [ix + ix * nobj] = ix;
-        /* if we have seeds, reset <to> fields to 0 for all that are not in seeds */
-        if ( _seeds != R_NilValue ) {
-            seeds = INTEGER( VECTOR_ELT(_seeds, im) );
-            nseeds = LENGTH( VECTOR_ELT(_seeds, im) );
-            for ( jy = 0; jy < nobj; jy++ ) {
-                isseed = 0;
-                for ( i = 0; i < nseeds && !isseed; i++ )
-                    if ( jy + 1 == seeds[i] ) isseed = 1;
-                if ( !isseed ) {
-                    for ( ix = 0; ix < nobj; ix++ )
-                        corr[ix + jy * nobj] = 0;
-                }
-            }
-        }
-        /* combine objects with the largest corr to their counterparts */
-        /* for each object ix search if it can be combined with jy */
-        do {
-            from = -1;
-            to = -1;
-            lfactor = 0.0;
-            for ( ix = 0; ix < nobj; ix++ )
-                for ( jy = 0; jy < nobj; jy++ ) {
-                    if ( ix == jy ) continue;
-                    if ( corr[ ix + jy * nobj] > lfactor ) {
-                        lfactor = corr[ ix + jy * nobj];
-                        from = ix;
-                        to = jy;
-                    }
-                }
-            if ( from < 0 || to < 0 || from == to || lfactor < factor ) break;
-            /* set that from points to to ot to where to points is not otherwise already set */
-            if ( corr[to + to * nobj] != from )
-                corr [from + from * nobj] = corr[to + to * nobj];
-            /* set all that point to from to point to whereever from points now */
-            /* set also corr for all this from to 0 so we do not pick this one any more */
-            corr [to + from * nobj] = 0;
-            corr [from + to * nobj] = 0;
-            for ( jy = 0; jy < nobj; jy++ )
-                if ( jy != from && jy != to ) {
-                    corr [from + jy * nobj] = 0;
-                    if ( corr[jy + jy * nobj] == from )
-                        corr[jy + jy * nobj] = corr[from + from * nobj];
-                }
-        } while ( lfactor >= factor && from >= 0 && to != from);
-
-        /* reset the index */
-        index = (int *) Calloc (nobj, int );
-        j = 0;
-        for ( i = 0; i < nobj; i++ ) {
-            if ( corr[i + i * nobj] == i ) {
-                index [i] = j;
-                j++;
-            }
-            else
-                index [i] = -1;
-        }
-        for ( i = 0; i < nobj; i++ ) {
-            if ( corr [i + i * nobj] < 0 ) continue;
-            index [i] = index[ (int)corr[i + i * nobj] ];
-        }
-        /* we got index, do not need corr any more */
-        Free (corr);
-
-        /* reset image values according to new index */
-        for ( i = 0; i < nx * ny; i++ ) {
-            if ( data[i] < 0.9 ) continue;
-            data[i] = index[ (int)data[i] - 1 ] + 1;
-        }
-        Free (index);
-        /* reset borders if it is only for the combined objects */
-        for ( i = 0; i < nx; i++ )
-            for ( j = 0; j < ny; j++ ) {
-                if ( data[ i + j * nx ] < 0.1 || data[ i + j * nx ] > 0.9 ) continue;
-                obj = -1;
-                leave = 0;
-                for ( ix = i - ext; ix <= i + ext && !leave; ix++ )
-                    for ( jy = j - ext; jy <= j + ext && !leave; jy++ ) {
-                        if ( ix < 0 || jy < 0 || ix >= nx || jy >= ny || (ix == i && jy == j) ) continue;
-                        if ( 0.1 < data[ ix + jy * nx] && data[ ix + jy * nx] < 0.9) continue;
-                        if ( obj <= 0 )
-                            obj = data[ ix + jy * nx];
-                        else
-                            if ( obj > 0 && obj != data[ ix + jy * nx] ) leave = 1;
-                    }
-                if ( obj >= 0 && !leave )
-                    data [i + j * nx] = obj;
-            }
-
-    }
-
-    SET_SLOT (res, mkString("features"), allocVector(VECSXP, 0) );
-
-    UNPROTECT (nprotect);
-    return res;
-}
-
-/*----------------------------------------------------------------------- */
+///*----------------------------------------------------------------------- */
 SEXP
 lib_matchFeatures (SEXP x, SEXP ref) {
     SEXP res, xf, * indexes;
@@ -599,9 +414,9 @@ lib_matchFeatures (SEXP x, SEXP ref) {
 
 /*----------------------------------------------------------------------- */
 SEXP
-lib_deleteFeatures (SEXP x, SEXP _index, SEXP _ext) {
+lib_deleteFeatures (SEXP x, SEXP _index) {
     SEXP res, index;
-    int nprotect, nx, ny, nz, i, j, ix, jy, im, nobj, * indexes, found, ext, leave, obj;
+    int nprotect, nx, ny, nz, i, j, im, nobj, * indexes, found;
     double * data;
 
     if ( !isImage(x) ) return x;
@@ -610,9 +425,6 @@ lib_deleteFeatures (SEXP x, SEXP _index, SEXP _ext) {
     ny = INTEGER ( GET_DIM(x) )[1];
     nz = INTEGER ( GET_DIM(x) )[2];
     nprotect = 0;
-
-    ext = INTEGER (_ext)[0];
-    if ( ext < 1 ) return x;
 
 
     PROTECT ( res = Rf_duplicate(x) );
@@ -651,25 +463,6 @@ lib_deleteFeatures (SEXP x, SEXP _index, SEXP _ext) {
             data [i] = indexes[ (int)data[i] - 1 ];
         }
         Free (indexes);
-
-        /* reset borders if left after deleting objects */
-        for ( i = 0; i < nx; i++ )
-            for ( j = 0; j < ny; j++ ) {
-                if ( data[ i + j * nx ] < 0.1 || data[ i + j * nx ] > 0.9 ) continue;
-                obj = -1;
-                leave = 0;
-                for ( ix = i - ext; ix <= i + ext && !leave; ix++ )
-                    for ( jy = j - ext; jy <= j + ext && !leave; jy++ ) {
-                        if ( ix < 0 || jy < 0 || ix >= nx || jy >= ny || (ix == i && jy == j) ) continue;
-                        if ( 0.1 < data[ ix + jy * nx] && data[ ix + jy * nx] < 0.9) continue;
-                        if ( obj <= 0 )
-                            obj = data[ ix + jy * nx];
-                        else
-                            if ( obj > 0 && obj != data[ ix + jy * nx] ) leave = 1;
-                    }
-                if ( obj >= 0 && !leave )
-                    data [i + j * nx] = obj;
-            }
 
     }
     SET_SLOT (res, mkString("features"), allocVector(VECSXP, 0) );

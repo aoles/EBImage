@@ -20,11 +20,11 @@
 
 \section{ Arguments }{ \describe{
 
-  \item{\code{x}}{An object of \code{\link{Image-class}} in the 
+  \item{\code{x}}{An object of \code{\link{Image-class}} in the
     \code{\link{Grayscale}} mode with integer-based object encoding, as
     returned by \code{\link{watershed}}. }
 
-  \item{\code{ref}}{A reference grayscale image with integer-based object 
+  \item{\code{ref}}{A reference grayscale image with integer-based object
     encoding to match objects to. }
 
   \item{\code{...}}{ Reserved for future use. }
@@ -39,8 +39,7 @@
 
 \seealso{
   \code{
-    \link{Image-class}, \link{watershed}, \link{getObjects}, 
-    \link{combineObjects}
+    \link{Image-class}, \link{watershed}, \link{getObjects}
   }
 }
 
@@ -49,7 +48,7 @@
 }
 
 \author{
-    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
+    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}
 }
 
 \keyword{file}
