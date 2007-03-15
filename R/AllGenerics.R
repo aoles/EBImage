@@ -43,6 +43,7 @@ setGeneric ("header",         function (x, ...)        standardGeneric("header")
 setGeneric ("write.image",    function (x, files, quality, ...) standardGeneric("write.image") )
 setGeneric ("assert",         function (x, y, ...)     standardGeneric("assert") )
 setGeneric ("combine",        function (x, y, ...)     standardGeneric("combine") )
+setGeneric ("tile",           function (x, ...)        standardGeneric("tile") )
 
 ## image filters (imageFilters.R)
 setGeneric ("blur",           function (x, ...)        standardGeneric("blur") )
@@ -90,6 +91,7 @@ setGeneric ("watershed",      function (x, ...)        standardGeneric("watershe
 setGeneric ("getObjects",     function (x, ref, ...)   standardGeneric("getObjects") )
 setGeneric ("paintObjects",   function (x, tgt, ...)   standardGeneric("paintObjects") )
 setGeneric ("matchObjects",   function (x, ref, ...)   standardGeneric("matchObjects") )
+setGeneric ("stackObjects",   function (x, ref, ...)   standardGeneric("stackObjects") )
 setGeneric ("rmObjects",      function (x, index, ...) standardGeneric("rmObjects") )
 setGeneric ("propagate",      function (x, ...)        standardGeneric("propagate") )
 

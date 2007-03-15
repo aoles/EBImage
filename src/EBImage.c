@@ -54,6 +54,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_getFeatures",    (DL_FUNC) &lib_getFeatures,    2},
     {"lib_paintFeatures",  (DL_FUNC) &lib_paintFeatures,  4},
     {"lib_matchFeatures",  (DL_FUNC) &lib_matchFeatures,  2},
+    {"lib_stackFeatures",  (DL_FUNC) &lib_stackFeatures,  2},
     {"lib_deleteFeatures", (DL_FUNC) &lib_deleteFeatures, 2},
     {"lib_propagate",      (DL_FUNC) &lib_propagate,      5},
 

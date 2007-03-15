@@ -74,6 +74,9 @@
 \alias{write.image,Image,character-method}
 \alias{write.image,Image,missing-method}
 \alias{propagate,Image-method}
+\alias{tile,list-method}
+\alias{tile,Image-method}
+\alias{stackObjects,Image,Image-method}
 
 \title{ Internals }
 

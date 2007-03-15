@@ -354,7 +354,7 @@ get_features (SEXP x) {
     return res;
 }
 
-///*----------------------------------------------------------------------- */
+/*----------------------------------------------------------------------- */
 SEXP
 lib_matchFeatures (SEXP x, SEXP ref) {
     SEXP res, xf, * indexes;
@@ -471,3 +471,140 @@ lib_deleteFeatures (SEXP x, SEXP _index) {
     return res;
 }
 
+/*----------------------------------------------------------------------- */
+SEXP
+lib_stackFeatures (SEXP obj, SEXP ref) {
+    SEXP res, xf, * stacks, * dims, * modes, * comp, * fltrslt, *ftrslt, * resol;
+    int nprotect, nx, ny, nz, i, im, nobj, dx, dy, ix, iy, x, y, colmode;
+    double * data, * ftrs;
+    double * refd, * stackd; // for grayscale ref
+    int * refi, * stacki;    // for TrueColor ref
+
+    if ( !isImage(obj) || !isImage(ref) ) return R_NilValue;
+
+    colmode = INTEGER ( GET_SLOT(ref, mkString("colormode") ) )[0];
+
+    nx = INTEGER ( GET_DIM(obj) )[0];
+    ny = INTEGER ( GET_DIM(obj) )[1];
+    nz = INTEGER ( GET_DIM(obj) )[2];
+    nprotect = 0;
+
+    PROTECT (res = allocVector(VECSXP, nz) );
+    nprotect++;
+    stacks  = (SEXP *) R_alloc (nz, sizeof(SEXP) );
+    dims    = (SEXP *) R_alloc (nz, sizeof(SEXP) );
+    modes   = (SEXP *) R_alloc (nz, sizeof(SEXP) );
+    comp    = (SEXP *) R_alloc (nz, sizeof(SEXP) );
+    fltrslt = (SEXP *) R_alloc (nz, sizeof(SEXP) );
+    ftrslt  = (SEXP *) R_alloc (nz, sizeof(SEXP) );
+    resol   = (SEXP *) R_alloc (nz, sizeof(SEXP) );
+
+    /* we need this to know the centres of objects in x */
+    PROTECT (xf = get_features (obj) );
+    nprotect++;
+
+    for ( im = 0; im < nz; im++ ) {
+        stacks[ im ] = R_NilValue;
+        /* get image data */
+        data = &( REAL(obj)[ im * nx * ny ] );
+        /* get number of objects -- max index */
+        nobj = 0;
+        for ( i = 0; i < nx * ny; i++ )
+            if ( data[i] > nobj ) nobj = data[i];
+
+        if ( nobj < 1 || VECTOR_ELT(xf, im) == R_NilValue ) continue;
+        /* check if features correspond to objects */
+        if ( LENGTH( VECTOR_ELT(xf, im) ) != nobj * N_FEATURES ) continue;
+        ftrs = REAL( VECTOR_ELT(xf, im) );
+        /* get single object image size */
+        dx = 0;
+        dy = 0;
+        for ( ix = 0; ix < nx; ix++ )
+            for ( iy = 0; iy < ny; iy++ ) {
+                i = (int)data[ ix + iy * nx ] - 1; // object index
+                if ( i < 0 || i >= nobj) continue;
+                x = (int)ftrs[ i ] - 1;
+                y = (int)ftrs[ i + nobj ] - 1;
+                if ( abs(x - ix) > dx )
+                    dx = abs(x - ix);
+                if ( abs(y - iy) > dy )
+                    dy = abs(y - iy);
+            }
+        if ( dx < 1 || dy < 1 ) continue;
+        /* create image */
+        stacki = NULL; refi = NULL;
+        stackd = NULL; refd = NULL;
+        if ( colmode == MODE_RGB ) {
+            PROTECT( stacks[im] = allocVector( INTSXP, (2 * dx + 1) * (2 * dy + 1) * nobj) );
+            nprotect++;
+            stacki = INTEGER( stacks[im] );
+            for ( i = 0; i < (2 * dx + 1) * (2 * dy + 1) * nobj; i++ )
+                stacki[ i ] = 0;
+            refi = &( INTEGER(ref)[ im * nx * ny ] );
+        }
+        else {
+            PROTECT( stacks[im] = allocVector( REALSXP, (2 * dx + 1) * (2 * dy + 1) * nobj) );
+            nprotect++;
+            stackd = REAL( stacks[im] );
+            for ( i = 0; i < (2 * dx + 1) * (2 * dy + 1) * nobj; i++ )
+                stackd[ i ] = 0.0;
+            refd = &( REAL(ref)[ im * nx * ny ] );
+        }
+        /* class */
+        SET_CLASS ( stacks[im], mkString("Image") );
+        /* dim */
+        PROTECT ( dims[im] = allocVector( INTSXP, 3 ) );
+        nprotect++;
+        INTEGER (dims[im])[0] = 2 * dx + 1;
+        INTEGER (dims[im])[1] = 2 * dy + 1;
+        INTEGER (dims[im])[2] = nobj;
+        SET_DIM ( stacks[im], dims[im] ) ;
+        /* attributes: colormode */
+        PROTECT ( modes[im] = allocVector(INTSXP, 1) );
+        nprotect++;
+        INTEGER ( modes[im] )[0] = colmode;
+        SET_SLOT ( stacks[im], mkString("colormode"), modes[im] );
+        /* attributes: filename */
+        SET_SLOT ( stacks[im], mkString("filename"), mkString("none") );
+        /* copy attributes: compression */
+        PROTECT ( comp[im] = allocVector(STRSXP, 1) );
+        nprotect++;
+        SET_STRING_ELT (comp[im], 0, mkChar("ZIP") );
+        SET_SLOT ( stacks[im], mkString("compression"), comp[im] );
+        /* copy attributes: filter */
+        PROTECT ( fltrslt[im] = allocVector(STRSXP, 1) );
+        nprotect++;
+        SET_STRING_ELT ( fltrslt[im], 0, mkChar("lanczos") );
+        SET_SLOT ( stacks[im], mkString("filter"), fltrslt[im] );
+        /* copy attributes: resolution */
+        PROTECT ( resol[im] = allocVector(REALSXP, 2) );
+        nprotect++;
+        REAL (resol[im])[0] = REAL ( GET_SLOT(ref, mkString("resolution") ) )[0];
+        REAL (resol[im])[1] = REAL ( GET_SLOT(ref, mkString("resolution") ) )[1];
+        SET_SLOT ( stacks[im], mkString("resolution"), resol[im] );
+        /* empty feature list */
+        PROTECT ( ftrslt[im] = allocVector(VECSXP, 0) );
+        nprotect++;
+        SET_CLASS ( ftrslt[im], mkString("list") );
+        SET_SLOT ( stacks[im], mkString("features"), ftrslt[im] );
+
+        /* copy ref into stacks */
+        for ( ix = 0; ix < nx; ix++ )
+            for ( iy = 0; iy < ny; iy++ ) {
+                i = (int)data[ ix + iy * nx ] - 1; // object index
+                if ( i < 0 || i >= nobj) continue;
+                x = dx + 1 + (ix - (int)ftrs[ i ] + 1);
+                y = dy + 1 + (iy - (int)ftrs[ i + nobj ] + 1);
+                if ( colmode == MODE_RGB )
+                    stacki[ x + (y + i * (2 * dy + 1)) * (2 * dx + 1) ] = refi[ ix + iy * nx ];
+                else
+                    stackd[ x + (y + i * (2 * dy + 1)) * (2 * dx + 1) ] = refd[ ix + iy * nx ];
+            }
+    }
+    for ( im = 0; im < nz; im++ )
+        SET_VECTOR_ELT (res, im, stacks[im] );
+
+
+    UNPROTECT (nprotect);
+    return res;
+}

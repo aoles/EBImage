@@ -514,3 +514,41 @@ setMethod ("combine", signature(x="Image", y="Image"),
         return (res)
     }
 )
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("tile", signature(x="Image"),
+    function (x, nx=10, grid.wd=1, grid.col="#E4AF2B", bg.col="black", ...) {
+        .dim <- dim(x)
+        ny <- ceiling(.dim[3] / nx )
+        if ( !as.logical(grid.wd) )
+            grid.wd <- 0
+        width <- nx * (.dim[1] + grid.wd) - grid.wd
+        height <- ny * (.dim[2] + grid.wd) - grid.wd
+        if ( as.logical(grid.wd) ) {
+            grid.col <- if ( colorMode(x) == TrueColor ) channel(grid.col, "rgb") else channel(grid.col, "gray")
+            res <- Image(grid.col, c(width, height), colormode=colorMode(x))
+        }
+        else
+            res <- Image(0, c(width, height), colormode=colorMode(x))
+        bg.col <- if ( colorMode(x) == TrueColor ) channel(bg.col, "rgb") else channel(bg.col, "gray")
+        for ( i in 1:nx )
+            for ( j in 1:ny ) {
+                starti <- (i - 1) * (.dim[1] + grid.wd) + 1
+                endi <- starti + .dim[1] - 1
+                startj <- (j - 1) * (.dim[2] + grid.wd) + 1
+                endj <- startj + .dim[2] - 1
+                if ( i + (j-1) * nx <= .dim[3] )
+                    res[ starti:endi, startj:endj, 1 ] <- x[,, i + (j-1) * nx]
+                else
+                    res[ starti:endi, startj:endj, 1 ] <- bg.col
+            }
+        return( res )
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("tile", signature(x="list"),
+    function (x, nx=10, grid.wd=1, grid.col="#E4AF2B", bg.col="black", ...) {
+        lapply(x, tile, nx=nx, grid.wd=grid.wd, grid.col=grid.col, bg.col=bg.col, ...)
+    }
+)
