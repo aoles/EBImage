@@ -1,10 +1,10 @@
 Package: EBImage
-Version: 1.9.28
-Date: 21 Feb 2007
+Version: 1.9.29
+Date: 15 Mar 2007
 Title: Image processing and analysis toolkit for R
 Author: Oleg Sklyar, Wolfgang Huber
 Maintainer: Oleg Sklyar <osklyar@ebi.ac.uk>
-SystemRequirements: Windows, UNIX/Linux, MacOS; ImageMagick (> 6.2.0); GTK+ (> 2.6); see INSTALL in the package root for details
+SystemRequirements: Windows, UNIX/Linux, MacOS; ImageMagick (> 6.1.7); GTK+ (> 2.6); see INSTALL in the package root for details
 Depends: R (>= 2.4.0), methods, utils
 Description: The package provides functionality to perform general image processing and image analysis in R. It was originally designed to support automated image analysis in high throughput cell-based microscopy assay and is being largerly developed in that direction. However, the package is of general natuare and can be used for other problems that require image analysis. The package supports over 95 image formats through its interface to ImageMagick and provides functions standard image filters plus morphological transformations and object detection algroithms. It has a build-in image previewer which supports single images or image stacks.
 License: LGPL

@@ -123,6 +123,17 @@ setMethod ("matchObjects", signature(x="Image", ref="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("stackObjects", signature(x="Image", ref="Image"),
+    function (x, ref, ...) {
+        if ( colorMode(x) != Grayscale )
+            stop ( .("only Grayscale images are supported, use 'channel' to convert") )
+        if ( any(dim(x) != dim(ref)) )
+            stop( .("'x' and 'ref' must be of the same size") )
+        return ( .DoCall ("lib_stackFeatures", x, ref) )
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("rmObjects", signature(x="Image", index="list"),
     function (x, index, ...) {
         if ( colorMode(x) != Grayscale )

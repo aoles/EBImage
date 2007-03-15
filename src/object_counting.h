@@ -12,6 +12,7 @@ SEXP lib_paintFeatures (SEXP, SEXP, SEXP, SEXP);
 SEXP lib_getFeatures (SEXP, SEXP);
 SEXP lib_matchFeatures (SEXP, SEXP);
 SEXP lib_deleteFeatures (SEXP, SEXP);
+SEXP lib_stackFeatures (SEXP, SEXP);
 
 #ifdef __cplusplus
 };
