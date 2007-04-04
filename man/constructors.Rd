@@ -108,8 +108,8 @@
 
 \examples{
   a <- Image()
-  b <- header(a)
-  imageData(b) <- imageData(a) + 0.2
+  b <- copy(a)
+  d <- combine(a, b)
 }
 
 \author{
