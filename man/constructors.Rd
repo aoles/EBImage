@@ -106,12 +106,6 @@
   }
 }
 
-\examples{
-  a <- Image()
-  b <- copy(a)
-  d <- combine(a, b)
-}
-
 \author{
     2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}
 }
