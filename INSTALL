@@ -1,12 +1,12 @@
-  The package was tested to work on Linux, MacOS, Windows XP and Solaris. 
+  The package was tested to work on Linux, MacOS, Windows XP and Solaris.
 It should be possible to install and run the package on other versions of
-UNIX-like and Windows systems in a similar manner. It is advisable to
+UNIX alike and Windows systems in a similar manner. It is advisable to
 install recommended dependencies as well to enjoy the full functionality of
-the package. On Windows, all dependencies are required, not recommended. 
+the package. On Windows, all dependencies are required, not recommended.
 GTK+ support was not tested on MacOS, but the package should support it.
 
 --------------------------------------------------------------------------------
-1. UNIX/Linux installation 
+1. UNIX/Linux installation
 
   The installation should be performed from the source after the dependencies
 described below are satisfied.
@@ -14,35 +14,35 @@ described below are satisfied.
 - required are header files and libraries (dev/devel) of ImageMagick
 - recommended are header files and libraries of GTK2 with dependencies
 
-  On most Linux distributions, these are available as packages in 'rpm' or 'deb' 
+  On most Linux distributions, these are available as packages in 'rpm' or 'deb'
 format. Hereafter, the examples concern Ubuntu Linux, but other distributions
 have similar packages that have only slight naming differences.
 
-  For ImageMagick, you will need to install  'libmagick9-dev' with all 
-dependencies using apt-get or synaptic. Alternatively, you can download the 
-latest version of ImageMagick from http://www.imagemagick.org and install it 
+  For ImageMagick, you will need to install  'libmagick9-dev' with all
+dependencies using apt-get or synaptic. Alternatively, you can download the
+latest version of ImageMagick from http://www.imagemagick.org and install it
 from source as usual using ./configure && make && make install. The latter will
 install the required development files as well.
 
   The package will function without GTK2, but most of GUI functionality (image
 chooser, interactive image display with zoom features etc) will be disabled.
-You will need 'libgtk2.0-dev' and dependencies (normally include glib, 
-pango-dev, libcairo-dev, atk-dev and some others). Alternatively, all these 
+You will need 'libgtk2.0-dev' and dependencies (normally include glib,
+pango-dev, libcairo-dev, atk-dev and some others). Alternatively, all these
 packages can be installed from source available at http://www.gtk.org along
 with installation instructions. When installing GTK2, please ensure that you
-also install 'pkg-config' as it is used to determine the location of GTK2 
-include files and its compile flags. Without this package, GTK2 will not be 
+also install 'pkg-config' as it is used to determine the location of GTK2
+include files and its compile flags. Without this package, GTK2 will not be
 located on your system by the package installer.
 
 --------------------------------------------------------------------------------
 2. MacOS installation
 
-  Analogously to UNIX/Linux installation, the installation should be performed 
-from source using the same technique and dependencies. 
+  Analogously to UNIX/Linux installation, the installation should be performed
+from source using the same technique and dependencies.
 
   One can use http://fink.sf.net packages for dependencies or install them from
-source as in Linux. The author did not have any opportunity to check if 
-GTK-enabled version works on MacOS, but since gtk+2-dev and gtk+2-shlib 
+source as in Linux. The author did not have any opportunity to check if
+GTK-enabled version works on MacOS, but since gtk+2-dev and gtk+2-shlib
 are available from 'fink', it is worth trying. Please remember again, that you
 will need 'pkgconfig', also available from 'fink', in order for the
 installation script to find your GTK2 includes.
@@ -51,14 +51,14 @@ installation script to find your GTK2 includes.
 2. Windows installation (tested and pre-compiled on Windows XP)
 
 Whether you are installing a binary package or compiling it from source on
-Windows, you will need to have BOTH ImageMagick and GTK2 installed and ADDED to 
+Windows, you will need to have BOTH ImageMagick and GTK2 installed and ADDED to
 your or system-wide PATH variable prior to the package installation.
 
 If you plan to compile the package from source, first follow R instructions on
 compiling Windows packages and install all the necessary tools. In this case
-it is recommended to install MinGW and MSYS into c:\mingw as this path is hard 
+it is recommended to install MinGW and MSYS into c:\mingw as this path is hard
 coded into src/Makevars.win of my package (or you will need to edit this file)
-You do NOT need MinGW or MSYS if you install the binary package. For the binary 
+You do NOT need MinGW or MSYS if you install the binary package. For the binary
 package, just install the following two packages so that the library could function.
 
 2.1 Installing ImageMagick
@@ -66,20 +66,20 @@ package, just install the following two packages so that the library could funct
 ImageMagick is available from http://www.imagemagick.org. Please ensure that you
 download ImageMagick-6.x.x-x-Q16-windows-dll.exe (both 16 and dll instead of
 8 and static). If you are planning to compile my package from source, select
-that you want development files to be installed during the installation of 
-ImageMagick. It is strongly recommended to install ImageMagick into a path that 
+that you want development files to be installed during the installation of
+ImageMagick. It is strongly recommended to install ImageMagick into a path that
 does NOT contain any spaces. The recommended (and hard coded into src/Makevars.win)
-is c:\ImageMagick. If you install into a different path, you will need to edit 
+is c:\ImageMagick. If you install into a different path, you will need to edit
 src/Makevars.win. The latter is not required for binary installation.
 
-Finally add the path to ImageMagick to your PATH variable, c:\ImageMagick; or 
+Finally add the path to ImageMagick to your PATH variable, c:\ImageMagick; or
 similar.
 
 2.2 Installing GTK2
 
 GTK2 for Windows is available from http://gladewin32.sf.net
-Please download the latest available release of 'Gtk+/Win32 Development 
-Environment' if you plan to compile my package from source, or 'Gtk+/Win32 
+Please download the latest available release of 'Gtk+/Win32 Development
+Environment' if you plan to compile my package from source, or 'Gtk+/Win32
 Runtime Environment' if you plan to use the binary installation.
 Install the above into a path that does not contain spaces. If you compile my
 package from source, it is strongly recommended to install it to the same location
