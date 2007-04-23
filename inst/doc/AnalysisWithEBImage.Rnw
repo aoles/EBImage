@@ -234,7 +234,7 @@ Illustration of the object detection algorithm: (a) -- {\em sqrt}-brightened com
 +  rgb <- channel(i1, "asgreen") + channel(i2, "asred")
 +  rgb <- rgb + channel(i3, "asblue")
 +  e <- paintObjects(x2, rgb)
-+  f <- paintObjects(x1, paintObejcts(x2, i3) )
++  f <- paintObjects(x1, paintObjects(x2, i3) )
 + }
 \end{verbatim}
 %$

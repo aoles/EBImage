@@ -1,6 +1,4 @@
 useDynLib(EBImage)
-## FIXME: importClassesFrom("base", ... -- cannot import from "base", why?
-##importClassesFrom("base", "array", base.OK = TRUE)
 export(
     Image, is.Image, stopIfNotImage, read.image, choose.image,
     TrueColor, Grayscale, morphKern, hist.Image, image.Image, print.Image,
@@ -12,8 +10,6 @@ exportClasses(
 exportMethods(
     copy, display, animate, write.image, header, assert, combine, tile,
     show, "[", channel,
-
-    ## FIXME: as.array, as.matrix, ## incompatibility with R < 2.4.1
 
     features, "features<-",
     colorMode, "colorMode<-",
