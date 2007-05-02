@@ -52,10 +52,12 @@ Image <- function (data=0.5, dim=c(200,200), colormode=Grayscale, ...) {
         dim <- c (dim, 1)
     if ( length(dim) != 3 )
         stop( .("length(dim) must be 2 for single images or 3 for stacks") )
-    if (colormode == TrueColor)
-        return ( new("Image", colormode=TrueColor, .Data=array( as.integer(data), dim), ... ) )
+    res <- new("Image", colormode=colormode, ...)
+    if ( colormode == TrueColor )
+      res@.Data <- array( as.integer(data), dim)
     else
-        return ( new("Image", colormode=Grayscale, .Data=array( as.double(data), dim), ... ) )
+      res@.Data <- array( as.double(data), dim)
+    return( res )
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
