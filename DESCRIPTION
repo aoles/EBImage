@@ -10,5 +10,5 @@ Description: The package provides functionality to perform image processing and 
 License: LGPL
 URL: http://www.ebi.ac.uk/~osklyar/EBImage/
 Copyright: Oleg Sklyar, Wolfgang Huber, 2005-2007
-SaveImage: yes
+LazyLoad: yes
 biocViews: Visualization
