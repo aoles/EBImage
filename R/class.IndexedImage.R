@@ -25,7 +25,19 @@ setMethod ("as.Image", signature(x="IndexedImage"),
   }
 )
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 print.IndexedImage <- function(x, ...) show(x)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("display", signature(x="IndexedImage"),
+  function (x, no.GTK=FALSE, ...) {
+    if ( !.isCorrectType(x) )
+      x <- .correctType ( normalize(x))
+    else
+      x <- normalize (x)
+    invisible ( .DoCall("lib_display", x, as.logical(no.GTK) ) )
+  }
+)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("watershed", signature(x="Image"),
