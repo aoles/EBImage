@@ -28,6 +28,7 @@
 \alias{despeckle,Image-method}
 \alias{dilate,Image-method}
 \alias{display,Image-method}
+\alias{display,IndexedImage-method}
 \alias{animate,Image-method}
 \alias{distmap,Image-method}
 \alias{edge,Image-method}

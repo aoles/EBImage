@@ -35,23 +35,24 @@ setClass( "IndexedImage", contains="Image" )
 }
 
 
-\section{ Accessor methods }{
+\section{ Details }{
 
-  None defined specifically for this class, but all of the parent 
-  \code{\link{Image-class}} and \code{\link{array}} are accessible.
+  No accessor methods are defined for this class specifically, but all of the 
+  parent \code{\link{Image-class}} and \code{\link{array}} are accessible.
 
-  There is one coersion routine defined in addition
+  One coersion routine is defined in addition, which simply sets the class 
+  attribute to \code{Image}:
 \preformatted{
 ## S4 method for signature x='IndexedImage'
 
 as.Image(x)
 }
 
-which simply sets the class attribute to \code{Image}.
+  Used with \code{IndexedImage}'s \code{display} by default normalizes the image.
 }
 
 \seealso{\code{
-  \link{Image}, \link{watershed}, \link{propagate}
+  \link{Image-class}, \link{watershed}, \link{propagate}
 }}
 
 \author{
