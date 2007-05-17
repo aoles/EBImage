@@ -8,78 +8,79 @@
 \title{ Distance map transform of binary images }
 
 \description{
-  Distance map transform of binary images. 
+  The function performs a distance map transform of binary images. In a distance
+  map each pixel contains the distance from that pixel to the nearest background
+  point.
 }
 
 \section{ Usage }{
-  \preformatted{
-    distmap(x, tolerance=0.05, minBG=0.05, strict=FALSE, ...)
-  }
-}
+\preformatted{
+## S4 method for signature x='Image'  
+  
+distmap(x, t=0.05, exact=FALSE, bg=0.05)
+}}
 
 \section{ Arguments }{ \describe{
 
 
-  \item{\code{x}}{An object of \code{\link{Image-class}} in the 
-    \code{\link{Grayscale}} mode. }
+  \item{\code{x}}{A \code{\link{Grayscale}} object of \code{\link{Image-class}}.
+    \code{x} is considered as a binary image, consisting of 0's for background
+    and all other values for foreground. }
 
-  \item{\code{tolerance}}{ A numeric value in the range \code{[0,1)}. Image 
-    pixels that differ from background (zero) by less than this value will be
-    considered as background. This enables image-wide single value threshloding
-    if necessary. } 
+  \item{\code{t}}{ A numeric value for the background threshold in the range 
+    \code{[0,1)}. Pixels with intensity smaller than \code{t} are considered 
+    as background. } 
 
-  \item{\code{minBG}}{ An estimated minimum fraction of background. If the 
-    estimated number of background pixels is smaller than this value the 
-    algorithm will terminate to avoid unnecessarily lengthy computations. This 
-    is a protection mechanism in case a very noise image is supplied without 
-    first  thresholding it. }
+  \item{\code{bg}}{ A numeric value for the allowed minimum for the fraction of 
+    background pixels in the image. The default and recommended value 
+    corresponds to 5\% (0.05). See details for more information. }
   
-  \item{\code{sctrict}}{ If \code{TRUE}, single-pixel diagonal distances 
-    are calculated exactly (i.e. \code{\link{sqrt}(2)}), otherwise these are
-    set to be 1, same as neighbouring pixels on the vertical and horizontal
-    axes. }
-
-  \item{\code{...}}{ Reserved for future use. }
+  \item{\code{exact}}{ A logical value if the distance to the neighboring diagonal
+    elements should be calculated exactly, as \code{\link{sqrt}(2)}, or it should
+    be set to 1, same as that for the neighbouring pixels on the vertical and 
+    horizontal axes. }
 }}
 
 \section{ Value }{
 
-  An object of \code{\link{Image-class}} in the \code{\link{Grayscale}} mode
-  with pixels containing \code{\link{floor}} of distances to the nearest 
-  background. If \code{strict} is set to \code{TRUE}, single-pixel diagonal 
-  distances are calculated exactly (i.e. \code{\link{sqrt}(2)}), otherwise these 
-  are set to be 1, same as neighbouring pixels on the vertical and horizontal
-  axes.To preview the results visually, use 
-  \code{\link{display}( \link{normalize}(result) )}.
-    
+  A \code{\link{Grayscale}} object of \code{\link{Image-class}} with pixels
+  containing the \code{\link{floor}} values of their distances to the nearest 
+  background points. The range of the resulting image is \code{[0,n]}, where
+  \code{n}, a positive integer, will be the distance from center of the largest 
+  object.
+  
+  To preview the results visually, use \code{\link{display}(\link{normalize}(result))}.
 }
 
 \section{ Details }{
 
-  Given a binary or grayscale image with zero background, a distance map 
-  transformed image contains in each pixel a distance to the closest background 
-  pixel (zero). This function is used extensively in object detection. Distance 
-  map is a usual input for \code{\link{watershed}} and other segmentation 
-  algorithms that are used to identify and separate closely positioned objects.
-    
+  Given a binary or gray scale image with background set to 0, a distance map 
+  transform generates an image each pixel of which contains the distance from that
+  pixel to the nearest background pixel (zero) or the edge of the image. 
+      
+  If foreground constitutes more than 95\% of the image, computation of a distance 
+  map can be very lengthy as the function uses an iterative algorithm. This is a 
+  very rare situation anyway and the value of \code{bg} provides a protection 
+  mechanism, e.g. in case a very noise image is supplied performing a threshold 
+  first.
+
+  This function is used extensively in object detection. Distance map is a standard 
+  input for the \code{\link{watershed}} algorithm used to identify and separate 
+  closely positioned objects.
 }
 
 \seealso{
   \code{
-    \link{Image-class}, \link{watershed}, \link{thresh}
+    \link{Image-class}, \link{watershed}, \link{thresh}, \link{propagate}
   }
 }
 
-\references{
-    \emph{ImageMagick}: \url{http://www.imagemagick.org}.
-}
-
 \author{
-    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
+  Oleg Sklyar: \email{osklyar@ebi.ac.uk}   
 }
 
 \examples{
-  \dontrun{see ?watershed for examples}
+  \dontrun{see ?watershed for an example}
 }
 
 

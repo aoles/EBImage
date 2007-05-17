@@ -10,36 +10,40 @@
 \description{
   \code{EBImage} is the image processing and analysis package for R. It is being
   created primarily to enable automated analysis of large sets of
-  cytomicroscopy images, e.g. results of automated microscopy screens.
+  cytomicroscopy images, e.g. results of automated microscopy screens, however
+  other image can be analysed in a similar manner.
 
   The package uses \code{ImageMagick} library for all of its I/O operations and
-  for many image processing routines. It does not inteface all
-  \code{ImageMagick API} functions though. Algorithms for image analysis are
-  implemented natively. These include distance maps, adaptive thresholding,
-  object counting, watershed transformation etc.
+  for many image processing routines; however, it does not inteface all
+  \code{ImageMagick} API functions. Algorithms for image analysis are
+  implemented natively. These include distance map and watershed transforms, 
+  adaptive thresholding, morphological transforms and image moments etc.
 
   Image data are stored in objects of \code{\link{Image-class}}. This S4 class
   is derived from \code{\link{array}} and inherits all of its properties and
-  S3 methods, like mathematical operations on arrays, subsetting, histograms
-  etc. Image processing and analysis routines require objects of
-  \code{\link{Image-class}} as input and often return objects of this class.
+  methods like mathematical operations on arrays, subsetting, histograms
+  etc. Image processing and analysis routines work with objects of
+  \code{\link{Image-class}}.
 
   The package provides many image processing filters that can
   be subdivided into the following categories: colour and image enhancement
   (e.g. \code{\link{enhance}, \link{contrast}}), sharpening and noise reduction
   (e.g. \code{\link{denoise}, \link{despeckle}}), image transformation (e.g.
-  \code{\link{rotate}, \link{resize}}), image segmentation (e.g.
-  \code{\link{watershed}, \link{propagate}, \link{edge}, \link{segment}, \link{thresh}}),
-  image morphology (e.g. \code{\link{dilate}, \link{opening}, \link{distmap}}),
-  and colour normalization (\code{\link{normalize}}).
+  \code{\link{rotate}, \link{resize}}), image segmentation (e.g. \code{\link{edge}, 
+  \link{segment}, \link{thresh}}), image morphology (e.g. \code{\link{dilate}, 
+  \link{opening}, \link{distmap}}), object detection (e.g. \code{\link{watershed},
+  \link{propagate}}) and normalization (\code{\link{normalize}}).
 
-  Windows binary can be downloaded from:
-
-  \url{http://www.ebi.ac.uk/~osklyar/EBImage}
+  The project page is: \url{http://www.ebi.ac.uk/~osklyar/EBImage}
 }
 
 \section{Changelog}{
   \preformatted{
+* 2.1.2, 2007-05-15: new development version with image\link{moments}
+    implemented.
+
+* 2.0.0, 2007-04-26: Bioconductor 2.0 release with EBImage 2.0 release!
+
 * 1.9.26, 2007-02-08: Voronoi-based image segmentation
   - added propagate(): Voronoi-based segmentation on image manifolds
     with modified metric! Great thing for cell image segmentation
@@ -91,8 +95,10 @@
   England
   }
 
-  Released under \code{LGPL} (see the \code{LICENSE} file in the package
-  root for the full license wording):
+  The full source code is released under \code{LGPL} (see the \code{LICENSE} 
+  file in the package root for the full license wording). \code{ImageMagick} and
+  \code{GTK} used from the package are distributed separately by the respective
+  copyright holders.
 
   \preformatted{
   This library is free software; you can redistribute

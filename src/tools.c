@@ -44,7 +44,8 @@ indexFromXY (const int x, const int y, const int xsize) {
 /*----------------------------------------------------------------------- */
 int
 isImage (SEXP x) {
-    if ( strcmp( CHAR( asChar( GET_CLASS(x) ) ), "Image") != 0) return 0;
+    if ( strcmp( CHAR( asChar( GET_CLASS(x) ) ), "Image") != 0 && 
+         strcmp( CHAR( asChar( GET_CLASS(x) ) ), "IndexedImage") != 0) return 0;
     if ( LENGTH( GET_DIM(x) ) != 3 ) return 0;
     return 1;
 }

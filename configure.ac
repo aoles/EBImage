@@ -1,4 +1,4 @@
-AC_INIT([EBImage], 2.0.0)
+AC_INIT([EBImage], 2.1.0)
 
 AC_CHECK_PROG(magickfound, [Magick-config --version], yes, no)
 if test "$magickfound" = "yes"; then
@@ -14,10 +14,10 @@ if test "$magickfound" = "yes"; then
         LINKERFLAGS="${LINKERFLAGS} `Magick-config --libs`"
         LIBS="${LINKERFLAGS} ${LIBS} ${LFLAGS}"
     else
-        AC_MSG_ERROR("ImageMagick-devel NOT FOUND")
+        AC_MSG_ERROR("ImageMagick includes NOT FOUND. Can not proceed!")
     fi
 else
-    AC_MSG_ERROR("ImageMagick NOT FOUND")
+    AC_MSG_ERROR("ImageMagick NOT FOUND. Can not proceed!")
 fi
 
 AC_CHECK_PROG(pkgfound, [pkg-config --version], yes, no)
@@ -41,6 +41,8 @@ fi
 if test -z "${R_HOME}"; then
     AC_MSG_ERROR("Cannot determine R_HOME...")
 fi
+
+echo -----------------------------------------------------
 
 AC_SUBST(CFLAGS)
 AC_SUBST(CXXFLAGS)

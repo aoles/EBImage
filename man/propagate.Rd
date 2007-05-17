@@ -12,22 +12,19 @@
 }
 
 \section{ Usage }{
-  \preformatted{
-    # S4 Method for Image-class
+\preformatted{
+## S4 Method for signature x='Image', seeds='IndexedImage'
 
-    propagate(x, seeds, mask=NULL, lambda=0.005, ext=1)
-  }
-}
+propagate(x, seeds, mask=NULL, lambda=0.005, ext=1)
+}}
 
 \section{ Arguments }{ \describe{
 
   \item{\code{x}}{An object of \code{\link{Image-class}} to be segmented,
     in the \code{\link{Grayscale}} mode. }
 
-  \item{\code{seeds}}{An object of \code{\link{Image-class}} of the same
-    size as x in all three dimensions; in the \code{\link{Grayscale}} mode
-    with integer-based object encoding, as returned by \code{\link{watershed}}.
-    This image provides seed points for object detection. }
+  \item{\code{seeds}}{An object of \code{\link{IndexedImage-class}} of the same
+    size as x in all three dimensions. This image provides seed points for object detection. }
 
   \item{\code{mask}}{An object of \code{\link{Image-class}} of the same
     size as x in all three dimensions; in the \code{\link{Grayscale}} mode.
@@ -77,7 +74,7 @@
 
 \seealso{
   \code{
-    \link{Image-class}, \link{watershed}, \link{getObjects}
+    \link{IndexedImage-class}, \link{Image-class}, \link{watershed}, \link{getObjects}
   }
 }
 
@@ -108,7 +105,6 @@
       prev1 <- paintObjects(wx1, rgb)
       display(prev1)
     }
-  }
 }
 
 \section{ Author }{

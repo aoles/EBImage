@@ -13,37 +13,37 @@
 }
 
 \section{ Usage }{
-  \preformatted{
-    # S4 methods for class 'Image':
+\preformatted{
+## S4 methods for signature x='IndexedImage', index='numeric' and index='list'
 
-    rmObjects(x, index)
-  }
-}
+rmObjects(x, index)
+}}
 
 \section{ Arguments }{ \describe{
 
-  \item{\code{x}}{An object of \code{\link{Image-class}} in the
-    \code{\link{Grayscale}} mode with integer-absed object index, as
-    returned by \code{\link{watershed}}. }
+  \item{\code{x}}{An object of \code{\link{IndexedImage-class}}. }
 
-  \item{\code{index}}{ A list of integer vectors (one vector per image)
-    with indexes of existing objects that will be deleted. }
+  \item{\code{index}}{ A numeric (integer) vector of indexes of objects to
+    remove in the frame if \code{x} contains one frame only. For multiple
+    frames, a list of such vectors.}
 
 }}
 
 \section{ Value }{
 
-  An image of \code{\link{Image-class}}, same as in \code{\link{watershed}}.
+  An image of \code{\link{IndexedImage-class}}.
 
 }
 
 \seealso{
   \code{
-    \link{Image-class}, \link{watershed}, \link{getObjects}, \link{paintObjects}
+    \link{IndexedImage-class}, \link{watershed}, \link{getObjects}, \link{paintObjects}
   }
 }
 
 \examples{
+  \dontrun{ FIXME: redo the example as new signature is available for 2D}
+
   if ( interactive() ) {
     ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
     a <- read.image( paste(ddir, "A04w1.jpg", sep="/") )

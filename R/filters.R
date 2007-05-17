@@ -15,9 +15,58 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("normalize", signature(x="Image"),
+  function (x, separate=TRUE, ft=c(0,1), ...) {
+    if ( colorMode(x) != Grayscale )
+      stop( "'x' must be Grayscale, use 'normalize2' for TrueColor images" )
+    ft <- as.numeric (ft)
+    if ( diff(ft) == 0 )
+      stop( "normalization range is 0" )
+    separate <- as.integer (separate)
+    return ( .DoCall("lib_normalize", x, separate, ft) )
+  }
+)
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("flip", signature(x="Image"),
+  function (x, ...) {
+    Y <- 1:(dim(x)[2])
+    x@.Data <- x@.Data[ , rev(Y), , drop=FALSE]
+    return (x)
+  }
+)
 
-# filter integer constants
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("flop", signature(x="Image"),
+  function (x, ...) {
+    X <- 1:(dim(x)[1])
+    x@.Data <- x@.Data[rev(X), , , drop=FALSE]
+    return (x)
+  }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("fill", signature(x="Image"),
+    function (x, col, xoff, yoff, fuzz=10, method="floodfill", ...) {
+        if ( missing(xoff) || missing(yoff) || missing(col) )
+            stop ( .("missing 'xoff', 'yoff' or 'col'") )
+        # color is converted into it's x11 representation, i.e. #112233
+        col <- channel (col[1], "x11")
+        xoff <- as.integer (xoff - 1)
+        yoff <- as.integer (yoff - 1)
+        if ( xoff < 0 || xoff >= dim(x)[1] || yoff < 0 || yoff >= dim(x)[2] )
+            stop ( .("start point outside of image") )
+        if ( fuzz < 0 )
+            stop ( .("fuzz must be non negative") )
+        method <- tolower(method)
+        if ( !switch(method, floodfill=TRUE, replace=TRUE, FALSE) )
+            stop ( .("wrong fill method specified, supported methods are: floodfill and replace") )
+        return ( .DoCall("lib_filterFill", x, as.character(col), as.integer(xoff, yoff), as.character(method), as.integer(fuzz) ) )
+    }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# ImageMagick filters below
 flt.blur      <- as.integer(0)
 flt.gaussblur <- as.integer(1)
 flt.contrast  <- as.integer(2)
@@ -123,11 +172,10 @@ setMethod ("mediansmooth", signature(x="Image"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("noise", signature(x="Image"),
-    function (x, type="gaussian", ...) {
-        type = tolower (type)
-        param = as.double( switch(type, "uniform" = 1, "gaussian" = 2,
-            "multi" = 3, "impulse" = 4, "laplace" = 5, "poisson" = 6, 2 ) )
-        if ( param == 2 && type != "gaussian" )
+    function (x, type="G", ...) {
+        type = tolower (substr(type,1,1))
+        param = as.numeric( switch(type, u= 1, g= 2, m= 3, i= 4, l= 5, p= 6, 2 ) )
+        if ( param == 2 && type != "g" )
             warning ( .("unsupported noise type selected, using 'gaussian' instead. Possible values are: uniform, gaussian, multi, impulse, laplace and poisson" ) )
         return ( .DoCall("lib_filterMagick", x, flt.noise, as.numeric(param) ) )
     }
@@ -207,18 +255,6 @@ setMethod ("umask", signature(x="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-## half width and height: moving frame will be 2 times + 1 px larger
-setMethod ("thresh", signature(x="Image"),
-    function (x, w=5, h=5, offset=0.01, ...) {
-        if ( colorMode(x) != Grayscale )
-            stop ( .("'thresh' is only defined for grayscale images, use 'athresh' instead or 'channel' to convert") )
-        if ( w < 2 || h < 2 )
-            stop ( .("width 'w' and height 'h' must be larger than 1") )
-        return ( .DoCall("lib_filterThresh", x, as.numeric( c(w, h, offset) ) ) )
-    }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("athresh", signature(x="Image"),
     function (x, w=10, h=10, offset=0, ...) {
         if ( w < 2 || h < 2 )
@@ -256,128 +292,10 @@ setMethod ("negate", signature(x="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-## FIXME: normalize, add independent or similar option
-setMethod ("normalize", signature(x="Image"),
-    function (x, from=0, to=1, ...) {
-        if ( colorMode(x) != Grayscale )
-            stop ( .("'normalize' is only defined for grayscale images, use 'normalize2' instead or 'channel' to convert") )
-        if ( to[1] - from[1] == 0 )
-            stop ( .("value 'to - from' must not be zero") )
-        minx = min (x)
-        maxx = max (x)
-        if ( maxx - minx == 0 )
-            stop ( .("image cannot be normalized as it contains one color only") )
-        return ( (x - minx) / (maxx - minx) * (to - from) + from )
-    }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("normalize2", signature(x="Image"),
     function (x, ...) {
         .DoCall("lib_filterMagick", x, flt.norm, as.numeric(0) )
     }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("fill", signature(x="Image"),
-    function (x, col, xoff, yoff, fuzz=10, method="floodfill", ...) {
-        if ( missing(xoff) || missing(yoff) || missing(col) )
-            stop ( .("missing 'xoff', 'yoff' or 'col'") )
-        # color is converted into it's x11 representation, i.e. #112233
-        col <- channel (col[1], "x11")
-        xoff <- as.integer (xoff - 1)
-        yoff <- as.integer (yoff - 1)
-        if ( xoff < 0 || xoff >= dim(x)[1] || yoff < 0 || yoff >= dim(x)[2] )
-            stop ( .("start point outside of image") )
-        if ( fuzz < 0 )
-            stop ( .("fuzz must be non negative") )
-        method <- tolower(method)
-        if ( !switch(method, floodfill=TRUE, replace=TRUE, FALSE) )
-            stop ( .("wrong fill method specified, supported methods are: floodfill and replace") )
-        return ( .DoCall("lib_filterFill", x, as.character(col), as.integer(xoff, yoff), as.character(method), as.integer(fuzz) ) )
-    }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("flip", signature(x="Image"),
-    function (x, ...) {
-        Y <- 1:(dim(x)[2])
-        x@.Data <- x@.Data[ , rev(Y), , drop=FALSE]
-        return (x)
-    }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("flop", signature(x="Image"),
-    function (x, ...) {
-        X <- 1:(dim(x)[1])
-        x@.Data <- x@.Data[rev(X), , , drop=FALSE]
-        return (x)
-    }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-morphKern <- function (size=5, shape="round") {
-    if ( size < 3 || ( size / 2 == as.integer(size / 2) ) )
-        stop ( .("kernel size must be an odd number >= 3: [3, 5, 7, ...") )
-    if ( switch(shape, round=, square=FALSE, TRUE) )
-        stop("available shapes 'round' and 'square'")
-    res <- matrix ( as.integer(FALSE), size, size, byrow = TRUE )
-    cx = as.integer(size / 2) + 1
-    if (shape == "round") {
-        res[cx,] = as.integer(TRUE)
-        res[,cx] = as.integer(TRUE)
-        for ( i in 1:(cx-1) )
-            for ( j in 1:(cx-1) )
-                if ( (cx - i)^2 + (cx - j)^2 <= (cx - 1)^2 ) {
-                    res[i, j] = as.integer (TRUE)
-                    res[size - i + 1, j] = as.integer (TRUE)
-                    res[i, size - j + 1] = as.integer (TRUE)
-                    res[size - i + 1, size - j + 1] = as.integer (TRUE)
-                }
-        return (res)
-    }
-    # otherwise square
-    res[] = as.integer (TRUE)
-    return(res)
-}
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("erode", signature(x="Image"),
-    function (x, kern=morphKern(5), iter=1, ...) {
-        if ( colorMode(x) != Grayscale )
-            stop ( .("2-color bitmap images only are supported in grayscale format") ) ## FIXME
-        if ( !is.integer(kern) || !is.matrix(kern) )
-            stop ( .("kernel must be an integer matrix of 0's and 1's") )
-        if ( iter < 1 )
-            stop ( .("'iter' is assumed to be a positive integer") )
-        return ( .DoCall("lib_erode_dilate", x, kern, as.integer(iter), as.integer(0) ) )
-    }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("dilate", signature(x="Image"),
-    function (x, kern=morphKern(5), iter=1, ...) {
-        if ( colorMode(x) != Grayscale )
-            stop ( .("2-color bitmap images only are supported in grayscale format") ) ## FIXME
-        if ( !is.integer(kern) || !is.matrix(kern) )
-            stop ( .("kernel must be an integer matrix of 0's and 1's") )
-        if ( iter < 1 )
-            stop ( .("'iter' is assumed to be a positive integer") )
-        return ( .DoCall("lib_erode_dilate", x, kern, as.integer(iter), as.integer(1) ) )
-    }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("opening", signature(x="Image"),
-    function (x, kern=morphKern(5), iter=1, ...)
-        dilate ( erode(x, kern, iter, ...), kern, iter, ... )
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("closing", signature(x="Image"),
-    function (x, kern=morphKern(5), iter=1, ...)
-        erode ( dilate(x, kern, iter, ...), kern, iter, ... )
 )
 
 
