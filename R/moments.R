@@ -1,0 +1,155 @@
+# Image moments
+
+# Copyright (c) 2005-2007 Oleg Sklyar
+
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public License
+# as published by the Free Software Foundation; either version 2.1
+# of the License, or (at your option) any later version.
+
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+# See the GNU Lesser General Public License for more details.
+# LGPL license wording: http://www.gnu.org/licenses/lgpl.html
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("cmoments", signature(x="IndexedImage", ref="Image"),
+  function (x, ref, ...) {
+    if ( colorMode(x) != Grayscale || !assert(x, ref, strict=TRUE) )
+      stop( "'x' and 'ref' must be gray scale images of equal size" )
+    return( .DoCall("lib_cmoments", x, ref ) )
+  }
+)
+
+setMethod ("cmoments", signature(x="IndexedImage", ref="missing"),
+  function (x, ref, ...) {
+    if ( colorMode(x) != Grayscale )
+      stop( "'x' must be a gray scale image" )
+    return( .DoCall("lib_cmoments", x, NULL ) )
+  }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("smoments", signature(x="IndexedImage", ref="Image"),
+  function (x, ref, pw=3, what="s", ...) {
+    if ( colorMode(x) != Grayscale || !assert(x, ref, strict=TRUE) )
+      stop( "'x' and 'ref' must be gray scale images of equal size" )
+    alg <- as.integer( switch(tolower(substr(what, 1, 1)), n=0, c=1, s=2, r=3, 2) )
+    pw <- as.integer (pw)
+    if ( pw < 1 || pw > 9 )
+      stop("'pw' must be in the range [1,9]" )
+    return( .DoCall("lib_moments", x, ref, pw, alg ) )
+  }
+)
+
+setMethod ("smoments", signature(x="IndexedImage", ref="missing"),
+  function (x, ref, pw=3, what="s", ...) {
+    if ( colorMode(x) != Grayscale )
+      stop( "'x' must be a gray scale image" )
+    alg <- as.integer( switch(tolower(substr(what, 1, 1)), c=1, s=2, r=3, 2) )
+    pw <- as.integer (pw)
+    if ( pw < 1 || pw > 9 )
+      stop("'pw' must be in the range [1,9]" )
+    if ( alg == 3 && pw < 3 )
+      stop( "'pw' must be at least 3 to calculate rotation invariant moments" )
+    return( .DoCall("lib_moments", x, NULL, pw, alg ) )
+  }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("rmoments", signature(x="IndexedImage", ref="Image"),
+  # this is a convenience function for smoments with what='r', pw=3
+  function (x, ref, ...) {
+    if ( colorMode(x) != Grayscale || !assert(x, ref, strict=TRUE) )
+      stop( "'x' and 'ref' must be gray scale images of equal size" )
+    return( .DoCall("lib_moments", x, ref, as.integer(3), as.integer(3) ) )
+  }
+)
+
+setMethod ("rmoments", signature(x="IndexedImage", ref="missing"),
+  # this is a convenience function for smoments with what='r', pw=3
+  function (x, ref, ...) {
+    if ( colorMode(x) != Grayscale )
+      stop( "'x' must be a gray scale image" )
+    return( .DoCall("lib_moments", x, NULL, as.integer(3), as.integer(3) ) )
+  }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# convenience function to call from moments and to write it only once
+# do not call directly
+.momentsSummary <- function(x, ref) {
+  if ( missing(ref) ) {
+    ctr <- cmoments (x)
+    rmo <- rmoments (x)
+    mom <- smoments (x, pw=2, what="s")
+  }
+  else {
+    ctr <- cmoments (x, ref)
+    rmo <- rmoments (x, ref)
+    mom <- smoments (x, ref, 2, "s")
+  }
+
+  covtheta <- function(u) {
+    res <- matrix(0, nrow=dim(u)[3], ncol=6)
+    res[,1] <- u[3,1,] / u[1,1,] # m20 = u20/u00
+    res[,2] <- u[2,2,] / u[1,1,] # m11 = u11/u00
+    res[,3] <- u[1,3,] / u[1,1,] # m02 = u02/u00
+    res[,4] = 0.5 * atan2( 2 * res[,2], res[,1] - res[,3])  # theta = 1/2 * tan[-1] (2u11/(u20-u02))
+    x1  = 0.5 * (res[,1] + res[,3])
+    x2  = 0.5 * sqrt( 4 * res[,2]^2 + (res[,1] - res[,3])^2 )
+    res[,5]  = x1 + x2 # eigenvalues of the cov matrix
+    res[,6]  = x1 - x2 # eigenvalues of the cov matrix
+    colnames(res) <- c("u20","u11","u02","theta","l1","l2")
+    res
+  }
+
+  if ( dim(x)[3] == 1 ) {
+    mom <- covtheta(mom)
+    return( cbind(ctr, mom, rmo) )
+  }
+
+  mom <- lapply(mom, covtheta)
+
+  res <- vector( "list", dim(x)[3] )
+  for ( i in 1:length(res) )
+    res[[i]] <- cbind(ctr[[i]], mom[[i]], rmo[[i]])
+  return( res )  
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("moments", signature(x="IndexedImage", ref="Image"),
+  function (x, ref, ...) {
+    if ( colorMode(x) != Grayscale || !assert(x, ref, strict=TRUE) )
+      stop( "'x' and 'ref' must be gray scale images of equal size" )
+    return( .momentsSummary(x, ref) )
+  }
+)
+
+setMethod ("moments", signature(x="IndexedImage", ref="missing"),
+  function (x, ref, ...) {
+    if ( colorMode(x) != Grayscale )
+      stop( "'x' must be a gray scale image" )
+    return( .momentsSummary(x) )
+  }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("moments", signature(x="Image", ref="missing"),
+  # in contrast to the above function, this considers one object per image
+  # and processes the stack of images returning a summary of moments
+  function (x, ref, ...) {
+    ref <- x
+    x[] <- 1
+    class(x) <- "IndexedImage"
+    mom <- .momentsSummary(x, ref)
+    if ( dim(x)[3] == 1 )
+      return( mom )
+    res <- mom[[1]]
+    for ( i in 2:length(mom) ) res <- rbind(res, mom[[i]])
+    res
+  }
+)
+

@@ -368,8 +368,6 @@ lib_matchFeatures (SEXP x, SEXP ref) {
     nz = INTEGER ( GET_DIM(x) )[2];
     nprotect = 0;
 
-    PROTECT (res = allocVector(VECSXP, nz) );
-    nprotect++;
     indexes = (SEXP *) R_alloc (nz, sizeof(SEXP) );
 
     /* we need this to know centres of objects in x */
@@ -386,8 +384,6 @@ lib_matchFeatures (SEXP x, SEXP ref) {
         /* create results vector */
         PROTECT ( indexes[im] = allocVector(INTSXP, nobj) );
         nprotect++;
-        /* add it to res */
-        SET_VECTOR_ELT (res, im, indexes[im] );
         if ( nobj < 1 ) continue;
         if ( VECTOR_ELT(xf, im) == R_NilValue ) continue;
         /* check if features correspond to objects */
@@ -404,10 +400,17 @@ lib_matchFeatures (SEXP x, SEXP ref) {
             if ( ix >= 0 && jy >= 0 && ix < nx && jy < ny )
                 if ( data[ix + jy * nx] > 0.9 )
                     INTEGER (indexes[im])[i] = (int)data[ix + jy * nx];
-
         }
     }
 
+    if ( nz > 1 ) {
+      PROTECT (res = allocVector(VECSXP, nz) );
+      nprotect++;
+      for ( im = 0; im < nz; im++ )
+        SET_VECTOR_ELT (res, im, indexes[im] );
+    }
+    else
+      res = indexes[0];
     UNPROTECT (nprotect);
     return res;
 }
@@ -429,6 +432,7 @@ lib_deleteFeatures (SEXP x, SEXP _index) {
 
     PROTECT ( res = Rf_duplicate(x) );
     nprotect++;
+    SET_CLASS (res, mkString("IndexedImage") );
 
     for ( im = 0; im < nz; im++ ) {
         /* get image data */
@@ -489,8 +493,6 @@ lib_stackFeatures (SEXP obj, SEXP ref) {
     nz = INTEGER ( GET_DIM(obj) )[2];
     nprotect = 0;
 
-    PROTECT (res = allocVector(VECSXP, nz) );
-    nprotect++;
     stacks  = (SEXP *) R_alloc (nz, sizeof(SEXP) );
     dims    = (SEXP *) R_alloc (nz, sizeof(SEXP) );
     modes   = (SEXP *) R_alloc (nz, sizeof(SEXP) );
@@ -601,10 +603,16 @@ lib_stackFeatures (SEXP obj, SEXP ref) {
                     stackd[ x + (y + i * (2 * dy + 1)) * (2 * dx + 1) ] = refd[ ix + iy * nx ];
             }
     }
-    for ( im = 0; im < nz; im++ )
+    if ( nz > 1 ) {
+      PROTECT (res = allocVector(VECSXP, nz) );
+      nprotect++;
+      for ( im = 0; im < nz; im++ )
         SET_VECTOR_ELT (res, im, stacks[im] );
-
+    }
+    else
+      res = stacks[0];
 
     UNPROTECT (nprotect);
     return res;
 }
+

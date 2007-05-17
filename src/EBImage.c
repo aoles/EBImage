@@ -13,9 +13,11 @@ See: ../LICENSE for license, LGPL
 #include "filters_magick.h"
 #include "filters_morph.h"
 #include "filters_propagate.h"
+#include "filters_normalize.h"
 #include "filters_watershed.h"
 #include "filters_thresh.h"
 #include "object_counting.h"
+#include "object_moments.h"
 
 #include <R.h>
 #include <Rdefines.h>
@@ -57,6 +59,9 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_stackFeatures",  (DL_FUNC) &lib_stackFeatures,  2},
     {"lib_deleteFeatures", (DL_FUNC) &lib_deleteFeatures, 2},
     {"lib_propagate",      (DL_FUNC) &lib_propagate,      5},
+    {"lib_normalize",      (DL_FUNC) &lib_normalize,      3},
+    {"lib_cmoments",       (DL_FUNC) &lib_cmoments,       2},
+    {"lib_moments",        (DL_FUNC) &lib_moments,        4},
 
     /* add above all R-lib functions from common.h */
     {NULL, NULL, 0}

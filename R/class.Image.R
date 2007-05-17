@@ -189,10 +189,10 @@ stopIfNotImage <- function (x) {
 setMethod ("header", signature(x="Image"),
     function (x, ...) {
         if ( x@colormode == TrueColor )
-            return ( new("Image", colormode=TrueColor, .Data=integer(0), filename=fileName(x),
+            return ( new(class(x), colormode=TrueColor, .Data=integer(0), filename=fileName(x),
                 compression=compression(x), resolution=resolution(x),
                 filter=sampleFilter(x), features=features(x) ) )
-        return ( new("Image", colormode=Grayscale, .Data=numeric(0), filename=fileName(x),
+        return ( new(class(x), colormode=Grayscale, .Data=numeric(0), filename=fileName(x),
             compression=compression(x), resolution=resolution(x),
             filter=sampleFilter(x), features=features(x) ) )
     }
@@ -310,10 +310,6 @@ setMethod ("[", signature(x="Image", i="missing", j="missing"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("[", signature(x="Image", i="numeric", j="missing"),
     function (x, i, j, ..., drop) {
-        ## Use nargs() to decide between [i], [i,] and [i,,]/[i,,k]
-        ## For [i], just return a numeric vector
-        ## For [i,,]/[i,,k], return subset Image objects
-        ## For [i,] return error
         n <- nargs()
         if ( n == 2 )
             return( x@.Data[i] )
@@ -378,121 +374,106 @@ setMethod ("[", signature(x="Image", i="logical", j="missing"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-print.Image <- function(x, ...) {
-    if ( length( features(x) ) > 0 )
-        cat ("\n'Image' with annotated object data\n")
+setMethod ("show", signature(object="Image"),
+  function (object) {
+    if ( length( features(object) ) > 0 )
+      cat ("\n'", class(object),"' with annotated object data\n", sep="")
     else
-        cat ("\n'Image'\n")
-    if ( colorMode(x) == TrueColor ) {
-        cat ("  colorMode()   : TrueColor\n")
-        cat ("  storage class : integer 3D array, 8-bit/color RGB-, no Alpha\n")
+      cat ("\n'", class(object),"'\n", sep="")
+    if ( colorMode(object) == TrueColor ) {
+      cat ("  colorMode()   : TrueColor\n")
+      cat ("  storage class : integer 3D array, 8-bit/color RGB-, no Alpha\n")
     }
-    if ( colorMode(x) == Grayscale ) {
-        cat ("  colorMode()   : Grayscale\n")
-        cat ("  storage class : numeric 3D array, writable images in range [0..1]\n")
+    if ( colorMode(object) == Grayscale ) {
+      cat ("  colorMode()   : Grayscale\n")
+      cat ("  storage class : numeric 3D array, writable images in range [0..1]\n")
     }
-    dimx = dim (x)
-    if ( dimx[3] > 1 )
-        cat ( sprintf ("  dim()         : %dx%d, %d image(s)\n", dimx[1], dimx[2], dimx[3]) )
+    dimobject = dim (object)
+    if ( dimobject[3] > 1 )
+      cat ( sprintf ("  dim()         : %dx%d, %d image(s)\n", dimobject[1], dimobject[2], dimobject[3]) )
     else
-        cat ( sprintf ("  dim()         : %dx%d\n", dimx[1], dimx[2]) )
-    cat ( sprintf ("  fileName()    : %s \n", fileName(x) ) )
-    cat ( sprintf ("  compression() : %s \n", compression(x) ) )
-    cat ( sprintf ("  resolution()  : dx = %.1f, dy = %.1f \n", resolution(x)[1], resolution(x)[2]) )
-    cat ( sprintf ("  sampleFilter(): %s \n", sampleFilter(x) ) )
+      cat ( sprintf ("  dim()         : %dx%d\n", dimobject[1], dimobject[2]) )
+    cat ( sprintf ("  fileName()    : %s \n", fileName(object) ) )
+    cat ( sprintf ("  compression() : %s \n", compression(object) ) )
+    cat ( sprintf ("  resolution()  : dx = %.1f, dy = %.1f \n", resolution(object)[1], resolution(object)[2]) )
+    cat ( sprintf ("  sampleFilter(): %s \n", sampleFilter(object) ) )
 
-    if ( length( features(x) ) > 0 ) {
-        cat ( "\n  Object data: features()\n" )
-        print ( x@features )
-        return ( invisible(NULL) )
+    if ( length( features(object) ) > 0 ) {
+      cat ( "\n  Object data: features()\n" )
+      print ( object@features )
+      return ( invisible(NULL) )
     }
 
     partial <- rep(FALSE, 3)
-    dmax <- c(5, 6, 3)
-    for (i in 1:3) {
-        if ( dimx[i] > dmax[i]) {
-            dimx[i] <- dmax[i]
-            partial[i] = TRUE
-        }
-    }
-    cat ( sprintf("\n  imageData() subset [1:%d, 1:%d, 1:%d]:\n", dimx[1], dimx[2], dimx[3]) )
-    print ( x@.Data[ 1:dimx[1], 1:dimx[2], 1:dimx[3] ], digits=3 )
-}
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("show", signature(object="Image"),
-    function (object) print (object)
+    dmaobject <- c(5, 6, 3)
+    for (i in 1:3)
+      if ( dimobject[i] > dmaobject[i]) {
+        dimobject[i] <- dmaobject[i]
+        partial[i] = TRUE
+      }
+    cat ( sprintf("\n  imageData() subset [1:%d, 1:%d, 1:%d]:\n", dimobject[1], dimobject[2], dimobject[3]) )
+    print ( object@.Data[ 1:dimobject[1], 1:dimobject[2], 1:dimobject[3] ], digits=3 )
+  }    
 )
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-## FIXME: as.matrix causes incompatibility with R < 2.4.1, as.array disabled as well, use imageData()
-#setMethod ("as.array", signature(x="Image"),
-#    function (x) imageData (x)
-#)
+print.Image <- function(x, ...) show(x)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-## FIXME: as.matrix causes incompatibility with R < 2.4.1, use imageData(as.matrix())
-#setMethod ("as.matrix", signature(x="Image"),
-#    function (x, ...) {
-#        if ( dim(x)[3] > 1 )
-#            stop ( .("cannot coerce multiple images to matrix") )
-#        return ( matrix( imageData(x), dim(x)[1:2] ) )
-#    }
-#)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-image.Image <- function(x, i, xlab = "", ylab = "", axes = FALSE, col=gray ((0:255) / 255), ...) {
+setMethod ("image", signature(x="Image"),
+  function(x, i, xlab = "", ylab = "", axes = FALSE, col=gray ((0:255) / 255), ...) {
     dimx <- dim (x)
     if ( missing(i) ) {
-        if ( dimx[3] > 1 )
-            warning ( .("missing i for an image stack, assuming i=1") )
-        i <- 1
+      if ( dimx[3] > 1 )
+        warning ( .("missing i for an image stack, assuming i=1") )
+      i <- 1
     }
     i <- as.integer ( i[1] )
     if ( i < 1 || i > dimx[3] )
-        stop ( .("index i out of range") )
+      stop ( .("index i out of range") )
     if ( any(dimx == 0) )
-        stop ( .("image size is zero, nothing to plot") )
+      stop ( .("image size is zero, nothing to plot") )
     X <- 1:dimx[1]
     Y <- 1:dimx[2]
-    Z <- as.matrix ( imageData(x[,,i]) )[, rev(Y)]
+    Z <- imageData(x[,,i])[, rev(Y), 1, drop=TRUE]
     asp <- dimx[2] / dimx[1]
     graphics:::image (x=X, y=Y, z=Z, asp=asp, col=col, axes=axes, xlab=xlab, ylab=ylab, ...)
-}
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("channel", signature(x="Image", mode="character"),
-    function (x, mode, ...) {
-        mode <- tolower (mode)
-        if ( mode == "grey" ) mode = "gray"
-        modeNo <- switch (EXPR=mode, rgb=0, gray=1, red=2, green=3,
-                blue=4, asred=5, asgreen=6, asblue=7, x11=8, -1)
-        if ( modeNo < 0 )
-            stop ( paste(.("wrong conversion mode. Please specify one of"), "rgb, gray, grey, red, green, blue, asred, asgreen, asblue, x11") )
-        resData <- .DoCall("lib_channel", x@.Data, as.integer(modeNo) )
-        if ( is.null(resData) )
-            stop ( .("could not convert colors, NULL result") )
-        resData [ which( is.na(x) ) ] = NA
-        resData <- array (resData, dim(x) )
-        if ( mode == "x11" ) return (resData)
-        res <- header (x)
-        res@colormode = switch (EXPR=mode, rgb=, asred=, asgreen=, asblue=TrueColor, Grayscale)
-        res@.Data <- resData
-        return (res)
-    }
+  }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-hist.Image <- function (x, breaks=255, main=paste("Image histogram. Total", length(x), "pixels"), xlab="colors", ...) {
+setMethod ("channel", signature(x="Image", mode="character"),
+  function (x, mode, ...) {
+    mode <- tolower (mode)
+    modeNo <- as.integer( switch (EXPR=mode, rgb=0, grey=, gray=1, r=, red=2, g=, 
+              green=3, b=, blue=4, asred=5, asgreen=6, asblue=7, x11=8, -1) )
+    if ( modeNo < 0 )
+      stop( "wrong conversion mode" )
+    resData <- .DoCall("lib_channel", x@.Data, modeNo )
+    if ( is.null(resData) )
+      stop( "error converting colors, check if all supplied values majke sense for color representation" )
+    resData [ which( is.na(x) ) ] = NA
+    resData <- array (resData, dim(x) )
+    if ( mode == "x11" ) return (resData)
+    res <- header (x)
+    res@colormode <- switch (EXPR=mode, rgb=, asred=, asgreen=, 
+                     asblue=TrueColor, Grayscale)
+    res@.Data <- resData
+    return (res)
+  }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("hist", signature(x="Image"),
+  function (x, breaks=255, main=paste("Image histogram. Total", length(x), "pxs"), xlab="colors", ...) {
     if ( xlab == "colors" ) {
-        if ( colorMode(x) == Grayscale )
-            xlab = "Shades of gray, 0: black, 1: white"
-        if ( colorMode(x) == TrueColor )
-            xlab = "RGB values, non-informative"
+      if ( colorMode(x) == Grayscale )
+        xlab = "Shades of gray, 0: black, 1: white"
+      if ( colorMode(x) == TrueColor )
+        xlab = "RGB values, non-informative"
     }
     graphics:::hist ( imageData(x), breaks=breaks, main=main, xlab=xlab, ...)
-}
-
+  }
+)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("combine", signature(x="Image", y="Image"),
     function (x, y, ...) {
@@ -554,3 +535,25 @@ setMethod ("tile", signature(x="list"),
         lapply(x, tile, nx=nx, grid.wd=grid.wd, grid.col=grid.col, bg.col=bg.col, ...)
     }
 )
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("features", signature (x="Image"),
+    function (x, ...) x@features
+)
+
+setReplaceMethod ("features", signature (x="Image", value="list"),
+    function (x, ..., value) {
+        error = FALSE
+        if ( !is.list(value) )
+            .stop("'value' must be a list" )
+        if ( length(value) != dim(x)[3] )
+            .stop("'value' length must be the same as number of images" )
+        for ( i in 1:length(value) )
+            if ( !is.matrix(value[[i]]) && !is.null(value[[i]]) )
+                .stop("all list items must be matrices" )
+        x@features <- value
+        return (x)
+    }
+)
+
+

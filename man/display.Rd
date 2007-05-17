@@ -12,19 +12,21 @@
 }
 
 \section{Usage}{
-  \preformatted{
-    display(x, no.GTK=FALSE, ...)
-    animate(x, ...)
-  }
-}
+\preformatted{
+## S4 methods for signature x='Image'    
+
+display(x, no.GTK=FALSE)
+animate(x)                 ## not available on Windows
+}}
 
 \section{ Arguments }{ \describe{
 
   \item{\code{x}}{An object of \code{\link{Image-class}}. }
 
-  \item{\code{no.GTK}}{ Set to \code{FALSE} to avoid using \code{GTK+} display. } 
+  \item{\code{no.GTK}}{ A logical value, if \code{TRUE} an \emph{ImageMagick}
+    display will be used instead of the GTK display (read details below). 
+    On Windows the \emph{ImageMagick} display is not available. } 
 
-  \item{\code{...}}{ Reserved for future use. }
 }}
 
 \section{ Value }{
@@ -34,40 +36,38 @@
 
 \section{ Details}{
 
-  If available the \code{GTK+} display is used by default. In this mode,
-  users can display as many images simultaneously as they want. On contrary,
-  if the \code{GTK+} mode is not used, the library uses internal 
-  \code{ImageMagick} display functions, which due to the lack of control over
-  their behavior are limited to displaying only one image at a time. Trying
-  to display another image while there is one on display will result in an
-  error message in the latter case.
-
-  It is not necessary supply the \code{no.GTK} argument if the library was
-  compiled without \code{GTK+} support as an alternative method will be 
-  selected by default.
-
-  \code{animate} will use \code{ImageMagick} AnimateImages API function to 
-  animate a stack of images. This function is not available on Windows, same as
-  \code{display} using ImageMagick API is not available on Windows, because API
-  does not fully support this functionality.
+  If available the \code{GTK} display will be used by default. This mode allows
+  display of multiple images simultaneously. If the \code{GTK} mode is not used,
+  an \code{ImageMagick}-internal display function, is used. This mode is
+  for compatibility purposes only and should not be used if \code{GTK} is
+  available. Because \code{ImageMagick} does not provide any programmatic ways to
+  control and close display windows, the display in this mode is limited to one
+  it time. The display window must be explicitly closed before a new image can
+  be displayed. If \code{EBImage} was installed without \code{GTK} support,
+  the function will fall back to the \code{ImageMagick} display automatically.
+  In this case there is no need to supply \code{no.GTK} argument.
+  
+  So far \code{animate} uses the \code{AnimateImages} function from
+  \code{ImageMagick}, which behavior is analogous to that of the \code{ImageMagick} 
+  display. This function is not available on Windows due to the lack of support
+  in the \code{ImageMagick} API.
+  
+  \code{GTK} display does not use \code{GTK} widgets available from other \code{R}
+  packages, the functionality is coded in \code{EBImage}. Therefore, the package
+  must be compiled with \code{GTK} support in order to enable it.
 }
 
-\seealso{
-  \code{
+\seealso{ \code{
     \link{Image-class}, \link{Image}, \link{read.image}, \link{write.image}
-  }
-}
+}}
 
 \references{
-    \emph{ImageMagick}: \url{http://www.imagemagick.org}.
+  \emph{ImageMagick}: \url{http://www.imagemagick.org}; \emph{GTK}: 
+  \url{http://www.gtk.org}; \emph{GTK on Windows}: \url{http://gladewin32.sf.net}
 }
 
 \author{
-    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
-}
-
-\examples{
-  \dontrun{see ?watershed for examples}
+  Oleg Sklyar: \email{osklyar@ebi.ac.uk}   
 }
 
 \keyword{file}

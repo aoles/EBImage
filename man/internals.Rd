@@ -62,21 +62,34 @@
 \alias{sampleFilter<-,Image,character-method}
 \alias{segment,Image-method}
 \alias{sharpen,Image-method}
-\alias{show,Image-method}
 \alias{thresh,Image-method}
 \alias{umask,Image-method}
 \alias{watershed,Image-method}
-\alias{matchObjects,Image,Image-method}
-\alias{getObjects,Image,Image-method}
-\alias{getObjects,Image,missing-method}
-\alias{rmObjects,Image,list-method}
-\alias{paintObjects,Image,Image-method}
+\alias{matchObjects,IndexedImage,IndexedImage-method}
+\alias{getObjects,IndexedImage,Image-method}
+\alias{getObjects,IndexedImage,missing-method}
+\alias{rmObjects,IndexedImage,list-method}
+\alias{rmObjects,IndexedImage,numeric-method}
+\alias{paintObjects,IndexedImage,Image-method}
 \alias{write.image,Image,character-method}
 \alias{write.image,Image,missing-method}
-\alias{propagate,Image-method}
+\alias{propagate,Image,IndexedImage-method}
 \alias{tile,list-method}
 \alias{tile,Image-method}
-\alias{stackObjects,Image,Image-method}
+\alias{stackObjects,IndexedImage,Image-method}
+\alias{moments,Image-method}
+\alias{as.Image,IndexedImage-method}
+\alias{print.Image}
+\alias{print.IndexedImage}
+\alias{cmoments,IndexedImage,Image-method}
+\alias{cmoments,IndexedImage,missing-method}
+\alias{moments,IndexedImage,Image-method}
+\alias{moments,IndexedImage,missing-method}
+\alias{moments,Image,missing-method}
+\alias{smoments,IndexedImage,Image-method}
+\alias{smoments,IndexedImage,missing-method}
+\alias{rmoments,IndexedImage,Image-method}
+\alias{rmoments,IndexedImage,missing-method}
 
 \title{ Internals }
 

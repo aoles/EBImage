@@ -27,31 +27,67 @@
 \concept{image object}
 \concept{color mode}
 
-\title{ Image class defintion and accessor methods }
+\title{ Defintion of class 'Image', its accessor methods }
 
 \description{
-  \code{Image} is the base class to hold data and parameters of grayscale and
-  RGB images in \code{R}. The class is derived from \code{\link{array}} and
-  inherits all of its properties and methods, e.g. mathematical operations
-  on arrays, subsetting, histograms etc. Image processing routines are
-  defined additionally as S4 methods for objects of this class. In many cases
-  they also return objects of class \code{Image}.
+  The class \code{Image} enables the storage and manipulation of image data for
+  grayscale and true color (RGB) images in \code{R}. The class is based on 
+  (derived from) \code{\link{array}} and inherits all its properties and methods,
+  e.g. mathematical operations, subsetting, histograms etc. Image processing and
+  analysis routines are defined as S4 methods for objects of the class \code{Image}.
 }
 
-\section{ Constants }{
+\section{ Class Definition }{ 
 
-  The following constant are defined in the package and should be used everywhere
-  where image color mode needs to be specified.
+The class is defined as follows:
 
-  \preformatted{
-    Grayscale = as.integer(0)
-    TrueColor = as.integer(1)
-  }
+\preformatted{
+## S4 class definition
+
+setClass( "Image",
+  representation (
+    colormode    = "integer", 
+    filename     = "character",
+    compression  = "character", 
+    resolution   = "numeric",   
+    filter       = "character", 
+    features     = "list"
+  ),
+  contains = "array"
+)
 }
+
+  Additionally, two constants are defined and exported that can be used to specify
+  or test image data type:
+
+\preformatted{
+  Grayscale = as.integer(0)
+  TrueColor = as.integer(1)
+}
+}
+
+\section{ Creating objects }{
+  Objects can be created using \code{\link{new}("Image")} supplying slot data
+  as necessary. Additionally, wrapper functions are defined to simplify the
+  construction of \code{Image} objects in different situations: the default 
+  constructor, \code{\link{Image}}, the \code{\link{read.image}} constructor that
+  creates an object from reading image files and the \code{\link{copy}} constructor.
+}
+
 
 \section{ Accessor methods }{
 
-  \code{# S4 methods for class 'Image':}
+  Accessor methods are class methods that are defined to retrieve data values 
+  from objects of a given class or to assigne those. These should be used instead
+  of directly referring to the slots. Unfortunately, R does not have a concept 
+  of private or protected class members: all slots have "public" access in terms
+  of other object-oriented languages. Therefore, data encapsulation in sense of
+  hiding the particular structure of the class is impossible. At the same time,
+  it is still recommended to use accessor functions instead of directly accessing
+  slots. One can also assume that any slot that does not have an accessor method
+  should not be accessed directly by the user.
+
+  The following accessor methods are defined as S4 methods for class \code{Image}:
 
   \describe{
 
@@ -99,76 +135,57 @@
       Gets and sets the filtering algorithm used when resizing images using
       \code{\link{resize}} and other image transformation routines. Possibly
       this value will be removed and supplied as argument to the
-      corresponding function. At the moment, possible values include:
+      corresponding function! At the moment, possible values include:
       \code{'point', 'box', 'triangle', 'hermite', 'hanning', 'hamming',
       'blackman', 'gaussian', 'quadratic', 'cubic', 'catrom', 'mitchell',
       'lanczos', 'bessel'} and \code{'sinc'}. Default: \code{'lanczos'}. }
   }
-
-  R does not have a concept of private/public class members, therefore, the
-  following cannot be enforced and are just recommendations: use only accessor
-  methods to get/set slot data; and consequently -- everything that does not
-  have an accessor method should not be accessed directly by the user. For this
-  reason, we do not describe slots here: consider all slots as private. Package
-  developers can have a look at the code and see the full object structure.
-}
-
-\section{ Creating objects }{
-  Objects can be created using \code{\link{new}("Image")} supplying slot data
-  if necessary. Additionally, wrapper functions are defined to simplify the
-  construction of \code{Image} objects in different situations.
-
-  See \code{\link{Image}} constructor and \code{\link{read.image}} function on
-  details how to create images or read images from disk or network.
 }
 
 \section{ Details }{
-  Image data are stored as 3D arrays,
-  with first two dimensions specifying image/frame size and third -- number
-  of frames. A single 2D image will have the number of frames 1. In subsetting,
-  the value of \code{drop} parameter is set to \code{FALSE}, thus image
-  dimensionality is preserved at 3.
+  Image data are stored as 3D arrays with first two dimensions specifying 
+  frame size and third the number of frames. A single 2D image has the number of 
+  frames 1. In subsetting, the value of \code{drop} parameter is set to 
+  \code{FALSE}, thus image dimensionality is preserved at 3.
 
-  At the moment, images can store data either as grayscale values or true color values.
-  Grayscale values are stored in \code{\link{numeric}} or \code{\link{double}}
-  arrays, whereas true color data are stored as \code{\link{integer}} arrays.
-  I.e. the type of image array with grayscale data can be tested as:
-  \code{is.array(x) && is.numeric(x) && !is.integer(x)} whereas for true color
-  data the test would look like: \code{is.array(x) && is.integer(x)}.
-  Correspondingly, the data slots are created with
-  \code{array(as.numeric(val),...)} for grayscales and
-  \code{array(as.integer(val),...)} for true color images. Grayscale values are
-  assumed to be in the range \code{[0,1]}, although this is not a requirement.
-  However, many image processing functions will also assume data in this range
-  or will generate wrong results if the data do not fit the range.
+  \code{Image} is derived from \code{\link{array}}, therefore, the data is stored
+  in arrays. \code{Image} can store either grayscale or true color data at the
+  moment. Grayscale data is stored in \code{\link{numeric}} arrays, whereas true
+  color data is stored in \code{\link{integer}} arrays. Correspondingly, the data 
+  is created with \code{array(as.numeric(val),dim(val))} for grayscale and
+  \code{array(as.integer(val),dim(val))} for true color images. Grayscale values
+  are assumed to be in the range \code{[0,1]}, although this is not a requirement
+  in sense of data storage. Although, many image processing functions will 
+  assume data in this range or will generate invalid results for the data out of 
+  this range.
 }
 
-\seealso{
-  \code{
-    \link{Image}, \link{image.Image}, \link{display}, \link{channel}
-  }
-}
+\seealso{\code{
+  \link{Image}, \link{IndexedImage-class}, \link{display}, \link{channel}, 
+  \link{image,Image-method}, \link{show,Image-method}, 
+}}
 
 \author{
-    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}, LGPL >= 2.1
+  Oleg Sklyar: \email{osklyar@ebi.ac.uk}
 }
 
 \examples{
-  if ( interactive() ) {
-    \dontrun{creates a new Grayscale image of shifted stripes}
-    a <- Image( (0:100)*0.01, c(60,60) )
-    display( a )
-    print( a )
 
-    \dontrun{converts image mode to TrueColor, compare print's}
-    b <- a
-    colorMode( b ) <- TrueColor
-    print( b )
+\dontrun{New Grayscale image of a black-to-white vertical gradient}
+w <- 120
+a <- Image((0:(w^2))/w^2, c(w,w))
+if ( interactive() ) display(a)
+print(a)
 
-    \dontrun{fills values with brightness > 50\% with red}
-    b[ a > 0.5 ] = as.integer( 255 )
-    display( b )
-  }
+\dontrun{Converts image to TrueColor}
+b <- a
+colorMode(b) <- TrueColor
+print(b)
+
+\dontrun{Fills values with intensities over 0.5 (50\%) with red}
+b[ a > 0.5 ] = as.integer(255)
+if ( interactive() ) display(b)
+
 }
 
 \keyword{methods}

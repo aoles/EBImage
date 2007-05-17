@@ -19,7 +19,7 @@
 
 \section{ Arguments }{ \describe{
 
-  \item{\code{x}}{An object of \code{\link{Image-class}} in the
+  \item{\code{x}}{An object of \code{\link{IndexedImage-class}} in the
     \code{\link{Grayscale}} mode with integer-absed object encoding, as
     returned by \code{\link{watershed}}. }
 
@@ -49,17 +49,12 @@
 
 \seealso{
   \code{
-    \link{Image-class}, \link{watershed}, \link{getObjects}
+    \link{IndexedImage-class}, \link{Image-class}, \link{watershed}, \link{getObjects}
   }
-}
-
-\references{
-    \emph{ImageMagick}: \url{http://www.imagemagick.org}.
 }
 
 \examples{
-    \dontrun{See ?watershed for example}
-  }
+  \dontrun{See ?watershed for example}
 }
 
 \author{

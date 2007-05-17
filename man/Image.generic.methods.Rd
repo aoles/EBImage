@@ -2,9 +2,9 @@
 
 \docType{class}
 
-\alias{hist.Image}
-\alias{print.Image}
-\alias{image.Image}
+\alias{hist,Image-method}
+\alias{show,Image-method}
+\alias{image,Image-method}
 \alias{[,Image-method}
 
 \concept{image processing}
@@ -23,7 +23,7 @@
   
   \describe{
 
-    \item{\code{print(x, ...)} and \code{show(object)} }{ Prints a summary of
+    \item{\code{show(object)} }{ Prints a summary of
       image and properties (as described in 'Accessor methods' section). Prints
       also an excerpt of data keeping it to the minimum just to have a visual 
       control over the atomic data type. Use\code{imageData(x)} to print or
@@ -42,14 +42,13 @@
     \item{\code{image(x, ...)}}{ Draws image data using \code{graphics::image} 
       keeping image aspect ratio. }
       
-    \item{\code{[}}{ Redefined versions (with different argument classes) of 
-      \code{\link{array}} subsetting operator. This returns objects of class 
+    \item{\code{[}}{ Redefined versions (multiple signatures) of the
+      \code{\link{array}} subsetting operator. These return objects of class 
       \code{Image} without dropping dimensions. }
   }
   
-  Other important methods that are taken over from \code{\link{array}} class.
-  These were not modified in the package and work in exactly the same manner as
-  for array. We just want to stress that they can and should be used:
+  Other important methods that directly applicable due to inheritance from the 
+  \code{\link{array}} class, just to stress that they can and should be used:
   
   \describe{
 
@@ -57,18 +56,18 @@
       dimensions. }
     \item{\code{\link{fft}(z, inverse = FALSE)}}{ Performs the Fast Fourier
       Transformation on an Image. }
-    \item{\code{\link{sqrt}(x)}}{ Miscellaneous mathematical functions. }
+    \item{\code{\link{sqrt}(x)} etc.}{ Miscellaneous mathematical functions. }
   }    
 }
 
 \seealso{ 
   \code{
-    \link{Image-class}, \link{Image}
+    \link{Image-class}, \link{IndexedImage-class}
   }
 }
 
 \author{
-    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}
+  Oleg Sklyar: \email{osklyar@ebi.ac.uk}
 }
 
 \keyword{methods}

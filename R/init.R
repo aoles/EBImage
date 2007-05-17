@@ -16,8 +16,6 @@
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .onLoad <- function (lib, pkg) {
-    require("methods")
-    require("utils")
     if ( getOption("verbose") )
-        cat ( paste("  : EBImage", packageDescription("EBImage",fields="Version"), "(2.0.RC) :\n") )
+        cat( "  : EBImage", packageDescription("EBImage",fields="Version"), ":\n" )
 }

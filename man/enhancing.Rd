@@ -8,20 +8,22 @@
 
 \concept{image color enhancement}
 
-\title{ Enhancing image and image colors }
+\title{ Enhancing images and colors }
 
 \description{
-  Functions to enhance image colours.
+  Functions to enhance and modify colors in images.
 }
 
 \section{ Usage }{
-  \preformatted{
-    cgamma(x, level=1, ...)
-    contrast(x, sharpen=TRUE, )
-    enhance(x, ...)
-    equalize(x, ...)
-    modulate(x, value=100, ...)
-  }
+\preformatted{
+## S4 methods for signature x='Image'
+
+cgamma(x, level=1)
+contrast(x, sharpen=TRUE)
+enhance(x)
+equalize(x)
+modulate(x, value=100)
+}
 }
 
 \section{ Arguments }{ \describe{
@@ -33,8 +35,6 @@
 
   \item{\code{value}}{ A percent change in brightness, saturation, and hue. 
     The default value to keep the values unchanged. } 
-
-  \item{\code{...}}{ Reserved for future use. }
 }}
 
 \section{ Value }{
@@ -75,7 +75,7 @@
 }
 
 \author{
-    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
+  Oleg Sklyar: \email{osklyar@ebi.ac.uk}   
 }
 
 \keyword{file}

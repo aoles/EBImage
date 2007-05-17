@@ -25,26 +25,26 @@
   return (string)
 }
 
+.stop <- function (string, ...) stop( .(string), ... )
+.warning <- function (string, ...) warning( .(string), ... )
+.cat <- function (string, ...) cat( .(string), ... )
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("channel", signature(x="ANY", mode="character"),
-    function (x, mode, ...) {
-        mode <- tolower (mode)
-        if ( mode == "grey" ) mode = "gray"
-        modeNo <- switch (EXPR=mode, rgb=0, gray=1, red=2, green=3, 
-                blue=4, asred=5, asgreen=6, asblue=7, x11=8, -1)
-        if ( modeNo < 0 )
-            stop ( paste(.("wrong conversion mode. Please specify one of"), "rgb, gray, grey, red, green, blue, asred, asgreen, asblue, x11") )
-        if ( !is.numeric(x) && !is.integer(x) && !is.array(x) && 
-             !is.matrix(x) && !is.character(x) )
-             stop ( .("supported types are numeric, integer, character, array, and matrix" ) )
-        if ( is.array(x) && !is.integer(x) && !is.numeric(x) )
-            stop ( .("supported arrays must be either numeric or interger based") )
-        res <- .DoCall("lib_channel", x, as.integer(modeNo) )
-        if ( !is.null(res) )
-            res [ which( is.na(x) ) ] = NA
-        if ( is.null(res) || is.character(res) ) return (res)
-        if ( is.array(x) ) dim (res) <- dim (x)
-        return (res)
-    }
+  function (x, mode, ...) {
+    mode <- tolower (mode)
+    modeNo <- as.integer( switch (EXPR=mode, rgb=0, grey=, gray=1, r=, red=2, 
+            g=, green=3, b=, blue=4, asred=5, asgreen=6, asblue=7, x11=8, -1) )
+    if ( modeNo < 0 )
+      stop( "wrong conversion mode")
+    if ( !is.numeric(x) && !is.character(x) )
+      stop( "argument must be coercible to either numeric or character" )
+    res <- .DoCall("lib_channel", x, modeNo )
+    if ( !is.null(res) )
+      res [ which( is.na(x) ) ] = NA
+    if ( is.null(res) || is.character(res) ) return (res)
+    if ( is.array(x) ) dim (res) <- dim (x)
+    return (res)
+  }
 )
 

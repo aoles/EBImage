@@ -44,6 +44,9 @@ setGeneric ("write.image",    function (x, files, quality, ...) standardGeneric(
 setGeneric ("assert",         function (x, y, ...)     standardGeneric("assert") )
 setGeneric ("combine",        function (x, y, ...)     standardGeneric("combine") )
 setGeneric ("tile",           function (x, ...)        standardGeneric("tile") )
+setGeneric ("image",          function (x, ...)        standardGeneric("image") )
+setGeneric ("hist",           function (x, ...)        standardGeneric("hist") )
+setGeneric ("as.Image",       function (x, ...)        standardGeneric("as.Image") )
 
 ## image filters (imageFilters.R)
 setGeneric ("blur",           function (x, ...)        standardGeneric("blur") )
@@ -93,7 +96,11 @@ setGeneric ("paintObjects",   function (x, tgt, ...)   standardGeneric("paintObj
 setGeneric ("matchObjects",   function (x, ref, ...)   standardGeneric("matchObjects") )
 setGeneric ("stackObjects",   function (x, ref, ...)   standardGeneric("stackObjects") )
 setGeneric ("rmObjects",      function (x, index, ...) standardGeneric("rmObjects") )
-setGeneric ("propagate",      function (x, ...)        standardGeneric("propagate") )
+setGeneric ("propagate",      function (x, seeds, ...) standardGeneric("propagate") )
+setGeneric ("cmoments",       function (x, ref, ...)   standardGeneric("cmoments") )
+setGeneric ("smoments",       function (x, ref, ...)   standardGeneric("smoments") )
+setGeneric ("rmoments",       function (x, ref, ...)   standardGeneric("rmoments") )
+setGeneric ("moments",        function (x, ref, ...)   standardGeneric("moments") )
 
 ## in this package defined for Image (class.Image.R), ANY (in tools.R)
 setGeneric ("channel",        function (x, mode, ...)  standardGeneric("channel") )
