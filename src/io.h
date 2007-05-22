@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 SEXP lib_readImages (SEXP, SEXP);
-SEXP lib_chooseImages ();
+SEXP lib_chooseImages (SEXP);
 SEXP lib_writeImages (SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus

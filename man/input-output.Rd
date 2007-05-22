@@ -16,8 +16,8 @@
 
 \usage{
 
-  choose.image()
-  read.image(files, colormode = Grayscale, ...)
+  choose.image(colormode=Grayscale)
+  read.image(files, colormode=Grayscale, ...)
   write.image(x, files, quality, ...)
 
 }

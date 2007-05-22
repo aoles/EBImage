@@ -42,7 +42,7 @@ See: ../LICENSE for license, LGPL
 /*----------------------------------------------------------------------- */
 static R_CallMethodDef libraryRCalls[] = {
     {"lib_readImages",     (DL_FUNC) &lib_readImages,     2},
-    {"lib_chooseImages",   (DL_FUNC) &lib_chooseImages,   0},
+    {"lib_chooseImages",   (DL_FUNC) &lib_chooseImages,   1},
     {"lib_writeImages",    (DL_FUNC) &lib_writeImages,    3},
     {"lib_display",        (DL_FUNC) &lib_display,        2},
     {"lib_animate",        (DL_FUNC) &lib_animate,        1},
