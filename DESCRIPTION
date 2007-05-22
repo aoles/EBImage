@@ -1,6 +1,6 @@
 Package: EBImage
 Version: 2.1.2
-Date: 18 May 2007
+Date: 22 May 2007
 Title: Image processing and analysis toolkit for R
 Author: Oleg Sklyar, Wolfgang Huber
 Maintainer: Oleg Sklyar <osklyar@ebi.ac.uk>
@@ -10,5 +10,5 @@ Description: The package provides functionality to perform image processing and 
 License: LGPL
 URL: http://www.ebi.ac.uk/~osklyar/EBImage/
 Copyright: Oleg Sklyar, Wolfgang Huber, 2005-2007
-SaveImage: yes
+LazyLoad: true
 biocViews: Visualization

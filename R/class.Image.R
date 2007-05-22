@@ -290,8 +290,8 @@ read.image <- function(files, colormode=Grayscale, ...) {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-choose.image <- function() {
-    .DoCall ("lib_chooseImages")
+choose.image <- function(colormode=Grayscale) {
+    .DoCall ("lib_chooseImages", as.integer(colormode))
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
