@@ -132,7 +132,7 @@ SEXP
 magick2SEXP (Image * images, int colormode) {
     unsigned int nx, ny, nz, i, nprotect, dx, dy;
     Image * image;
-    SEXP res, dim;
+    SEXP res, resd, dim;
     void * data;
     ExceptionInfo exception;
     SEXP modeSlot, filenameSlot, compSlot, filterSlot, resSlot, features;
@@ -161,11 +161,11 @@ magick2SEXP (Image * images, int colormode) {
     /* allocate memory and copy data */
     switch ( colormode ) {
         case MODE_RGB:
-            PROTECT ( res = allocVector(INTSXP, nx * ny * nz) );
+            PROTECT ( resd = allocVector(INTSXP, nx * ny * nz) );
             nprotect++;
         break;
         default: /* grayscale */
-            PROTECT ( res = allocVector(REALSXP, nx * ny * nz) );
+            PROTECT ( resd = allocVector(REALSXP, nx * ny * nz) );
             nprotect++;
     }
 
@@ -179,39 +179,44 @@ magick2SEXP (Image * images, int colormode) {
         SetImageOpacity (image, 0);
         switch ( colormode ) {
             case MODE_RGB:
-                data = &( INTEGER(res)[i * nx * ny] );
+                data = &( INTEGER(resd)[i * nx * ny] );
                 SetImageType (image, TrueColorType);
                 DispatchImage (image, 0, 0, dx, dy, "RGBO", CharPixel, data, &exception);
             break;
             default: /* grayscale */
-                data = &( REAL(res)[i * nx * ny] );
+                data = &( REAL(resd)[i * nx * ny] );
                 SetImageType (image, GrayscaleType);
                 DispatchImage (image, 0, 0, dx, dy, "I", DoublePixel, data, &exception);
         }
         CatchException (&exception);
     }
     /* set image properties */
-    /* class */
-    SET_CLASS (res, mkString("Image") );
     /* dim */
     PROTECT ( dim = allocVector(INTSXP, 3) );
     nprotect++;
     INTEGER (dim)[0] = nx;
     INTEGER (dim)[1] = ny;
     INTEGER (dim)[2] = nz;
-    SET_DIM (res, dim);
+    SET_DIM (resd, dim);
+
+    /* class */
+    PROTECT(res = NEW_OBJECT(MAKE_CLASS("Image")) );
+    nprotect++;
+    /* WARNING: we must reassign here, otherwise .Data slot is not assigned
+     * apparently this problem exists only for .Data slot */
+    res = SET_SLOT(res, install(".Data"), resd);
 
     /* copy attributes: colormode */
     PROTECT ( modeSlot = allocVector(INTSXP, 1) );
     nprotect++;
     INTEGER (modeSlot)[0] = colormode;
-    SET_SLOT (res, mkString("colormode"), modeSlot);
+    SET_SLOT (res, install("colormode"), modeSlot);
 
     /* copy attributes: filename */
     PROTECT ( filenameSlot = allocVector(STRSXP, 1) );
     nprotect++;
     SET_STRING_ELT (filenameSlot, 0, mkChar(images->filename) );
-    SET_SLOT (res, mkString("filename"), filenameSlot);
+    SET_SLOT (res, install("filename"), filenameSlot);
     /* copy attributes: compression */
     PROTECT ( compSlot = allocVector(STRSXP, 1) );
     nprotect++;
@@ -220,7 +225,7 @@ magick2SEXP (Image * images, int colormode) {
             SET_STRING_ELT (compSlot, 0, mkChar(COMP_IDS[i]) );
             break;
         }
-    SET_SLOT (res, mkString("compression"), compSlot);
+    SET_SLOT (res, install("compression"), compSlot);
     /* copy attributes: filter */
     PROTECT ( filterSlot = allocVector(STRSXP, 1) );
     nprotect++;
@@ -229,18 +234,17 @@ magick2SEXP (Image * images, int colormode) {
             SET_STRING_ELT (filterSlot, 0, mkChar(FLTR_IDS[i]) );
             break;
         }
-    SET_SLOT (res, mkString("filter"), filterSlot);
+    SET_SLOT (res, install("filter"), filterSlot);
     /* copy attributes: resolution */
     PROTECT ( resSlot = allocVector(REALSXP, 2) );
     nprotect++;
     REAL (resSlot)[0] = images->x_resolution;
     REAL (resSlot)[1] = images->y_resolution;
-    SET_SLOT (res, mkString("resolution"), resSlot);
+    SET_SLOT (res, install("resolution"), resSlot);
 
-    PROTECT ( features = allocVector(VECSXP, 0) );
+    PROTECT ( features = NEW_OBJECT(MAKE_CLASS("list")) );
     nprotect++;
-    SET_CLASS (features, mkString("list") );
-    SET_SLOT (res, mkString("features"), features);
+    SET_SLOT (res, install("features"), features);
 
     DestroyExceptionInfo(&exception);
 

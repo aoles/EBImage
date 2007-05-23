@@ -469,7 +469,7 @@ lib_deleteFeatures (SEXP x, SEXP _index) {
         Free (indexes);
 
     }
-    SET_SLOT (res, mkString("features"), allocVector(VECSXP, 0) );
+    SET_SLOT (res, install("features"), allocVector(VECSXP, 0) );
 
     UNPROTECT (nprotect);
     return res;
@@ -478,7 +478,7 @@ lib_deleteFeatures (SEXP x, SEXP _index) {
 /*----------------------------------------------------------------------- */
 SEXP
 lib_stackFeatures (SEXP obj, SEXP ref) {
-    SEXP res, xf, * stacks, * dims, * modes, * comp, * fltrslt, *ftrslt, * resol;
+    SEXP res, xf, * stacks, * stacksd, * dims, * modes, * comp, * fltrslt, *ftrslt, * resol;
     int nprotect, nx, ny, nz, i, im, nobj, dx, dy, ix, iy, x, y, colmode;
     double * data, * ftrs;
     double * refd, * stackd; // for grayscale ref
@@ -494,6 +494,7 @@ lib_stackFeatures (SEXP obj, SEXP ref) {
     nprotect = 0;
 
     stacks  = (SEXP *) R_alloc (nz, sizeof(SEXP) );
+    stacksd = (SEXP *) R_alloc (nz, sizeof(SEXP) );
     dims    = (SEXP *) R_alloc (nz, sizeof(SEXP) );
     modes   = (SEXP *) R_alloc (nz, sizeof(SEXP) );
     comp    = (SEXP *) R_alloc (nz, sizeof(SEXP) );
@@ -537,23 +538,26 @@ lib_stackFeatures (SEXP obj, SEXP ref) {
         stacki = NULL; refi = NULL;
         stackd = NULL; refd = NULL;
         if ( colmode == MODE_RGB ) {
-            PROTECT( stacks[im] = allocVector( INTSXP, (2 * dx + 1) * (2 * dy + 1) * nobj) );
+            PROTECT( stacksd[im] = allocVector( INTSXP, (2 * dx + 1) * (2 * dy + 1) * nobj) );
             nprotect++;
-            stacki = INTEGER( stacks[im] );
+            stacki = INTEGER( stacksd[im] );
             for ( i = 0; i < (2 * dx + 1) * (2 * dy + 1) * nobj; i++ )
                 stacki[ i ] = 0;
             refi = &( INTEGER(ref)[ im * nx * ny ] );
         }
         else {
-            PROTECT( stacks[im] = allocVector( REALSXP, (2 * dx + 1) * (2 * dy + 1) * nobj) );
+            PROTECT( stacksd[im] = allocVector( REALSXP, (2 * dx + 1) * (2 * dy + 1) * nobj) );
             nprotect++;
-            stackd = REAL( stacks[im] );
+            stackd = REAL( stacksd[im] );
             for ( i = 0; i < (2 * dx + 1) * (2 * dy + 1) * nobj; i++ )
                 stackd[ i ] = 0.0;
             refd = &( REAL(ref)[ im * nx * ny ] );
         }
         /* class */
-        SET_CLASS ( stacks[im], mkString("Image") );
+        PROTECT(stacks[im] = NEW_OBJECT(MAKE_CLASS("Image")) );
+        nprotect++;
+        stacks[im] = SET_SLOT(stacks[im], install(".Data"), stacksd[im]);
+
         /* dim */
         PROTECT ( dims[im] = allocVector( INTSXP, 3 ) );
         nprotect++;
@@ -565,30 +569,29 @@ lib_stackFeatures (SEXP obj, SEXP ref) {
         PROTECT ( modes[im] = allocVector(INTSXP, 1) );
         nprotect++;
         INTEGER ( modes[im] )[0] = colmode;
-        SET_SLOT ( stacks[im], mkString("colormode"), modes[im] );
+        SET_SLOT ( stacks[im], install("colormode"), modes[im] );
         /* attributes: filename */
-        SET_SLOT ( stacks[im], mkString("filename"), mkString("none") );
+        SET_SLOT ( stacks[im], install("filename"), mkString("none") );
         /* copy attributes: compression */
         PROTECT ( comp[im] = allocVector(STRSXP, 1) );
         nprotect++;
         SET_STRING_ELT (comp[im], 0, mkChar("ZIP") );
-        SET_SLOT ( stacks[im], mkString("compression"), comp[im] );
+        SET_SLOT ( stacks[im], install("compression"), comp[im] );
         /* copy attributes: filter */
         PROTECT ( fltrslt[im] = allocVector(STRSXP, 1) );
         nprotect++;
         SET_STRING_ELT ( fltrslt[im], 0, mkChar("lanczos") );
-        SET_SLOT ( stacks[im], mkString("filter"), fltrslt[im] );
+        SET_SLOT ( stacks[im], install("filter"), fltrslt[im] );
         /* copy attributes: resolution */
         PROTECT ( resol[im] = allocVector(REALSXP, 2) );
         nprotect++;
         REAL (resol[im])[0] = REAL ( GET_SLOT(ref, mkString("resolution") ) )[0];
         REAL (resol[im])[1] = REAL ( GET_SLOT(ref, mkString("resolution") ) )[1];
-        SET_SLOT ( stacks[im], mkString("resolution"), resol[im] );
+        SET_SLOT ( stacks[im], install("resolution"), resol[im] );
         /* empty feature list */
-        PROTECT ( ftrslt[im] = allocVector(VECSXP, 0) );
+        PROTECT ( ftrslt[im] = NEW_OBJECT(MAKE_CLASS("list")) );
         nprotect++;
-        SET_CLASS ( ftrslt[im], mkString("list") );
-        SET_SLOT ( stacks[im], mkString("features"), ftrslt[im] );
+        SET_SLOT ( stacks[im], install("features"), ftrslt[im] );
 
         /* copy ref into stacks */
         for ( ix = 0; ix < nx; ix++ )
