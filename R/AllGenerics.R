@@ -25,8 +25,6 @@ setGeneric ("compression",    function (x, ...)        standardGeneric("compress
 setGeneric ("compression<-",  function (x, ..., value) standardGeneric("compression<-") )
 setGeneric ("resolution",     function (x, ...)        standardGeneric("resolution") )
 setGeneric ("resolution<-",   function (x, ..., value) standardGeneric("resolution<-") )
-setGeneric ("sampleFilter",   function (x, ...)        standardGeneric("sampleFilter") )
-setGeneric ("sampleFilter<-", function (x, ..., value) standardGeneric("sampleFilter<-") )
 setGeneric ("imageData",      function (x, ...)        standardGeneric("imageData") )
 setGeneric ("imageData<-",    function (x, ..., value) standardGeneric("imageData<-") )
 ## ObjectImage property accessor methods

@@ -478,7 +478,7 @@ lib_deleteFeatures (SEXP x, SEXP _index) {
 /*----------------------------------------------------------------------- */
 SEXP
 lib_stackFeatures (SEXP obj, SEXP ref) {
-    SEXP res, xf, * stacks, * stacksd, * dims, * modes, * comp, * fltrslt, *ftrslt, * resol;
+    SEXP res, xf, * stacks, * stacksd, * dims, * modes, * comp, *ftrslt, * resol;
     int nprotect, nx, ny, nz, i, im, nobj, dx, dy, ix, iy, x, y, colmode;
     double * data, * ftrs;
     double * refd, * stackd; // for grayscale ref
@@ -498,7 +498,6 @@ lib_stackFeatures (SEXP obj, SEXP ref) {
     dims    = (SEXP *) R_alloc (nz, sizeof(SEXP) );
     modes   = (SEXP *) R_alloc (nz, sizeof(SEXP) );
     comp    = (SEXP *) R_alloc (nz, sizeof(SEXP) );
-    fltrslt = (SEXP *) R_alloc (nz, sizeof(SEXP) );
     ftrslt  = (SEXP *) R_alloc (nz, sizeof(SEXP) );
     resol   = (SEXP *) R_alloc (nz, sizeof(SEXP) );
 
@@ -577,11 +576,6 @@ lib_stackFeatures (SEXP obj, SEXP ref) {
         nprotect++;
         SET_STRING_ELT (comp[im], 0, mkChar("ZIP") );
         SET_SLOT ( stacks[im], install("compression"), comp[im] );
-        /* copy attributes: filter */
-        PROTECT ( fltrslt[im] = allocVector(STRSXP, 1) );
-        nprotect++;
-        SET_STRING_ELT ( fltrslt[im], 0, mkChar("lanczos") );
-        SET_SLOT ( stacks[im], install("filter"), fltrslt[im] );
         /* copy attributes: resolution */
         PROTECT ( resol[im] = allocVector(REALSXP, 2) );
         nprotect++;

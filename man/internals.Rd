@@ -59,8 +59,6 @@
 \alias{resolution,Image-method}
 \alias{resolution<-,Image,numeric-method}
 \alias{rotate,Image-method}
-\alias{sampleFilter,Image-method}
-\alias{sampleFilter<-,Image,character-method}
 \alias{segment,Image-method}
 \alias{sharpen,Image-method}
 \alias{thresh,Image-method}

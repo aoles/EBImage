@@ -26,7 +26,6 @@ setClass ("Image",
         filename     = "character",
         compression  = "character",  ##
         resolution   = "numeric",    ## length = 2 ## lost in jpeg, pixels per inch
-        filter       = "character",  ## filter for sampling
         features     = "list"
     ),
     prototype (
@@ -34,7 +33,6 @@ setClass ("Image",
         filename     = "no-name",
         compression  = "LZW",
         resolution   = c(2.5e+6, 2.5e+6), ## 1 px per 1um in pixels per inch
-        filter       = "lanczos",
         features     = list()
 
     ),
@@ -115,22 +113,6 @@ setReplaceMethod ("resolution", signature (x="Image", value="numeric"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("sampleFilter", signature (x="Image"),
-    function (x, ...) x@filter
-)
-setReplaceMethod ("sampleFilter", signature (x="Image", value="character"),
-    function (x, ..., value) {
-        value <- tolower (value)
-        if ( switch (EXPR=value, point=, box=, triangle=, hermite=, hanning=,
-                hamming=, blackman=, gaussian=, quadratic=, cubic=, catrom=, mitchell=,
-                lanczos=, bessel=, sinc=FALSE, TRUE) )
-            stop ( paste( .("wrong filter type. Possible values are:"), "point, box, triangle, hermite, hanning, hamming, blackman, gaussian, quadratic, cubic, catrom, mitchell, lanczos, bessel, sinc") )
-        x@filter <- value
-        return (x)
-    }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("imageData", signature (x="Image"),
     function (x, ...) x@.Data
 )
@@ -191,10 +173,10 @@ setMethod ("header", signature(x="Image"),
         if ( x@colormode == TrueColor )
             return ( new(class(x), colormode=TrueColor, .Data=integer(0), filename=fileName(x),
                 compression=compression(x), resolution=resolution(x),
-                filter=sampleFilter(x), features=features(x) ) )
+                features=features(x) ) )
         return ( new(class(x), colormode=Grayscale, .Data=numeric(0), filename=fileName(x),
             compression=compression(x), resolution=resolution(x),
-            filter=sampleFilter(x), features=features(x) ) )
+            features=features(x) ) )
     }
 )
 
@@ -396,7 +378,6 @@ setMethod ("show", signature(object="Image"),
     cat ( sprintf ("  fileName()    : %s \n", fileName(object) ) )
     cat ( sprintf ("  compression() : %s \n", compression(object) ) )
     cat ( sprintf ("  resolution()  : dx = %.1f, dy = %.1f \n", resolution(object)[1], resolution(object)[2]) )
-    cat ( sprintf ("  sampleFilter(): %s \n", sampleFilter(object) ) )
 
     if ( length( features(object) ) > 0 ) {
       cat ( "\n  Object data: features()\n" )

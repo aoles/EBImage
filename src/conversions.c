@@ -21,26 +21,13 @@ const CompressionType COMP_VALS [] = {
     JPEGCompression, BZipCompression, Group4Compression };
 
 /*----------------------------------------------------------------------- */
-#define FLTR_LENGTH 15
-
-const char * FLTR_IDS [] = {
-    "point", "box", "triangle", "hermite", "hanning",
-    "hamming", "blackman", "gaussian", "quadratic", "cubic",
-    "catrom", "mitchell", "lanczos", "bessel", "sinc" };
-
-const FilterTypes FLTR_VALS [] = {
-    PointFilter, BoxFilter, TriangleFilter, HermiteFilter, HanningFilter,
-    HammingFilter, BlackmanFilter, GaussianFilter, QuadraticFilter, CubicFilter,
-    CatromFilter, MitchellFilter, LanczosFilter, BesselFilter, SincFilter };
-
-/*----------------------------------------------------------------------- */
 Image *
 sexp2Magick (SEXP x) {
     int nx, ny, nz, colormode, i, j, * dim;
     Image * image, * res;
     ExceptionInfo exception;
     void * data;
-    char * compressStr, * filterStr;
+    char * compressStr;
 
     /* basic checks */
     if ( !isImage(x) )
@@ -101,18 +88,6 @@ sexp2Magick (SEXP x) {
             }
             break;
         }
-    /* copy attributes: filter */
-    filterStr = CHAR( asChar( GET_SLOT(x, mkString("filter") ) ) );
-    for ( i = 0; i < FLTR_LENGTH; i++ )
-        if ( strcmp(filterStr, FLTR_IDS[i]) == 0 ) {
-            res->filter = FLTR_VALS[i];
-            /* propagate to all images */
-            for ( j = 0; j < (int) GetImageListLength(res); j++ ) {
-                image = GetImageFromList (res, j);
-                image->filter = FLTR_VALS[i];
-            }
-            break;
-        }
     /* copy attributes: resolution */
     res->x_resolution = REAL ( GET_SLOT(x, mkString("resolution") ) )[0];
     res->y_resolution = REAL ( GET_SLOT(x, mkString("resolution") ) )[1];
@@ -135,7 +110,7 @@ magick2SEXP (Image * images, int colormode) {
     SEXP res, resd, dim;
     void * data;
     ExceptionInfo exception;
-    SEXP modeSlot, filenameSlot, compSlot, filterSlot, resSlot, features;
+    SEXP modeSlot, filenameSlot, compSlot, resSlot, features;
 
     if ( images == (Image *)NULL )
         return R_NilValue;
@@ -226,15 +201,6 @@ magick2SEXP (Image * images, int colormode) {
             break;
         }
     SET_SLOT (res, install("compression"), compSlot);
-    /* copy attributes: filter */
-    PROTECT ( filterSlot = allocVector(STRSXP, 1) );
-    nprotect++;
-    for ( i = 0; i < FLTR_LENGTH; i++ )
-        if ( images->filter == FLTR_VALS[i] ) {
-            SET_STRING_ELT (filterSlot, 0, mkChar(FLTR_IDS[i]) );
-            break;
-        }
-    SET_SLOT (res, install("filter"), filterSlot);
     /* copy attributes: resolution */
     PROTECT ( resSlot = allocVector(REALSXP, 2) );
     nprotect++;

@@ -14,8 +14,6 @@
 \alias{imageData<-}
 \alias{resolution}
 \alias{resolution<-}
-\alias{sampleFilter}
-\alias{sampleFilter<-}
 
 \alias{Grayscale}
 \alias{TrueColor}
@@ -50,7 +48,6 @@ setClass( "Image",
     filename     = "character",
     compression  = "character", 
     resolution   = "numeric",   
-    filter       = "character", 
     features     = "list"
   ),
   contains = "array"
@@ -131,14 +128,6 @@ setClass( "Image",
       required: the package does not take care of this. The default values
       are equal for both directions, 2.5e+6 dpi. }
 
-    \item{\code{sampleFilter(x)}, \code{sampleFilter(x) <- value}}{
-      Gets and sets the filtering algorithm used when resizing images using
-      \code{\link{resize}} and other image transformation routines. Possibly
-      this value will be removed and supplied as argument to the
-      corresponding function! At the moment, possible values include:
-      \code{'point', 'box', 'triangle', 'hermite', 'hanning', 'hamming',
-      'blackman', 'gaussian', 'quadratic', 'cubic', 'catrom', 'mitchell',
-      'lanczos', 'bessel'} and \code{'sinc'}. Default: \code{'lanczos'}. }
   }
 }
 

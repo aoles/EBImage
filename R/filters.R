@@ -183,7 +183,7 @@ setMethod ("noise", signature(x="Image"),
         
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("resize", signature(x="Image"),
-    function (x, w, h, blur=1, ...) {
+    function (x, w, h, blur=1, filter="Lanczos", ...) {
         if ( missing(w) && missing(h) )
             stop ( .("either 'w' or 'h' must be specified") )
         dimx = dim (x)
@@ -194,7 +194,9 @@ setMethod ("resize", signature(x="Image"),
             h <- dimx[2] * w / dimx[1]
         if ( w <= 0 || h <= 0 )
             stop ( .("width and height of a new image must be non zero positive") )
-        return ( .DoCall("lib_filterMagick", x, flt.resize, as.numeric( c(w, h, blur) ) ) )
+        filter <- switch(filter, Point=0, Box=1, Triangle=2, Hermite=3, Hanning=4,
+    Hamming=5, Blackman=6, Gaussian=7, Quadratic=8, Cubic=9, Catrom=10, Mitchell=11, Lanczos=12, Bessel=13, Sinc=14, 12)
+        return ( .DoCall("lib_filterMagick", x, flt.resize, as.numeric( c(w, h, blur, filter) ) ) )
     }
 )
 

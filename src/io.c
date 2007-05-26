@@ -63,10 +63,8 @@ lib_readImages (SEXP files, SEXP mode) {
             /* set all attributes from the first image */
             strcpy (images->filename, image->filename);
             images->compression = image->compression;
-            images->filter = image->filter;
             images->x_resolution = image->x_resolution;
             images->y_resolution = image->y_resolution;
-            images->filter = LanczosFilter;
         }
         nappends++;
     }
