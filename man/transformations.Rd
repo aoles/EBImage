@@ -19,14 +19,15 @@
 
 \section{ Usage }{
   \preformatted{
-    affinet(x, sx=0, rx=0, ry=0, sy=0, tx=0, ty=0, ...)
-    flip(x, ...)
-    flop(x, ...)
-    resample(x, w, h, ...)
-    resize(x, w, h, blur=1, ...)
-    rotate(x, angle=90, ...)
-  }
-}
+  ## S4 classes for signature x="Image"
+
+  affinet(x, sx=0, rx=0, ry=0, sy=0, tx=0, ty=0)
+  flip(x)
+  flop(x)
+  resample(x, w, h)
+  resize(x, w, h, blur=1, filter="Lanczos")
+  rotate(x, angle=90)
+}}
 
 \section{ Arguments }{ \describe{
 
@@ -39,6 +40,8 @@
 
   \item{\code{blur}}{ The blur factor, where 1 (\code{TRUE}) is blurry, 
     0 (\code{FALSE}) is sharp. } 
+
+  \item{\code{filter}}{ Resize pixel sampling filter. } 
 
   \item{\code{angle}}{ Image rotation angle in degrees. } 
 
@@ -65,12 +68,12 @@
     sampling. Unlike other scaling methods, this method does not introduce 
     any additional color into the scaled image.
     
-  \code{resize} scales an image to the desired dimensions with one of the 
-    filters that can be set using the \code{\link{Image-class}} accessor
-    method \code{\link{sampleFilter}}. Most of the filters are FIR (finite 
-    impulse response), however, Bessel, Gaussian, and Sinc are IIR (infinite 
-    impulse response). Bessel and Sinc are windowed (brought down to zero) with 
-    the Blackman filter.
+  \code{resize} scales an image to the desired dimensions using the supplied 
+    filter algorithm. Available filters are: \code{Point, Box, Triangle, Hermite, 
+    Hanning, Hamming, Blackman, Gaussian, Quadratic, Cubic, Catrom, Mitchell, 
+    Lanczos, Bessel, Sinc}. Most of the filters are FIR (finite impulse response), 
+    however, Bessel, Gaussian, and Sinc are IIR (infinite impulse response). 
+    Bessel and Sinc are windowed (brought down to zero) with the Blackman filter.
     
   \code{rotate} creates a new image that is a rotated copy of an existing one. 
     Positive angles rotate counter-clockwise (right-hand rule), while negative 
@@ -82,7 +85,7 @@
 
 \seealso{
   \code{
-    \link{Image-class}, \link{sampleFilter}
+    \link{Image-class}
   }
 }
 
@@ -91,7 +94,7 @@
 }
 
 \author{
-    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
+    Oleg Sklyar: \email{osklyar@ebi.ac.uk}   
 }
 
 \keyword{file}

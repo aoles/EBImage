@@ -20,7 +20,6 @@ exportMethods(
     fileName, "fileName<-",
     compression, "compression<-",
     resolution, "resolution<-",
-    sampleFilter, "sampleFilter<-",
     imageData, "imageData<-",
 
     blur, gblur, contrast, denoise, despeckle, edge, enhance, equalize,

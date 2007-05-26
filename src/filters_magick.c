@@ -13,6 +13,14 @@ See: ../LICENSE for license, LGPL
 #include <magick/ImageMagick.h>
 
 /*----------------------------------------------------------------------- */
+#define FLTR_LENGTH 15
+
+const FilterTypes FLTR_VALS [] = {
+    PointFilter, BoxFilter, TriangleFilter, HermiteFilter, HanningFilter,
+    HammingFilter, BlackmanFilter, GaussianFilter, QuadraticFilter, CubicFilter,
+    CatromFilter, MitchellFilter, LanczosFilter, BesselFilter, SincFilter };
+
+/*----------------------------------------------------------------------- */
 #define FLT_BLUR        0
 #define FLT_GAUSSBLUR   1
 #define FLT_CONTRAST    2
@@ -44,24 +52,27 @@ lib_filterMagick (SEXP x, SEXP filter, SEXP parameters) {
     Image * images, * newimages, * image;
     AffineMatrix amatrix;
     ExceptionInfo exception;
-    int npar, mode, i, nz, nappended;
+    int npar, mode, i, nz, nappended, flt;
     double * par;
     SEXP res;
     char aStr[255];
 
-    images = sexp2Magick (x);
+    flt = INTEGER(filter)[0];
     mode = INTEGER ( GET_SLOT(x, mkString("colormode") ) )[0];
-    GetExceptionInfo(&exception);
-    nz = GetImageListLength (images);
     par = &( REAL (parameters)[0] );
     npar = LENGTH (parameters);
+
+    images = sexp2Magick (x);
+    if ( flt == FLT_RESIZE ) images->filter = FLTR_VALS[(int)(par[3])];
+    GetExceptionInfo(&exception);
+    nz = GetImageListLength (images);
     res = R_NilValue;
     newimages = NewImageList ();
     nappended = 0;
 
     for ( i = 0; i < nz; i++ ) {
         image = GetFirstImageInList (images);
-        switch ( INTEGER(filter)[0] ) {
+        switch ( flt ) {
             case FLT_BLUR:
                 image = BlurImage (image, par[0], par[1], &exception);
                 break;
@@ -173,7 +184,6 @@ lib_filterMagick (SEXP x, SEXP filter, SEXP parameters) {
             /* copy attributes once and only if image contains more than 1 element */
             nappended = 1;
             newimages->compression = images->compression;
-            newimages->filter = images->filter;
             strcpy (newimages->filename, image->filename);
             newimages->x_resolution = images->x_resolution;
             newimages->y_resolution = images->y_resolution;
@@ -251,7 +261,6 @@ warning ("FIXME: the fill function does not seem to fill anything, no idea why\n
             /* copy attributes once and only if image contains more than 1 element */
             nappended = 1;
             newimages->compression = images->compression;
-            newimages->filter = images->filter;
             strcpy (newimages->filename, image->filename);
             newimages->x_resolution = images->x_resolution;
             newimages->y_resolution = images->y_resolution;
