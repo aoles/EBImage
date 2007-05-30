@@ -14,9 +14,9 @@
 
 \section{ Usage }{
   \preformatted{
-    negate(x, ...)
-    normalize(x, from=0, to=1, ...)
-    normalize2(x, ...)
+    negate(x)
+    normalize(x, separate=TRUE, ft=c(0,1))
+    normalize2(x)
   }
   
 }
@@ -25,10 +25,10 @@
 
   \item{\code{x}}{ An object of \code{\link{Image-class}}. }
 
-  \item{\code{from, to}}{ Target minimum and maximum intensity values after
-    normalization for \code{\link{Grayscale}} images. }
+  \item{\code{separate}}{ If \code{TRUE} normalizes each frame separately. }
 
-  \item{\code{...}}{ Reserved for future use. }
+  \item{\code{ft}}{ A numeric vector of 2 values, target minimum and maximum 
+    intensity values after normalization for \code{\link{Grayscale}} images. }
 }}
 
 \section{ Value }{
@@ -60,7 +60,7 @@
 }
 
 \author{
-    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
+    Oleg Sklyar: \email{osklyar@ebi.ac.uk}   
 }
 
 \examples{
