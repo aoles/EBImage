@@ -3,6 +3,7 @@
 \alias{choose.image}
 \alias{read.image}
 \alias{write.image}
+\alias{quality}
 %\alias{ping.image}
 
 \concept{image IO}
