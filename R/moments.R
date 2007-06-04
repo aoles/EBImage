@@ -93,7 +93,8 @@ setMethod ("rmoments", signature(x="IndexedImage", ref="missing"),
   }
 
   covtheta <- function(u) {
-    res <- matrix(0, nrow=dim(u)[3], ncol=6)
+    res <- try( matrix(0, nrow=dim(u)[3], ncol=6) )
+    if ( class(res) == "try-error" ) return( numeric() )
     res[,1] <- u[3,1,] / u[1,1,] # m20 = u20/u00
     res[,2] <- u[2,2,] / u[1,1,] # m11 = u11/u00
     res[,3] <- u[1,3,] / u[1,1,] # m02 = u02/u00
@@ -114,8 +115,10 @@ setMethod ("rmoments", signature(x="IndexedImage", ref="missing"),
   mom <- lapply(mom, covtheta)
 
   res <- vector( "list", dim(x)[3] )
-  for ( i in 1:length(res) )
-    res[[i]] <- cbind(ctr[[i]], mom[[i]], rmo[[i]])
+  for ( i in 1:length(res) ) {
+    if ( length(ctr[[i]]) == 0 || length(mom[[i]]) == 0 || length(rmo[[i]]) == 0 ) res[[i]] <- numeric()
+    else res[[i]] <- cbind(ctr[[i]], mom[[i]], rmo[[i]])
+  }
   return( res )  
 }
 
