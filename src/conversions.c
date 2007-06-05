@@ -27,7 +27,7 @@ sexp2Magick (SEXP x) {
     Image * image, * res;
     ExceptionInfo exception;
     void * data;
-    char * compressStr;
+    const char * compressStr;
 
     /* basic checks */
     if ( !isImage(x) )

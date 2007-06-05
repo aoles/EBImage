@@ -216,7 +216,7 @@ lib_filterFill (SEXP x, SEXP colStrSXP, SEXP coords, SEXP methodSXP, SEXP fuzzSX
     PaintMethod pm;
     PixelPacket pp, tgt;
     int * xy, fuzz;
-    char * str;
+    const char * str;
 
     images = sexp2Magick (x);
     mode = INTEGER ( GET_SLOT(x, mkString("colormode") ) )[0];
