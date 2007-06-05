@@ -31,7 +31,7 @@ lib_readImages (SEXP files, SEXP mode) {
     Image * image, * images;
     ImageInfo * image_info;
     ExceptionInfo exception;
-    char * file;
+    const char * file;
 
     if ( LENGTH(files) < 1 )
         error ( "please supply at least one file name or URL" );
@@ -133,7 +133,7 @@ lib_writeImages (SEXP x, SEXP files, SEXP quality) {
     int nz, nfiles, i;
     Image * images, * image;
     ImageInfo *image_info;
-    char * file;
+    const char * file;
 
     /* basic checks */
     if ( !isImage(x) )
