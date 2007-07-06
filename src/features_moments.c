@@ -1,4 +1,4 @@
-#include "object_moments.h"
+#include "features_moments.h"
 
 /* -------------------------------------------------------------------------
 Calculating image moments from images and indexed images
@@ -140,7 +140,7 @@ lib_moments (SEXP obj, SEXP ref, SEXP pw, SEXP what) {
     rdims    = (SEXP *) R_alloc(nz, sizeof(SEXP));
   }
 
-# define  IND(I,X,Y) X + Y*(N+1) + I*(N+1)*(N+1)
+# define  IND(I,X,Y) (X) + (Y)*(N+1) + (I)*(N+1)*(N+1)
 
   for ( im = 0; im < nz; im++ ) {
     /* get pointers */

@@ -84,17 +84,16 @@ setMethod ("rmoments", signature(x="IndexedImage", ref="missing"),
   if ( missing(ref) ) {
     ctr <- cmoments (x)
     rmo <- rmoments (x)
-    mom <- smoments (x, pw=2, what="s")
+    mom <- smoments (x, pw=2, what="c")
   }
   else {
     ctr <- cmoments (x, ref)
     rmo <- rmoments (x, ref)
-    mom <- smoments (x, ref, 2, "s")
+    mom <- smoments (x, ref, 2, "c")
   }
-
-  covtheta <- function(u) {
-    res <- try( matrix(0, nrow=dim(u)[3], ncol=6) )
-    if ( class(res) == "try-error" ) return( numeric() )
+  summ <- function(u) {
+    if ( length(u) < 6 ) return( numeric() )
+    res <- matrix(0, nrow=dim(u)[3], ncol=6)
     res[,1] <- u[3,1,] / u[1,1,] # m20 = u20/u00
     res[,2] <- u[2,2,] / u[1,1,] # m11 = u11/u00
     res[,3] <- u[1,3,] / u[1,1,] # m02 = u02/u00
@@ -103,17 +102,18 @@ setMethod ("rmoments", signature(x="IndexedImage", ref="missing"),
     x2  = 0.5 * sqrt( 4 * res[,2]^2 + (res[,1] - res[,3])^2 )
     res[,5]  = x1 + x2 # eigenvalues of the cov matrix
     res[,6]  = x1 - x2 # eigenvalues of the cov matrix
-    colnames(res) <- c("u20","u11","u02","theta","l1","l2")
+    ## second division to transfer to scale invariants
+    res[,1] <- res[,1] / u[1,1,]
+    res[,2] <- res[,2] / u[1,1,]
+    res[,3] <- res[,3] / u[1,1,]
+    colnames(res) <- c("n20","n11","n02","theta","l1","l2")
     res
   }
-
   if ( dim(x)[3] == 1 ) {
-    mom <- covtheta(mom)
+    mom <- summ(mom)
     return( cbind(ctr, mom, rmo) )
   }
-
-  mom <- lapply(mom, covtheta)
-
+  mom <- lapply(mom, summ)
   res <- vector( "list", dim(x)[3] )
   for ( i in 1:length(res) ) {
     if ( length(ctr[[i]]) == 0 || length(mom[[i]]) == 0 || length(rmo[[i]]) == 0 ) res[[i]] <- numeric()

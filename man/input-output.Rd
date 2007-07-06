@@ -16,11 +16,12 @@
 }
 
 \usage{
+  choose.image(colormode = Grayscale)
+  read.image(files, colormode = Grayscale, ...)
 
-  choose.image(colormode=Grayscale)
-  read.image(files, colormode=Grayscale, ...)
+  ## S4 class for signatures x='Image' and files='character'/'missing'
+  
   write.image(x, files, quality, ...)
-
 }
 
 \arguments{
@@ -34,7 +35,7 @@
 
   \item{quality}{ A numeric in the range \code{[1,100]} defining the quality
     of non-lossless compression, such as JPEG, when saving images. Higher
-    values correspond to better quality.}
+    values correspond to better quality. Defaults to 95.}
 
   \item{...}{ Reserved for future use. }
 
@@ -88,7 +89,7 @@
 }
 
 \author{
-    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
+  Oleg Sklyar <\email{osklyar@ebi.ac.uk}>, 2005-2006
 }
 
 \examples{

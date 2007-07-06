@@ -1,14 +1,14 @@
 Package: EBImage
-Version: 2.1.5
-Date: 26 May 2007
-Title: Image processing and analysis toolkit for R
-Author: Oleg Sklyar, Wolfgang Huber
+Version: 2.1.7
+Date: 06 July 2007
+Title: Image processing and image analysis toolkit for R
+Author: Oleg Sklyar, Wolfgang Huber, Mike Smith
 Maintainer: Oleg Sklyar <osklyar@ebi.ac.uk>
 SystemRequirements: ImageMagick (> 6.1.7), GTK+ (> 2.6) -- Windows dependencies are available from the URL below! See package vignette for installation instructions.
-Depends: R (>= 2.6.0), methods, graphics, utils
-Description: The package provides functionality to perform image processing and image analysis in R. It was originally designed to support automated image analysis in high throughput cell-based microscopy assay and is being largerly developed in that direction. However, the package is of general natuare and can be used for other problems that require image analysis. The package supports over 95 image formats through its interface to ImageMagick and provides functions standard image filters plus morphological transformations and object detection algroithms. It has a build-in image viewer which supports single images and image stacks.
+Depends: R (>= 2.4.0), methods, graphics, utils
+Description: The package provides functionality to perform image processing and image analysis in R. Originally designed to support automated image analysis in high throughput cell-based microscopy assays, the package is of general natuare and can be used for other image analysis problems. The package supports over 95 image formats through its interface to ImageMagick and provides an extensive set of functions for image manipulation and feature extraction on single images and image stacks. The package features a minimal set of GUI options providing a built-in image viewer and an image selection dialog.
 License: LGPL
 URL: http://www.ebi.ac.uk/~osklyar/EBImage/
-Copyright: Oleg Sklyar, Wolfgang Huber, 2005-2007
+Copyright: Oleg Sklyar, 2005-2007
 LazyLoad: true
 biocViews: Visualization

@@ -1,6 +1,6 @@
 # Declarations of all generic methods used in the package
 
-# Copyright (c) 2006 Oleg Sklyar
+# Copyright (c) 2005-2007 Oleg Sklyar
 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public License
@@ -16,7 +16,7 @@
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-## Image and ObjectImage property accessor methods
+## image accessor methods
 setGeneric ("colorMode",      function (x, ...)        standardGeneric("colorMode") )
 setGeneric ("colorMode<-",    function (x, ..., value) standardGeneric("colorMode<-") )
 setGeneric ("fileName",       function (x, ...)        standardGeneric("fileName") )
@@ -27,11 +27,11 @@ setGeneric ("resolution",     function (x, ...)        standardGeneric("resoluti
 setGeneric ("resolution<-",   function (x, ..., value) standardGeneric("resolution<-") )
 setGeneric ("imageData",      function (x, ...)        standardGeneric("imageData") )
 setGeneric ("imageData<-",    function (x, ..., value) standardGeneric("imageData<-") )
-## ObjectImage property accessor methods
 setGeneric ("features",       function (x, ...)        standardGeneric("features") )
-setGeneric ("features<-",     function (x, ..., value) standardGeneric("features<-") )
 
-## in this package defined for Image and ObjectImage only (class.Image.R)
+setGeneric ("channel",        function (x, mode, ...)  standardGeneric("channel") )
+
+## image IO, assertion, display
 setGeneric ("copy",           function (x, ...)        standardGeneric("copy") )
 setGeneric (".isCorrectType", function (x)             standardGeneric(".isCorrectType") )
 setGeneric (".correctType",   function (x)             standardGeneric(".correctType") )
@@ -46,7 +46,7 @@ setGeneric ("image",          function (x, ...)        standardGeneric("image") 
 setGeneric ("hist",           function (x, ...)        standardGeneric("hist") )
 setGeneric ("as.Image",       function (x, ...)        standardGeneric("as.Image") )
 
-## image filters (imageFilters.R)
+## image filters
 setGeneric ("blur",           function (x, ...)        standardGeneric("blur") )
 setGeneric ("gblur",          function (x, ...)        standardGeneric("gblur") )
 setGeneric ("contrast",       function (x, ...)        standardGeneric("contrast") )
@@ -64,42 +64,42 @@ setGeneric ("resample",       function (x, ...)        standardGeneric("resample
 setGeneric ("segment",        function (x, ...)        standardGeneric("segment") )
 setGeneric ("sharpen",        function (x, ...)        standardGeneric("sharpen") )
 setGeneric ("umask",          function (x, ...)        standardGeneric("umask") )
-## adaptive threshold using running square frame
 setGeneric ("thresh",         function (x, ...)        standardGeneric("thresh") )
-## adaptive threshold using magick
 setGeneric ("athresh",        function (x, ...)        standardGeneric("athresh") )
-## channel threshold
 setGeneric ("cthresh",        function (x, ...)        standardGeneric("cthresh") )
-## affine transform image
 setGeneric ("affinet",        function (x, ...)        standardGeneric("affinet") )
-## bright, sat and hue in percent
 setGeneric ("modulate",       function (x, ...)        standardGeneric("modulate") )
 setGeneric ("negate",         function (x, ...)        standardGeneric("negate") )
 setGeneric ("normalize",      function (x, ...)        standardGeneric("normalize") )
-## works for RGB as well, uses magick
 setGeneric ("normalize2",     function (x, ...)        standardGeneric("normalize2") )
 setGeneric ("fill",           function (x, ...)        standardGeneric("fill") )
 setGeneric ("flip",           function (x, ...)        standardGeneric("flip") )
 setGeneric ("flop",           function (x, ...)        standardGeneric("flop") )
+
+## morphology
+setGeneric ("distmap",        function (x, ...)        standardGeneric("distmap") )
+setGeneric ("watershed",      function (x, ...)        standardGeneric("watershed") )
+setGeneric ("propagate",      function (x, seeds, ...) standardGeneric("propagate") )
 setGeneric ("erode",          function (x, ...)        standardGeneric("erode") )
 setGeneric ("dilate",         function (x, ...)        standardGeneric("dilate") )
 setGeneric ("opening",        function (x, ...)        standardGeneric("opening") )
 setGeneric ("closing",        function (x, ...)        standardGeneric("closing") )
 
-## object detection and related
-setGeneric ("distmap",        function (x, ...)        standardGeneric("distmap") )
-setGeneric ("watershed",      function (x, ...)        standardGeneric("watershed") )
-setGeneric ("getObjects",     function (x, ref, ...)   standardGeneric("getObjects") )
+## object manipulation
 setGeneric ("paintObjects",   function (x, tgt, ...)   standardGeneric("paintObjects") )
 setGeneric ("matchObjects",   function (x, ref, ...)   standardGeneric("matchObjects") )
 setGeneric ("stackObjects",   function (x, ref, ...)   standardGeneric("stackObjects") )
 setGeneric ("rmObjects",      function (x, index, ...) standardGeneric("rmObjects") )
-setGeneric ("propagate",      function (x, seeds, ...) standardGeneric("propagate") )
+
+## feature extraction
+setGeneric ("getFeatures",    function (x, ...)        standardGeneric("getFeatures") )
+setGeneric ("hull.features",  function (x, ...)        standardGeneric("hull.features") )
+setGeneric ("edge.profile",   function (x, ref, ...)   standardGeneric("edge.profile") )
+setGeneric ("edge.features",  function (x, ...)        standardGeneric("edge.features") )
 setGeneric ("cmoments",       function (x, ref, ...)   standardGeneric("cmoments") )
 setGeneric ("smoments",       function (x, ref, ...)   standardGeneric("smoments") )
 setGeneric ("rmoments",       function (x, ref, ...)   standardGeneric("rmoments") )
 setGeneric ("moments",        function (x, ref, ...)   standardGeneric("moments") )
-
-## in this package defined for Image (class.Image.R), ANY (in tools.R)
-setGeneric ("channel",        function (x, mode, ...)  standardGeneric("channel") )
+setGeneric ("haralick.matrix",function (x, ref, ...)   standardGeneric("haralick.matrix") )
+setGeneric ("haralick.features",function (x, ref,...)   standardGeneric("haralick.features") )
 

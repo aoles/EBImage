@@ -12,11 +12,11 @@
 }
 
 \section{Usage}{
-\preformatted{
-## S4 methods for signature x='Image'    
+  \preformatted{
+    ## S4 methods for signature x='Image'    
 
-display(x, no.GTK=FALSE)
-animate(x)                 ## not available on Windows
+    display(x, no.GTK=FALSE)
+    animate(x)                 ## not available on Windows
 }}
 
 \section{ Arguments }{ \describe{
@@ -67,7 +67,7 @@ animate(x)                 ## not available on Windows
 }
 
 \author{
-  Oleg Sklyar: \email{osklyar@ebi.ac.uk}   
+  Oleg Sklyar <\email{osklyar@ebi.ac.uk}>, 2005-2007
 }
 
 \keyword{file}

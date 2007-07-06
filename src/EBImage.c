@@ -9,6 +9,7 @@ See: ../LICENSE for license, LGPL
 #include "colors.h"
 #include "display.h"
 #include "io.h"
+
 #include "filters_distmap.h"
 #include "filters_magick.h"
 #include "filters_morph.h"
@@ -16,8 +17,12 @@ See: ../LICENSE for license, LGPL
 #include "filters_normalize.h"
 #include "filters_watershed.h"
 #include "filters_thresh.h"
-#include "object_counting.h"
-#include "object_moments.h"
+
+#include "features_hull.h"
+#include "features_moments.h"
+#include "features_haralick.h"
+
+#include "objects.h"
 
 #include <R.h>
 #include <Rdefines.h>
@@ -47,21 +52,28 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_display",        (DL_FUNC) &lib_display,        2},
     {"lib_animate",        (DL_FUNC) &lib_animate,        1},
     {"lib_channel",        (DL_FUNC) &lib_channel,        2},
+
     {"lib_filterMagick",   (DL_FUNC) &lib_filterMagick,   3},
     {"lib_erode_dilate",   (DL_FUNC) &lib_erode_dilate,   4},
     {"lib_filterThresh",   (DL_FUNC) &lib_filterThresh,   2},
     {"lib_filterFill",     (DL_FUNC) &lib_filterFill,     5},
+    {"lib_normalize",      (DL_FUNC) &lib_normalize,      3},
     {"lib_distMap",        (DL_FUNC) &lib_distMap,        4},
     {"lib_filterInvWS",    (DL_FUNC) &lib_filterInvWS,    3},
-    {"lib_getFeatures",    (DL_FUNC) &lib_getFeatures,    2},
+    {"lib_propagate",      (DL_FUNC) &lib_propagate,      5},
+
     {"lib_paintFeatures",  (DL_FUNC) &lib_paintFeatures,  4},
     {"lib_matchFeatures",  (DL_FUNC) &lib_matchFeatures,  2},
-    {"lib_stackFeatures",  (DL_FUNC) &lib_stackFeatures,  2},
     {"lib_deleteFeatures", (DL_FUNC) &lib_deleteFeatures, 2},
-    {"lib_propagate",      (DL_FUNC) &lib_propagate,      5},
-    {"lib_normalize",      (DL_FUNC) &lib_normalize,      3},
+    {"lib_stack_objects",  (DL_FUNC) &lib_stack_objects,  6},
+    {"lib_tile_stack",     (DL_FUNC) &lib_tile_stack,     3},
+
+    {"lib_basic_hull",     (DL_FUNC) &lib_basic_hull,     1},
     {"lib_cmoments",       (DL_FUNC) &lib_cmoments,       2},
     {"lib_moments",        (DL_FUNC) &lib_moments,        4},
+    {"lib_edge_profile",   (DL_FUNC) &lib_edge_profile,   2},
+    {"lib_co_occurrence",  (DL_FUNC) &lib_co_occurrence,  3},
+    {"lib_haralick",       (DL_FUNC) &lib_haralick,       1},
 
     /* add above all R-lib functions from common.h */
     {NULL, NULL, 0}

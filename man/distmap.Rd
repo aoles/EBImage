@@ -14,10 +14,10 @@
 }
 
 \section{ Usage }{
-\preformatted{
-## S4 method for signature x='Image'  
+  \preformatted{
+    ## S4 method for signature x='Image'  
   
-distmap(x, t=0.05, exact=FALSE, bg=0.05)
+    distmap(x, t=0.05, exact=FALSE, bg=0.05)
 }}
 
 \section{ Arguments }{ \describe{
@@ -76,7 +76,7 @@ distmap(x, t=0.05, exact=FALSE, bg=0.05)
 }
 
 \author{
-  Oleg Sklyar: \email{osklyar@ebi.ac.uk}   
+  Oleg Sklyar <\email{osklyar@ebi.ac.uk}>, 2006
 }
 
 \examples{

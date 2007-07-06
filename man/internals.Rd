@@ -65,8 +65,6 @@
 \alias{umask,Image-method}
 \alias{watershed,Image-method}
 \alias{matchObjects,IndexedImage,IndexedImage-method}
-\alias{getObjects,IndexedImage,Image-method}
-\alias{getObjects,IndexedImage,missing-method}
 \alias{rmObjects,IndexedImage,list-method}
 \alias{rmObjects,IndexedImage,numeric-method}
 \alias{paintObjects,IndexedImage,Image-method}
@@ -89,6 +87,15 @@
 \alias{smoments,IndexedImage,missing-method}
 \alias{rmoments,IndexedImage,Image-method}
 \alias{rmoments,IndexedImage,missing-method}
+\alias{haralick.matrix,IndexedImage,Image-method}
+\alias{haralick.features,IndexedImage,Image-method}
+\alias{edge.profile,IndexedImage,missing-method}
+\alias{edge.profile,IndexedImage,Image-method}
+\alias{edge.features,IndexedImage-method}
+\alias{animate,IndexedImage-method}
+\alias{features,IndexedImage-method}
+\alias{getFeatures,IndexedImage-method}
+\alias{hull.features,IndexedImage-method}
 
 \title{ Internals }
 
