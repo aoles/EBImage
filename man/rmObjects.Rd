@@ -37,27 +37,7 @@ rmObjects(x, index)
 
 \seealso{
   \code{
-    \link{IndexedImage-class}, \link{watershed}, \link{getObjects}, \link{paintObjects}
-  }
-}
-
-\examples{
-  \dontrun{ FIXME: redo the example as new signature is available for 2D}
-
-  if ( interactive() ) {
-    ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
-    a <- read.image( paste(ddir, "A04w1.jpg", sep="/") )
-    w <- watershed( distmap( thresh(a, 10, 10) ) )
-    display( normalize(w) )
-
-    \dontrun{Often one need to delete small objects, here is the}
-    \dontrun{straightfoward way to construct an index}
-    index <- lapply( getObjects(w), function(x) which( x[, "size"] < 30) )
-
-    \dontrun{now we delete these small objects}
-    w <- rmObjects( w, index )
-    display( normalize(w) )
-
+    \link{IndexedImage-class}, \link{watershed}, \link{getFeatures}, \link{paintObjects}
   }
 }
 

@@ -45,7 +45,7 @@ propagate(x, seeds, mask=NULL, lambda=0.005, ext=1)
 
   An image of \code{\link{Image-class}}, with the same object indexing as
   \code{seeds}. No new objects are created, only those specified by
-  seeds are propagated. Use \code{\link{getObjects}} to assign the
+  seeds are propagated. Use \code{\link{getFeatures}} to assign the
   feature matrix.
 
 }
@@ -74,7 +74,7 @@ propagate(x, seeds, mask=NULL, lambda=0.005, ext=1)
 
 \seealso{
   \code{
-    \link{IndexedImage-class}, \link{Image-class}, \link{watershed}, \link{getObjects}
+    \link{IndexedImage-class}, \link{Image-class}, \link{watershed}, \link{getFeatures}
   }
 }
 

@@ -5,9 +5,9 @@
 \alias{smoments}
 \alias{rmoments}
 
-\concept{object detection}
+\concept{feature extraction}
 
-\title{ Image moments and moment invariants }
+\title{ Image moments and moment invariants, feature extraction }
 
 \description{
   A set of functions to compute central, scale and rotation invariant moments
@@ -16,19 +16,19 @@
 }
 
 \section{ Usage }{
-\preformatted{
+  \preformatted{
 
-## S4 methods for x='IndexedImage' and ref='Image'/'missing'
+  ## S4 methods for x='IndexedImage' and ref='Image'/'missing'
 
-cmoments(x, ref)
-smoments(x, ref, pw=3, what="s")
-rmoments(x, ref)
+  cmoments(x, ref)
+  smoments(x, ref, pw=3, what="s")
+  rmoments(x, ref)
 
-moments(x, ref)
+  moments(x, ref)
 
-## S4 method for signature x='Image'
+  ## S4 method for signature x='Image'
 
-moments(x)
+  moments(x)
 }}
 
 \section{ Arguments }{ \describe{
@@ -75,8 +75,8 @@ moments(x)
   non-background pixels).
 
   \code{smoments} computes for each object in an image a square matrix of order 
-  \code{pw} of either central moments (\code{µ[i,j]}) or scale invariant moments 
-  (\code{η[i,j]}) depending on the parameter \code{what}.
+  \code{pw} of either central moments (\code{mu[i,j]}) or scale invariant moments 
+  (\code{nabla[i,j]}) depending on the parameter \code{what}.
   
   \code{rmoments} computes for each object the Hu's set of 7 rotation invariants.
   
@@ -105,11 +105,11 @@ moments(x)
 }
 
 \seealso{\code{
-  \link{Image-class}, \link{IndexedImage-class}, \link{watershed}, \link{propagate}
+  \link{IndexedImage-class}, \link{watershed}, \link{getFeatures}
 }}
 
 \author{
-    Oleg Sklyar: \email{osklyar@ebi.ac.uk}, 2007
+  Oleg Sklyar <\email{osklyar@ebi.ac.uk}>, 2007
 }
 
 \examples{

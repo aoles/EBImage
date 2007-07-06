@@ -21,42 +21,40 @@
 }
 
 \section{ Class Definition }{ 
-\preformatted{
-## S4 class definition
+  \preformatted{
+    ## S4 class definition
 
-setClass( "IndexedImage", contains="Image" )
-
-}
-}
+    setClass( "IndexedImage", contains="Image" )
+}}
 
 \section{ Creating objects }{
-  Objects of this class should not be created directly, but rather as the result
-  of calls to \code{\link{watershed}}, \code{\link{propagate}} etc.
+  Objects of this class are not supposed to be created directly, rather as the 
+  result of calls to \code{\link{watershed}} or \code{\link{propagate}}, or other
+  functions that index objects in images.
 }
 
-
 \section{ Details }{
-
-  No accessor methods are defined for this class specifically, but all of the 
-  parent \code{\link{Image-class}} and \code{\link{array}} are accessible.
+  No accessor methods are defined for this class, however all of the 
+  parents' ones are available, i.e. those of \code{\link{Image-class}} 
+  and \code{\link{array}}.
 
   One coersion routine is defined in addition, which simply sets the class 
   attribute to \code{Image}:
-\preformatted{
-## S4 method for signature x='IndexedImage'
 
-as.Image(x)
+\preformatted{
+    ## S4 method for signature x='IndexedImage'
+    as.Image(x)
 }
 
   Used with \code{IndexedImage}'s \code{display} by default normalizes the image.
 }
 
 \seealso{\code{
-  \link{Image-class}, \link{watershed}, \link{propagate}
+  \link{Image-class}, \link{watershed}, \link{getFeatures}
 }}
 
 \author{
-  Oleg Sklyar: \email{osklyar@ebi.ac.uk}
+  Oleg Sklyar <\email{osklyar@ebi.ac.uk}>, 2007
 }
 
 \examples{

@@ -37,7 +37,7 @@ matchObjects(x, ref)
 }
 
 \seealso{ \code{
-    \link{IndexedImage-class}, \link{watershed}, \link{getObjects}
+    \link{IndexedImage-class}, \link{watershed}, \link{getFeatures}
 }}
 
 \author{

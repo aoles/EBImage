@@ -60,12 +60,13 @@
 
 \seealso{
   \code{
-    \link{Image-class}, \link{distmap}, \link{thresh}, \link{getObjects},
+    \link{Image-class}, \link{distmap}, \link{thresh}, \link{getFeatures},
     \code{matchObjects}
   }
 }
 
 \examples{
+## REDO THE EXAMPLE
   if ( interactive() ) {
     ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
     a <- read.image( paste(ddir, "A04w1.jpg", sep="/") )
@@ -75,9 +76,9 @@
 
     \dontrun{often one needs to delete small objects}
     \dontrun{here is the straightforward way to construct the index}
-    index <- lapply( getObjects(w), function(x) which( x[, "size"] < 40) )
-    w <- rmObjects(w, index)
-    display( normalize(w) )
+##    index <- lapply( getFeatures(w), function(x) which( x[, "size"] < 40) )
+##    w <- rmObjects(w, index)
+    display( w )
 
   }
 }

@@ -7,7 +7,7 @@
 \title{ Marking detected objects in reference images }
 
 \description{
-  This function allows to mark objects detected with \code{\link{getObjects}} or
+  This function allows to mark objects detected with \code{\link{getFeatures}} or
   \code{\link{watershed}} in colour for preview.
 }
 
@@ -49,7 +49,7 @@
 
 \seealso{
   \code{
-    \link{IndexedImage-class}, \link{Image-class}, \link{watershed}, \link{getObjects}
+    \link{IndexedImage-class}, \link{Image-class}, \link{watershed}, \link{getFeatures}
   }
 }
 

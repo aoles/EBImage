@@ -32,13 +32,17 @@
   \code{\link{rotate}, \link{resize}}), image segmentation (e.g. \code{\link{edge}, 
   \link{segment}, \link{thresh}}), image morphology (e.g. \code{\link{dilate}, 
   \link{opening}, \link{distmap}}), object detection (e.g. \code{\link{watershed},
-  \link{propagate}}) and normalization (\code{\link{normalize}}).
+  \link{propagate}}) abd feature extractuion (e.g. \code{\link{haralick.features},
+  \link{edge.features}} etc).
 
   The project page is: \url{http://www.ebi.ac.uk/~osklyar/EBImage}
 }
 
 \section{Changelog}{
   \preformatted{
+* 2.1.7, 2007-07-06: multiple feature extraction algorithms (hull, Haralick, 
+    edge features); new optimized 'stackObjects' (with rotation) and fast 'tile'
+
 * 2.1.2, 2007-05-15: new development version with image\link{moments}
     implemented.
 
@@ -82,9 +86,12 @@
 }
 
 \author{
-  Copyright (c) 2005-2007 Oleg Sklyar: \email{osklyar@ebi.ac.uk}.
+  Copyright (c) 2005-2007 Oleg Sklyar <\email{osklyar@ebi.ac.uk}>
 
-  Parts of the code by Wolfgang Huber: \email{huber@ebi.ac.uk}
+  Parts of the code by Wolfgang Huber <\email{huber@ebi.ac.uk}> and
+  Mike Smith <\email{msmith@ebi.ac.uk}>. The code of \code{\link{propagate}}
+  is based on \code{CellProfiler} with permission granted to distribute this
+  particular part under LGPL, the corresponding copyright applies.
 
   \preformatted{
   European Bioinformatics Institute
