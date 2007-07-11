@@ -100,6 +100,7 @@ setGeneric ("cmoments",       function (x, ref, ...)   standardGeneric("cmoments
 setGeneric ("smoments",       function (x, ref, ...)   standardGeneric("smoments") )
 setGeneric ("rmoments",       function (x, ref, ...)   standardGeneric("rmoments") )
 setGeneric ("moments",        function (x, ref, ...)   standardGeneric("moments") )
+setGeneric ("zernike.moments",function (x, ref, ...)   standardGeneric("zernike.moments") )
 setGeneric ("haralick.matrix",function (x, ref, ...)   standardGeneric("haralick.matrix") )
-setGeneric ("haralick.features",function (x, ref,...)   standardGeneric("haralick.features") )
+setGeneric ("haralick.features",function (x, ref,...)  standardGeneric("haralick.features") )
 

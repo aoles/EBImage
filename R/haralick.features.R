@@ -31,7 +31,7 @@ setMethod ("haralick.matrix", signature(x="IndexedImage", ref="Image"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("haralick.features", signature(x="IndexedImage", ref="Image"),
   function(x, ref, nc=32, ...) {
-    hm <- haralick.matrix(x, ref, nc)
+    hm <- haralick.matrix(x=x, ref=ref, nc=nc, ...)
     if ( is.null(hm) || !(is.array(hm) || is.list(hm)) ) return( NULL )
     do.features <- function(m) {
       res <- .DoCall( "lib_haralick", m )

@@ -5,9 +5,6 @@ Calculating Haralick image features
 Copyright (c) 2007 Oleg Sklyar, Mike Smith
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
-// why these two?
-#include <stdio.h> 
-#include <stdlib.h>
 
 #include "tools.h"
 #include <R_ext/Error.h>
@@ -17,7 +14,7 @@ See: ../LICENSE for license, LGPL
 /* calculates haralick cooccurrence matrix ---------------------------------- */
 SEXP
 lib_co_occurrence (SEXP obj, SEXP ref, SEXP cgrades) {
-  SEXP res, * cm, * dm;
+  SEXP res, cm, dm;
   int nx, ny, nz, nprotect, im, x, y, nobj, index, i, nc, colthis, colthat, * ncomp;
   double * data, * refdata, * cmdata;
 
@@ -25,19 +22,17 @@ lib_co_occurrence (SEXP obj, SEXP ref, SEXP cgrades) {
   nx = INTEGER ( GET_DIM(obj) )[0];
   ny = INTEGER ( GET_DIM(obj) )[1];
   nz = INTEGER ( GET_DIM(obj) )[2];
+  nprotect = 0;
+
   if ( INTEGER(GET_DIM(ref))[0] != nx || INTEGER(GET_DIM(ref))[1] != ny ||
        INTEGER(GET_DIM(ref))[2] != nz )
     error( "'ref' image has different size than 'obj'" );
-  nprotect = 0;
 
   nc = INTEGER(cgrades)[0];
   if ( nc < 2 ) error( "the number of color grades must be larger than 1" );
 
-  /* will be freed automatically, list of feature matrices */
-  cm = (SEXP *) R_alloc (nz, sizeof(SEXP) );
-  for ( im = 0; im < nz; im++ ) cm[im] = R_NilValue;
-  /* will be freed automatically, list of dimensions for feature matrices */
-  dm = (SEXP *) R_alloc (nz, sizeof(SEXP) );
+  PROTECT ( res = allocVector(VECSXP, nz) );
+  nprotect++;
 
   for ( im = 0; im < nz; im++ ) {
     /* get image data */
@@ -46,22 +41,24 @@ lib_co_occurrence (SEXP obj, SEXP ref, SEXP cgrades) {
     /* get number of objects -- max index */
     nobj = 0;
     for ( index = 0; index < nx * ny; index++ )
-      if ( data[index] > nobj ) nobj = data[index];
-    if ( nobj < 1 ) continue;
+      if ( data[index] > nobj ) nobj = floor( data[index] );
+    if ( nobj < 1 ) {
+      SET_VECTOR_ELT( res, im, R_NilValue);
+      continue;
+    }
     /* create features matrix */
-    PROTECT ( cm[im] = allocVector(REALSXP, nobj * nc * nc) );
-    nprotect++;
+    SET_VECTOR_ELT( res, im, (cm = allocVector(REALSXP, nobj * nc * nc)) );
     /* initialize feature matrix with 0 */
-    cmdata = REAL (cm[im]);
+    cmdata = REAL( cm );
     for ( index = 0; index < nobj * nc * nc; index++ ) cmdata [index] = 0.0;
     /* set dimensions of the feature matrix */
-    PROTECT ( dm[im] = allocVector(INTSXP, 3) );
+    PROTECT( dm = allocVector(INTSXP, 3) );
     nprotect++;
-    INTEGER ( dm[im] )[0] = nc;
-    INTEGER ( dm[im] )[1] = nc;
-    INTEGER ( dm[im] )[2] = nobj;
-    SET_DIM ( cm[im], dm[im] );
-  
+    INTEGER( dm )[0] = nc;
+    INTEGER( dm )[1] = nc;
+    INTEGER( dm )[2] = nobj;
+    SET_DIM( cm, dm );
+    UNPROTECT( 1 ); nprotect--;
     /* number of comparisons for each object */
     ncomp = (int *) R_alloc (nobj, sizeof(int) );
     for ( index = 0; index < nobj; index++ )  ncomp[index] = 0;
@@ -70,7 +67,7 @@ lib_co_occurrence (SEXP obj, SEXP ref, SEXP cgrades) {
     /* reason to skip lines: we compare from this to: right, botoom, right-botoom, left-bottom */
     for ( x = 1; x < nx - 1; x++ )      // skip leftmost and rightmost cols
       for ( y = 0; y < ny - 1; y++ ) {  // skip bottom row
-        index = data[x + y * nx]; /* index of the object, R-style = 1-based */
+        index = floor( data[x + y * nx] ); /* index of the object, R-style = 1-based */
         if ( index < 1 ) continue;
         /* all indexes were 1, 2, 3, but C has 0-based indexes!!! */
         index--;
@@ -106,19 +103,8 @@ lib_co_occurrence (SEXP obj, SEXP ref, SEXP cgrades) {
 	    if ( ncomp[index] > 0 ) cmdata[i + index * nc * nc] /= ncomp[index];
   }
 
-  if ( nz == 1 ) {
-    UNPROTECT( nprotect );
-    return cm[0];
-  }
-
-  PROTECT ( res = allocVector(VECSXP, nz) );
-  nprotect++;
-
-  /* put fm into the list */
-  for ( im = 0; im < nz; im++ )
-   SET_VECTOR_ELT (res, im, cm[im] );
-
   UNPROTECT( nprotect );
+  if ( nz == 1 ) return VECTOR_ELT(res, 0 );
   return res;
 }
 
@@ -140,6 +126,9 @@ lib_haralick ( SEXP cm ) {
   double HXY1, HXY2, entpx;  //used in calculating IMC1 and IMC2
   /* offsets in the res matrix for each feature, calculated from nobj */
   enum { ASM, CON, COR, VAR, IDM, SAV, SVA, SEN, ENT, DVA, DEN, IMC1, IMC2 };
+
+  if ( cm == R_NilValue ) return R_NilValue;
+  
   nprotect = 0;
   /* n = number of colors, nc, determined by the size of the haralick matrix */
   nc = INTEGER(GET_DIM(cm))[0];
@@ -241,8 +230,8 @@ lib_haralick ( SEXP cm ) {
         HXY2 -= (tmp >= SMALL) ? (tmp * log10(tmp)) : (tmp * log10(SMALL));
       }
     }
-//    Rprintf("%f %f\n", f[index + ENT], HXY1);
-    f[index + IMC1 * nobj] = (entpx > 0) ? ((f[index + ENT * nobj] - HXY1) / entpx) : 0.0;
+//    FIXME: why is the following negative (if fabs removed)?
+    f[index + IMC1 * nobj] = (entpx != 0) ? ( fabs(f[index + ENT * nobj] - HXY1) / entpx) : 0.0;
     tmp = 1.0 - exp( -2.0 * (HXY2 - f[index + ENT * nobj]));
     f[index + IMC2 * nobj] = ( tmp >= 0 ) ? sqrt(tmp) : 0.0;
   }

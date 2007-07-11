@@ -84,12 +84,12 @@ setMethod ("rmoments", signature(x="IndexedImage", ref="missing"),
   if ( missing(ref) ) {
     ctr <- cmoments (x)
     rmo <- rmoments (x)
-    mom <- smoments (x, pw=2, what="c")
+    mom <- smoments (x=x, pw=2, what="c")
   }
   else {
-    ctr <- cmoments (x, ref)
-    rmo <- rmoments (x, ref)
-    mom <- smoments (x, ref, 2, "c")
+    ctr <- cmoments (x=x, ref=ref)
+    rmo <- rmoments (x=x, ref=ref)
+    mom <- smoments (x=x, ref=ref, pw=2, what="c")
   }
   summ <- function(u) {
     if ( length(u) < 6 ) return( numeric() )
@@ -147,7 +147,7 @@ setMethod ("moments", signature(x="Image", ref="missing"),
     ref <- x
     x[] <- 1
     class(x) <- "IndexedImage"
-    mom <- .momentsSummary(x, ref)
+    mom <- .momentsSummary(x=x, ref=ref)
     if ( dim(x)[3] == 1 )
       return( mom )
     res <- mom[[1]]

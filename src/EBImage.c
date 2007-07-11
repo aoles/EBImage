@@ -21,6 +21,7 @@ See: ../LICENSE for license, LGPL
 #include "features_hull.h"
 #include "features_moments.h"
 #include "features_haralick.h"
+#include "features_zernike.h"
 
 #include "objects.h"
 
@@ -74,6 +75,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_edge_profile",   (DL_FUNC) &lib_edge_profile,   2},
     {"lib_co_occurrence",  (DL_FUNC) &lib_co_occurrence,  3},
     {"lib_haralick",       (DL_FUNC) &lib_haralick,       1},
+    {"lib_zernike",        (DL_FUNC) &lib_zernike,        6},
 
     /* add above all R-lib functions from common.h */
     {NULL, NULL, 0}

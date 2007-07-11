@@ -17,7 +17,7 @@
   \preformatted{
     ## S4 methods for signature x='IndexedImage'
 
-    getFeatures(x, ref)
+    getFeatures(x, ref, ...)
     features(x)
 }}
 
@@ -28,6 +28,9 @@
 
   \item{\code{ref}}{ A reference image containing images of the objects in
     Grayscale mode (intensity values)! }
+
+  \item{\code{...}}{ Pass further arguments like \code{N}, \code{R} and \code{apply.Gaussian} 
+    to \code{\link{zernike.moments}} or \code{nc} to \code{\link{haralick.features}}! }
 }}
 
 \section{ Value }{
@@ -51,7 +54,8 @@
 
 \section{See Also}{ \code{
   \link{IndexedImage-class}, \link{propagate}, \link{paintObjects}, \link{stackObjects},
-  \link{hull.features}, \link{haralick.features}, \link{moments}, \link{edge.features}
+  \link{hull.features}, \link{haralick.features}, \link{moments}, \link{edge.features},
+  \link{zernike.moments}
 }}
 
 \author{
