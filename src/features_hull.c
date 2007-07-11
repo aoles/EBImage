@@ -6,27 +6,31 @@ Copyright (c) 2007 Oleg Sklyar
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
 
-#include "tools.h"
 #include <R_ext/Error.h>
+
+int _is_perimeter(int x, int y, int index, double * data, int nx, int ny) {
+  if ( x+1 >= nx ) return 1; else if ( floor(data[(x+1) + y * nx]) != index + 1 ) return 1;
+  if ( x-1 < 0 )   return 1; else if ( floor(data[(x-1) + y * nx]) != index + 1 ) return 1;
+  if ( y+1 >= ny ) return 1; else if ( floor(data[x + (y+1) * nx]) != index + 1 ) return 1;
+  if ( y-1 < 0 )   return 1; else if ( floor(data[x + (y-1) * nx]) != index + 1 ) return 1;
+  return 0;
+}
 
 /* calculates basic hull features --------------------------------------- */
 SEXP
 lib_basic_hull (SEXP obj) {
-  SEXP res, * fm, * dm;
-  int nx, ny, nz, nprotect, im, x, y, nobj, index, is_per, nf=10;
+  SEXP res, fm, dm;
+  int nx, ny, nz, nprotect, im, x, y, nobj, index, nf=10;
   double * data, * fmdata, d;
+  enum { XCT, YCT, SIZ, PER, PMN, PSD, EFR, ACR, SHF, EDG };
 
-  if ( !isImage(obj) ) return R_NilValue;
   nx = INTEGER ( GET_DIM(obj) )[0];
   ny = INTEGER ( GET_DIM(obj) )[1];
   nz = INTEGER ( GET_DIM(obj) )[2];
   nprotect = 0;
 
-  /* will be freed automatically, list of feature matrices */
-  fm = (SEXP *) R_alloc (nz, sizeof(SEXP) );
-  for ( im = 0; im < nz; im++ ) fm[im] = R_NilValue;
-  /* will be freed automatically, list of dimensions for feature matrices */
-  dm = (SEXP *) R_alloc (nz, sizeof(SEXP) );
+  PROTECT ( res = allocVector(VECSXP, nz) );
+  nprotect++;
 
   for ( im = 0; im < nz; im++ ) {
     /* get image data */
@@ -34,129 +38,104 @@ lib_basic_hull (SEXP obj) {
     /* get number of objects -- max index */
     nobj = 0;
     for ( index = 0; index < nx * ny; index++ )
-      if ( data[index] > nobj ) nobj = data[index];
-    if ( nobj < 1 ) continue;
+      if ( data[index] > nobj ) nobj = floor( data[index] );
+    if ( nobj < 1 ) {
+      SET_VECTOR_ELT (res, im, R_NilValue );
+      continue;
+    }
     /* create features matrix */
-    PROTECT ( fm[im] = allocVector(REALSXP, nobj * nf) );
-    nprotect++;
+    SET_VECTOR_ELT( res, im, (fm = allocVector(REALSXP, nobj * nf)) );
     /* initialize feature matrix with 0 */
-    fmdata = REAL (fm[im]);
+    fmdata = REAL( fm );
     for ( index = 0; index < nobj * nf; index++ ) fmdata [index] = 0.0;
     /* set dimensions of the feature matrix */
-    PROTECT ( dm[im] = allocVector(INTSXP, 2) );
+    PROTECT ( dm = allocVector(INTSXP, 2) );
     nprotect++;
-    INTEGER ( dm[im] )[0] = nobj;
-    INTEGER ( dm[im] )[1] = nf;
-    SET_DIM ( fm[im], dm[im] );
+    INTEGER( dm )[0] = nobj;
+    INTEGER( dm )[1] = nf;
+    SET_DIM( fm, dm );
+    UNPROTECT( 1 ); nprotect--;
     /* go through pixels and collect primary descriptors */
     for ( x = 0; x < nx; x++ )
       for ( y = 0; y < ny; y++ ) {
-        index = data[x + y * nx]; /* index of the object, R-style = 1-based */
+        index = floor( data[x + y * nx] ); /* index of the object, R-style = 1-based */
         if ( index < 1 ) continue;
         /* all indexes were 1, 2, 3, but C has 0-based indexes!!! */
         index--;
-        /* update x (+0), y (+1), accumulated -- need normalization later */
-        fmdata [index] += x; // coordinates in C-style, 0-based
-        fmdata [index + nobj] += y; // coordinates in C-style, 0-based
-        /* size (+2) */
-        fmdata [index + 2 * nobj] += 1.0;
-        /* is it a perimeter point */
-        is_per = 0;
-        // for nicer code we rely on C standard - if first (within one if) false, rest (in that if) is not checked
-        if      ( x > 0             && (int) data [x-1 + y    *nx] - 1 != index ) is_per = 1;
-        else if ( y > 0  && !is_per && (int) data [x   + (y-1)*nx] - 1 != index ) is_per = 1;
-        else if ( x < nx && !is_per && (int) data [x+1 + y    *nx] - 1 != index ) is_per = 1;
-        else if ( y < ny && !is_per && (int) data [x   + (y+1)*nx] - 1 != index ) is_per = 1;
-        /* per (+3) */
-        if ( is_per ) fmdata [index + 3 * nobj] += 1.0;
-        /* edge (+9) */
+        /* update x, y accumulated -- need normalization later */
+        fmdata [index + XCT * nobj] += x; // coordinates in C-style, 0-based
+        fmdata [index + YCT * nobj] += y; // coordinates in C-style, 0-based
+        /* size */
+        fmdata [index + SIZ * nobj] += 1.0;
+        /* per */
+        if ( _is_perimeter(x, y, index, data, nx, ny) ) 
+          fmdata [index + PER * nobj] += 1.0;
+        /* edge */
         if ( x == 0 || y == 0 || x == nx - 1 || y == ny - 1 )
-          fmdata [index + 9 * nobj] += 1.0;
+          fmdata [index + EDG * nobj] += 1.0;
       }
     /* calculate some secondary descriptors */
     for ( index = 0; index < nobj; index++ ) {
-      if ( fmdata[index + 2 * nobj] > 0 ) {
-        /* normalize x (+0), y (+1) */
-        fmdata [index] /= fmdata[index + 2 * nobj];
-        fmdata [index + nobj] /= fmdata[index + 2 * nobj];
-        /* shape factor +8 */
-        fmdata [index + 8 * nobj] = 0.5 * fmdata [index + 3 * nobj] / sqrt( M_PI * fmdata [index + 2 * nobj] );
+      if ( fmdata[index + SIZ * nobj] > 0 ) {
+        /* normalize x, y */
+        fmdata [index] /= fmdata[index + SIZ * nobj];
+        fmdata [index + nobj] /= fmdata[index + SIZ * nobj];
+        /* shape factor */
+        fmdata [index + SHF * nobj] = 0.5 * fmdata [index + PER * nobj] / sqrt( M_PI * fmdata [index + SIZ * nobj] );
       }
-      /* effr +6 */
-      fmdata [index + 6 * nobj] = sqrt ( fmdata[index + 2 * nobj] / M_PI );
+      /* effr */
+      fmdata [index + EFR * nobj] = sqrt ( fmdata[index + SIZ * nobj] / M_PI );
     }
     /* go through pixels and collect secondary descriptors */
     for ( x = 0; x < nx; x++ )
       for ( y = 0; y < ny; y++ ) {
-        index = data[x + y * nx]; /* index of the object, R-style = 1-based */
+        index = floor( data[x + y * nx] ); /* index of the object, R-style = 1-based */
         if ( index < 1 ) continue;
         /* all indexes were 1, 2, 3, but C has 0-based indexes!!! */
         index--;
         /* get the distance from the pixel to the centre of the corresponding object, in tools */
-        d = distancexy(x, y, fmdata[index], fmdata[index + nobj]);
-        /* acircularity (+7) */
-        if ( d > fmdata[index + 6 * nobj] ) fmdata [index + 7 * nobj] += 1.0;
-        /* is it a perimeter point */
-        is_per = 0;
-        // for nicer code we rely on C standard - if first (within one if) false, rest (in that if) is not checked
-        if      ( x > 0             && (int) data [x-1 + y    *nx] - 1 != index ) is_per = 1;
-        else if ( y > 0  && !is_per && (int) data [x   + (y-1)*nx] - 1 != index ) is_per = 1;
-        else if ( x < nx && !is_per && (int) data [x+1 + y    *nx] - 1 != index ) is_per = 1;
-        else if ( y < ny && !is_per && (int) data [x   + (y+1)*nx] - 1 != index ) is_per = 1;
-        if ( !is_per ) continue;
-        /* per mean +4 */
-        fmdata [index + 4 * nobj] += d;
+        d = sqrt( (x - fmdata[index + XCT * nobj])*(x - fmdata[index + XCT * nobj]) + 
+                  (y - fmdata[index + YCT * nobj])*(y - fmdata[index + YCT * nobj]));
+        /* acircularity */
+        if ( d > fmdata[index + EFR * nobj] ) fmdata [index + ACR * nobj] += 1.0;
+        /* per mean */
+        if ( _is_perimeter(x, y, index, data, nx, ny) ) 
+          fmdata [index + PMN * nobj] += d; 
       }
     /* update some secondary descriptors, 1st run */
     for ( index = 0; index < nobj; index++ ) {
-      /* acircularity +7 */
-      if ( fmdata[index + 2 * nobj] > 0 )
-        fmdata [index + 7 * nobj] /= fmdata[index + 2 * nobj];
-      /* per mean +4 */
-      if ( fmdata[index + 3 * nobj] > 0 )
-        fmdata [index + 4 * nobj] /= fmdata[index + 3 * nobj];
+      /* acircularity */
+      if ( fmdata[index + SIZ * nobj] > 0 )
+        fmdata [index + ACR * nobj] /= fmdata[index + SIZ * nobj];
+      /* per mean */
+      if ( fmdata[index + PER * nobj] > 0 )
+        fmdata [index + PMN * nobj] /= fmdata[index + PER * nobj];
     }
     /* go through pixels and collect secondary descriptors, 2nd run (per sd) */
     for ( x = 0; x < nx; x++ )
       for ( y = 0; y < ny; y++ ) {
-        index = data[x + y * nx]; /* index of the object, R-style = 1-based */
+        index = floor( data[x + y * nx] ); /* index of the object, R-style = 1-based */
         if ( index < 1 ) continue;
         /* all indexes were 1, 2, 3, but C has 0-based indexes!!! */
         index--;
         /* is it a perimeter point */
-        is_per = 0;
-        // for nicer code we rely on C standard - if first (within one if) false, rest (in that if) is not checked
-        if      ( x > 0             && (int) data [x-1 + y    *nx] - 1 != index ) is_per = 1;
-        else if ( y > 0  && !is_per && (int) data [x   + (y-1)*nx] - 1 != index ) is_per = 1;
-        else if ( x < nx && !is_per && (int) data [x+1 + y    *nx] - 1 != index ) is_per = 1;
-        else if ( y < ny && !is_per && (int) data [x   + (y+1)*nx] - 1 != index ) is_per = 1;
-        if ( !is_per ) continue;
+        if ( !_is_perimeter(x, y, index, data, nx, ny) ) continue;
         /* get the distance from the pixel to the centre of the corresponding object, in tools */
-        d = distancexy(x, y, fmdata[index], fmdata[index + nobj]);
-        /* per var +5 */
-        fmdata [index + 5 * nobj] += (d - fmdata [index + 4 * nobj]) * (d - fmdata [index + 4 * nobj]);
+        d = sqrt( (x - fmdata[index + XCT * nobj])*(x - fmdata[index + XCT * nobj]) + 
+                  (y - fmdata[index + YCT * nobj])*(y - fmdata[index + YCT * nobj]));
+        /* per sd sum squares here */
+        fmdata [index + PSD * nobj] += (d - fmdata [index + PMN * nobj]) * (d - fmdata [index + PMN * nobj]);
       }
     /* update some secondary descriptors, 2nd run */
     for ( index = 0; index < nobj; index++ ) {
-      /* per sd +5 */
-      if ( fmdata[index + 3 * nobj] > 0 )
-        fmdata [index + 5 * nobj] = sqrt(fmdata [index + 5 * nobj] / fmdata[index + 3 * nobj]);
+      /* per sd */
+      if ( fmdata[index + PER * nobj] > 0 )
+        fmdata [index + PSD * nobj] = sqrt(fmdata [index + PSD * nobj] / fmdata[index + PER * nobj]);
     }
   }
 
-  if ( nz == 1 ) {
-    UNPROTECT( nprotect );
-    return fm[0];
-  }
-
-  PROTECT ( res = allocVector(VECSXP, nz) );
-  nprotect++;
-
-  /* put fm into the list */
-  for ( im = 0; im < nz; im++ )
-   SET_VECTOR_ELT (res, im, fm[im] );
-
   UNPROTECT( nprotect );
+  if ( nz == 1 ) return VECTOR_ELT( res, 0 );
   return res;
 }
 
@@ -164,11 +143,10 @@ lib_basic_hull (SEXP obj) {
 /* partial calculation, the rest is done in R */
 SEXP
 lib_edge_profile (SEXP obj, SEXP xy_list) {
-  SEXP res, edg, xys, * pm, * dm;
-  int nx, ny, nz, nprotect, im, x, y, nobj, index, is_per, nper, counter;
+  SEXP res, edg, xys, pm, dm;
+  int nx, ny, nz, nprotect, im, x, y, nobj, index, nper, counter;
   double * data, * edata, * xy, * pmdata, xx, yy;
 
-  if ( !isImage(obj) || xy_list == R_NilValue) return R_NilValue;
   nx = INTEGER ( GET_DIM(obj) )[0];
   ny = INTEGER ( GET_DIM(obj) )[1];
   nz = INTEGER ( GET_DIM(obj) )[2];
@@ -176,12 +154,8 @@ lib_edge_profile (SEXP obj, SEXP xy_list) {
 
   PROTECT( edg = Rf_duplicate(obj) );
   nprotect++;
-
-  /* will be freed automatically, list of perimeter point matrices (keeps obj index, angle and distance) */
-  pm = (SEXP *) R_alloc (nz, sizeof(SEXP) );
-  for ( im = 0; im < nz; im++ ) pm[im] = R_NilValue;
-  /* will be freed automatically, list of dimensions for feature matrices */
-  dm = (SEXP *) R_alloc (nz, sizeof(SEXP) );
+  PROTECT ( res = allocVector(VECSXP, nz) );
+  nprotect++;
 
   for ( im = 0; im < nz; im++ ) {
     /* get image data */
@@ -189,8 +163,11 @@ lib_edge_profile (SEXP obj, SEXP xy_list) {
     /* get number of objects -- max index */
     nobj = 0;
     for ( index = 0; index < nx * ny; index++ )
-      if ( data[index] > nobj ) nobj = data[index];
-    if ( nobj < 1 ) continue;
+      if ( data[index] > nobj ) nobj = floor( data[index] );
+    if ( nobj < 1 ) {
+      SET_VECTOR_ELT (res, im, R_NilValue );
+      continue;
+    }
     /* get xy */
     if ( nz == 1 ) xys = xy_list;
     else xys = VECTOR_ELT(xy_list, im);
@@ -202,28 +179,23 @@ lib_edge_profile (SEXP obj, SEXP xy_list) {
     /* unset all non-perimeter points */
     for ( x = 0; x < nx; x++ )
       for ( y = 0; y < ny; y++ ) {
-        index = data[x + y * nx]; /* index of the object, R-style = 1-based */
+        index = floor( data[x + y * nx] ); /* index of the object, R-style = 1-based */
         if ( index < 1 ) continue;
         /* all indexes were 1, 2, 3, but C has 0-based indexes!!! */
         index--;
-        is_per = 0;
-        if      ( x > 0             && (int) data [x-1 + y    *nx] - 1 != index ) is_per = 1;
-        else if ( y > 0  && !is_per && (int) data [x   + (y-1)*nx] - 1 != index ) is_per = 1;
-        else if ( x < nx && !is_per && (int) data [x+1 + y    *nx] - 1 != index ) is_per = 1;
-        else if ( y < ny && !is_per && (int) data [x   + (y+1)*nx] - 1 != index ) is_per = 1;
-        if ( is_per ) nper++;
+        if ( _is_perimeter(x, y, index, data, nx, ny) ) nper++;
         else edata[x + y * nx] = 0.0;
       }
     /* allocate memory */
-    PROTECT( pm[im] = allocVector(REALSXP, 3 * nper) );
-    nprotect++;
-    pmdata = REAL( pm[im] );
+    SET_VECTOR_ELT( res, im, (pm = allocVector(REALSXP, 3 * nper)) );
+    pmdata = REAL( pm );
     for ( index = 0; index < 3 * nper; index++ ) pmdata[index] = 0;
-    PROTECT( dm[im] = allocVector(INTSXP, 2) );
+    PROTECT( dm = allocVector(INTSXP, 2) );
     nprotect++;
-    INTEGER( dm[im] )[0] = nper;
-    INTEGER( dm[im] )[1] = 3;
-    SET_DIM( pm[im], dm[im] );
+    INTEGER( dm )[0] = nper;
+    INTEGER( dm )[1] = 3;
+    SET_DIM( pm, dm );
+    UNPROTECT( 1 ); nprotect--;
     /* go through all edge points */
     counter = 0;
     for ( x = 0; x < nx; x++ )
@@ -241,19 +213,8 @@ lib_edge_profile (SEXP obj, SEXP xy_list) {
       }
   }
 
-  if ( nz == 1 ) {
-    UNPROTECT( nprotect );
-    return pm[0];
-  }
-
-  PROTECT ( res = allocVector(VECSXP, nz) );
-  nprotect++;
-
-  /* put fm into the list */
-  for ( im = 0; im < nz; im++ )
-   SET_VECTOR_ELT (res, im, pm[im] );
-
   UNPROTECT( nprotect );
+  if ( nz == 1 ) return VECTOR_ELT( res, 0 );
   return res;
 }
 

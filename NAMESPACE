@@ -30,5 +30,5 @@ exportMethods(
   cmoments, smoments, rmoments, moments,
   
   features, getFeatures, hull.features, edge.profile, edge.features,
-  haralick.matrix, haralick.features
+  haralick.matrix, haralick.features, zernike.moments
 )

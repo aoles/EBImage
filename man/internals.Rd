@@ -96,6 +96,7 @@
 \alias{features,IndexedImage-method}
 \alias{getFeatures,IndexedImage-method}
 \alias{hull.features,IndexedImage-method}
+\alias{zernike.moments,IndexedImage,Image-method}
 
 \title{ Internals }
 

@@ -9,72 +9,71 @@ See: ../LICENSE for license, LGPL
 #include "tools.h"
 #include <R_ext/Error.h>
 
+# define  IND(I,X,Y) (X) + (Y)*(N+1) + (I)*(N+1)*(N+1)
+
 /* calculates size, M00, M10/M00, M01/M00 for all indexed objects */
 /* obj is an IndexedImage here and ref is a grayscale one */
 SEXP
 lib_cmoments (SEXP obj, SEXP ref) { 
   int nprotect, nx, ny, nz, im, i, x, y, nobj;
   double * data, * refd, * m, val;
-  SEXP res, * moments, * dims, * dimnames, * names;
+  SEXP res, moments, dm, nm, dmnm;
   
   nx = INTEGER (GET_DIM(obj))[0];
   ny = INTEGER (GET_DIM(obj))[1];
   nz = INTEGER (GET_DIM(obj))[2];
+  nprotect = 0;
 
   if ( isImage(ref) )
     if ( INTEGER(GET_DIM(ref))[0] != nx || INTEGER(GET_DIM(ref))[1] != ny ||
          INTEGER(GET_DIM(ref))[2] != nz )
       error( "'ref' image is present, but has different size from 'obj'" );
-  nprotect = 0;
 
-  moments  = (SEXP *) R_alloc(nz, sizeof(SEXP));
-  dims     = (SEXP *) R_alloc(nz, sizeof(SEXP));
-  dimnames = (SEXP *) R_alloc(nz, sizeof(SEXP));
-  names    = (SEXP *) R_alloc(nz, sizeof(SEXP));
+  PROTECT( res = allocVector(VECSXP, nz) );
+  nprotect++;
+
+  /* prepare dimnames, will be duplicated */
+  PROTECT( dmnm = allocVector(VECSXP, 2) );
+  nprotect++;
+  PROTECT( nm = allocVector(STRSXP, 4) );
+  nprotect++;
+  SET_STRING_ELT( nm, 0, mkChar("pxs") );
+  SET_STRING_ELT( nm, 1, mkChar("int") );
+  SET_STRING_ELT( nm, 2, mkChar("x") );
+  SET_STRING_ELT( nm, 3, mkChar("y") );
+  SET_VECTOR_ELT( dmnm, 1, nm );
+  UNPROTECT( 1 ); nprotect--; // nm
 
   for ( im = 0; im < nz; im++ ) {
     /* get pointers */
     data = &( REAL(obj)[ im * nx * ny ] );
-    if ( ref != R_NilValue )
-      refd = &( REAL(ref)[ im * nx * ny ] );
-    else
-      refd = NULL;
+    if ( ref != R_NilValue ) refd = &( REAL(ref)[ im * nx * ny ] );
+    else refd = NULL;
     
     nobj = 0;
     /* get nobj */
     for ( i = 0; i < nx * ny; i++ )
-      if ( data[i] > nobj ) nobj = (int) data[i];
+      if ( data[i] > nobj ) nobj = floor( data[i] );
     /* create result storage */
-    PROTECT( moments[im] = allocVector(REALSXP, 4 * nobj) );
-    nprotect++;
+    SET_VECTOR_ELT( res, im, (moments = allocVector(REALSXP, 4 * nobj)) );
     /* if no data to fill, continue */
     if ( nobj == 0 ) continue;
-    PROTECT( dims[im] = allocVector(INTSXP, 2) );
-    nprotect++;
-    INTEGER( dims[im] )[0] = nobj;
-    INTEGER( dims[im] )[1] = 4;
-    SET_DIM( moments[im], dims[im] );
-
-    /* set dim names */
-    PROTECT( names[im] = allocVector(STRSXP, 4) );
-    nprotect++;
-    SET_STRING_ELT( names[im], 0, mkChar("pxs") );
-    SET_STRING_ELT( names[im], 1, mkChar("int") );
-    SET_STRING_ELT( names[im], 2, mkChar("x") );
-    SET_STRING_ELT( names[im], 3, mkChar("y") );
-    PROTECT( dimnames[im] = allocVector(VECSXP, 2) );
-    nprotect++;
-    SET_VECTOR_ELT( dimnames[im], 1, names[im] );
-    setAttrib( moments[im], R_DimNamesSymbol, dimnames[im] );
-
     /* reset result */
-    m = REAL( moments[im] );
+    m = REAL( moments );
     for ( i = 0; i < 4 * nobj; i++ ) m[i] = 0.0;
-
+    /* set dim, etc */
+    PROTECT( dm = allocVector(INTSXP, 2) );
+    nprotect++;
+    INTEGER( dm )[0] = nobj;
+    INTEGER( dm )[1] = 4;
+    SET_DIM( moments, dm );
+    UNPROTECT( 1 ); nprotect--;
+    /* set dim names */
+    setAttrib( moments, R_DimNamesSymbol, Rf_duplicate(dmnm) );
     /* moment calculations for M00, M10, M01 */
     for ( x = 0; x < nx; x++ )
       for ( y = 0; y < ny; y++ ) {
-        i = (int) data[ x + y * nx ];
+        i = floor( data[ x + y * nx ] );
         if ( i < 1 ) continue;
         i--;
         if ( ref != R_NilValue )
@@ -95,16 +94,8 @@ lib_cmoments (SEXP obj, SEXP ref) {
     }
   }
   
-  if ( im > 1 ) {
-    PROTECT( res = allocVector(VECSXP, nz) );
-    nprotect++;
-    for ( im = 0; im < nz; im++ )
-      SET_VECTOR_ELT(res, im, moments[im] );
-  }
-  else
-    res = moments[0];
-    
   UNPROTECT( nprotect );
+  if ( nz == 1 ) return VECTOR_ELT(res, 0 );
   return res;
 }
 
@@ -116,48 +107,71 @@ lib_moments (SEXP obj, SEXP ref, SEXP pw, SEXP what) {
   int nprotect, nx, ny, nz, im, i, x, y, ix, iy, nobj, N, alg;
   double * data, * refd, * m, * rm,* cm, dx, dy, val, powx, powy, * fct = NULL;
   SEXP res, ctrlist, ctr;
-  SEXP * moments, * dims, * dimnames, * namesx, * namesy, * rmoments = NULL, * rdims = NULL;
+  SEXP moments, rmoments, dm, dmnm, nmx, nmy;
   char label[3] = "X0";
   
+  N   = INTEGER (pw)[0];
+  alg = INTEGER (what)[0];
+
   nx  = INTEGER (GET_DIM(obj))[0];
   ny  = INTEGER (GET_DIM(obj))[1];
   nz  = INTEGER (GET_DIM(obj))[2];
-  N   = INTEGER (pw)[0];
-  alg = INTEGER (what)[0];
   nprotect = 0;
   
   PROTECT( ctrlist = lib_cmoments(obj, ref) ); /* this also checks x and ref */
   nprotect++;
-  ctr = ctrlist; /* this remains unchanged if nz == 1, matrix not a list */
 
-  moments  = (SEXP *) R_alloc(nz, sizeof(SEXP));
-  dims     = (SEXP *) R_alloc(nz, sizeof(SEXP));
-  dimnames = (SEXP *) R_alloc(nz, sizeof(SEXP));
-  namesx   = (SEXP *) R_alloc(nz, sizeof(SEXP));
-  namesy   = (SEXP *) R_alloc(nz, sizeof(SEXP));
-  if ( alg > 2 ) { /* rotation invariant moments */
-    rmoments = (SEXP *) R_alloc(nz, sizeof(SEXP));
-    rdims    = (SEXP *) R_alloc(nz, sizeof(SEXP));
+  /* preset dim names, will be duplicate later */
+  if ( alg < 3 ) {
+    PROTECT( dmnm = allocVector(VECSXP, 3) );
+    nprotect++;
+    PROTECT( nmx = allocVector(STRSXP, N+1) );
+    nprotect++;
+    PROTECT( nmy = allocVector(STRSXP, N+1) );
+    nprotect++;
+    for ( int i = 0; i <= N; i++ ) {
+      label[1] = (char)(i+48); /* 48 should 0 */
+      label[0] = 'x';
+      SET_STRING_ELT( nmx, i, Rf_duplicate(mkChar(label)) ); 
+      label[0] = 'y';
+      SET_STRING_ELT( nmy, i, Rf_duplicate(mkChar(label)) ); 
+    }
+    SET_VECTOR_ELT( dmnm, 0, nmx );
+    SET_VECTOR_ELT( dmnm, 1, nmy );
+    UNPROTECT( 2 ); nprotect -= 2; // nmx, nmy
   }
-
-# define  IND(I,X,Y) (X) + (Y)*(N+1) + (I)*(N+1)*(N+1)
+  else {
+    PROTECT( dmnm = allocVector(VECSXP, 2) );
+    nprotect++;
+    /* set dim colnames, all these vars unset and unused if !(alg < 3) */
+    PROTECT( nmx = allocVector(STRSXP, 7) );
+    nprotect++;
+    label[0] = 'I';
+    for ( int i = 0; i < 7; i++ ) {
+      label[1] = (char)(i+49); /* 49 should 1 */
+      SET_STRING_ELT( nmx, i, mkChar(label) ); 
+    }
+    SET_VECTOR_ELT( dmnm, 1, nmx );
+    UNPROTECT( 1 ); nprotect--; // nmx
+  }
+  
+  PROTECT( res = allocVector(VECSXP, nz) );
+  nprotect++;
 
   for ( im = 0; im < nz; im++ ) {
     /* get pointers */
     data = &( REAL(obj)[ im * nx * ny ] );
-    if ( ref != R_NilValue )
-      refd = &( REAL(ref)[ im * nx * ny ] );
-    else
-      refd = NULL;
+    if ( ref != R_NilValue ) refd = &( REAL(ref)[ im * nx * ny ] );
+    else refd = NULL;
 
     /* get centers from ctrlist, which is already set if nz == 1 */
-    if ( nz > 1 )
-      ctr = VECTOR_ELT (ctrlist, im);
+    if ( nz > 1 ) ctr = VECTOR_ELT (ctrlist, im);
+    else ctr = ctrlist;
+    
     /* get nobj */
     if ( LENGTH(ctr) < 1 ) {
       /* nobj = 0, nothind to fill */
-      PROTECT( moments[im] = allocVector(REALSXP, 0) );
-      nprotect++;
+      SET_VECTOR_ELT( res, im, allocVector(REALSXP, 0) );
       continue;
     }
     nobj = INTEGER( GET_DIM(ctr) )[0];
@@ -172,44 +186,28 @@ lib_moments (SEXP obj, SEXP ref, SEXP pw, SEXP what) {
     }
     
     /* create result storage */
-    PROTECT( moments[im] = allocVector(REALSXP, (N+1)*(N+1)*nobj) );
+    PROTECT( moments = allocVector(REALSXP, (N+1)*(N+1)*nobj) );
     nprotect++;
+    /* reset result */
+    m = REAL( moments );
+    for ( i = 0; i < (N+1)*(N+1)*nobj; i++ ) m[i] = 0.0;
 
-    PROTECT( dims[im] = allocVector(INTSXP, 3) );
+    PROTECT( dm = allocVector(INTSXP, 3) );
     nprotect++;
-    INTEGER( dims[im] )[0] = N+1;
-    INTEGER( dims[im] )[1] = N+1;
-    INTEGER( dims[im] )[2] = nobj;
-    SET_DIM( moments[im], dims[im] );
+    INTEGER( dm )[0] = N+1;
+    INTEGER( dm )[1] = N+1;
+    INTEGER( dm )[2] = nobj;
+    SET_DIM( moments, dm );
+    UNPROTECT( 1 ); nprotect--; // dm
 
     /* set dim names if not rotation invariant, then different return */
-    if ( alg < 3 ) {
-      PROTECT( namesx[im] = allocVector(STRSXP, N+1) );
-      nprotect++;
-      PROTECT( namesy[im] = allocVector(STRSXP, N+1) );
-      nprotect++;
-      for ( int i = 0; i <= N; i++ ) {
-        label[1] = (char)(i+48); /* 48 should 0 */
-        label[0] = 'x';
-        SET_STRING_ELT( namesx[im], i, mkChar(label) ); 
-        label[0] = 'y';
-        SET_STRING_ELT( namesy[im], i, mkChar(label) ); 
-      }
-      PROTECT( dimnames[im] = allocVector(VECSXP, 3) );
-      nprotect++;
-      SET_VECTOR_ELT( dimnames[im], 0, namesx[im] );
-      SET_VECTOR_ELT( dimnames[im], 1, namesy[im] );
-      setAttrib( moments[im], R_DimNamesSymbol, dimnames[im] );
-    }
-    
-    /* reset result */
-    m = REAL( moments[im] );
-    for ( i = 0; i < (N+1)*(N+1)*nobj; i++ ) m[i] = 0.0;
+    if ( alg < 3 )
+      setAttrib( moments, R_DimNamesSymbol, Rf_duplicate(dmnm) );
 
     /* calculation of central moments */
     for ( x = 0; x < nx; x++ )
       for ( y = 0; y < ny; y++ ) {
-        i = (int) data[ x + y * nx ];
+        i = floor( data[ x + y * nx ] );
         if ( i < 1 ) continue;
         i--;
         if ( ref != R_NilValue )
@@ -239,31 +237,25 @@ lib_moments (SEXP obj, SEXP ref, SEXP pw, SEXP what) {
       m[IND(i,0,1)] = 0.0;
     }
       
-    if ( alg < 3 ) continue;
+    if ( alg < 3 ) {
+      SET_VECTOR_ELT( res, im, moments );
+      UNPROTECT( 1 ); nprotect--; // moments if not used below
+      continue;
+    }
     
     /* rotation invariant moments, alg 3 means scale inv are done already: alg > 1 */
-    PROTECT( rmoments[im] = allocVector(REALSXP, 7 * nobj) );
+    PROTECT( rmoments = allocVector(REALSXP, 7 * nobj) );
     nprotect++;
-    PROTECT( rdims[im] = allocVector(INTSXP, 2) );
+    rm = REAL( rmoments );
+    PROTECT( dm = allocVector(INTSXP, 2) );
     nprotect++;
-    INTEGER( rdims[im] )[0] = nobj;
-    INTEGER( rdims[im] )[1] = 7;
-    SET_DIM( rmoments[im], rdims[im] );
+    INTEGER( dm )[0] = nobj;
+    INTEGER( dm )[1] = 7;
+    SET_DIM( rmoments, dm );
+    UNPROTECT( 1 ); nprotect--; // dm
 
-    rm = REAL( rmoments[im] );
-
-    /* set dim colnames, all these vars unset and unused if !(alg < 3) */
-    PROTECT( namesx[im] = allocVector(STRSXP, 7) );
-    nprotect++;
-    label[0] = 'I';
-    for ( int i = 0; i < 7; i++ ) {
-      label[1] = (char)(i+49); /* 49 should 1 */
-      SET_STRING_ELT( namesx[im], i, mkChar(label) ); 
-    }
-    PROTECT( dimnames[im] = allocVector(VECSXP, 2) );
-    nprotect++;
-    SET_VECTOR_ELT( dimnames[im], 1, namesx[im] );
-    setAttrib( rmoments[im], R_DimNamesSymbol, dimnames[im] );
+    /* set dim names */
+    setAttrib( rmoments, R_DimNamesSymbol, Rf_duplicate(dmnm) );
     
     /* calculate */
     for ( i = 0; i < nobj; i++ ) {
@@ -292,28 +284,12 @@ lib_moments (SEXP obj, SEXP ref, SEXP pw, SEXP what) {
                        (m[IND(i,3,0)] - 3.0 * m[IND(i,1,2)]) * (m[IND(i,2,1)] + m[IND(i,0,3)]) *
                        (3.0 * pow(m[IND(i,3,0)] + m[IND(i,1,2)], 2) - pow(m[IND(i,2,1)] + m[IND(i,0,3)], 2));
     }
+    SET_VECTOR_ELT( res, im, rmoments );
+    UNPROTECT( 2 ); nprotect -= 2; // moments and rmoments
   }
   
-  if ( im > 1 ) {
-    PROTECT( res = allocVector(VECSXP, nz) );
-    nprotect++;
-    if ( alg > 2 ) { /* rotation invariant moments */
-      for ( im = 0; im < nz; im++ )
-        SET_VECTOR_ELT(res, im, rmoments[im] );
-    }
-    else {
-      for ( im = 0; im < nz; im++ )
-        SET_VECTOR_ELT(res, im, moments[im] );
-    }
-  }
-  else {
-    if ( alg > 2 )
-      res = rmoments[0];
-    else
-      res = moments[0];
-  }
-    
   UNPROTECT( nprotect );
+  if ( nz == 1 ) return VECTOR_ELT( res, 0 );
   return res;
 }
 

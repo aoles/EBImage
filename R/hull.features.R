@@ -43,7 +43,7 @@ setMethod ("hull.features", signature(x="IndexedImage"),
       I2 <- (m20 - m02)^2 + 4 * m11^2
       matrix( c(theta, 2*smaj, 2*sqrt(eig2), sqrt(eig1-eig2)/smaj, I1, I2), nrow=dim(m)[3], ncol=6 )
     }
-    resm <- smoments(x, pw=2, what="c")
+    resm <- smoments(x=x, pw=2, what="c")
     if ( is.matrix(res) ) res <- cbind( res, moms(resm) )
     else for ( i in seq_along(res) ) res[[i]] <- cbind( res[[i]], moms(resm[[i]]) )
     cn <- c("h.x", "h.y", "h.s", "h.p", "h.pdm", "h.pdsd", "h.effr", "h.acirc", "h.sf", 
@@ -62,14 +62,14 @@ setMethod ("hull.features", signature(x="IndexedImage"),
   ## radius for scaling, s. If a reference image is provided, then xy and t are
   ## affected by the intensity distribution (as per moments)
   if ( .dim[3] == 1 ) {
-    if ( is.null(ref) ) xyt <- moments(x)[, c(3,4,8)]
-    else xyt <- moments(x, ref)[, c(3,4,8)]
-    if ( scale ) s <- hull.features(x)[,7] else s <- NULL
+    if ( is.null(ref) ) xyt <- moments(x=x)[, c(3,4,8)]
+    else xyt <- moments(x=x, ref=ref)[, c(3,4,8)]
+    if ( scale ) s <- hull.features(x=x)[,7] else s <- NULL
   }
   else {
     if ( is.null(ref) ) xyt <- lapply(moments(x), function(x) x[,c(3,4,8)] )
-    else xyt <- lapply(moments(x, ref), function(x) x[,c(3,4,8)] )
-    if ( scale ) s <- lapply(hull.features(x), function(x) x[,7] )
+    else xyt <- lapply(moments(x=x, ref=ref), function(x) x[,c(3,4,8)] )
+    if ( scale ) s <- lapply(hull.features(x=x), function(x) x[,7] )
     else s <- vector("list", length(xyt))
   }
   ## returns for each image a matrix of border points with for each
@@ -133,8 +133,8 @@ setMethod ("edge.profile", signature(x="IndexedImage", ref="Image"),
 setMethod ("edge.features", signature(x="IndexedImage"),
   function (x, ref, ...) {
     .dim <- dim(x)
-    res <- if ( missing(ref) ) edge.profile(x, n=16, fft=FALSE, scale=TRUE, rotate=TRUE)
-    else edge.profile(x, ref, n=16, fft=FALSE, scale=TRUE, rotate=TRUE)
+    res <- if ( missing(ref) ) edge.profile(x=x, n=16, fft=FALSE, scale=TRUE, rotate=TRUE)
+    else edge.profile(x=x, ref=ref, n=16, fft=FALSE, scale=TRUE, rotate=TRUE)
     do.profile <- function(e) {
       m <- matrix(0, ncol=5, nrow=nrow(e))
       colnames(m) <- c("e.irr", "e.f2Pi", "e.fPi", "e.fPi2", "e.fPi4")
