@@ -24,33 +24,20 @@ double factorial(int x) {
 }
 
 /* calculates zernike features --------------------------------------- */
-
-void Vnl(double x, double y, int n, int l, double vnl[2]) {
-  int m;
-  double denom, theta, value, m1; 
-  value = 0.0;
-  for (m = 0; m <= 0.5 * (n - l); m++ ) {
-    /* denominator */
-    denom = factorial(m) * factorial(0.5 * (n - 2*m + l)) * 
-            factorial(0.5 * (n - 2*m - l));
-    if ( denom == 0.0 ) continue;
-    /* numerator */
-    m1 = ( m % 2 == 0) ? 1.0 : (-1.0);
-    value += m1 * factorial(n - m) * pow(x * x + y * y, 0.5 * n - m) / denom;
-  }
-  theta = atan2(y, x);
-  vnl[0] = value * cos(l * theta);
-  vnl[1] = value * sin(l * theta);
-}
+#define ZIND(n,l)   ((l) + (n)*(nmax + 1))
+#define VIND(n,l,m) ((l) + (n)*(nmax + 1) + (m)*(nmax + 1) * (nmax + 1) )
 
 SEXP
 lib_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP applyGaussian) {
   SEXP res, dup, xys, mRe, mIm, dm, dmnm, nm;
   int nx, ny, nz, nprotect, im, index, x, y, nobj, l, m, n, i, nmax, msize, doGauss;
   double * data, * xy, * ddata, * dmRe, * dmIm;
-  double cy, cx, oneTo2sigma2, d2, r, newx, newy, vnl, theta, denom, m1;
+  double r2To2sigma2, d2, r, newx, newy, vnl, theta;
   char label[7] = "z.0000";
-  
+
+  double * v; /* array of Vnl factors for n, l, m */
+  int    * z; /* array of Z feature indexes from n, l */
+
   if ( !isImage(obj) ) return R_NilValue;
   nx = INTEGER ( GET_DIM(obj) )[0];
   ny = INTEGER ( GET_DIM(obj) )[1];
@@ -59,7 +46,7 @@ lib_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP applyGaussi
 
   doGauss = INTEGER(applyGaussian)[0];
   r = REAL(R)[0];
-  oneTo2sigma2 = 0.5 / (r * r * 0.64);
+  r2To2sigma2 = 0.5 / 0.64; // s = 0.8 * r => r^2 / ( 2 *(0.8 *r)^2 ) = 1/(2*0.64)
   nmax = INTEGER(N)[0];
   msize = nl_index(nmax, nmax) + 1; // inlcude n = 0
   
@@ -72,6 +59,9 @@ lib_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP applyGaussi
   }
   else dup = ref;
 
+  /* precalculates v's and z's */
+  v = (double *) R_alloc((nmax + 1) * (nmax + 1) * (nmax/2 + 1), sizeof(double) );
+  z = (int *) R_alloc((nmax + 1) * (nmax + 1), sizeof(int));
   /* precreate dimnames to duplicate onto each matrix later */
   PROTECT( dmnm = allocVector(VECSXP, 2) );
   nprotect++;
@@ -81,11 +71,16 @@ lib_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP applyGaussi
     for ( l = 0; l <= n; l++ ) {
       if ( (n - l) % 2 != 0 ) continue;
       i = nl_index(n, l);
+      z[ ZIND(n,l) ] = i;
       label[2] = (char)(n / 10 + 48);
       label[3] = (char)(n - (n / 10) * 10 + 48);
       label[4] = (char)(l / 10 + 48);
       label[5] = (char)(l - (l / 10) * 10 + 48);
       SET_STRING_ELT( nm, i, Rf_duplicate(mkChar(label)) );
+      for (m = 0; m <= (n - l) / 2; m++ )
+        v[ VIND(n,l,m) ] = (n + 1) * ((m%2==0)?(1.0):(-1.0)) * factorial(n - m) / 
+                           ( M_PI * factorial(m) * factorial(0.5*(n - 2*m + l)) 
+                             * factorial(0.5*(n - 2*m - l)) );
     }
   SET_VECTOR_ELT( dmnm, 1, nm );
   UNPROTECT( 1 ); nprotect--; // nm
@@ -136,33 +131,24 @@ lib_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP applyGaussi
         /* all indexes were 1, 2, 3, but C has 0-based indexes!!! */
         index--;
         /* get object's centre */
-        cx = xy[index];
-        cy = xy[index + nobj];
     		/* normalise co-ordinates */
-		    newx = (x - cx) / r;
-    		newy = (y - cy) / r;
+		    newx = (x - xy[index]       ) / r;
+    		newy = (y - xy[index + nobj]) / r;
     	  d2 = newx * newx + newy * newy;
     		/* only use pixels within normalisd unit circle */
     		if ( d2 > 1.0 ) continue;
         /* apply Gaussian transform */
-    	  if ( doGauss ) ddata[x + y * nx] *= exp( -d2 * r*r * oneTo2sigma2 );
+    	  if ( doGauss ) ddata[x + y * nx] *= exp( -d2 * r2To2sigma2 );
         for ( n = 0; n <= nmax; n++ )
         	for ( l = 0; l <= n; l++ ) {
 	          /* only want values when (n - l) is even */
         	  if ( (n - l) % 2 != 0 ) continue;
             vnl = 0.0;
-            for (m = 0; m <= (n - l) / 2; m++ ) {
-              /* denominator */
-              denom = factorial(m) * factorial(0.5 * (n - 2*m + l)) * 
-                      factorial(0.5 * (n - 2*m - l));
-              if ( denom == 0.0 ) continue;
-              /* numerator */
-              m1 = ( m % 2 == 0) ? 1.0 : (-1.0);
-              vnl += m1 * factorial(n - m) * pow(d2, 0.5 * n - m) / denom;
-            }
+            for (m = 0; m <= (n - l) / 2; m++ )
+              vnl += v[ VIND(n,l,m) ] * pow(d2, 0.5 * n - m);
+            vnl *= ddata[x + y * nx];
             theta = atan2(newy, newx);
-            vnl *= ddata[x + y * nx] * (n + 1) / M_PI;
-            i = index + nl_index(n,l) * nobj;
+            i = index + z[ZIND(n,l)] * nobj;
             dmRe[i] = vnl * cos(l * theta);
             dmIm[i] = vnl * sin(l * theta);
           }
@@ -178,3 +164,4 @@ lib_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP applyGaussi
   if ( nz == 1 ) return VECTOR_ELT( res, 0 );
   return res;   
 }
+
