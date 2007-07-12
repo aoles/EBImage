@@ -40,7 +40,7 @@ lib_normalize (SEXP x, SEXP separate, SEXP range) {
     }
     diff = max - min;
     if ( diff == 0 )
-      error( "image can not be normalized, its diff(range) is 0" );
+      warning( "image can not be normalized, its diff(range) is 0" );
   }
 
   for ( im = 0; im < nz; im++ ) {
@@ -54,7 +54,7 @@ lib_normalize (SEXP x, SEXP separate, SEXP range) {
       }
       diff = max - min;
       if ( diff == 0 ) {
-        warning( "image #", im+1, " can not be normalized, its diff(range) is 0" );
+        warning( "frame can not be normalized, its diff(range) is 0" );
         continue;
       }        
     }

@@ -20,7 +20,7 @@ int _is_perimeter(int x, int y, int index, double * data, int nx, int ny) {
 SEXP
 lib_basic_hull (SEXP obj) {
   SEXP res, fm, dm;
-  int nx, ny, nz, nprotect, im, x, y, nobj, index, nf=10;
+  int nx, ny, nz, nprotect, im, x, y, nobj, index, no_objects, nf=10;
   double * data, * fmdata, d;
   enum { XCT, YCT, SIZ, PER, PMN, PSD, EFR, ACR, SHF, EDG };
 
@@ -40,9 +40,11 @@ lib_basic_hull (SEXP obj) {
     for ( index = 0; index < nx * ny; index++ )
       if ( data[index] > nobj ) nobj = floor( data[index] );
     if ( nobj < 1 ) {
-      SET_VECTOR_ELT (res, im, R_NilValue );
-      continue;
+      no_objects = 1;
+      nobj = 1; /* if no objects, create a matrix for 1 and fill all 0 */
+      warning("IndexedImage contains no objects");
     }
+    else no_objects = 0;
     /* create features matrix */
     SET_VECTOR_ELT( res, im, (fm = allocVector(REALSXP, nobj * nf)) );
     /* initialize feature matrix with 0 */
@@ -55,6 +57,8 @@ lib_basic_hull (SEXP obj) {
     INTEGER( dm )[1] = nf;
     SET_DIM( fm, dm );
     UNPROTECT( 1 ); nprotect--;
+    /* return matrix with 1 row full of 0 if no objects */
+    if ( no_objects ) continue;
     /* go through pixels and collect primary descriptors */
     for ( x = 0; x < nx; x++ )
       for ( y = 0; y < ny; y++ ) {
@@ -164,8 +168,8 @@ lib_edge_profile (SEXP obj, SEXP xy_list) {
     nobj = 0;
     for ( index = 0; index < nx * ny; index++ )
       if ( data[index] > nobj ) nobj = floor( data[index] );
-    if ( nobj < 1 ) {
-      SET_VECTOR_ELT (res, im, R_NilValue );
+    if ( nobj < 1 ) { 
+      SET_VECTOR_ELT (res, im, R_NilValue ); // check in R code
       continue;
     }
     /* get xy */

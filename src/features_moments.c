@@ -15,7 +15,7 @@ See: ../LICENSE for license, LGPL
 /* obj is an IndexedImage here and ref is a grayscale one */
 SEXP
 lib_cmoments (SEXP obj, SEXP ref) { 
-  int nprotect, nx, ny, nz, im, i, x, y, nobj;
+  int nprotect, nx, ny, nz, im, i, x, y, nobj, no_objects;
   double * data, * refd, * m, val;
   SEXP res, moments, dm, nm, dmnm;
   
@@ -27,7 +27,7 @@ lib_cmoments (SEXP obj, SEXP ref) {
   if ( isImage(ref) )
     if ( INTEGER(GET_DIM(ref))[0] != nx || INTEGER(GET_DIM(ref))[1] != ny ||
          INTEGER(GET_DIM(ref))[2] != nz )
-      error( "'ref' image is present, but has different size from 'obj'" );
+      error( "'ref' image is present, but has different size than 'obj'" );
 
   PROTECT( res = allocVector(VECSXP, nz) );
   nprotect++;
@@ -54,10 +54,14 @@ lib_cmoments (SEXP obj, SEXP ref) {
     /* get nobj */
     for ( i = 0; i < nx * ny; i++ )
       if ( data[i] > nobj ) nobj = floor( data[i] );
+    if ( nobj < 1 ) {
+      no_objects = 1;
+      nobj = 1; /* if no objects, create a matrix for 1 and fill all 0 */
+      warning("IndexedImage contains no objects");
+    }
+    else no_objects = 0;
     /* create result storage */
     SET_VECTOR_ELT( res, im, (moments = allocVector(REALSXP, 4 * nobj)) );
-    /* if no data to fill, continue */
-    if ( nobj == 0 ) continue;
     /* reset result */
     m = REAL( moments );
     for ( i = 0; i < 4 * nobj; i++ ) m[i] = 0.0;
@@ -70,6 +74,9 @@ lib_cmoments (SEXP obj, SEXP ref) {
     UNPROTECT( 1 ); nprotect--;
     /* set dim names */
     setAttrib( moments, R_DimNamesSymbol, Rf_duplicate(dmnm) );
+
+    /* return empty matrix (go to next image) with 1 line if error (no objects) */
+    if ( no_objects ) continue;
     /* moment calculations for M00, M10, M01 */
     for ( x = 0; x < nx; x++ )
       for ( y = 0; y < ny; y++ ) {
@@ -88,9 +95,9 @@ lib_cmoments (SEXP obj, SEXP ref) {
     
     /* convert M10, M01 to xm and ym */
     for ( i = 0; i < nobj; i++ ) {
-      if ( m[i + nobj] == 0.0 ) continue;
-      m[i + 2 * nobj] /= m[i + nobj];
-      m[i + 3 * nobj] /= m[i + nobj];
+      if ( (val = m[i + nobj]) == 0.0 ) continue;
+      m[i + 2 * nobj] /= val;
+      m[i + 3 * nobj] /= val;
     }
   }
   
@@ -105,7 +112,7 @@ lib_cmoments (SEXP obj, SEXP ref) {
 SEXP
 lib_moments (SEXP obj, SEXP ref, SEXP pw, SEXP what) { 
   int nprotect, nx, ny, nz, im, i, x, y, ix, iy, nobj, N, alg;
-  double * data, * refd, * m, * rm,* cm, dx, dy, val, powx, powy, * fct = NULL;
+  double * data, * refd, * m, * rm,* cm, dx, dy, val, powx, powy, tmp, * fct = NULL;
   SEXP res, ctrlist, ctr;
   SEXP moments, rmoments, dm, dmnm, nmx, nmy;
   char label[3] = "X0";
@@ -174,7 +181,7 @@ lib_moments (SEXP obj, SEXP ref, SEXP pw, SEXP what) {
       SET_VECTOR_ELT( res, im, allocVector(REALSXP, 0) );
       continue;
     }
-    nobj = INTEGER( GET_DIM(ctr) )[0];
+    nobj = INTEGER( GET_DIM(ctr) )[0]; /* will be 1 if no objects, empty matrix */
     cm = REAL (ctr);
     
     /* precalculate u00=1/M00^(1+(i+j)/2) for i+j >= 2 for all objects */
@@ -182,7 +189,8 @@ lib_moments (SEXP obj, SEXP ref, SEXP pw, SEXP what) {
       fct = (double *) R_alloc ((2*N + 1) * nobj, sizeof(double) );
       for ( ix = 2; ix <= 2 * N; ix++ )
         for ( i = 0; i < nobj; i++ )
-          fct[i + ix * nobj] = 1.0 / pow( cm[i + nobj], 1 + 0.5*ix);
+          if ( (tmp = pow( cm[i + nobj], 1 + 0.5*ix)) != 0.0 ) 
+            fct[i + ix * nobj] = 1.0 / tmp;
     }
     
     /* create result storage */

@@ -16,7 +16,7 @@
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("zernike.moments", signature(x="IndexedImage", ref="Image"),
-  function(x, ref, R=30, N=5, apply.Gaussian=TRUE, ...) {
+  function(x, ref, N=12, R=30, apply.Gaussian=TRUE, ...) {
     if ( colorMode(x) != Grayscale || colorMode(ref) != Grayscale ) 
       .stop( "both 'x' and 'ref' must be Grayscale" )
     if ( any( dim(x) != dim(ref) ) )
