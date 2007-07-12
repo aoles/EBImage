@@ -106,6 +106,7 @@ setMethod ("rmoments", signature(x="IndexedImage", ref="missing"),
     res[,1] <- res[,1] / u[1,1,]
     res[,2] <- res[,2] / u[1,1,]
     res[,3] <- res[,3] / u[1,1,]
+    res[ which(is.na(res)) ] = 0.0
     colnames(res) <- c("n20","n11","n02","theta","l1","l2")
     res
   }

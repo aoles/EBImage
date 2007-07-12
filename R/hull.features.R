@@ -77,9 +77,13 @@ setMethod ("hull.features", signature(x="IndexedImage"),
   ## and theta in third
   res <- .DoCall("lib_edge_profile", x, xyt)
   ## profile will be calculated at these angle coordinates (-2Pi,+2Pi)
-  xout <- (2*(1:n)/(n+1) - 1) * pi
+  xout <- (2*(0:(n-1))/(n-1) - 1) * pi
   ## this function will compose a profile matrix from the above matrix
   do.profile <- function(m, xyt, s) {
+    if ( is.null(m) ) { # no objects return 1 line full of zeros
+      warning("IndexedImage contains no objects");
+      return( matrix(0, ncol=n, nrow=1) )
+    }
     ## object indexes for each record
     index <- m[,1]
     ## split by object indexes and sort by object index acsending
@@ -105,11 +109,16 @@ setMethod ("hull.features", signature(x="IndexedImage"),
         if (changes) m[[i]] <- mi
       }
     ## approximate the data sets for each object by approx at xout, apply fft, return
+    do.approx <- function(x) {
+      y <- approx(x[,2], x[,1], xout=xout, n=n)$y
+      y[ which(is.na(y)) ] <- median(y, na.rm=TRUE)
+      y
+    }
     if ( fft )
-      return( matrix( unlist( lapply(m, function(x) abs(fft(approx(x[,2], x[,1], 
-        xout=xout, n=n)$y)) ) ), ncol=n, nrow=length(m), byrow=TRUE) )
-    matrix( unlist( lapply(m, function(x) approx(x[,2], x[,1], xout=xout, n=n)$y) ),
-      ncol=n, nrow=length(m), byrow=TRUE)
+      res <- lapply(m, function(x) abs(fft(do.approx(x))))
+    else
+      res <- lapply(m, do.approx)
+    matrix( unlist(res), ncol=n, nrow=length(m), byrow=TRUE)
   }
   ## run the above function for all images    
   if ( .dim[3] == 1 ) res <- do.profile(res, xyt, s)

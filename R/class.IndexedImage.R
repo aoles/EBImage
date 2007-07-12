@@ -98,29 +98,40 @@ setMethod ("features", signature (x="IndexedImage"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("getFeatures", signature(x="IndexedImage"),
-  function (x, ref, ...) {
+  function (x, ref, N = 12, R = 30, apply.Gaussian=TRUE, nc = 256, ...) {
     if ( !missing(ref) && is.Image(ref) && !(colorMode(ref) == Grayscale) ) 
       .stop( "if present, 'ref' must be Grayscale" )
     .dim <- dim(x)
     hf <- hull.features( x )
-    if ( missing(ref) ) ef <- edge.features(x=x)
-    else ef <- edge.features(x=x, ref=ref)
     if ( !missing(ref) ) {
-      tf <- haralick.features(x=x, ref=ref, ...)
+      ef <- edge.features( x=x, ref=ref )
+      tf <- haralick.features(x=x, ref=ref, nc=nc)
+      zf <- zernike.moments(x=x, ref=ref, N=N, R=R, apply.Gaussian=apply.Gaussian)
+      ## mf calculation
       mf <- moments(x=x, ref=ref)
       ## distance from COM to geometric centre
-      if ( .dim[3] == 1 ) mf <- cbind(mf, sqrt((mf[,3]-hf[,1])^2 +(mf[,4]-hf[,2])^2))
-      else for ( i in seq_along(hf) ) mf[[i]] <- cbind(mf[[i]], sqrt((mf[[i]][,3]-hf[[i]][,1])^2 +(mf[[i]][,4]-hf[[i]][,2])^2))
+      if ( .dim[3] == 1 ) 
+        mf <- cbind(mf, sqrt((mf[,3,drop=FALSE]-hf[,1])^2 +(mf[,4]-hf[,2])^2))
+      else {
+        for ( i in seq_along(hf) ) 
+          mf[[i]] <- cbind(mf[[i]], sqrt((mf[[i]][,3,drop=FALSE]-hf[[i]][,1])^2 +
+                                                     (mf[[i]][,4]-hf[[i]][,2])^2))
+      }
       do.moms <- function(m) {
-        m <- cbind(m[,2], m[,2]/m[,1], m[,18], 2*sqrt(m[,9]), 2*sqrt(m[,10]), sqrt((m[,9] - m[,10])/m[,9]), m[,11:17])
-        colnames(m) <- c("i.int", "i.dens", "i.d", "i.s2maj", "i.s2min", "i.ecc", "i.I1",
-                         "i.I2", "i.I3", "i.I4", "i.I5", "i.I6", "i.I7")
+        m <- cbind(m[,2,drop=FALSE], m[,2]/m[,1], m[,18], 2*sqrt(m[,9]), 
+                   2*sqrt(m[,10]), sqrt((m[,9] - m[,10])/m[,9]), m[,11:17,drop=FALSE])
+        m[ which(is.na(m)) ] = 0.0
+        colnames(m) <- c("i.int", "i.dens", "i.d", "i.s2maj", "i.s2min", "i.ecc", 
+                         "i.I1", "i.I2", "i.I3", "i.I4", "i.I5", "i.I6", "i.I7")
         m
       }
       if ( .dim[3] == 1 ) mf <- do.moms(mf)
       else mf <- lapply(mf, do.moms)
-      zf <- zernike.moments(x=x, ref=ref, ...)
     }
+    else { # missing ref
+      ef <- edge.features( x=x )
+    }
+
     if ( .dim[3] == 1 ) {
       if ( !missing(ref) )
         x@features <- list( cbind(hf, ef, tf, mf, zf) )

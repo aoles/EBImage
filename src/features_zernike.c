@@ -10,6 +10,8 @@ See: ../LICENSE for license, LGPL
 #include "Rmath.h"
 #include <R_ext/Error.h>
 
+/* ---------------------------------------------------------------------- */
+/* generates Z index from n, l */
 int nl_index(int n, int l) {
   int i, sum = 0;
   if ( n < 2 ) return n;
@@ -19,23 +21,27 @@ int nl_index(int n, int l) {
   return 2 * sum + l / 2 + n / 2 + 1;
 }
 
+/* ---------------------------------------------------------------------- */
 double factorial(int x) {
-  return floor(gammafn( (double)(x + 1) ));
+  return floor( gammafn( (double)(x + 1) ) );
 }
 
-/* calculates zernike features --------------------------------------- */
+/* ---------------------------------------------------------------------- */
+/* run-through index of features, from n, l */
 #define ZIND(n,l)   ((l) + (n)*(nmax + 1))
+/* run-through index of V-factors, from n, l, m */
 #define VIND(n,l,m) ((l) + (n)*(nmax + 1) + (m)*(nmax + 1) * (nmax + 1) )
 
+/* ---------------------------------------------------------------------- */
 SEXP
 lib_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP applyGaussian) {
   SEXP res, dup, xys, mRe, mIm, dm, dmnm, nm;
-  int nx, ny, nz, nprotect, im, index, x, y, nobj, l, m, n, i, nmax, msize, doGauss;
+  int nx, ny, nz, nprotect, im, index, x, y, nobj, l, m, n, i, nmax, msize, doGauss, no_objects;
   double * data, * xy, * ddata, * dmRe, * dmIm;
   double r2To2sigma2, d2, r, newx, newy, vnl, theta;
   char label[7] = "z.0000";
 
-  double * v; /* array of Vnl factors for n, l, m */
+  double * v; /* array of Vnl factors for n, l, m (everything but pow(d,...) and e^ilT) */
   int    * z; /* array of Z feature indexes from n, l */
 
   if ( !isImage(obj) ) return R_NilValue;
@@ -53,6 +59,7 @@ lib_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP applyGaussi
   PROTECT ( res = allocVector(VECSXP, nz) );
   nprotect++;
 
+  /* if Gaussian is applied, the image is modified, thus we need a duplicate */
   if ( doGauss ) {
     PROTECT( dup = Rf_duplicate(ref) );
     nprotect++;
@@ -61,7 +68,7 @@ lib_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP applyGaussi
 
   /* precalculates v's and z's */
   v = (double *) R_alloc((nmax + 1) * (nmax + 1) * (nmax/2 + 1), sizeof(double) );
-  z = (int *) R_alloc((nmax + 1) * (nmax + 1), sizeof(int));
+  z = (int *)    R_alloc((nmax + 1) * (nmax + 1), sizeof(int));
   /* precreate dimnames to duplicate onto each matrix later */
   PROTECT( dmnm = allocVector(VECSXP, 2) );
   nprotect++;
@@ -71,6 +78,7 @@ lib_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP applyGaussi
     for ( l = 0; l <= n; l++ ) {
       if ( (n - l) % 2 != 0 ) continue;
       i = nl_index(n, l);
+      /* z(n,l) cached */
       z[ ZIND(n,l) ] = i;
       label[2] = (char)(n / 10 + 48);
       label[3] = (char)(n - (n / 10) * 10 + 48);
@@ -78,6 +86,7 @@ lib_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP applyGaussi
       label[5] = (char)(l - (l / 10) * 10 + 48);
       SET_STRING_ELT( nm, i, Rf_duplicate(mkChar(label)) );
       for (m = 0; m <= (n - l) / 2; m++ )
+        /* v(n,l,m) cached */
         v[ VIND(n,l,m) ] = (n + 1) * ((m%2==0)?(1.0):(-1.0)) * factorial(n - m) / 
                            ( M_PI * factorial(m) * factorial(0.5*(n - 2*m + l)) 
                              * factorial(0.5*(n - 2*m - l)) );
@@ -88,40 +97,44 @@ lib_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP applyGaussi
   for ( im = 0; im < nz; im++ ) {
     /* get image data */
     data  = &( REAL(obj)[ im * nx * ny ] );
-    ddata = &( REAL(dup)[ im * nx * ny] );
+    ddata = &( REAL(dup)[ im * nx * ny ] );
     /* get number of objects -- max index */
     nobj = 0;
     for ( index = 0; index < nx * ny; index++ )
       if ( data[index] > nobj ) nobj = floor( data[index] );
     if ( nobj < 1 ) {
-      SET_VECTOR_ELT( res, im, R_NilValue );
-      continue;
+      no_objects = 1;
+      nobj = 1; /* if no objects, create a matrix for 1 and fill all 0 */
+      warning("IndexedImage contains no objects");
     }
-    /* get xy values for this frame */
-    if ( nz == 1 ) xys = xy_list;
-    else xys = VECTOR_ELT(xy_list, im);
-    if ( xys == R_NilValue || INTEGER(GET_DIM(xys))[0] != nobj || INTEGER(GET_DIM(xys))[1] < 2 ) continue;
-    xy = REAL(xys);
-
+    else no_objects = 0;
+    
     SET_VECTOR_ELT( res, im, (mRe = allocVector(REALSXP, nobj * msize)) );
     dmRe = REAL( mRe );
-    PROTECT( mIm = allocVector(REALSXP, nobj * msize) );
-    nprotect++;
-    dmIm = REAL( mIm );
-    for ( i = 0; i < nobj * msize; i++ ) {
-      dmRe[i] = 0.0;
-      dmIm[i] = 0.0;
+    for ( i = 0; i < nobj * msize; i++ ) dmRe[i] = 0.0;
+    if ( !no_objects ) {
+      PROTECT( mIm = allocVector(REALSXP, nobj * msize) );
+      nprotect++;
+      dmIm = REAL( mIm );
+      for ( i = 0; i < nobj * msize; i++ ) dmIm[i] = 0.0;
     }
-
     /* dimension of results matrix */
     PROTECT( dm = allocVector(INTSXP, 2) );
     nprotect++;
     INTEGER(dm)[0] = nobj; 
     INTEGER(dm)[1] = msize;
     SET_DIM( mRe, dm );
-    SET_DIM( mIm, Rf_duplicate(dm) );
+    if ( !no_objects ) SET_DIM( mIm, Rf_duplicate(dm) );
     UNPROTECT( 1 ); nprotect--; // dm
     setAttrib( mRe, R_DimNamesSymbol, Rf_duplicate(dmnm) );
+
+    /* return empty matrix (go to next image) with 1 line if error (no objects) */
+    if ( no_objects ) continue;
+    /* get xy values for this frame */
+    if ( nz == 1 ) xys = xy_list;
+    else xys = VECTOR_ELT(xy_list, im);
+    if ( xys == R_NilValue || INTEGER(GET_DIM(xys))[0] != nobj || INTEGER(GET_DIM(xys))[1] < 2 ) continue;
+    xy = REAL(xys);
 
     /* loop through x/y, calculate features*/
     for ( x = 0; x < nx; x++ )
@@ -157,7 +170,9 @@ lib_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP applyGaussi
     for ( i = 0; i < nobj * msize; i++ )
       dmRe[i] = sqrt(dmRe[i]*dmRe[i] + dmIm[i]*dmIm[i]);
       
-    UNPROTECT( 1 ); nprotect--; // mIm
+    if ( !no_objects ) { /* i.e. if protected */
+      UNPROTECT( 1 ); nprotect--; // mIm
+    }
   }
 
   UNPROTECT( nprotect );

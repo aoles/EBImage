@@ -15,7 +15,7 @@ See: ../LICENSE for license, LGPL
 SEXP
 lib_co_occurrence (SEXP obj, SEXP ref, SEXP cgrades) {
   SEXP res, cm, dm;
-  int nx, ny, nz, nprotect, im, x, y, nobj, index, i, nc, colthis, colthat, * ncomp;
+  int nx, ny, nz, nprotect, im, x, y, nobj, index, i, nc, colthis, colthat, no_objects, * ncomp;
   double * data, * refdata, * cmdata;
 
   if ( !isImage(obj) || !isImage(ref) ) return R_NilValue;
@@ -43,9 +43,11 @@ lib_co_occurrence (SEXP obj, SEXP ref, SEXP cgrades) {
     for ( index = 0; index < nx * ny; index++ )
       if ( data[index] > nobj ) nobj = floor( data[index] );
     if ( nobj < 1 ) {
-      SET_VECTOR_ELT( res, im, R_NilValue);
-      continue;
+      no_objects = 1;
+      nobj = 1; /* if no objects, create a matrix for 1 and fill all 0 */
+      warning("IndexedImage contains no objects");
     }
+    else no_objects = 0;
     /* create features matrix */
     SET_VECTOR_ELT( res, im, (cm = allocVector(REALSXP, nobj * nc * nc)) );
     /* initialize feature matrix with 0 */
@@ -58,7 +60,11 @@ lib_co_occurrence (SEXP obj, SEXP ref, SEXP cgrades) {
     INTEGER( dm )[1] = nc;
     INTEGER( dm )[2] = nobj;
     SET_DIM( cm, dm );
-    UNPROTECT( 1 ); nprotect--;
+    UNPROTECT( 1 ); nprotect--; // dm
+
+    /* return empty matrix (go to next image) with 1 line if error (no objects) */
+    if ( no_objects ) continue;
+
     /* number of comparisons for each object */
     ncomp = (int *) R_alloc (nobj, sizeof(int) );
     for ( index = 0; index < nobj; index++ )  ncomp[index] = 0;
@@ -117,9 +123,8 @@ lib_co_occurrence (SEXP obj, SEXP ref, SEXP cgrades) {
 SEXP 
 lib_haralick ( SEXP cm ) {
   SEXP res, dm;
-  int nprotect, nc, nobj, index, i, j, n, nonZeros;
+  int nprotect, nc, nobj, index, i, j, n, nonZeros, no_objects, nf=13;
   double mu, tmp;
-  int nf = 13;     // number of features
   double *p, *f;   // p for co-occurrence matrix -- probability; f for features
   double *px;      // partial probability density: rows summed, = py as matrix symmetrical
   double * Pxpy, * Pxmy;
@@ -147,8 +152,21 @@ lib_haralick ( SEXP cm ) {
   INTEGER(dm)[0] = nobj;
   INTEGER(dm)[1] = nf;
   SET_DIM( res, dm );
+  if ( nobj == 1) {
+    /* check if all zeros (co-occurance matrix for 0 objects ), 
+       return empty matrix if yes */
+    no_objects = 1;
+    p = REAL(cm); /* for the first object */
+    for ( i = 0; i < nc && no_objects; i++ )
+      for ( j = 0; j < nc && no_objects; j++ )
+        if ( (tmp = p[i + j * nc]) > 0 ) no_objects = 0;
+    if ( no_objects ) {
+      UNPROTECT( nprotect );
+      return res;
+    }
+  }
   /* temp vars */
-  px = (double *) R_alloc (nc, sizeof(double) );
+  px   = (double *) R_alloc (nc, sizeof(double) );
   Pxpy = (double *) R_alloc(2 * nc + 10, sizeof(double) ); // +10 is to be safe with limits
   Pxmy = (double *) R_alloc(2 * nc + 10, sizeof(double) ); // +10 is to be safe with limits
   /* GO through objects and calculate features */
