@@ -118,6 +118,10 @@ lib_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP applyGaussi
       dmIm = REAL( mIm );
       for ( i = 0; i < nobj * msize; i++ ) dmIm[i] = 0.0;
     }
+    else {
+      mIm = R_NilValue;
+      dmIm = NULL;
+    }
     /* dimension of results matrix */
     PROTECT( dm = allocVector(INTSXP, 2) );
     nprotect++;
@@ -170,7 +174,7 @@ lib_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP applyGaussi
     for ( i = 0; i < nobj * msize; i++ )
       dmRe[i] = sqrt(dmRe[i]*dmRe[i] + dmIm[i]*dmIm[i]);
       
-    if ( !no_objects ) { /* i.e. if protected */
+    if ( mIm != R_NilValue ) { /* i.e. if protected */
       UNPROTECT( 1 ); nprotect--; // mIm
     }
   }

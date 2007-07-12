@@ -76,7 +76,7 @@
   If \code{apply.Gaussian = TRUE} then prior to calculating the Zernike features, 
   a Gaussian is applied to the image centred at the co-ordinates of an objects 
   centre of mass, with the standard deviation defined by \code{sigma = 0.8 * R}. 
-  The centres of mass are found by using \code{\link{moments(x, ref)}}.
+  The centres of mass are found by using \code{\link{moments}(x, ref)}.
   The resulting image is then:
   
   \code{i'(x,y) = i(x,y) * exp( -(x^2+y^2) / (2 * sigma^2) )}.
