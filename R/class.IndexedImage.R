@@ -189,11 +189,11 @@ setMethod ("stackObjects", signature(x="IndexedImage", ref="Image"),
     ## determine the bounding box -- same for all images in stack
     hf <- hull.features( x )
     if ( .dim[3] == 1 ) {
-      xyt <- hf[,c(1,2,11)]
+      xyt <- hf[,c(1,2,11), drop=FALSE]
       ext <- hf[,12] ## h.s2major ~ h.pdm + h.pdsd
     }
     else {
-      xyt <- lapply( hf, function(x) x[,c(1,2,11)] )
+      xyt <- lapply( hf, function(x) x[,c(1,2,11), drop=FALSE] )
       ext <- unlist( lapply(hf, function(x) x[,12]) ) ## h.s2major ~ h.pdm + h.pdsd
     }
     ext <- quantile(ext, 0.95, na.rm=TRUE)
@@ -212,6 +212,7 @@ setMethod ("stackObjects", signature(x="IndexedImage", ref="Image"),
         hdr[[i]]@.Data <- array(col, c(1,1,1))
       }
     }
+    browser()
     .DoCall ("lib_stack_objects", x, ref, hdr, xyt, as.numeric(ext), as.integer(rotate))
   }
 )
