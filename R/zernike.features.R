@@ -17,17 +17,17 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("zernike.moments", signature(x="IndexedImage", ref="Image"),
   function(x, ref, N=12, R=30, apply.Gaussian=TRUE, ...) {
-    if ( colorMode(x) != Grayscale || colorMode(ref) != Grayscale ) 
+    if ( colorMode(x) != Grayscale || colorMode(ref) != Grayscale )
       .stop( "both 'x' and 'ref' must be Grayscale" )
     if ( any( dim(x) != dim(ref) ) )
       .stop("'x' and 'ref' must have the same dimensions")
 
     if ( dim(x)[3] == 1 )
-      xy <- moments(x=x, ref=ref)[, c(3,4)]
+      xy <- moments(x=x, ref=ref)[, c(3,4), drop=FALSE]
     else
-      xy <- lapply(moments(x=x, ref=ref), function(x) x[,c(3,4)] )
+      xy <- lapply(moments(x=x, ref=ref), function(x) x[,c(3,4), drop=FALSE] )
     .DoCall("lib_zernike", x, ref, xy, as.numeric(R), as.integer(N), as.integer(apply.Gaussian))
-  } 
+  }
 )
 
 

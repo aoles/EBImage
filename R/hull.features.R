@@ -46,7 +46,7 @@ setMethod ("hull.features", signature(x="IndexedImage"),
     resm <- smoments(x=x, pw=2, what="c")
     if ( is.matrix(res) ) res <- cbind( res, moms(resm) )
     else for ( i in seq_along(res) ) res[[i]] <- cbind( res[[i]], moms(resm[[i]]) )
-    cn <- c("h.x", "h.y", "h.s", "h.p", "h.pdm", "h.pdsd", "h.effr", "h.acirc", "h.sf", 
+    cn <- c("h.x", "h.y", "h.s", "h.p", "h.pdm", "h.pdsd", "h.effr", "h.acirc", "h.sf",
             "h.edge", "h.theta", "h.s2maj", "h.s2min", "h.ecc", "h.I1", "h.I2")
     if ( is.matrix(res) ) colnames(res) <- cn
     else res <- lapply(res, function(x) { if ( is.matrix(x) ) colnames(x) <- cn; x } )
@@ -62,13 +62,13 @@ setMethod ("hull.features", signature(x="IndexedImage"),
   ## radius for scaling, s. If a reference image is provided, then xy and t are
   ## affected by the intensity distribution (as per moments)
   if ( .dim[3] == 1 ) {
-    if ( is.null(ref) ) xyt <- moments(x=x)[, c(3,4,8)]
-    else xyt <- moments(x=x, ref=ref)[, c(3,4,8)]
+    if ( is.null(ref) ) xyt <- moments(x=x)[, c(3,4,8), drop=FALSE]
+    else xyt <- moments(x=x, ref=ref)[, c(3,4,8), drop=FALSE]
     if ( scale ) s <- hull.features(x=x)[,7] else s <- NULL
   }
   else {
-    if ( is.null(ref) ) xyt <- lapply(moments(x), function(x) x[,c(3,4,8)] )
-    else xyt <- lapply(moments(x=x, ref=ref), function(x) x[,c(3,4,8)] )
+    if ( is.null(ref) ) xyt <- lapply(moments(x), function(x) x[,c(3,4,8), drop=FALSE] )
+    else xyt <- lapply(moments(x=x, ref=ref), function(x) x[,c(3,4,8), drop=FALSE] )
     if ( scale ) s <- lapply(hull.features(x=x), function(x) x[,7] )
     else s <- vector("list", length(xyt))
   }
@@ -90,7 +90,7 @@ setMethod ("hull.features", signature(x="IndexedImage"),
     m <- split(as.data.frame(m[,2:3]), index)
     m <- m[ order(as.integer(names(m))) ]
     ## shift theta and scale d if rotation and scaling required
-    if (rotate || scale) 
+    if (rotate || scale)
       for (i in seq_along(m)) {
         mi <- m[[i]]
         changes <- FALSE
@@ -120,7 +120,7 @@ setMethod ("hull.features", signature(x="IndexedImage"),
       res <- lapply(m, do.approx)
     matrix( unlist(res), ncol=n, nrow=length(m), byrow=TRUE)
   }
-  ## run the above function for all images    
+  ## run the above function for all images
   if ( .dim[3] == 1 ) res <- do.profile(res, xyt, s)
   else for (i in seq_along(res)) res[[i]] <- do.profile(res[[i]], xyt[[i]], s[[i]])
   res
@@ -146,9 +146,9 @@ setMethod ("edge.features", signature(x="IndexedImage"),
     else edge.profile(x=x, ref=ref, n=16, fft=FALSE, scale=TRUE, rotate=TRUE)
     do.profile <- function(e) {
       m <- matrix(0, ncol=5, nrow=nrow(e))
-      colnames(m) <- c("e.irr", "e.f2Pi", "e.fPi", "e.fPi2", "e.fPi4")
+      colnames(m) <- c("e.irr", "e.f2Pi", "e.fPi", "e.f2Pi3", "e.fPi2")
       m[,1] <- apply(e, 1, max, na.rm=TRUE) - apply(e, 1, min, na.rm=TRUE)
-      m[,2:5] <- t(apply(e, 1, function(x) { x[which(is.na(x))]=median(x,na.rm=TRUE); abs(fft(x))[1:4] } ))
+      m[,2:5] <- t(apply(e, 1, function(x) { x[which(is.na(x))]=median(x,na.rm=TRUE); abs(fft(x))[2:5] } ))
       return( m )
     }
     if ( dim(x)[3] == 1 ) return( do.profile(res) )

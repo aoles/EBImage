@@ -76,7 +76,7 @@ setMethod ("propagate", signature(x="Image", seeds="IndexedImage"),
       .stop("'x' must be Grayscale" )
     if ( !assert(x, seeds, strict=TRUE) || (!is.null(mask) && !assert(x, mask, strict=TRUE)) )
       .stop( "dim(x) must equal dim(seeds) and dim(mask) if mask is not NULL, all images must be Grayscale" )
-    ext <- as.integer (ext)    
+    ext <- as.integer (ext)
     if ( ext < 1 )
       .stop("'ext' must be a positive integer" )
     lambda <- as.numeric (lambda)
@@ -89,7 +89,7 @@ setMethod ("propagate", signature(x="Image", seeds="IndexedImage"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("features", signature (x="IndexedImage"),
   function (x, ...) {
-    if ( length(x@features) > 0 ) 
+    if ( length(x@features) > 0 )
       return( x@features )
     else
       return( getFeatures(x)@features )
@@ -99,7 +99,7 @@ setMethod ("features", signature (x="IndexedImage"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("getFeatures", signature(x="IndexedImage"),
   function (x, ref, N = 12, R = 30, apply.Gaussian=TRUE, nc = 256, ...) {
-    if ( !missing(ref) && is.Image(ref) && !(colorMode(ref) == Grayscale) ) 
+    if ( !missing(ref) && is.Image(ref) && !(colorMode(ref) == Grayscale) )
       .stop( "if present, 'ref' must be Grayscale" )
     .dim <- dim(x)
     hf <- hull.features( x )
@@ -110,18 +110,18 @@ setMethod ("getFeatures", signature(x="IndexedImage"),
       ## mf calculation
       mf <- moments(x=x, ref=ref)
       ## distance from COM to geometric centre
-      if ( .dim[3] == 1 ) 
+      if ( .dim[3] == 1 )
         mf <- cbind(mf, sqrt((mf[,3,drop=FALSE]-hf[,1])^2 +(mf[,4]-hf[,2])^2))
       else {
-        for ( i in seq_along(hf) ) 
+        for ( i in seq_along(hf) )
           mf[[i]] <- cbind(mf[[i]], sqrt((mf[[i]][,3,drop=FALSE]-hf[[i]][,1])^2 +
                                                      (mf[[i]][,4]-hf[[i]][,2])^2))
       }
       do.moms <- function(m) {
-        m <- cbind(m[,2,drop=FALSE], m[,2]/m[,1], m[,18], 2*sqrt(m[,9]), 
+        m <- cbind(m[,2,drop=FALSE], m[,2]/m[,1], m[,18], 2*sqrt(m[,9]),
                    2*sqrt(m[,10]), sqrt((m[,9] - m[,10])/m[,9]), m[,11:17,drop=FALSE])
         m[ which(is.na(m)) ] = 0.0
-        colnames(m) <- c("i.int", "i.dens", "i.d", "i.s2maj", "i.s2min", "i.ecc", 
+        colnames(m) <- c("i.int", "i.dens", "i.d", "i.s2maj", "i.s2min", "i.ecc",
                          "i.I1", "i.I2", "i.I3", "i.I4", "i.I5", "i.I6", "i.I7")
         m
       }
@@ -185,7 +185,7 @@ setMethod ("stackObjects", signature(x="IndexedImage", ref="Image"),
     if ( any(dim(x) != dim(ref)) )
       .stop( "dim(x) must equal dim(ref)" )
     .dim <- dim(x)
-      
+
     ## determine the bounding box -- same for all images in stack
     hf <- hull.features( x )
     if ( .dim[3] == 1 ) {
@@ -212,7 +212,6 @@ setMethod ("stackObjects", signature(x="IndexedImage", ref="Image"),
         hdr[[i]]@.Data <- array(col, c(1,1,1))
       }
     }
-    browser()
     .DoCall ("lib_stack_objects", x, ref, hdr, xyt, as.numeric(ext), as.integer(rotate))
   }
 )
