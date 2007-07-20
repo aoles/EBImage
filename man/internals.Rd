@@ -19,6 +19,7 @@
 \alias{colorMode,Image-method}
 \alias{colorMode<-,Image,numeric-method}
 \alias{combine,Image,Image-method}
+\alias{combine,list,missing-method}
 \alias{compression,Image-method}
 \alias{compression<-,Image,character-method}
 \alias{contrast,Image-method}

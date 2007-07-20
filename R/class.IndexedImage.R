@@ -179,7 +179,7 @@ setMethod ("matchObjects", signature(x="IndexedImage", ref="IndexedImage"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("stackObjects", signature(x="IndexedImage", ref="Image"),
-  function (x, ref, rotate=TRUE, bg.col="black", ...) {
+  function (x, ref, rotate=TRUE, bg.col="black", ext, ...) {
     if ( colorMode(x) != Grayscale )
       .stop( "'x' must be Grayscale" )
     if ( any(dim(x) != dim(ref)) )
@@ -190,13 +190,16 @@ setMethod ("stackObjects", signature(x="IndexedImage", ref="Image"),
     hf <- hull.features( x )
     if ( .dim[3] == 1 ) {
       xyt <- hf[,c(1,2,11), drop=FALSE]
-      ext <- hf[,12] ## h.s2major ~ h.pdm + h.pdsd
+      if ( missing(ext) )
+        ext <- hf[,12] ## h.s2major ~ h.pdm + h.pdsd
     }
     else {
       xyt <- lapply( hf, function(x) x[,c(1,2,11), drop=FALSE] )
-      ext <- unlist( lapply(hf, function(x) x[,12]) ) ## h.s2major ~ h.pdm + h.pdsd
+      if ( missing(ext) )
+        ext <- unlist( lapply(hf, function(x) x[,12]) ) ## h.s2major ~ h.pdm + h.pdsd
     }
-    ext <- quantile(ext, 0.95, na.rm=TRUE)
+    if ( length(ext) > 1 )
+      ext <- quantile(ext, 0.95, na.rm=TRUE)
     if ( colorMode(ref) == TrueColor ) col <- channel(bg.col, "rgb")
     else col <- channel(bg.col, "gray")
     ## create image headers for the result: better to do in C, but too complicated
