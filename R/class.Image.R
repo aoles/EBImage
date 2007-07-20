@@ -140,7 +140,7 @@ setMethod ("assert", signature (x="Image", y="Image"),
   function (x, y, strict=FALSE, ...) {
     n <- 2
     if ( !missing(strict) && strict ) n <- 3
-    if ( any( dim(x)[1:n] != dim(y)[1:n] ) || colorMode(x) != colorMode(y) ) 
+    if ( any( dim(x)[1:n] != dim(y)[1:n] ) || colorMode(x) != colorMode(y) )
       return( FALSE )
     return( TRUE )
   }
@@ -363,7 +363,7 @@ setMethod ("show", signature(object="Image"),
         cat( "feature set ", i, "/", dimobject[3], ":\n", sep="" )
         x <- object@features[[i]]
         if (nrow(x) < 10)
-          print(x) 
+          print(x)
         else {
           print( x[1:10,] )
           cat(" ...\n")
@@ -371,7 +371,7 @@ setMethod ("show", signature(object="Image"),
       }
     }
     invisible(NULL)
-  }    
+  }
 )
 
 print.Image <- function(x, ...) show(x)
@@ -401,7 +401,7 @@ setMethod ("image", signature(x="Image"),
 setMethod ("channel", signature(x="Image", mode="character"),
   function (x, mode, ...) {
     mode <- tolower (mode)
-    modeNo <- as.integer( switch (EXPR=mode, rgb=0, grey=, gray=1, r=, red=2, g=, 
+    modeNo <- as.integer( switch (EXPR=mode, rgb=0, grey=, gray=1, r=, red=2, g=,
               green=3, b=, blue=4, asred=5, asgreen=6, asblue=7, x11=8, -1) )
     if ( modeNo < 0 )
       .stop( "wrong conversion mode" )
@@ -412,7 +412,7 @@ setMethod ("channel", signature(x="Image", mode="character"),
     resData <- array (resData, dim(x) )
     if ( mode == "x11" ) return (resData)
     res <- header (x)
-    res@colormode <- switch (EXPR=mode, rgb=, asred=, asgreen=, 
+    res@colormode <- switch (EXPR=mode, rgb=, asred=, asgreen=,
                      asblue=TrueColor, Grayscale)
     res@.Data <- resData
     return (res)
@@ -453,6 +453,11 @@ setMethod ("combine", signature(x="Image", y="Image"),
       res@.Data <- array ( c(x, y, ...), c( dim(x)[1:2], nz ) )
     return (res)
   }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("combine", signature(x="list", y="missing"),
+  function (x, y, ...) do.call("combine", x)
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

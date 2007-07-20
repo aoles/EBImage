@@ -17,7 +17,7 @@
 }
 
 
-\section{ Usage }{ 
+\section{ Usage }{
 
 Image constructors:
 
@@ -29,7 +29,8 @@ Image(data=0.5, dim=c(200,200), colormode=Grayscale, ...)
 copy(x)
 header(x)
 
-## S4 method for signature x='Image', and y='Image':
+## S4 method for signatures x='Image', y='Image'; and
+##                          x='list,   y='missing'
 
 combine(x, y, ...)
 }
@@ -48,15 +49,17 @@ assert(x, y, strict=FALSE)
 
 \section{ Arguments }{ \describe{
 
-  \item{\code{x, y}}{Objects of \code{\link{Image-class}} or any derived class.}
+  \item{\code{x, y}}{Objects of \code{\link{Image-class}} or any derived class.
+    In case of \code{combine}, \code{x} can be a list of equally sized (in \code{xy}
+    images) with \code{y} missing. }
 
   \item{\code{data}}{ Data to fill the image coercible to \code{numeric}. }
 
-  \item{\code{dim}}{ A numeric vector of image dimensions with length of 2 or 3. 
+  \item{\code{dim}}{ A numeric vector of image dimensions with length of 2 or 3.
     If length is 2, the third dimension is set to 1 automatically. }
 
   \item{\code{colormode}}{ An integer value for the image data color mode.
-    It is recommended to use constants \code{\link{TrueColor}} or 
+    It is recommended to use constants \code{\link{TrueColor}} or
     \code{\link{Grayscale}} correspondingly. }
 
   \item{\code{strict}}{If \code{TRUE} the size of all three dimensions of
@@ -65,18 +68,18 @@ assert(x, y, strict=FALSE)
     size, but image size should be the same). }
 
   \item{\code{...}}{ Further arguments to \code{\link{new}} when used with
-    \code{Image} and further images to stack at the back when used with 
+    \code{Image} and further images to stack at the back when used with
     \code{combine}. }
 
 }}
 
 \section{ Value }{
 
-  Constructors \code{Image}, \code{copy}, \code{combine} and \code{header} will 
+  Constructors \code{Image}, \code{copy}, \code{combine} and \code{header} will
   return a new object of \code{\link{Image-class}}.
 
   \code{assert} and \code{is.Image} will return a \code{logical}.
-  
+
   \code{stopIfNotImage} will return invisible \code{NULL} if argument is of
   \code{\link{Image-class}} and an error message otherwise.
 }
@@ -95,19 +98,20 @@ assert(x, y, strict=FALSE)
 
     \item{\code{combine}}{ Acts similarly to \code{\link{rbind}} and
       \code{\link{cbind}}. It allows to combine images to stacks adding further
-      images at the back of the first one. Properties of the first image in 
-      the argument \code{x} are transferred to the result. All images must be of 
-      the same size (in first two dimensions) and color mode. }
+      images at the back of the first one. Properties of the first image in
+      the argument \code{x} are transferred to the result. All images must be of
+      the same size (in first two dimensions) and color mode. If applied to
+      a list of images, it calls \code{\link{do.call}("combine", x)} }
 
-    \item{\code{header}}{ Acts similarly to copy, but does not copy the actual 
-      image data. It copies all other slots however. This function is useful 
-      when creating new images from existing large ones preserving other 
+    \item{\code{header}}{ Acts similarly to copy, but does not copy the actual
+      image data. It copies all other slots however. This function is useful
+      when creating new images from existing large ones preserving other
       attributes. }
 
     \item{\code{is.Image}}{ Returns \code{TRUE} if argument is a valid
       \code{Image} and \code{FALSE} otherwise. }
 
-    \item{\code{assert}}{ Compares dimensions and color modes of two images. 
+    \item{\code{assert}}{ Compares dimensions and color modes of two images.
       If argument \code{strict} is \code{FALSE} images are allowed to have
       different number of frames.}
 
