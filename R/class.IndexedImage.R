@@ -178,16 +178,16 @@ setMethod ("matchObjects", signature(x="IndexedImage", ref="IndexedImage"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("stackObjects", signature(x="IndexedImage", ref="Image"),
-  function (x, ref, rotate=TRUE, bg.col="black", ext, ...) {
+setMethod ("stackObjects", signature(x="IndexedImage", ref="Image", index="missing"),
+  function (x, ref, index, combine, rotate, bg.col, ext, ...) {
     if ( colorMode(x) != Grayscale )
       .stop( "'x' must be Grayscale" )
     if ( any(dim(x) != dim(ref)) )
       .stop( "dim(x) must equal dim(ref)" )
     .dim <- dim(x)
 
-    ## determine the bounding box -- same for all images in stack
     hf <- hull.features( x )
+    ## determine the bounding box -- same for all images in stack
     if ( .dim[3] == 1 ) {
       xyt <- hf[,c(1,2,11), drop=FALSE]
       if ( missing(ext) )
@@ -200,22 +200,74 @@ setMethod ("stackObjects", signature(x="IndexedImage", ref="Image"),
     }
     if ( length(ext) > 1 )
       ext <- quantile(ext, 0.95, na.rm=TRUE)
+    if ( missing(bg.col) ) bg.col <- "black"
     if ( colorMode(ref) == TrueColor ) col <- channel(bg.col, "rgb")
     else col <- channel(bg.col, "gray")
+    if ( missing(rotate) ) rotate <- TRUE
+    if ( missing(combine) ) combine <- FALSE
     ## create image headers for the result: better to do in C, but too complicated
     ## this hdr will be copied in C code, not modified
-    if ( .dim[3] == 1 ) {
-      hdr <- header(ref)
-      hdr@.Data <- array(col, c(1,1,1))
+    hdr <- header(ref)
+    hdr@.Data <- array(col, c(1,1,1))
+    res <- .DoCall ("lib_stack_objects", x, ref, hdr, xyt, as.numeric(ext), as.integer(rotate))
+    if (!combine || !is.list(res)) return( res )
+    ## if we are here, we have more than one frame and hf is a list
+    ## index of frames with no objects, these are to remove
+    index <- which( unlist( lapply(hf, function(x) all(x[,"h.s"] == 0)) ) )
+    ## if all are empty we return the first empty one
+    if ( length(index) == .dim[3] ) return( res[[1]] )
+    if ( length(index) > 0 ) res <- res[ -index ]
+    return( combine(res) )
+  }
+)
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("stackObjects", signature(x="IndexedImage", ref="Image", index="character"),
+  function (x, ref, index, ...) {
+    index <- strsplit(index, ".", fixed=TRUE)
+    fct <- unlist(lapply(index, function(x) x[1]))
+    index <- split( as.numeric(unlist(lapply(index, function(x) x[2]))), fct )
+    if ( dim(x)[3] == 1 )
+      return( stackObjects(x, ref, index=as.numeric(index), ...) )
+    stackObjects(x, ref, index=index, ...)
+  }
+)
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("stackObjects", signature(x="IndexedImage", ref="Image", index="list"),
+  function (x, ref, index, combine, ...) {
+    if ( missing(combine) )
+      combine <- FALSE
+    .dim <- dim(x)
+    if ( !is.null(names(index)) ) {
+      suppressWarnings( ims <- as.numeric(names(index)) )
+      if ( any(is.na(ims)) | any(ims > .dim[3]) | any(ims < 1) )
+        stop("if 'index' is a named list, names must correspond to frame indexes")
+    } else {
+      if ( length(index) != .dim[3] )
+        stop("if 'index' is an unnamed list, its length must be equal to the number of frames")
+      names(index) <- 1:(.dim[3])
     }
-    else {
-      hdr <- vector("list", .dim[3])
-      for ( i in 1:.dim[3] ) {
-        hdr[[i]] <- header(ref)
-        hdr[[i]]@.Data <- array(col, c(1,1,1))
-      }
+    s <- stackObjects(x, ref, combine=FALSE, ...)
+    if ( .dim[3] == 1 ) s <- list(s)
+    res <- list()
+    for ( i in as.numeric(names(index)) ) {
+      j <- index[[as.character(i)]]
+      if ( sum(j > dim(s[[i]])[3]) > 0 ) j <- j[ j <= dim(s[[i]])[3] ]
+      res[[as.character(i)]] <- s[[i]][,,j]
     }
-    .DoCall ("lib_stack_objects", x, ref, hdr, xyt, as.numeric(ext), as.integer(rotate))
+    if ( length(res) < 2 || !combine ) return( res )
+    return( combine(res) )
+  }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("stackObjects", signature(x="IndexedImage", ref="Image", index="numeric"),
+  function (x, ref, index, ...) {
+    .dim <- dim(x)
+    if ( .dim[3] > 1 )
+      stop("index cannot be numeric if there is more than 1 frame in 'x', consider character or list-type index")
+    s <- stackObjects(x, ref, ...)
+    if ( sum(index > dim(s)[3]) > 0 ) index <- index[ index <= dim(s)[3] ]
+    return( s[,,index] )
   }
 )
 

@@ -127,7 +127,7 @@ lib_matchFeatures (SEXP x, SEXP ref) {
         PROTECT ( indexes[im] = allocVector(INTSXP, nobj) );
         nprotect++;
         if ( nobj < 1 ) continue;
-        if ( nz == 1 ) ft = xf; 
+        if ( nz == 1 ) ft = xf;
         else ft = VECTOR_ELT(xf, im);
         if ( ft == R_NilValue ) continue;
         /* check if features correspond to objects */
@@ -221,8 +221,8 @@ lib_deleteFeatures (SEXP x, SEXP _index) {
 /*----------------------------------------------------------------------- */
 SEXP
 lib_stack_objects ( SEXP obj, SEXP ref, SEXP hdr, SEXP xy_list, SEXP extension, SEXP rotate ) {
-  SEXP res, * st, * std, * dm, xys;
-  int nx, ny, nz, nprotect, im, x, y, i, pxi, nobj, index, dox, doy, ibg = 0;
+  SEXP res, st, dm, xys;
+  int nx, ny, nz, nprotect, im, x, y, i, pxi, nobj, index, dox, doy, ibg = 0, error=0;
   double * data, * xy, xx, yy, xxc, yyc, theta, dbg = 0.0;
   double * dst, * dref; int * ist, * iref; // double or integer reference and stack
   int ext = floor( REAL(extension)[0] );
@@ -235,25 +235,19 @@ lib_stack_objects ( SEXP obj, SEXP ref, SEXP hdr, SEXP xy_list, SEXP extension, 
   nz = INTEGER ( GET_DIM(obj) )[2];
   nprotect = 0;
 
-  PROTECT( res = Rf_duplicate(hdr) );
-  nprotect++;
-  
   if ( nz == 1 ) {
-    if ( mode == MODE_RGB ) ibg = INTEGER(hdr)[0];
-    else dbg = REAL(hdr)[0];
+    PROTECT( res = Rf_duplicate(hdr) );
+    nprotect++;
   }
   else {
-    if ( mode == MODE_RGB ) ibg = INTEGER( VECTOR_ELT(hdr,0) )[0];
-    else dbg = REAL( VECTOR_ELT(hdr,0) )[0];
+    PROTECT( res = allocVector(VECSXP, nz) );
+    nprotect++;
+    for ( im = 0; im < nz; im++ ) SET_VECTOR_ELT(res, im, Rf_duplicate(hdr) );
   }
-  /* array of image stacks, freed on exit*/
-  st    = (SEXP *) R_alloc( nz, sizeof(SEXP) );  // stack images
-  std   = (SEXP *) R_alloc( nz, sizeof(SEXP) );  // data of stack images
-  dm    = (SEXP *) R_alloc( nz, sizeof(SEXP) );
-  if ( nz == 1) st[0] = res;
-  else for ( im = 0; im < nz; im++ ) st[im] = VECTOR_ELT(res, im);
-  for ( im = 0; im < nz; im++ ) std[im] = R_NilValue;
-  
+
+  if ( mode == MODE_RGB ) ibg = INTEGER(hdr)[0];
+  else dbg = REAL(hdr)[0];
+
   for ( im = 0; im < nz; im++ ) {
     /* get image data */
     data = &( REAL(obj)[ im * nx * ny ] );
@@ -261,30 +255,58 @@ lib_stack_objects ( SEXP obj, SEXP ref, SEXP hdr, SEXP xy_list, SEXP extension, 
     nobj = 0;
     for ( index = 0; index < nx * ny; index++ )
       if ( data[index] > nobj ) nobj = data[index];
-    if ( nobj < 1 ) continue;
-    /* get xy */
-    if ( nz == 1 ) xys = xy_list;
-    else xys = VECTOR_ELT(xy_list, im);
-    if ( xys == R_NilValue || INTEGER(GET_DIM(xys))[0] != nobj || INTEGER(GET_DIM(xys))[1] < 3 ) continue;
-    xy = REAL(xys);
+    if ( nobj < 1 ) {
+      error = 1;
+      nobj = 1;
+    } else error = 0;
     /* create stack */
     if ( mode == MODE_RGB ) {
-      PROTECT( std[im] = allocVector(INTSXP, nobj * snx * sny) );
+      PROTECT( st = allocVector(INTSXP, nobj * snx * sny) );
       nprotect++;
-      ist = INTEGER( std[im] );
+      ist = INTEGER( st );
       dst = NULL;
       for ( i = 0; i < nobj * snx * sny; i++ ) ist[i] = ibg;
       iref = &( INTEGER(ref)[im * nx * ny] );
       dref = NULL;
     }
     else {
-      PROTECT( std[im] = allocVector(REALSXP, nobj * snx * sny) );
+      PROTECT( st = allocVector(REALSXP, nobj * snx * sny) );
       nprotect++;
-      dst = REAL( std[im] );
+      dst = REAL( st );
       ist = NULL;
       for ( i = 0; i < nobj * snx * sny; i++ ) dst[i] = dbg;
       dref = &( REAL(ref)[im * nx * ny] );
       iref = NULL;
+    }
+    /* set dims on array */
+    PROTECT ( dm = allocVector( INTSXP, 3 ) );
+    nprotect++;
+    INTEGER (dm)[0] = snx;
+    INTEGER (dm)[1] = sny;
+    INTEGER (dm)[2] = nobj;
+    SET_DIM ( st, dm );
+    UNPROTECT( 1 ); nprotect--; // dm
+    if ( nz == 1 ) res = SET_SLOT(res, install(".Data"), st);
+    else SET_VECTOR_ELT(res, im, SET_SLOT(VECTOR_ELT(res, im), install(".Data"), st) );
+    UNPROTECT( 1 ); nprotect--; // st
+    if ( error == 1 ) continue;
+    /* get xy */
+    if ( nz == 1 ) xys = xy_list;
+    else xys = VECTOR_ELT(xy_list, im);
+    if ( xys == R_NilValue || INTEGER(GET_DIM(xys))[0] != nobj || INTEGER(GET_DIM(xys))[1] < 3 ) continue;
+    xy = REAL(xys);
+
+    if ( mode == MODE_RGB ) {
+      if ( nz == 1 )
+        ist = INTEGER( res );
+      else
+        ist = INTEGER( VECTOR_ELT(res, im) );
+    }
+    else {
+      if ( nz == 1 )
+        dst = REAL( res );
+      else
+        dst = REAL( VECTOR_ELT(res, im) );
     }
     /* copy reference data into stack */
     /* unset all non-perimeter points */
@@ -311,7 +333,7 @@ lib_stack_objects ( SEXP obj, SEXP ref, SEXP hdr, SEXP xy_list, SEXP extension, 
         xx += ext + 1;
         yy += ext + 1;
         if ( xx < 0 || xx >= snx || yy < 0 || yy >= sny ) continue;
-        /* put a pixel */ 
+        /* put a pixel */
         pxi = xx + yy * snx + index * sny * snx;
         if ( mode == MODE_RGB ) ist[ pxi ] = iref[x + y * nx];
         else dst[ pxi ] = dref[x + y * nx];
@@ -327,21 +349,9 @@ lib_stack_objects ( SEXP obj, SEXP ref, SEXP hdr, SEXP xy_list, SEXP extension, 
           else dst[ pxi ] = dref[x + y * nx];
         }
       }
-    /* set dims on array */
-    PROTECT ( dm[im] = allocVector( INTSXP, 3 ) );
-    nprotect++;
-    INTEGER (dm[im])[0] = snx;
-    INTEGER (dm[im])[1] = sny;
-    INTEGER (dm[im])[2] = nobj;
-    SET_DIM ( std[im], dm[im] ) ;
-    /* set data */
-    st[im] = SET_SLOT( st[im], install(".Data"), std[im] );
-    if ( nz == 1 && im == 0 ) res = st[0];
-    else if ( nz > 1 ) SET_VECTOR_ELT( res, im, st[im] );
   }
-
   UNPROTECT( nprotect );
-  return res;  
+  return res;
 }
 
 /*----------------------------------------------------------------------- */
@@ -353,7 +363,7 @@ lib_tile_stack (SEXP obj, SEXP hdr, SEXP params) {
   int lwd = INTEGER(params)[1];
   int nprotect, nx, ny, nz, ifg, ibg, nxr, nyr, * iim, i, j, index, x, y;
   double dfg, dbg, * dim, onetondx;
-  
+
   nx = INTEGER ( GET_DIM(obj) )[0];
   ny = INTEGER ( GET_DIM(obj) )[1];
   nz = INTEGER ( GET_DIM(obj) )[2];
@@ -368,7 +378,7 @@ lib_tile_stack (SEXP obj, SEXP hdr, SEXP params) {
   else {
     dfg = REAL(hdr)[0]; ifg = 0.0;
     dbg = REAL(hdr)[1]; ibg = 0.0;
-  }  
+  }
   /* calculate size of the resulting image */
   onetondx = 1.0 / (double)ndx;
   ndy = ceil( nz * onetondx ); // number of tiles in y-dir

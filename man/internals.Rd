@@ -74,7 +74,10 @@
 \alias{propagate,Image,IndexedImage-method}
 \alias{tile,list-method}
 \alias{tile,Image-method}
-\alias{stackObjects,IndexedImage,Image-method}
+\alias{stackObjects,IndexedImage,Image,character-method}
+\alias{stackObjects,IndexedImage,Image,list-method}
+\alias{stackObjects,IndexedImage,Image,numeric-method}
+\alias{stackObjects,IndexedImage,Image,missing-method}
 \alias{moments,Image-method}
 \alias{as.Image,IndexedImage-method}
 \alias{print.Image}

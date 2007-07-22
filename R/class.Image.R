@@ -457,7 +457,10 @@ setMethod ("combine", signature(x="Image", y="Image"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("combine", signature(x="list", y="missing"),
-  function (x, y, ...) do.call("combine", x)
+  function (x, y, ...) {
+    names(x) <- NULL
+    do.call("combine", x)
+  }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
