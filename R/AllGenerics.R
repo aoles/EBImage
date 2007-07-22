@@ -88,7 +88,7 @@ setGeneric ("closing",        function (x, ...)        standardGeneric("closing"
 ## object manipulation
 setGeneric ("paintObjects",   function (x, tgt, ...)   standardGeneric("paintObjects") )
 setGeneric ("matchObjects",   function (x, ref, ...)   standardGeneric("matchObjects") )
-setGeneric ("stackObjects",   function (x, ref, ...)   standardGeneric("stackObjects") )
+setGeneric ("stackObjects",   function (x, ref, index, ...) standardGeneric("stackObjects") )
 setGeneric ("rmObjects",      function (x, index, ...) standardGeneric("rmObjects") )
 
 ## feature extraction
