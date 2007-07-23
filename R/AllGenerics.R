@@ -38,7 +38,7 @@ setGeneric (".correctType",   function (x)             standardGeneric(".correct
 setGeneric ("display",        function (x, ...)        standardGeneric("display") )
 setGeneric ("animate",        function (x, ...)        standardGeneric("animate") )
 setGeneric ("header",         function (x, ...)        standardGeneric("header") )
-setGeneric ("write.image",    function (x, files, quality, ...) standardGeneric("write.image") )
+setGeneric ("write.image",    function (x, files, ...) standardGeneric("write.image") )
 setGeneric ("assert",         function (x, y, ...)     standardGeneric("assert") )
 setGeneric ("combine",        function (x, y, ...)     standardGeneric("combine") )
 setGeneric ("tile",           function (x, ...)        standardGeneric("tile") )
