@@ -180,7 +180,7 @@ setMethod ("noise", signature(x="Image"),
         return ( .DoCall("lib_filterMagick", x, flt.noise, as.numeric(param) ) )
     }
 )
-        
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("resize", signature(x="Image"),
     function (x, w, h, blur=1, filter="Lanczos", ...) {
@@ -202,8 +202,11 @@ setMethod ("resize", signature(x="Image"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("rotate", signature(x="Image"),
-    function (x, angle=90, ...)
+    function (x, angle=90, col, ...) {
+        if ( !missing(col) )
+          warning("argument 'col' is ignored, not implemented yet, black is used as default")
         .DoCall("lib_filterMagick", x, flt.rotate, as.numeric(angle) )
+    }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
