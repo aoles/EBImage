@@ -122,6 +122,19 @@ lib_filterMagick (SEXP x, SEXP filter, SEXP parameters) {
                 image = ResizeImage (image, (unsigned long)par[0], (unsigned long)par[1], images->filter, par[2], &exception);
                 break;
             case FLT_ROTATE:
+                /* this doesn't work, it is not purely correct either, but this
+                 * is the way to go later
+                 * col = (int)par[1];
+                 * image->background_color.red = colb[0] / 255.0;
+                 * image->background_color.green = colb[1] / 255.0;
+                 * image->background_color.blue = colb[2] / 255.0;
+                 * image->background_color.opacity = 1.0; */
+                /* or we can supply the color as string, which is much more
+                 * straight forward, but then we need to change a lot of R
+                 * code to add an extra NULL to all functions calling
+                 * this one from R:
+                 *  str = CHAR ( asChar(colStrSXP) ); */
+                QueryColorDatabase ("black", &(image->background_color), &exception);
                 image = RotateImage (image, par[0], &exception);
                 break;
             case FLT_SAMPLE:
