@@ -133,7 +133,7 @@ lib_writeImages (SEXP x, SEXP files, SEXP quality) {
     int nz, nfiles, i;
     Image * images, * image;
     ImageInfo *image_info;
-    const char * file;
+    ExceptionInfo exception;
 
     /* basic checks */
     if ( !isImage(x) )
@@ -143,46 +143,42 @@ lib_writeImages (SEXP x, SEXP files, SEXP quality) {
     if ( nfiles != 1 && nfiles != nz)
         error ( "number of files must be 1, or equal to the size of the image stack" );
     images = sexp2Magick (x);
-    if ( images == NULL )
+    if ( images == NULL || GetImageListLength (images) < 1 )
         error ( "cannot write an empty image" );
-    if ( GetImageListLength (images) < 1 )
-        error ( "cannot write an empty image" );
+    GetExceptionInfo (&exception);
     image_info = CloneImageInfo ( (ImageInfo *)NULL );
     /* set attributes in image_info*/
     image_info->compression = images->compression;
     image_info->quality = (unsigned int) INTEGER (quality)[0];
     if ( nfiles == 1 ) {
     /* save into a single file, TIFF, GIF, or automatically add file suffixes */
-        strcpy (image_info->filename, CHAR( asChar(files) ) );
+        strcpy (image_info->filename, CHAR(STRING_ELT(files, 0)) );
         /* we want to overwrite the feature imported from SEXP image */
         strcpy (images->filename, image_info->filename);
-        if ( WriteImage (image_info, images) == 0 )
-            error ( "cannot write image, check path and file name (UNIX home directories with ~ are not supported)" );
-        CatchException (&images->exception);
+        WriteImages(image_info, images, CHAR(STRING_ELT(files, 0)), &exception);
+        CatchException (&exception);
     }
     else {
     /* save each frame into a separate file */
         for ( i = 0; i < nz; i++ ) {
-            file = CHAR ( asChar( STRING_ELT(files, i) ) );
             image = GetImageFromList (images, i);
-            if ( image == NULL ) {
+            if ( image == NULL || GetImageListLength (image) < 1 ) {
                 warning ( "cannot write an empty image, skipping" );
                 continue;
             }
-            if ( GetImageListLength (image) < 1 ) {
-                warning ( "cannot write an empty image, skipping" );
-                continue;
-            }
-            strcpy (image_info->filename, file);
+            strcpy (image_info->filename, CHAR(STRING_ELT(files, i)));
             /* we want to overwrite the feature imported from SEXP image */
             strcpy (image->filename, image_info->filename);
-            if ( WriteImage (image_info, image) == 0 )
-                warning ( "cannot write image, check path and file name (UNIX home directories with ~ are not supported" );
+            WriteImage (image_info, image);
             CatchException (&image->exception);
+            // WriteImages(image_info, image, CHAR(STRING_ELT(files, i)), &exception);
+            // CatchException (&exception);
+
         }
     }
 
     image_info = DestroyImageInfo (image_info);
     images = DestroyImageList (images);
+    DestroyExceptionInfo(&exception);
     return R_NilValue;
 }

@@ -226,7 +226,8 @@ setMethod ("animate", signature(x="Image"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("write.image", signature(x="Image", files="character"),
-  function (x, files, quality=95, ...) {
+  function (x, files, quality, ...) {
+    if ( missing(quality) ) quality <- 95
     if ( quality < 1 || quality > 100 )
       .stop( "quality value is given in % between 1 and 100" )
     if ( !.isCorrectType(x) ) x <- .correctType (x)
@@ -236,8 +237,8 @@ setMethod ("write.image", signature(x="Image", files="character"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("write.image", signature(x="Image", files="missing"),
-  function (x, files, quality=95, ...) {
-#    if ( missing(quality) ) quality <- 95
+  function (x, files, quality, ...) {
+    if ( missing(quality) ) quality <- 95
 #    else quality <- as.integer (quality)
 #    if ( quality < 1 || quality > 100 )
 #      .stop ( "quality value is given in % between 1 and 100" )
