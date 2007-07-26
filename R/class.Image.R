@@ -387,14 +387,15 @@ setMethod ("image", signature(x="Image"),
     }
     i <- as.integer ( i[1] )
     if ( i < 1 || i > dimx[3] )
-      .stop( "index i out of range" )
+      stop( "index i out of range" )
     if ( any(dimx == 0) )
-      .stop( "image size is zero, nothing to plot" )
+      stop( "image size is zero, nothing to plot" )
     X <- 1:dimx[1]
     Y <- 1:dimx[2]
     Z <- imageData(x[,,i])[, rev(Y), 1, drop=TRUE]
     asp <- dimx[2] / dimx[1]
-    graphics:::image (x=X, y=Y, z=Z, asp=asp, col=col, axes=axes, xlab=xlab, ylab=ylab, ...)
+    browser()
+    graphics:::image (x=X, y=Y, z=Z, asp=1, col=col, axes=axes, xlab=xlab, ylab=ylab, ...)
   }
 )
 
