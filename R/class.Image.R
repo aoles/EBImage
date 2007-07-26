@@ -394,7 +394,6 @@ setMethod ("image", signature(x="Image"),
     Y <- 1:dimx[2]
     Z <- imageData(x[,,i])[, rev(Y), 1, drop=TRUE]
     asp <- dimx[2] / dimx[1]
-    browser()
     graphics:::image (x=X, y=Y, z=Z, asp=1, col=col, axes=axes, xlab=xlab, ylab=ylab, ...)
   }
 )
