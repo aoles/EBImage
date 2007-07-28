@@ -149,7 +149,6 @@ setMethod ("assert", signature (x="Image", y="missing"),
   function (x, y, ...) is.Image (x)
 )
 
-
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 stopIfNotImage <- function (x) {
   if ( !is(x, "Image") )
@@ -206,6 +205,26 @@ setMethod (".correctType", signature(x="Image"),
       x@.Data = array (as.double(x@.Data), dim(x@.Data) )
     return (x)
   }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod("Arith", signature(e1="Image", e2="Image"),
+	function(e1, e2) {
+		imageData(e1) <- callGeneric(imageData(e1), imageData(e2))
+		return( e1 )
+	}
+)
+setMethod("Arith", signature(e1="Image", e2="array"),
+	function(e1, e2) {
+		imageData(e1) <- callGeneric(imageData(e1), e2)
+		return( e1 )
+	}
+)
+setMethod("Arith", signature(e1="array", e2="Image"),
+	function(e1, e2) {
+		imageData(e2) <- callGeneric(e1, imageData(e2))
+		return( e2 )
+	}
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -387,9 +406,9 @@ setMethod ("image", signature(x="Image"),
     }
     i <- as.integer ( i[1] )
     if ( i < 1 || i > dimx[3] )
-      stop( "index i out of range" )
+      .stop( "index i out of range" )
     if ( any(dimx == 0) )
-      stop( "image size is zero, nothing to plot" )
+      .stop( "image size is zero, nothing to plot" )
     X <- 1:dimx[1]
     Y <- 1:dimx[2]
     Z <- imageData(x[,,i])[, rev(Y), 1, drop=TRUE]

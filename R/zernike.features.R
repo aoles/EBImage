@@ -16,7 +16,7 @@
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("zernike.moments", signature(x="IndexedImage", ref="Image"),
-  function(x, ref, N=12, R=30, apply.Gaussian=TRUE, ...) {
+  function(x, ref, N=12, R=30, apply.Gaussian=TRUE, pseudo=FALSE, ...) {
     if ( colorMode(x) != Grayscale || colorMode(ref) != Grayscale )
       .stop( "both 'x' and 'ref' must be Grayscale" )
     if ( any( dim(x) != dim(ref) ) )
@@ -26,8 +26,9 @@ setMethod ("zernike.moments", signature(x="IndexedImage", ref="Image"),
       xy <- moments(x=x, ref=ref)[, c(3,4), drop=FALSE]
     else
       xy <- lapply(moments(x=x, ref=ref), function(x) x[,c(3,4), drop=FALSE] )
-    .DoCall("lib_zernike", x, ref, xy, as.numeric(R), as.integer(N), as.integer(apply.Gaussian))
+    if ( !pseudo )
+      return( .DoCall("lib_zernike", x, ref, xy, as.numeric(R), as.integer(N), as.integer(apply.Gaussian)) )
+    else
+      return( .DoCall("lib_pseudo_zernike", x, ref, xy, as.numeric(R), as.integer(N), as.integer(apply.Gaussian)) )
   }
 )
-
-
