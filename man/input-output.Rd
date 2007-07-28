@@ -33,10 +33,6 @@
   \item{colormode}{ An integer value for the color mode of images after they are
     read. By default all images will be converted to Grayscale on read. }
 
-  \item{quality}{ A numeric in the range \code{[1,100]} defining the quality
-    of non-lossless compression, such as JPEG, when saving images. Higher
-    values correspond to better quality. Defaults to 95.}
-
   \item{...}{ Reserved for future use. }
 
 }
@@ -57,6 +53,10 @@
   method will be used to select a single file to write to. Otherwise,
   the length of this vector must be equal either 1 or the number of 2D images
   in the stack.
+
+  When writing images in formats supporting non-lossless compression (like JPEG),
+  the quality can be spcified used a numeric \code{quality} argument with the
+  range \code{[1,100]}. Higher values correspond to better quality. Defaults to 95.
 
   The file format is deduced from the file name extension(s), there is neither
   a need nor a way to specify the format explicitly.

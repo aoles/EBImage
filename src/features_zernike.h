@@ -9,6 +9,7 @@ extern "C" {
 #endif
 
 SEXP lib_zernike (SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP lib_pseudo_zernike (SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus
 };

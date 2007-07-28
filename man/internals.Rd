@@ -49,6 +49,9 @@
 \alias{imageData<-,Image,matrix-method}
 \alias{imageData<-,Image,array-method}
 \alias{mediansmooth,Image-method}
+\alias{Arith,Image,Image-method}
+\alias{Arith,Image,array-method}
+\alias{Arith,array,Image-method}
 \alias{modulate,Image-method}
 \alias{negate,Image-method}
 \alias{noise,Image-method}

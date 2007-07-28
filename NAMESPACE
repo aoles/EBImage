@@ -1,5 +1,6 @@
 useDynLib(EBImage)
 
+importFrom("methods", "Arith")
 importFrom("methods", "show")
 importFrom("graphics", "image")
 importFrom("graphics", "hist")
@@ -13,7 +14,7 @@ exportClasses(
 )
 exportMethods(
   copy, display, animate, write.image, header, assert, combine, tile,
-  show, "[", channel, as.Image,
+  show, "[", channel, as.Image, Arith,
 
   colorMode, "colorMode<-",
   fileName, "fileName<-",
@@ -26,9 +27,10 @@ exportMethods(
   sharpen, umask, thresh, athresh, cthresh, affinet, modulate, negate,
   normalize, normalize2, fill, flip, flop, erode, dilate, opening, closing,
   distmap, watershed, paintObjects,
-  matchObjects, stackObjects, rmObjects, propagate, image, show, hist, 
+  matchObjects, stackObjects, rmObjects, propagate, image, show, hist,
   cmoments, smoments, rmoments, moments,
-  
+
   features, getFeatures, hull.features, edge.profile, edge.features,
   haralick.matrix, haralick.features, zernike.moments
 )
+

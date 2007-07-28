@@ -6,6 +6,7 @@
 \alias{show,Image-method}
 \alias{image,Image-method}
 \alias{[,Image-method}
+\alias{Arith}
 
 \concept{image processing}
 \concept{image class}
@@ -45,6 +46,10 @@
     \item{\code{[}}{ Redefined versions (multiple signatures) of the
       \code{\link{array}} subsetting operator. These return objects of class 
       \code{Image} without dropping dimensions. }
+
+    \item{\code{Arith}}{ Redefined arithmetic operators acting on any 
+      combination of \code{Image} with another \code{Image} or \code{array}
+      will return an object of class \code{Image}. }
   }
   
   Other important methods that directly applicable due to inheritance from the 
