@@ -3,19 +3,20 @@
 %\VignetteKeywords{image processing, visualization}
 %\VignettePackage{EBImage}
 
-\documentclass[11pt]{article}
-%% times,10pt,twocolumn
+\documentclass[10pt,a4paper]{article}
+
+\RequirePackage{amsfonts,amsmath,amstext,amssymb,amscd}
 \usepackage{graphicx}
 \usepackage{verbatim}
-\topmargin -1.5cm        % read Lamport p.163
-\oddsidemargin -0.04cm   % read Lamport p.163
-\evensidemargin -0.04cm  % same as oddsidemargin but for left-hand pages
-\textwidth 16.59cm
-\textheight 21.94cm
-
-\usepackage{color}
 \usepackage{hyperref}
+\usepackage{color}
 \definecolor{darkblue}{rgb}{0.2,0.0,0.4}
+
+\topmargin -1.5cm
+\oddsidemargin -0cm   % read Lamport p.163
+\evensidemargin -0cm  % same as oddsidemargin but for left-hand pages
+\textwidth 17cm
+\textheight 24.5cm
 
 \newcommand{\lib}[1]{{\mbox{\normalfont\textsf{#1}}}}
 \newcommand{\file}[1]{{\mbox{\normalfont\textsf{'#1'}}}}
@@ -36,7 +37,11 @@
 
 %\usepackage[baseurl={http://www.ebi.ac.uk/~osklyar/EBImage/},pdftitle={EBImage - Image Processing Toolkit For R},pdfauthor={Oleg Sklyar},pdfsubject={EBImage},pdfkeywords={image processing},pagebackref,bookmarks,colorlinks,linkcolor=darkblue,citecolor=darkblue,pagecolor=darkblue,raiselinks,plainpages,pdftex]{hyperref}
 
-\bibliographystyle{abbrvnat}
+%% Uncomment the second to show solutions
+%\SweaveOpts{echo=FALSE,results=hide}
+%\SweaveOpts{echo=FALSE,results=hide,eval=FALSE}
+\SweaveOpts{echo=TRUE,results=verbatim,eval=TRUE}
+
 \begin{document}
 
 \begin{figure}
@@ -46,289 +51,503 @@
 \end{center}
 \end{figure}
 
-\title{Analysing Microscopy Screens with \Rpackage{EBImage}}
-\author{Oleg Sklyar and Wolfgang Huber\\
-    \emph{European Bioinformatics Institute - EMBL}\\
-    \emph{Wellcome Trust Genome Campus}\\
-    \emph{Cambridge CB10 1SD, England}\\
-    \email{osklyar@ebi.ac.uk} }
-
+%------------------------------------------------------------
+\title{Analysis of biological images with \lib{EBImage}}
+%------------------------------------------------------------
+\author{Oleg Sklyar, Wolfgang Huber\\\email{osklyar@ebi.ac.uk}}
 \maketitle
 
 
-The \R{}-package \Rpackage{EBImage} provides functionality to perform {\em image processing} and {\em image analysis} on large sets of images in a programmatic fashion using the \R{} language.
+In this manual the \EBImage{} package is used to analyse a set of images acquired in a large-scale RNAi microscopy screen and to extract numerical descriptors of the cells in these images.  The descriptors define biological phenotypes. The descriptors can be further analysed statistically e.\,g.\ to classify genes by their phenotypic effect.
 
-We use the term {\em image analysis} to describe the extraction of numeric features ({\em image descriptors}) from images and image collections~\cite{R:Russ:2002}. Image descriptors can then be used for statistical analysis, such as classification, clustering and hypothesis testing, using the resources of \R{} and its contributed packages.
+The images used in this manual are available in the package lab can be downloaded from\\ \web{http://www.ebi.ac.uk/\~{}osklyar/BioC2007/data}.
 
-Image analysis is not an easy task, and the definition of image descriptors depends on the problem. Analysis algorithms need to be adapted correspondingly. We find it desirable to develop and optimize such algorithms in conjunction with the subsequent statistical analysis, rather than as separate tasks. This is one of our motivations for writing \Rpackage{EBImage} as an \R{} package.
+The images are 16-bit grayscale TIFF's and were measured at two different wavelengths corresponding to two different stainings: DNA content measured in the green channel (suffix G) and one of a cytoplasm protein in red (suffix R). 
 
-We use the term {\em image processing} for operations that turn images into images with the goals of enhancing, manipulating, sharpening, denoising or similar~\cite{R:Russ:2002}. While some image processing is often needed as a preliminary step for image analysis, image processing is not the primary goal of the package. We focus on methods that do not require interactive user input, such as selecting image regions with a pointer etc. Whereas interactive methods can be very effective for small sets of images, they tend to have limited throughput and reproducibility.
+<<loadlib,echo=FALSE,results=hide,eval=TRUE>>=
+library(EBImage)
+@
 
-\Rpackage{EBImage} uses the \cite{R:ImageMagick:2006} library API's to implement much of its functionality in image processing and input/output operations.
+%%--------------------------------------------
+\section{Handling images}
+%%--------------------------------------------
 
-%--------------------------------------------------
-\section*{Cell-based assays}
-%--------------------------------------------------
+\EBImage{} provides two functions to read images, \Rfunction{read.image} and \Rfunction{choose.image}. They both allow users to specify whether the result should be in grayscale or RGB mode.  
 
-Advances in automated microscopy have made it possible to conduct large scale cell-based assays with image-type phenotypic readouts. In such an assay, cells are grown in the wells of a microtitre plate (often a 96- or 384-well format is used) under a condition or stimulus of interest. Each well is treated with one of the reagents from the screening library and the cells' response is monitored, for which in many cases certain proteins of interest are antibody-stained or labeled with a GFP-tag~\cite{CarpenterSabatini2004, Wiemann2004, MoffatSabatini2006, R:Neumann:2006}.
+An interactive window for loading images is provided by the \Rfunction{choose.image} function, which is available if the package was compiled with GTK+ support (always the case on Windows): 
 
-The resulting imaging data can be in the form of two-dimensional (2D) still images, three-dimensional (3D) image stacks or image-based time courses. Such assays can be used to screen compound libraries for the effect of potential drugs on the cellular system of interest. Similarly, RNA interference (RNAi) libraries can be used to screen a set of genes (in many cases the whole genome) for the effect of their loss of function in a certain biological process~\cite{R:Boutros:2004}.
+<<example.choose.image,echo=TRUE,results=hide,eval=FALSE>>=
+x = choose.image(TrueColor)
+@
 
-%--------------------------------------------------
-\section*{Importing and handling images}
-%--------------------------------------------------
+The \Rfunction{read.image} function can read local or network files via HTTP or anonymous FTP protocols. Multiple files can be loaded into a single object, an image stack. If the source image has multiple frames they all will be read into a stack. Single, multi-frame or multiple images read are stored in objects of class \code{Image}:
+ 
+<<example.read.image,echo=TRUE,results=verbatim,eval=TRUE>>=
+ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
+fG = paste(ddir, dir(path=ddir, pattern="_G.tif"), sep="/")
+iG = read.image(fG[1], Grayscale)
+class(iG)
+dim(iG)
 
-Images in \Rpackage{EBImage} are stored in objects of \lib{S4} class \Rclass{Image} that extends the \R{} \Rclass{array} class. The class encapsulates the most important image properies like size, resolution and colour mode, which are accessible by means of \emph{accessor methods}. It is recommended not to access slot data directly as their structure might change in the future releases and only use accessor methods. The \code{get} and \code{set} accessor methods for the \Rclass{Image}class are: \Rfunction{colorMode}, \Rfunction{imageData}, \Rfunction{fileName}, \Rfunction{compression}, \Rfunction{resolution}, and the \code{get}-only \Rfunction{features}. The colour mode can be either \code{Grayscale} or \code{TrueColor} with the corresponding integer constants defined in the package. See help pages for the corresponding functions for more detail.
+fR = paste(ddir, dir(path=ddir, pattern="_R.tif"), sep="/")
+iR = read.image(fR[1])
+@
 
-New images can be created with the standard \R{} constructor \Rfunction{new}, or using the wrapper function \Rfunction{Image}. The following example code generates a \normalfont\textsf{100x100} pixel grayscale image with black and white vertical stripes \footnote{All examples in this vignette are based on version 1.9.12 (RC) of the package. Older versions have similar functions, that can have slightly different names.}:
+Images can be read from remote URL's as in the following example:
 
-\begin{verbatim}
-> im <- Image(0.0, c(100,100), Grayscale)
-> im[ c(1:20, 40:60, 80:100), , ] = 1
-\end{verbatim}
+<<example.readRemote,echo=TRUE,results=hide,eval=FALSE>>=
+baseurl = "http://www.ebi.ac.uk/~osklyar/BioC2007/data/"
+a = read.image( paste(baseurl, c("Gene1_R.tif", "Gene2_R.tif"), sep="") )
+@
 
-As mentioned above, for input/output operations \Rpackage{EBImage} uses \lib{ImageMagick} API, which support reading and writing of more than 95 image formats including JPEG, TIFF and PNG. The package can read and write multi-page images (image stacks or 3D images) or process multiple files simultaneously. For example, the following code demonstrates how to read all PNG files in the working directory into a single object of class \code{Image}, convert them to grayscales and save the output as a single multi-page TIFF file:
+%%--------------------------------------------
+\section{Exploring data}
+%%--------------------------------------------
 
-\begin{verbatim}
-> files <- dir(pattern=".png")
-> im <- read.image(files, TrueColor)
-> img <- channel(im, "gray")
-> write.image(img, "single_multipage.tif")
-\end{verbatim}
+Objects of the class \Rclass{Image} can be displayed using either the \Rfunction{display} function or the standard \Rfunction{image} method for the \Rclass{Image} class: 
 
-\noindent The package also provides an interactive way to select and load (multiple) images using the \Rfunction{choose.image} function and an alternative way of specifying the file name to write as in the following example:
+<<example.imageDisplay,echo=TRUE,results=hide,eval=FALSE>>=
+image(iG[,,1])
+display(iR)
+animate(iR)
+@
 
-\begin{verbatim}
-> img <- choose.image()
-> fileName(img) <- "single_multipage.tif"
-> write.image(img)
-\end{verbatim}
+Beside displaying one can use \Rfunction{hist} and standard \Rfunction{print} methods to explore the data contained in images. For example, for the image stack \code{iR} consisting of 4 images, individual histograms are obtained with the following code (results shown in Figure~\ref{figure:histbefore}):
 
-If the output format does not support multiple frames (stacks), \lib{ImageMagick} will automatically extend the provided filename with counter suffixes \code{-0, -1, ...} placed either before or after the file extension depending on your installation of \lib{ImageMagick}. Alternatively, one can specify the same number of files as image frames in call to \Rfunction{write.image} or \Rfunction{fileName}. File names supplied to \Rfunction{write.image} will take precedence over
-
-Besides operations on local image files, anonymous HTTP and FTP protocols are supported. The package can read from both and it can write to FTP only. These protocols are supported internally by \lib{ImageMagick} and do not use \R{} connections.
-
-%--------------------------------------------------
-\section*{Displaying images}
-%--------------------------------------------------
-
-\Rpackage{EBImage} implements the method \Rfunction{display} to show images on screen interactively. By default (and if the package was compiled with \lib{GTK+} support) \Rpackage{EBImage} uses the \lib{GTK+} implementation of this function. It allows to display as many images simultaneously as the user needs and its interface is easily expandable programmatically. The alternative implementation uses the \lib{ImageMagick} API's \Rfunction{display} function. This implementation is only intended for systems where \lib{GTK+} interface is not available and can only show one image at a time. The \code{GTK+} interface is known to be working on all supported architectures, including \lib{MS Windows}.
-
-In some cases users may want to use the generic \R{} \Rfunction{image} function, the package provides a simple wrapper, which keeps the image aspect ration and allows to specify which frame has to be displayed as in the following example:
-
-\begin{verbatim}
-> display(abc)  # 3 images, interactively
-> image(abc, 2) # displays the 2nd frame
-\end{verbatim}
-
-%--------------------------------------------------
-\section*{Image processing}
-%--------------------------------------------------
-
-The \lib{ImageMagick} library provides a number of image processing routines, so called {\em filters}. Many of those are ported to \R{} in \Rpackage{EBImage}. The missing ones can be added as opportunity arises. Additional image processing routines implementing distance map and watershed transforms and others have been added to the package to power our work on cell-based assays.
-
-Filters are implemented as \lib{S4} methods for class \Rclass{Image}. The return value is usually an object of class \Rclass{Image} as well. One can divide all the filters into four categories: image enhancement, segmentation and transformation, and colour correction. Some examples are listed below.
-
-\begin{description}
-    \setlength{\itemsep}{0in}
-    \item[channel] enables colour mode and colour channel conversions
-    \item[sharpen, umask] generate sharpened versions of an image
-    \item[gblur] applies the Gaussian blur to an image softening sharp edges and noise
-    \item[thresh] segments a grayscale image into a binary black-and-white image by the adaptive thresholding algorithm
-    \item[opening, closing] sequentially use erosion and dilation operators to enhance edges of objects in binary images and to reduce noise
-    \item[distmap] performs a Euclidean distance transform of a binary image, also known as {\em distance map}. On a distance map, values of pixels indicate how far are they away from the nearest background
-    \item[normalize] shifts and scales colours of images to a specified range, normally $[0,1]$ for grayscales
-    \item[resample, resize] changes image size, proportionally or arbitrary
-    \item[watershed] performs a \emph{watershed}-like image segmentation (used also for object detection)
-\end{description}
-
-The storage mode of grayscale images is \Rclass{double} (or \Rclass{numeric}), and \R{} functions that work with arrays can be directly applied to grayscale images. This includes the arithmetic functions, subsetting, histograms, Fast Fourier transformation, (local) regression etc. For example, the sharpened image in Figure~\ref{figure:sharpening}{\bf c} can be obtained by subtracting the slightly blurred, scaled in colour version of the original image (Figure~\ref{figure:sharpening}{\bf b}) from its source in Figure~\ref{figure:sharpening}{\bf a}. All pixels that become negative after subtraction are then re-set to background. The source image is obtained by subsetting the original microscopic image. Hereafter, variables in the code are given the same literal names as the corresponding image labels (e.g. data of variable \code{a} are shown in Figure ~\ref{figure:sharpening}~{\bf a}, \code{b} -- in {\bf b}, and \code{C} -- in {\bf c}, etc).
-
-\begin{verbatim}
-> orig <- read.image("ch2.png")
-> a <- orig[150:550, 120:520,]
-> b <- blur(0.5 * a, 80, 5)
-> C <- a - b
-> C[C < 0] = 0
-> C <- normalize(C)
-\end{verbatim}
-
-One can think of this code as of a naive but fast and effective version of the {\em unsharp mask} filter; a more sophisticated implementation from the \lib{ImageMagick} library is provided by the \Rfunction{umask} function in the package.
-
-\begin{figure}
-\vspace*{.1in}
-\begin{center}
-\scalebox{0.75}{\includegraphics{umask.jpg}}
-\end{center}
-\caption{\label{figure:sharpening}
-    Implementation of a simple {\em unsharp mask} filter: (a) source image, (b) blurred colour-scaled image, (c) sharpened image after normalization}
-\end{figure}
-
-Some of the image analysis routines in \Rpackage{EBImage} assume grayscale data in the interval $[0,1]$, but there are no formal restrictions on the range.
-
-The storage mode of true colour images is \Rclass{integer}, and we use the three lowest bytes to store the red (R), green (G) and blue (B) values, each in the \code{unsigned char} (of \lib{C}) range of $[0, 255]$. Because of this, application of arithmetic and other functions on true colour images is generally meaningless; although they can be useful in some special cases, as shown in the example code in the following section. The support for true colour images is included mainly to enhance the display of the analysis results and to support further extensions of the package by third parties. Most analysis routines require grayscale data though.
-
-The following code demonstrates how grayscale images recorded using three different microscope filters (Figure~\ref{figure:channels}~{\bf a}, {\bf b} and {\bf c}) can be put together into a single {\em false-colour} representation (Figure~\ref{figure:channels}~{\bf d}), and conversely, how a single false-colour image can be decomposed into its individual channels.
-
-\begin{figure}
-\vspace*{.1in}
-\begin{center}
-\scalebox{0.75}{\includegraphics{channels.jpg}}
-\end{center}
-\caption{\label{figure:channels}
-    Composing a false-colour image (d) from a set of grayscale microscopy images for three different luminescent compounds: (a) -- DAPI, (b) -- tubulin and (c) -- phalloidin
+<<echo=FALSE,results=hide,eval=TRUE>>=
+pdf("01.pdf", width=10, height=10)
+@
+<<example.histograms,echo=TRUE,results=hide,eval=TRUE>>=
+split.screen(c(2,2))
+for ( i in 1:4 ) {
+  screen(i)
+  hist(iR[,,i], xlim=c(0,1))
 }
+close.screen(all=TRUE)
+@
+<<echo=FALSE,results=hide,eval=TRUE>>=
+dev.off()
+@
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=0.75\textwidth]{01.pdf}
+    \caption{\label{figure:histsbefore} Histograms of individual images in \file{Gene1\_{}R.tif}. The frames have significantly different dynamic ranges and need to be normalized before intensity-based descriptors can be used.}
+  \end{center}
 \end{figure}
 
-\begin{verbatim}
-> files <- c("ch1.png","ch2.png","ch3.png")
-> orig <- read.image(files, Grayscale)
-> abc <- orig[150:550, 120:520,]
-> a <- channel(abc[,,1], "asgreen")  # RGB
-> b <- channel(abc[,,2], "asred")    # RGB
-> d <- a + b + channel(abc[,,1], "asblue")
-> C <- channel(d, "blue")            # gray
-\end{verbatim}
+Try additionally the following commands to investigate the structure of the data:
 
-%------------------------------------------------------------
-\section*{Analysing an RNAi screen}
-%------------------------------------------------------------
+<<example.print.methods,echo=TRUE,results=hide,eval=FALSE>>=
+str(iR)
+print(iR)
+dim(iR)
+range(iR)
+@
+%
+Try also to do the same for \code{iG}, the images of the DNA content.
 
-Consider an experiment in which images like in Figure~\ref{figure:channels} were recorded for each of $\approx$ 20,000 genes, using a whole-genome RNAi library to test the effect of gene knock-down on cell viability and appearance. Among the image descriptors of interest are the number, position, size, shape and the fluorescent intensities of cells and nuclei.
+%%--------------------------------------------
+\section{Image processing}
+%%--------------------------------------------
 
-As a side effect of the watershed transform, the function \Rfunction{watershed}, \Rpackage{EBImage} identifies separable objects in an image. For this particular purpose it is advisable to use the result of the distance map transform (\Rfunction{distmap}) as input. Object descriptors can be obtained by calling \Rfunction{getObjects} on the result. One can see that an image has data of detected object by printing it (typing its name and hitting \code{Enter}): this information will be included in the object description. The features are a list of matrices, one per image frame, each containing different objects in its rows and different object descriptors in the columns. If a reference grayscale image was supplied to the watershed routine, object gray value intensities will be calculated as well.
+The \Rfunction{normalize} function allows you to perform normalization of image data to a given range (the default is $[0,1]$). Images in a stack can be normalized either separately from each other or simultaneously as parts of a large dataset. In our case, we want to normalize each image separately. Try the following two normalizations and compare the outputs:
+ 
+<<example.normalizations,echo=TRUE,results=verbatim,eval=TRUE>>=
+iRn.wrong = normalize(iR, separate=FALSE)
+apply(iRn.wrong, 3, range)
+iRn = normalize(iR, separate=TRUE)
+apply(iRn, 3, range)
+iGn = normalize(iG, separate=TRUE)
+@
 
-For every gene, the image analysis workflow looks, therefore, as follows: load and normalize images, perform image segmentation, enhance the segmented images by morphological opening and closing, generate distance maps and use them to identify cells and nuclei and to extract image descriptors, and, finally, generate image previews with the identified objects marked.
+\EBImage{} provides a set of functions to manipulate the quality of images like \Rfunction{enhance}, \Rfunction{contrast}, \Rfunction{despeckle} or \Rfunction{denoise}. Try them out on the images in \code{iRn}. Note that such manipulations can be useful for visualisation, but they are not appropriate for quantitative analyses, such as when intensity-derived features are used as phenotypic descriptors.
+ 
+We can also apply non-linear transformations to improve image quality. Another reason for some of these transformations is to achieve a higher object contrast against the background, which turns useful in consequent image segmentation. Please bear in mind the same note: images transformed in such a way cannot (should not) be used to extract intensity-based descriptors and are assumed for visualisation or segmentation purposes.
 
-Object descriptors can then be analysed statistically to cluster genes by their phenotypic effect, generate a list of genes that should be studied further in more detail (hit list), e.~g. genes that have a specific phenotypic effect of interest, etc. The image previews can be used to verify and audit the performance of the algorithm through visual inspection.
+Let us define several functions for transforming the range $[0,1]$ into itself.
 
-A schematic implementation is illustrated in the following example code and in Figure~\ref{figure:analysis}. Here we omit the step of nuclei detection (object \Robject{x1}), from where the matrix of nuclei coordinates (object \Robject{seeds}) is retrieved to serve as starting points for the cell detection. The nuclei detection is done analogously to the cell detection without specifying starting points, seeds.
+<<example.modifFunctions,echo=TRUE,results=verbatim,eval=TRUE>>=
+modif1 = function(x) sin((x-1.2)^3)+1
+modif2 = function(x, s) (exp(-s*x) - 1) / (exp(-s) - 1)
+modif3 = function(x) x^1.5
+@
 
-\begin{figure}
-\vspace*{.1in}
-\begin{center}
-\scalebox{0.75}{\includegraphics{analysis.jpg}}
-\end{center}
-\caption{\label{figure:analysis}
-Illustration of the object detection algorithm: (a) -- {\em sqrt}-brightened combined image of nuclei (DAPI from Figure~\ref{figure:channels}{\bf a}) and cells (phalloidin from Figure~\ref{figure:channels}{\bf c}); (b) -- image {\bf a} after {\em blur} and {\em adaptive thresholding}; (c) -- image {\bf b} after morphological {\em opening} followed by {\em closing}; (d) -- normalized {\em distance map} generated from image {\bf c}; (e) -- outlines of cells detected using \Rfunction{watershed} drawn on top of the RGB image from Figure~\ref{figure:channels}{\bf d}; (f) -- colour-mapped cells and nuclei as detected with \Rfunction{watershed} (one unique colour per object)
+The graphs of these functions are shown in Figure~\ref{figure:modif} on page~\pageref{figure:modif}. Non-linear transformations of the range $[0,1]$ into itself are often used in image processing to prepare an image for subsequent operations. I remark as a sidenote that this is also one of the most useful filters in Photoshop or GIMP when it comes to processing holiday photos. 
+
+<<modifPlots,echo=FALSE,results=hide,eval=TRUE>>=
+pdf("02.pdf", width=6,height=6)
+  x = (0:100)/100
+  plot(x, x, type="l", xlim=c(0,1), ylim=c(0,1), col="gray", lwd=1, lty=2,
+     xlab="source intensity", ylab="target intensity")
+  lines(x, modif2(x,4), col="#10508B", lwd=2)
+  text(0.3, 0.83, "modif2(s=4)", col="#10508B")
+  lines(x, modif2(x,-4), col="#4E82B5", lwd=2)
+  text(0.7, 0.16, "modif2(s=-4)", col="#4E82B5")
+  lines(x, sqrt(x), col="#24A072", lwd=2)
+  text(0.2, 0.37, "sqrt")
+  lines(x, x^1.5, col="#421C80", lwd=2)
+  text(0.52, 0.3, "modif3", col="#421C80")
+  lines(x, modif1(x), col="red", lwd=2)
+  text(0.52, 0.6, "modif1", col="red")
+dev.off()
+@
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=0.5\textwidth]{02.pdf}
+    \caption{\label{figure:modif} Non-linear transformations for data in the range $[0,1]$ onto $[0,1]$. The \emph{curves} filter in Photoshop or The GIMP.}
+  \end{center}
+\end{figure}
+
+We will use \code{modif1} to improve the contrast and proceed as follows. The modification used (if any) is problem specific and is determined by the quality of original images:
+
+<<example.do.modif1,echo=TRUE,results=hide,eval=TRUE>>=
+iGn = modif1(iGn)
+iRn = modif1(iRn)
+@
+
+The histograms after the normalization and the above transformation are given in Figure~\ref{figure:histsafter}:
+
+<<echo=FALSE,results=hide,eval=TRUE>>=
+pdf("03.pdf", width=10,height=10)
+@
+<<example.histograms2,echo=TRUE,results=hide,eval=TRUE>>=
+split.screen(c(2,2))
+for ( i in 1:4 ) {
+  screen(i)
+  hist(iRn[,,i], xlim=c(0,1))
 }
+close.screen(all=TRUE)
+@
+<<echo=FALSE,results=hide,eval=TRUE>>=
+dev.off()
+@
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=0.75\textwidth]{03.pdf}
+    \caption{\label{figure:histsafter} Histograms of individual images in \file{Gene1\_{}R.tif} after the normalization.}
+  \end{center}
 \end{figure}
 
-\begin{verbatim}
-> for (X in genes) {
-+  files <- dir(pattern=X)
-+  orig <- read.image(files)
-+  abc <- normalize(orig)
-+  i1 <- abc[,,1]
-+  i2 <- abc[,,2]
-+  i3 <- abc[,,3]
-+  a <- sqrt(normalize(i1 + i3))
-+  b <- thresh( blur(a, 4, 2), 50, 50)
-+  C <- opening(b, morphKern(7))
-+  C <- closing(C, morphKern(7))
-+  d <- distmap(C)  # shown normalized
-+ ## x1 <- watershed(...) # nuclei detection
-+  features(x1) <- getObjects(x1, i1)
-+  x2 <- propagate(x1, a, d)
-+  features(x2) <- getObjects(x2, i3)
-+  rgb <- channel(i1, "asgreen") + channel(i2, "asred")
-+  rgb <- rgb + channel(i3, "asblue")
-+  e <- paintObjects(x2, rgb)
-+  f <- paintObjects(x1, paintObjects(x2, i3) )
-+ }
-\end{verbatim}
-%$
+%%--------------------------------------------
+\section{Colour modes}
+%%--------------------------------------------
 
-Note that here we adopted the \emph{record-at-a-time} approach: image data, which can be huge, are stored on a mass-storage device and are loaded into RAM in portions of just a few images at a time.
+For visual representations, images can be converted between the grayscale and true colour modes; a grayscale image can also be converted into one of the RGB channels if required and channels can be added together as in the following example:
 
-\section*{Summary}
+<<example.grayscaleToRGB,echo=TRUE,results=hide,eval=TRUE>>=
+iRG = channel(iRn, "asred") + channel(iGn, "asgreen")
+@
+<<example.displayConversions,echo=TRUE,results=hide,eval=FALSE>>=
+display( iRG )
+display( channel(iRG, "gray") )
+display( channel(iRG, "asred") )
+@
+<<echo=FALSE,results=hide,eval=TRUE>>=
+write.image(iRG[,,1], "04.png")
+@
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=0.5\textwidth]{04.png}
+    \caption{\label{figure:screenshot} False-colour representation of
+      the data from two independent channels, red and green.}
+  \end{center}
+\end{figure}
 
-\Rpackage{EBImage} brings image processing and image analysis capabilities to \R. Its focus is the programmatic (non-interactive) analysis of large sets of similar images, such as those that are obtained in cell-based assays for gene function via RNAi knock-down. Image descriptors extracted as the result of analysis can be analysed further using existing \R{}-functionality in machine learning (clustering, classification) and hypothesis testing.
+The \Rfunction{channel} function can also be used to convert vectors containing colour data from one format to another. Grayscale to RGB integers: 
 
-Our future developments in image analysis will focus primarily on more accurate object detection and on algorithms for feature/descriptor extraction, and eventually on image registration, alignment and object tracking. Algorithms for the statistical analysis of image descriptors will be developed as part of a separate package that uses \Rpackage{EBImage} for image processing and analysis. In addition, one can imagine many other useful features, for example, support for more \lib{ImageMagick} functions. Contributions or collaborations on these or other topics are welcome.
+<<example.channel1,echo=TRUE,results=verbatim,eval=TRUE>>=
+ch=channel(c(0.2,0.5,0.7), "rgb") 
+ch
+sprintf("%X", ch)
+@ 
+\noindent Grayscale to X11 hexadecimal color strings:
+<<example.channel2,echo=TRUE,results=verbatim,eval=TRUE>>=
+channel(c(0.2,0.5,0.7), "x11") 
+@ 
+\noindent Color strings to RGB:
+<<example.channel3,echo=TRUE,results=verbatim,eval=TRUE>>=
+channel(c("red","green","#0000FF"), "rgb") 
+@ 
+\noindent RGB to grayscale:
+<<example.channel4,echo=TRUE,results=verbatim,eval=TRUE>>=
+channel(as.integer(c(3355443, 8355711, 11711154)), "gray") 
+# channel(c(3355443L, 8355711L, 11711154L), "gray") # in newer R
+@
 
-%--------------------------------------------------
-\section*{Acknowledgements and Availability}
-%--------------------------------------------------
+Images can be stored in files as in the following example for \code{iRG}:
 
-We thank F.~Fuchs and M.~Boutros for providing their miscroscopy data and for many stimulating discussions about the technology and the biology, and the European Bioinformatics Institute (EBI), Cambridge, UK, for financial support.
+<<example.write.image,echo=TRUE,results=verbatim,eval=FALSE>>=
+write.image(iRG, "composite.tif")
+compression(iRG) = "JPEG"
+write.image(iRG, "composite.jpg", quality=98)
+@
 
-\Rpackage{EBImage} is available from \lib{BioConductor} (\url{www.bioconductor.org}). The package was tested to work on 32 and 64 bit UNIX and Linux systems, on both PowerPC and Intel based \lib{MacOS} and on \lib{MS Windows}. The package requires external dependencies, \lib{ImageMagick} and \lib{GTK+}, therefore, please read the included file \file{INSTALL} in the package tarball for installation instructions on different systems.
+%%--------------------------------------------
+\section{Creating images and further data manipulation}
+%%--------------------------------------------
 
-Parts of this text for older versions of \Rpackage{EBImage} were used in \R{}-News~\cite{Sklyar2006}.
+Images can be created either using the default constructor \Rfunction{new} for class \code{Image} or using a wrapper function, \Rfunction{Image}:
+
+<<echo=FALSE,results=verbatim,eval=TRUE>>=
+pdf("05.pdf", width=6,height=4)
+par(mar=c(1,1,1,1))
+@
+<<example.runif.Image,echo=TRUE,results=verbatim,eval=TRUE>>=
+a = Image(runif(200*100), c(200,100))
+image(a)
+@
+<<echo=FALSE,results=hide,eval=TRUE>>=
+dev.off()
+@
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=0.5\textwidth]{05.pdf}
+    \caption{\label{figure:imx} An image of uniform random numbers.}
+  \end{center}
+\end{figure}
+
+\noindent One can also use the data of other images to create new ones:
+
+<<example.newFromExisting,echo=TRUE,results=verbatim,eval=TRUE>>=
+a = Image(iRn, dim(iRn), colormode=colorMode(iRn))
+@
+<<echo=TRUE,results=verbatim,eval=FALSE>>=
+display(a)
+@
+
+\noindent In the above example, it is not necessary to supply the dimensions as those will be automatically detected from the data if that has the \code{dim} method defined.
+
+Transformations can be performed using \Rfunction{resize}, \Rfunction{rotate} etc. Try the following two to increase the image by a factor of 1.3 or to rotate it by 15 degrees:
+
+<<example.resize,echo=TRUE,results=verbatim,eval=TRUE>>=
+a = resize(iRn, dim(iRn)[1]*1.3)
+@
+<<echo=TRUE,results=verbatim,eval=FALSE>>=
+display(a)
+@
+<<example.rotate,echo=TRUE,results=verbatim,eval=TRUE>>=
+a = rotate(iRn, 15)
+@
+<<echo=TRUE,results=verbatim,eval=FALSE>>=
+display(a)
+@
+
+Simple data manipulations can be performed by subsetting. For example, the following lines represent simple thresholding:
+
+<<example.masking,echo=TRUE,results=verbatim,eval=TRUE>>=
+a = iRn
+a[ a > 0.6 ] = 1.0
+a[ a <= 0.6] = 0.0
+@
+
+\noindent On a grayscale image the values of $0$ and $1$ in the above example create a black-and-white mask. If now we want to mark the background e.g. in blue and foreground in red, this can be achieved as follows:
+
+<<example.colorMask,echo=TRUE,results=verbatim,eval=TRUE>>=
+b = channel(a, "rgb")
+b[ a >= 0.1] = channel("red", "rgb")
+b[ a < 0.1 ] = channel("#114D90", "rgb")
+@
+<<echo=TRUE,results=verbatim,eval=FALSE>>=
+display(b)
+@
+<<echo=FALSE,results=hide,eval=TRUE>>=
+write.image(b[,,1], "06.png")
+rm(a,b,x)
+gc()
+@
+
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=0.5\textwidth]{06.png}
+    \caption{\label{figure:marked} Colour-marked binary mask.}
+  \end{center}
+\end{figure}
+
+%%--------------------------------------------
+\section{Image segmentation and image analysis}
+%%--------------------------------------------
+
+The purpose of segmentation is to mask the objects of interest from the background prior to identifying them. The quality of the segmentation will generally define the quality of the subsequent object indexing and feature extraction. We need something better than the mask in Figure~\ref{figure:marked}.
+ 
+For further object indexing We will make use of the fact that we have two images corresponding to the same location of the microscope -- one of the nuclei staining and one for the cytoplasm protein. Assuming that every cell has a nucleus we will use indexed nuclei (after segmentation, indexing and feature extraction) to index cells. Therefore, we start start with segmenting nuclei, images \code{iG}.
+ 
+The function \Rfunction{thresh} provides an implementation of an adaptive threshold filter that takes into account inequalities in background intensity across the image. For \code{iG} the segmented image can be obtained as follows:
+
+<<example.threshG,echo=TRUE,results=verbatim,eval=TRUE>>=
+mask = thresh(iGn, 15, 15, 0.002)
+@
+
+The parameters \Robject{w}, \Robject{h} of the function are related to the size of the objects we expect to find in the image: objects of different size would require adjustment of these parameters. The \Robject{offset} is determined by the local intensity differences. Try using different parameters and compare the segmentation. The quality of segmentation is vital for good quality of object indexing and feature extraction, therefore it worth to spend time tuning the parameters. For comparable results, images across the experiment should be segmented using the same parameter set. This might lead to artifacts in segmentation in some cases, but will ensure that same types of cells look similar in different images! The result of the above segmentation is shown in Figure~\ref{figure:nt1}.
+ 
+<<echo=FALSE,results=hide,eval=TRUE>>=
+write.image(mask[,,1], "07.png")
+@
+
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=0.5\textwidth]{07.png}
+    \caption{\label{figure:nt1} Preliminary nuclei segmentation.}
+  \end{center}
+\end{figure}
+
+Some further smoothing of the mask is necessary. A useful set of instruments for this is provided by \emph{mathematical morphology} implemented in the morphological operators \Rfunction{dilate}, \Rfunction{erode}, \Rfunction{opening} and \Rfunction{closing}:
+
+<<example.dilate,echo=TRUE,results=verbatim,eval=TRUE>>=
+mk3 = morphKern(3)
+mk5 = morphKern(5)
+mask = dilate(erode(closing(mask, mk5), mk3), mk5)
+@
+<<echo=FALSE,results=hide,eval=TRUE>>=
+write.image(mask[,,1], "08.png")
+@
+
+\noindent Here, several operators were used sequentially. You can observe the results of each of these operators separately by looking at the intermediate images. You can also try different kernels, i.\,e.\ different parameters for the function \Rfunction{morphKern}. The current result is shown in Figure~\ref{figure:nt2}.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=0.5\textwidth]{08.png}
+    \caption{\label{figure:nt2} Nuclei segmentation after smoothing and noise removal.}
+  \end{center}
+\end{figure}
+
+As the next step, one needs to index regions in the segmented image that correspond to the different objects.  A classic algorithm for this is computing the distance map transform followed by the \code{watershed} transform (see Figure~\ref{figure:wsn1}):
+
+<<example.watershedOnDistmap,echo=TRUE,results=verbatim,eval=TRUE>>=
+sG = watershed( distmap(mask), 1.5, 1)
+@
+<<echo=FALSE,results=hide,eval=TRUE>>=
+write.image(normalize(sG[,,1]), "09.png")
+@
+
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=0.5\textwidth]{09.png}
+    \caption{\label{figure:wsn1} Nuclei segmentation by watershed 
+  (before artifact removal).}
+  \end{center}
+\end{figure}
+
+Finally, when we are happy with the result of the watershed transform, we can remove nuclei that are either too small or too dark or fall on the edge of the images, etc (see Figure~\ref{figure:wsn2}): 
+
+<<example.removeBadG,echo=TRUE,results=verbatim,eval=TRUE>>=
+ft = hull.features(sG)  ## need these for edge and perimeter
+mf = moments(sG, iGn)   ## need these for intensity and size
+for ( i in seq_along(ft) ) ft[[i]] = cbind(ft[[i]], mf[[i]])
+sG = rmObjects(sG, 
+        lapply(ft, 
+          function(x) 
+            which(x[,"h.s"] < 150 | x[,"h.s"] > 10000 | x[,"int"] < 30 |
+                  0.4 * x[,"h.p"] < x[,"h.edge"] )
+      ))
+@
+<<echo=FALSE,results=hide,eval=TRUE>>=
+write.image(normalize(sG[,,1]), "10.png")
+@
+
+\noindent here \code{h.s} and \code{h.p} stand for the hull size and perimeter, \code{h.edge} for the number of pixels at the image edge and \code{int} for the intensity of the region (as returned by \Rfunction{hull.features} and \Rfunction{moments}). Investigate the structure of \code{ft} and \code{mf} and explain what kind of objects were removed.
+
+What we have finally obtained is an \code{IndexedImage} for the nuclei, where each nucleus is given an index from $1$ to \code{max(sG)}. One can now directly use functions like \Rfunction{getFeatures} or \Rfunction{moments} etc.\ to obtain numerical descriptors of each nucleus.
+ 
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=0.5\textwidth]{10.png}
+    \caption{\label{figure:wsn2} Nuclei segmentation by watershed 
+    (after artefact removal).}
+  \end{center}
+\end{figure}
+
+In principle, the same distance-map/watershed algorithm could be used to segment the cells, however we often find that neighbouring cells are touching and lead to segmentation errors. We can use the already identified nuclei as seed points to detect corresponding cells -- assuming that each cell has exactly one nucleus. This method falls short of detecting multi-nuclear cells, but it improves the quality of detection for all other cells tremendously. We start similarly to the nuclei segmentation, however instead of using \code{watershed}, we use \code{propagate}, supplying it with an \code{IndexedImage} of the seed points (nuclei). The function implements an elegant algorithm that produces a Voronoi segmentation using a metric that combines Euclidean distance and intensity differences between different pixels in the image:
+
+<<example.propagate,echo=TRUE,results=verbatim,eval=TRUE>>=
+mask = thresh(blur(iRn,4,1.5), 25, 25, 0.005)
+mask = erode( erode( dilate(mask,mk5), mk5), mk3 )
+sR = propagate( iRn, sG, mask, 1e-5, 1.6)
+@
+<<echo=FALSE,results=hide,eval=TRUE>>=
+write.image(normalize(sR[,,1]), "11.png")
+@
+
+\noindent A weighting factor is used in propagate to either give more weight to the Euclidean distance or otherwise to the intensity-driven one. We use a very low value of $1e-5$ basically minimizing the effect of the Euclidean. Also please note that we used the \Rfunction{blur} filter to obtain the original mask. In case of cells we use seed points and we know where the cells are, therefore the mask we use is larger and smoother to accommodate more tiny settled changed in the overall image of every individual cell. The result is shown in Figure~\ref{figure:cells}.
+
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=0.5\textwidth]{11.png}
+    \caption{\label{figure:cells} Cell segmentation by the
+      \Rfunction{propagate} function (before artifact removal).}
+  \end{center}
+\end{figure}
+
+Again, some artifacts need to be removed. In all consequent computations, the number of objects in an indexed image (as obtained from \Rfunction{watershed} or \Rfunction{propagate}) is determined by finding the maximum value. Consider that this value is $N$ for \code{sR}. If the image contains pixels indexed with $N$, but is missing pixels with some other indexes, smaller than $N$, the corresponding objects will be identified with $0$ data, first of all $0$ size. $N$ can be smaller than the original number of nuclei as it could happen that for some nuclei no cells were identified. There can be many reasons for this: cells masked out or too small or too dark etc. In order to preserve the 1-t-1 match of nuclei to cells, \code{max(sG)} must be equal $N$, so we mask out all nuclei with indexes larger than $N$:
+
+<<example.matching,echo=TRUE,results=verbatim,eval=TRUE>>=
+for ( i in 1:dim(sR)[3] ) {
+  x = sG[,,i]
+  x[ x > max(sR[,,i]) ] = 0.0
+  sG[,,i] = x
+}
+@
+
+Now as we ensured the 1-to-1 match of nuclei to cells, we can remove cells that are too small or too large to be plausible, are on the edge of the image, are too dark, etc. We also remove the corresponding nuclei (the result is given in Figure~\ref{figure:wsn3}):
+ 
+<<example.removeBadR,echo=TRUE,results=verbatim,eval=TRUE>>=
+ft = hull.features(sR)
+mf = moments(sR, iRn)
+for ( i in seq_along(ft) ) ft[[i]] = cbind(ft[[i]], mf[[i]])
+index = lapply(ft, 
+           function(x) 
+             which( x[,"h.s"] < 150 | x[,"h.s"] > 15000 | 
+                    x[,"int"]/x[,"h.s"] < 0.1 | 
+                    0.3 * x[,"h.p"] < x[,"h.edge"]
+         ))
+sR = rmObjects(sR, index)
+sG = rmObjects(sG, index)
+@
+
+\noindent See above for the notations of the column names in \code{x}.
+
+<<echo=FALSE,results=hide,eval=TRUE>>=
+write.image(normalize(sR[,,1]), "12.png")
+@
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=0.5\textwidth]{12.png}
+    \caption{\label{figure:wsn3} Cell segmentation by propagate (after artefact removal).}
+  \end{center}
+\end{figure}
+
+Finally, having the indexed images for cells and nuclei, the full set of descriptors can be extracted using the \Rfunction{getFeatures} function:
+ 
+<<example.getFeatures,echo=TRUE,results=verbatim,eval=TRUE>>=
+sG = getFeatures(sG, iGn)
+sR = getFeatures(sR, iRn)
+nucl = do.call("rbind", features(sG))
+cells = do.call("rbind", features(sR))
+stopifnot(identical(dim(nucl), dim(cells)))
+@
+The resulting matrices have \Sexpr{nrow(nucl)} rows (one for each of cell/nucleus) and \Sexpr{ncol(nucl)} columns (one for each object descriptor).  
+
+You can now try out the following visualisations, with the first one shown in Figure~\ref{figure:done}:
+
+<<example.visualize,echo=TRUE,results=verbatim,eval=TRUE>>=
+rgb = paintObjects(sR, iRG)
+rgb = paintObjects(sG, rgb)
+
+ct = tile( combine(stackObjects(sR, iRn)) )
+nt = tile( combine(stackObjects(sG, iGn)) )
+@
+<<echo=FALSE,results=hide,eval=TRUE>>=
+write.image(rgb[,,1], "13.png")
+@
+The result is shown in Figure~\ref{figure:done}.
+\begin{figure}[htbp]
+  \begin{center}
+    \includegraphics[width=0.5\textwidth]{13.png}
+    \caption{\label{figure:done} Results of detection.}
+  \end{center}
+\end{figure}
 
 
-\begin{thebibliography}{1}
-\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
-\expandafter\ifx\csname url\endcsname\relax
-  \def\url#1{{\tt #1}}\fi
-
-\bibitem[Sklyar2006]{Sklyar2006}
-  O.~Sklyar, W.~Huber.
-  \newblock Image Analysis for microscopy Screens.
-  \newblock {\em R-News}, 6/5:12--16, 2006.
-
-\bibitem[Boutros2004]{R:Boutros:2004}
-  M.~Boutros, A.~Kiger, S.~Armknecht, \textit{et al.}
-  \newblock Genome-wide RNAi analysis of cell growth and viability in Drosophila.
-  \newblock {\em Science}, 303:832--835, 2004.
-
-%\bibitem[Fuchs and Boutros(2006)]{R:Fuchs+Boutros:2006}
-%    F.~Fuchs and M.~Boutros.
-%    \newblock Cellular phenotyping by RNAi.
-%    \newblock {\em Brief Funct Genomic Proteomic.}, 5:52--56, 2006.
-
-\bibitem[Carpenter2004]{CarpenterSabatini2004}
-  A.~E.~Carpenter and D.M.~Sabatini.
-  \newblock Systematic genome-wide screens of gene function.
-  \newblock {\em Nature Reviews Genetics}, 5:11--22, 2004.
-
-%\bibitem[Carpenter et al.(in preparation)]{R:Carpenter:prep}
-%    A.~E.~Carpenter, T.~R.~Jones, M.~Lamprecht, \textit{et al.}
-%    \newblock CellProfiler: image analysis for high throughput microscopy.
-%    \newblock {\em In preparation}.
-%    \newblock URL \url{http://www.cellprofiler.org/}
-
-\bibitem[ImageMagick]{R:ImageMagick:2006}
-    ImageMagick: software to convert, edit, and compose images.
-    \newblock {\em Copyright: ImageMagick Studio LLC}, 1999-2006.
-    \newblock URL \url{http://www.imagemagick.org/}
-
-%\bibitem[Jones et al.(2005)]{R:Jones:2005}
-%    T.~R.~Jones and A.~E.~Carpenter and P.~Golland.
-%    \newblock Voronoi-based segmentation of cells on image manifolds.
-%    \newblock {\em ICCV Workshop on Computer Vision for Biomedical
-%    Image Applications}, 535--543, 2005 (conference proceedings).
-
-%\bibitem[Lotufo and Zampirolli(2001)]{R:Lotufo+Zampirolli:2001}
-%    R.~Lotufo and F.~Zampirolli.
-%    \newblock Fast multidimensional parallel Euclidean distance transform based on mathematical %morphology.
-%    \newblock {\em SIBGRAPI-2001/Brazil}, 100--105, 2001.
-
-\bibitem[Moffat2006]{MoffatSabatini2006}
-  J.~Moffat and D.M.~Sabatini.
-  \newblock Building mammalian signalling pathways with RNAi screens.
-  \newblock {\em Nature Reviews Mol. Cell Biol.}, 7:177--187, 2006.
-
-\bibitem[Neumann2006]{R:Neumann:2006}
-    B.~Neumann, M.~Held, U.~Liebel, \textit{et al.}
-    \newblock High-throughput RNAi screening by time-lapse imaging of live human cells.
-    \newblock {\em Nature Mathods}, 3\penalty0 (5):\penalty0 385--390, 2006.
-
-\bibitem[Russ2002]{R:Russ:2002}
-    J.~C.~Russ.
-   \newblock The image processing handbook -- 4th ed.
-   \newblock CRC Press, {\em Boca Raton}. 732 p., 2002
-
-\bibitem[Wiemann2004]{Wiemann2004}
-   S.~Wiemann, D.~Arlt, W.~Huber,  \textit{et al.}
-   \newblock From ORFeome to biology: a functional genomics pipeline.
-   \newblock {\em Genome Res.} 14(10B):2136--2144, 2004.
-
-\end{thebibliography}
-
-\begin{center}
-\scalebox{0.2}{\includegraphics{logo.png}}
-\end{center}
 
 \end{document}
+
+
