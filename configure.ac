@@ -3,6 +3,16 @@ AC_INIT([EBImage], 2.2.0)
 AC_CHECK_PROG(magickfound, [Magick-config --version], yes, no)
 if test "$magickfound" = "yes"; then
     echo ImageMagick version `Magick-config --version` found
+    ## check the version
+    Magick-config --version | head -n 1 | awk '{
+            gsub("\.", "", $1);
+            if ( substr($1,1,3) < 624 ) exit(1);
+            exit(0);
+          }'
+    ext=$?
+    if [[ $ext -ge 1 ]] ; then
+      AC_MSG_ERROR("ImageMagick version 6.2.4 required!")
+    fi
     AC_CHECK_PROG(magickincludes, [Magick-config --cppflags], yes, no)
     if test "$magickincludes" = "yes"; then
         echo ImageMagick includes located in `Magick-config --cppflags`
