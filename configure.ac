@@ -5,8 +5,14 @@ if test "$magickfound" = "yes"; then
     echo ImageMagick version `Magick-config --version` found
     ## check the version
     Magick-config --version | head -n 1 | awk '{
-            gsub("\.", "", $1);
-            if ( substr($1,1,3) < 624 ) exit(1);
+            x[1] = substr($1,1,1);
+            x[2] = substr($1,3,1);
+            x[3] = substr($1,5,1);
+            if ( x[1] < 6 ) exit(1);
+            if ( x[1] > 6 ) exit(0);
+            if ( x[2] < 2 ) exit(2);
+            if ( x[2] > 2 ) exit(0);
+            if ( x[3] < 4 ) exit(3);
             exit(0);
           }'
     ext=$?
