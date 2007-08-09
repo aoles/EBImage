@@ -9,7 +9,7 @@
 
 \description{
   A set of functions to compute the co-occurrence matrix (GLCM - gray level 
-  co-occurence matrix) and haralick texture features of objects in an indexed image.
+  co-occurrence matrix) and haralick texture features of objects in an indexed image.
 }
 
 \section{ Usage }{
@@ -50,13 +50,13 @@
   \code{haralick.matrix} computes a co-occurrence matrix of dimension \code{nc * nc} 
   for each object in an image.  The co-occurrence matrix is constructed
   by assigning to element \code{[i,j]} the number of times a pixel of value
-  \code{i} is ajacent to a pixel of value \code{j}.
+  \code{i} is adjacent to a pixel of value \code{j}.
   
-  In order to achieve rotational invarience the co-occurrence matrix is
+  In order to achieve rotational invariance the co-occurrence matrix is
   computed using four passes through each object.  Thus each pixel is
   compared to four neighbours: right, below, diagonally down left and
   diagonally down right.  In order to achieve symmetry in the
-  co-occurence matrix the reciprocal of each of these scores is also
+  co-occurrence matrix the reciprocal of each of these scores is also
   added.  Thus for each pixel we have have a score for comparison with each of the
   surrounding pixels.
 
@@ -93,21 +93,21 @@
 
   Where:
   \describe{
-    \item{\code{p(i,j)}}{The value in row i, column j of the co-occurence
+    \item{\code{p(i,j)}}{The value in row i, column j of the co-occurrence
       matrix.}
-    \item{\code{Px(i)}}{Parital probability density function.  Defined
+    \item{\code{Px(i)}}{Partial probability density function.  Defined
       by \code{sum[_j=1^nc] p(i,j) }.}
-    \item{\code{Py(j)}}{Parital probability density function.  Defined
+    \item{\code{Py(j)}}{Partial probability density function.  Defined
       by \code{sum[_i=1^nc] p(i,j) }.}
     \item{\code{mu_x, mu_y}}{Are the means of \code{Px} and \code{Px}, the partial
       probability density functions.}
     \item{\code{sigma_x, sigma_y}}{Are the standard deviations of
       \code{Px} and \code{Py}.}
-    \item{\code{Px+y}}{Is the probability of the co-occurance matrix
+    \item{\code{Px+y}}{Is the probability of the co-occurrence matrix
       co-ordinates summing to \code{x+y}.  It is defined as \code{Px+y(k) =
 	sum[_i=1^nc] sum[_j=1^nc] p(i,j), i + j = k and k = 2,3,...,2*nc}.}
     \item{\code{Px-y}}{Is the probability of the absolute value of the
-      difference between co-occurance matrix
+      difference between co-occurrence matrix
       co-ordinates being equal to \code{x-y}.  It is defined as \code{Px-y(k) =
 	sum[_i=1^nc] sum[_j=1^nc] p(i,j), ABS(i - j) = k and k =
 	2,3,...,2*nc}.}
