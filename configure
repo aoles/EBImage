@@ -1723,6 +1723,7 @@ fi
         CXXFLAGS="-Wall ${COMPILERFLAGS} ${CXXFLAGS}"
         LINKERFLAGS="`Magick-config --ldflags`"
         LINKERFLAGS="${LINKERFLAGS} `Magick-config --libs`"
+        LINKERFLAGS="${LINKERFLAGS} -lWand"
         LIBS="${LINKERFLAGS} ${LIBS} ${LFLAGS}"
     else
         { { echo "$as_me:$LINENO: error: \"ImageMagick includes NOT FOUND. Can not proceed!\"" >&5

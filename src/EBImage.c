@@ -23,6 +23,8 @@ See: ../LICENSE for license, LGPL
 #include "features_haralick.h"
 #include "features_zernike.h"
 
+#include "drawable.h"
+
 #include "objects.h"
 
 #include <R.h>
@@ -68,6 +70,8 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_deleteFeatures", (DL_FUNC) &lib_deleteFeatures, 2},
     {"lib_stack_objects",  (DL_FUNC) &lib_stack_objects,  6},
     {"lib_tile_stack",     (DL_FUNC) &lib_tile_stack,     3},
+
+    {"lib_drawText",       (DL_FUNC) &lib_drawText,       3},
 
     {"lib_basic_hull",     (DL_FUNC) &lib_basic_hull,     1},
     {"lib_cmoments",       (DL_FUNC) &lib_cmoments,       2},

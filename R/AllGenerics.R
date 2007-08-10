@@ -91,6 +91,9 @@ setGeneric ("matchObjects",   function (x, ref, ...)   standardGeneric("matchObj
 setGeneric ("stackObjects",   function (x, ref, index, ...) standardGeneric("stackObjects") )
 setGeneric ("rmObjects",      function (x, index, ...) standardGeneric("rmObjects") )
 
+## drawables
+setGeneric ("drawtext",       function (img, xy, labels, ...) standardGeneric("drawtext"))
+
 ## feature extraction
 setGeneric ("getFeatures",    function (x, ...)        standardGeneric("getFeatures") )
 setGeneric ("hull.features",  function (x, ...)        standardGeneric("hull.features") )
