@@ -30,6 +30,8 @@ exportMethods(
   matchObjects, stackObjects, rmObjects, propagate, image, show, hist,
   cmoments, smoments, rmoments, moments,
 
+  drawtext,
+  
   features, getFeatures, hull.features, edge.profile, edge.features,
   haralick.matrix, haralick.features, zernike.moments
 )

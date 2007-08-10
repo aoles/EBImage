@@ -66,6 +66,9 @@
 \alias{segment,Image-method}
 \alias{sharpen,Image-method}
 \alias{thresh,Image-method}
+\alias{drawtext,Image,numeric,character-method}
+\alias{drawtext,Image,matrix,character-method}
+\alias{drawtext,Image,list,list-method}
 \alias{umask,Image-method}
 \alias{watershed,Image-method}
 \alias{matchObjects,IndexedImage,IndexedImage-method}
