@@ -71,7 +71,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_stack_objects",  (DL_FUNC) &lib_stack_objects,  6},
     {"lib_tile_stack",     (DL_FUNC) &lib_tile_stack,     3},
 
-    {"lib_drawText",       (DL_FUNC) &lib_drawText,       3},
+    {"lib_drawText",       (DL_FUNC) &lib_drawText,       5},
 
     {"lib_basic_hull",     (DL_FUNC) &lib_basic_hull,     1},
     {"lib_cmoments",       (DL_FUNC) &lib_cmoments,       2},

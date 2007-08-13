@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-SEXP lib_drawText (SEXP, SEXP, SEXP);
+SEXP lib_drawText (SEXP, SEXP, SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus
 };
