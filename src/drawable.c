@@ -19,11 +19,12 @@ See: ../LICENSE for license, LGPL
 
 
 SEXP
-lib_drawText (SEXP obj, SEXP xylist, SEXP textlist) {
+lib_drawText (SEXP obj, SEXP xylist, SEXP textlist, SEXP thefont, SEXP thecol) {
   SEXP res, xy, text;
-  int i, im, nz, mode, nval, nappended=0, nprotect=0;
+  int i, im, nz, mode, nval, nappended=0, nprotect=0, colcount=0;
   DrawingWand * dwand;
   MagickWand  * mwand;
+  PixelWand * pwand;
   double * dxy;
   Image * images, * image, * newimages;
   
@@ -33,20 +34,18 @@ lib_drawText (SEXP obj, SEXP xylist, SEXP textlist) {
   nz = INTEGER(GET_DIM(obj))[2];
 
   if ( LENGTH(xylist) != LENGTH(textlist) || LENGTH(xylist) != nz )
-    error("mismatch of the number of coordinates, labels or frames provided");
-
-//  ExceptionInfo exception;
+    error("lists of coordinates 'xy' labels 'labels' must be of the same length as the number of frames");
 
   mode = INTEGER( GET_SLOT(obj, mkString("colormode")) )[0];
   images = sexp2Magick(obj);
   newimages = NewImageList();
 
-
+  /* start magick wand */
   MagickWandGenesis();
-
   /* create empty wand */
   dwand = NewDrawingWand();
-
+  pwand = NewPixelWand();
+  /* loop through images */
   for ( im = 0; im < nz; im++ ) {
     /* create magick wand from one image, this does NOT copy */
     mwand = NewMagickWandFromImage(GetFirstImageInList(images));
@@ -58,6 +57,20 @@ lib_drawText (SEXP obj, SEXP xylist, SEXP textlist) {
     if ( nval > 0 && LENGTH(xy) >= 2 * nval ) {
       /* clear drawing wand */
       ClearDrawingWand(dwand);
+      DrawSetFontFamily(dwand, CHAR(STRING_ELT(VECTOR_ELT(thefont, 0),0)));
+      switch ( INTEGER(VECTOR_ELT(thefont, 1))[0]) {
+        case 1: DrawSetFontStyle(dwand, ItalicStyle); break;
+        case 2: DrawSetFontStyle(dwand, ObliqueStyle); break;
+        default: DrawSetFontStyle(dwand, NormalStyle);
+      }
+      DrawSetStrokeAntialias(dwand, INTEGER(VECTOR_ELT(thefont, 4))[0]);
+      DrawSetFontWeight(dwand, REAL(VECTOR_ELT(thefont, 3))[0]);
+      DrawSetFontSize(dwand, REAL(VECTOR_ELT(thefont, 2))[0]);
+      PixelSetColor(pwand, CHAR(STRING_ELT(thecol, colcount)));
+      colcount++;
+      if ( colcount >= LENGTH(thecol) ) colcount = 0;
+      DrawSetFillColor(dwand, pwand);
+      /* no need: DrawSetStrokeColor(dwand, PixelWand); */
       /* add text to the wand */
       for ( i = 0; i < nval; i++ ) {
         DrawAnnotation(dwand, dxy[i], dxy[i + nval],
@@ -68,7 +81,7 @@ lib_drawText (SEXP obj, SEXP xylist, SEXP textlist) {
     }
     else {
       /* do not draw if more text labels than coordinates */
-      warning("not enough coordinate points to output all text");
+      warning("not enough coordinate points to output all labels");
     }
     image = GetImageFromMagickWand(mwand);
     AppendImageToList (&newimages, image);
@@ -87,6 +100,7 @@ lib_drawText (SEXP obj, SEXP xylist, SEXP textlist) {
     RemoveFirstImageFromList(&images);
     image = DestroyImage(image);
   }
+  pwand = DestroyPixelWand(pwand);
   dwand = DestroyDrawingWand(dwand);
   MagickWandTerminus();
   

@@ -7,7 +7,8 @@ importFrom("graphics", "hist")
 
 export(
   Image, is.Image, stopIfNotImage, read.image, choose.image,
-  TrueColor, Grayscale, morphKern, print.Image, print.IndexedImage
+  TrueColor, Grayscale, morphKern, print.Image, print.IndexedImage,
+  drawfont
 )
 exportClasses(
   Image, IndexedImage
@@ -30,8 +31,8 @@ exportMethods(
   matchObjects, stackObjects, rmObjects, propagate, image, show, hist,
   cmoments, smoments, rmoments, moments,
 
-  drawtext,
-  
+  drawtext, 
+    
   features, getFeatures, hull.features, edge.profile, edge.features,
   haralick.matrix, haralick.features, zernike.moments
 )
