@@ -174,14 +174,8 @@ lib_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP applyGaussi
             vnl *= ddata[x + y * nx];
             i = index + z[ZIND(n,l)] * nobj;
             /* no need to do e^i*l*theta if l=0 */
-            if( l != 0 ) {                       
-              dmRe[i] = vnl * cos(l * theta);
-              dmIm[i] = vnl * sin(l * theta);
-            }
-            else {
-              dmRe[i] = vnl;
-              dmIm[i] = 0;
-            }
+            dmRe[i] += vnl * cos(l * theta);
+            dmIm[i] += vnl * sin(l * theta);
           }
       }
     /* loop through mRe, mIm, get abs and mult by (n+1)/pi, save in mRe, which is returned! */ 
@@ -332,14 +326,8 @@ lib_pseudo_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP appl
             vnl *= ddata[x + y * nx];
             i = index + z[ZIND(n,l)] * nobj;
             /* no need to do e^i*l*theta if l=0 */
-            if( l != 0 ) {     
-              dmRe[i] = vnl * cos(l * theta);
-              dmIm[i] = vnl * sin(l * theta);
-            }
-            else {
-              dmRe[i] = vnl;
-              dmIm[i] = 0;
-            }
+            dmRe[i] += vnl * cos(l * theta);
+            dmIm[i] += vnl * sin(l * theta);
           }
       }
     /* loop through mRe, mIm, get abs, save in mRe, which is returned! */ 
