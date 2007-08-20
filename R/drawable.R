@@ -15,7 +15,8 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-drawfont <- function(family="Arial", style="n", size=14, weight=200, antialias=TRUE) {
+drawfont <- function(family=switch(.Platform$OS.type, windows="Arial", "helvetica"),
+                     style="n", size=14, weight=200, antialias=TRUE) {
   res <- list(family=family, style=style, size=size, weight=weight, antialias=antialias)
   class(res) <- "DrawFont"
   res

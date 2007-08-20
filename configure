@@ -614,7 +614,6 @@ build_alias
 host_alias
 target_alias
 magickfound
-magickincludes
 pkgfound
 CFLAGS
 CXXFLAGS
@@ -1619,8 +1618,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-# Extract the first word of "Magick-config --version", so it can be a program name with args.
-set dummy Magick-config --version; ac_word=$2
+# Extract the first word of "Magick-config --cppflags", so it can be a program name with args.
+set dummy Magick-config --cppflags; ac_word=$2
 { echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
 if test "${ac_cv_prog_magickfound+set}" = set; then
@@ -1658,7 +1657,7 @@ fi
 
 
 if test "$magickfound" = "yes"; then
-    echo ImageMagick version `Magick-config --version` found
+    echo 'ImageMagick' version `Magick-config --version` found
     ## check the version
     Magick-config --version | head -n 1 | awk '{
             x1 = substr($1,1,1);
@@ -1673,69 +1672,26 @@ if test "$magickfound" = "yes"; then
           }'
     ext=$?
     if [ $ext -ge 1 ] ; then
-      { { echo "$as_me:$LINENO: error: \"ImageMagick version 6.2.4 required!\"" >&5
-echo "$as_me: error: \"ImageMagick version 6.2.4 required!\"" >&2;}
+      { { echo "$as_me:$LINENO: error: \"'ImageMagick' version >= 6.2.4 required\"" >&5
+echo "$as_me: error: \"'ImageMagick' version >= 6.2.4 required\"" >&2;}
    { (exit 1); exit 1; }; }
     fi
-    # Extract the first word of "Magick-config --cppflags", so it can be a program name with args.
-set dummy Magick-config --cppflags; ac_word=$2
-{ echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
-if test "${ac_cv_prog_magickincludes+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
+    echo 'ImageMagick' includes located in `Magick-config --cppflags`
+    COMPILERFLAGS="`Magick-config --cflags`"
+    COMPILERFLAGS="${COMPILERFLAGS} `Magick-config --cppflags`"
+    CFLAGS="-Wall ${COMPILERFLAGS} ${CFLAGS}"
+    CXXFLAGS="-Wall ${COMPILERFLAGS} ${CXXFLAGS}"
+    LINKERFLAGS="`Magick-config --ldflags`"
+    LINKERFLAGS="${LINKERFLAGS} `Magick-config --libs`"
+    LINKERFLAGS="${LINKERFLAGS} -lWand"
+    LIBS="${LINKERFLAGS} ${LIBS} ${LFLAGS}"
 else
-  if test -n "$magickincludes"; then
-  ac_cv_prog_magickincludes="$magickincludes" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_prog_magickincludes="yes"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-IFS=$as_save_IFS
-
-  test -z "$ac_cv_prog_magickincludes" && ac_cv_prog_magickincludes="no"
-fi
-fi
-magickincludes=$ac_cv_prog_magickincludes
-if test -n "$magickincludes"; then
-  { echo "$as_me:$LINENO: result: $magickincludes" >&5
-echo "${ECHO_T}$magickincludes" >&6; }
-else
-  { echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-fi
-
-
-    if test "$magickincludes" = "yes"; then
-        echo ImageMagick includes located in `Magick-config --cppflags`
-        COMPILERFLAGS="`Magick-config --cflags`"
-        COMPILERFLAGS="${COMPILERFLAGS} `Magick-config --cppflags`"
-        CFLAGS="-Wall ${COMPILERFLAGS} ${CFLAGS}"
-        CXXFLAGS="-Wall ${COMPILERFLAGS} ${CXXFLAGS}"
-        LINKERFLAGS="`Magick-config --ldflags`"
-        LINKERFLAGS="${LINKERFLAGS} `Magick-config --libs`"
-        LINKERFLAGS="${LINKERFLAGS} -lWand"
-        LIBS="${LINKERFLAGS} ${LIBS} ${LFLAGS}"
-    else
-        { { echo "$as_me:$LINENO: error: \"ImageMagick includes NOT FOUND. Can not proceed!\"" >&5
-echo "$as_me: error: \"ImageMagick includes NOT FOUND. Can not proceed!\"" >&2;}
-   { (exit 1); exit 1; }; }
-    fi
-else
-    { { echo "$as_me:$LINENO: error: \"ImageMagick NOT FOUND. Can not proceed!\"" >&5
-echo "$as_me: error: \"ImageMagick NOT FOUND. Can not proceed!\"" >&2;}
+    { { echo "$as_me:$LINENO: error: \"'ImageMagick' or 'ImageMagick' includes not found!\"" >&5
+echo "$as_me: error: \"'ImageMagick' or 'ImageMagick' includes not found!\"" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
+PKGCONF=pkg-config
 # Extract the first word of "pkg-config --version", so it can be a program name with args.
 set dummy pkg-config --version; ac_word=$2
 { echo "$as_me:$LINENO: checking for $ac_word" >&5
@@ -1774,21 +1730,63 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 
+if test "$pkgfound" = "no"; then
+  PKGCONF=pkgconfig
+  # Extract the first word of "pkgconfig --version", so it can be a program name with args.
+set dummy pkgconfig --version; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_pkgfound+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$pkgfound"; then
+  ac_cv_prog_pkgfound="$pkgfound" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_pkgfound="yes"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_prog_pkgfound" && ac_cv_prog_pkgfound="no"
+fi
+fi
+pkgfound=$ac_cv_prog_pkgfound
+if test -n "$pkgfound"; then
+  { echo "$as_me:$LINENO: result: $pkgfound" >&5
+echo "${ECHO_T}$pkgfound" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+fi
+
 if test "$pkgfound" = "yes"; then
-    if `pkg-config --cflags gtk+-2.0 > /dev/null` ; then
+    if `$PKGCONF --cflags gtk+-2.0 > /dev/null` ; then
         echo Compiling with GTK+ support
-        COMPILERFLAGS="`pkg-config --cflags gtk+-2.0`"
+        COMPILERFLAGS="`$PKGCONF --cflags gtk+-2.0`"
         CFLAGS="-DUSE_GTK -DGLIB_GETTEXT ${COMPILERFLAGS} ${CFLAGS}"
-        ## DO NOT ADD GTK keys to g++, that code does not use it
+        ## DO NOT ADD GTK keys to c++, that code does not use it
         ## CXXFLAGS="-DUSE_GTK -DGLIB_GETTEXT ${COMPILERFLAGS} ${CXXFLAGS}"
-        LINKERFLAGS="`pkg-config --libs gtk+-2.0`"
+        LINKERFLAGS="`$PKGCONF --libs gtk+-2.0`"
         LIBS="${LINKERFLAGS} ${LIBS} ${LFLAGS}"
         LFLAGS="${LIBS}"
     else
-    echo 'GTK+2.0' NOT FOUND: compiling without GTK+
+        echo 'GTK+2.0' not found: compiling without GTK+
     fi
 else
-    echo 'PKG-CONFIG' NOT FOUND: compiling without GTK+
+    echo 'Package config' not found: compiling without GTK+
 fi
 
 if test -z "${R_HOME}"; then
@@ -2471,7 +2469,6 @@ build_alias!$build_alias$ac_delim
 host_alias!$host_alias$ac_delim
 target_alias!$target_alias$ac_delim
 magickfound!$magickfound$ac_delim
-magickincludes!$magickincludes$ac_delim
 pkgfound!$pkgfound$ac_delim
 CFLAGS!$CFLAGS$ac_delim
 CXXFLAGS!$CXXFLAGS$ac_delim
@@ -2479,7 +2476,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 44; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 43; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

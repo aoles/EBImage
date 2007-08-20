@@ -10,13 +10,8 @@ See: ../LICENSE for license, LGPL
 #include "conversions.h"
 
 #include <R_ext/Error.h>
-//#include <magick/ImageMagick.h>
-
-/* unfortunately I have to use MAgickWand here. I do not like it to be honest
- * and it also means one extra copying of images - bad thing */
+/* this module uses MagickWand API instead of MagickCore */
 #include <wand/magick-wand.h>
-
-
 
 SEXP
 lib_drawText (SEXP obj, SEXP xylist, SEXP textlist, SEXP thefont, SEXP thecol) {
@@ -27,6 +22,7 @@ lib_drawText (SEXP obj, SEXP xylist, SEXP textlist, SEXP thefont, SEXP thecol) {
   PixelWand * pwand;
   double * dxy;
   Image * images, * image, * newimages;
+  char * str;
   
   if ( !isImage(obj) )
     error("'obj' must be an Image");
@@ -57,7 +53,9 @@ lib_drawText (SEXP obj, SEXP xylist, SEXP textlist, SEXP thefont, SEXP thecol) {
     if ( nval > 0 && LENGTH(xy) >= 2 * nval ) {
       /* clear drawing wand */
       ClearDrawingWand(dwand);
-      DrawSetFontFamily(dwand, CHAR(STRING_ELT(VECTOR_ELT(thefont, 0),0)));
+      str = CHAR(STRING_ELT(VECTOR_ELT(thefont, 0),0));
+      if (str)
+        DrawSetFontFamily(dwand, str);
       switch ( INTEGER(VECTOR_ELT(thefont, 1))[0]) {
         case 1: DrawSetFontStyle(dwand, ItalicStyle); break;
         case 2: DrawSetFontStyle(dwand, ObliqueStyle); break;
@@ -73,8 +71,9 @@ lib_drawText (SEXP obj, SEXP xylist, SEXP textlist, SEXP thefont, SEXP thecol) {
       /* no need: DrawSetStrokeColor(dwand, PixelWand); */
       /* add text to the wand */
       for ( i = 0; i < nval; i++ ) {
-        DrawAnnotation(dwand, dxy[i], dxy[i + nval],
-          (unsigned char *)CHAR(STRING_ELT(text, i)) );
+        str = CHAR(STRING_ELT(text, i));
+        if (str)
+          DrawAnnotation(dwand, dxy[i], dxy[i + nval], (unsigned char *)str );
       }
       /* draw the wand */
       MagickDrawImage(mwand, dwand);

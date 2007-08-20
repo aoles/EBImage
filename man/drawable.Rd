@@ -19,7 +19,8 @@
     ##                img='Image', xy='matrix'/'numeric', labels='character'
     drawtext(img, xy, labels, font, col, ...)
     
-    drawfont(family="h", style="n", size=14, weight=200, antialias=TRUE)
+    drawfont(family=switch(.Platform$OS.type, windows="Arial", "helvetica"), 
+             style="n", size=14, weight=200, antialias=TRUE)
 }}
 
 \section{ Arguments }{ \describe{
