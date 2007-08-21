@@ -78,36 +78,41 @@
 }
 
 \examples{
-## load images
-f <- paste( system.file(package="EBImage"), "images/Gene1_G.tif", sep="/" )
-ii = normalize(read.image(f), separate=TRUE)
-## segment
-mask = thresh(ii, 25, 25, 0.02)
-mk3 = morphKern(3)
-mk5 = morphKern(5)
-mask = dilate(erode(closing(mask, mk5), mk3), mk5)
-## index objects in images and remove bad ones
-io = watershed( distmap(mask), 1.5, 1)
-ft = hull.features(io)
-mf = moments(io, ii)   ## need these for intensity and size
-for ( i in seq_along(ft) ) ft[[i]] = cbind(ft[[i]], mf[[i]])
-io = rmObjects(io, lapply(ft, function(x) 
-       which(x[,"h.s"] < 150 | x[,"int"] < 50 | 0.3 * x[,"h.p"] < x[,"h.edge"] )
-     ))
-## get centres of objects (list, for ii is a stack of 4)
-xy <- lapply(ft, function(x) x[,1:2])
-# create labels for objects (list, for ii is a stack of 4)
-labels <- lapply(xy, function(x) as.character(1:nrow(x)))
-## set font properties: italic helvetica, semi bold
-f <- drawfont()
-f$style="i"
-f$weight=600
-## draw annotations, recycle 2 colours between 4 images
-annot <- drawtext(channel(ii,"rgb"), xy, labels, font=f, col=c("#F0B769","#ACEE3F"))
+## Dear Mac users. This example is currently excluded from MacOS builds as it
+## fails in ImageMagick string assertion. Although I tried to find the reason for
+## the problem, I do not have a test environment (MacOS). Please test it and
+## report what goes wrong here and at which stage. Thank you. Oleg
 
-if (interactive()) display(annot)
+if ( length(grep("apple", Sys.getenv("R_PROFILE"))) == 0 ) {
+  ## load images
+  f <- paste( system.file(package="EBImage"), "images/Gene1_G.tif", sep="/" )
+  ii = normalize(read.image(f), separate=TRUE)
+  ## segment
+  mask = thresh(ii, 25, 25, 0.02)
+  mk3 = morphKern(3)
+  mk5 = morphKern(5)
+  mask = dilate(erode(closing(mask, mk5), mk3), mk5)
+  ## index objects in images and remove bad ones
+  io = watershed( distmap(mask), 1.5, 1)
+  ft = hull.features(io)
+  mf = moments(io, ii)   ## need these for intensity and size
+  for ( i in seq_along(ft) ) ft[[i]] = cbind(ft[[i]], mf[[i]])
+  io = rmObjects(io, lapply(ft, function(x) 
+         which(x[,"h.s"] < 150 | x[,"int"] < 50 | 0.3 * x[,"h.p"] < x[,"h.edge"] )
+       ))
+  ## get centres of objects (list, for ii is a stack of 4)
+  xy <- lapply(ft, function(x) x[,1:2])
+  # create labels for objects (list, for ii is a stack of 4)
+  labels <- lapply(xy, function(x) as.character(1:nrow(x)))
+  ## set font properties: semi bold
+  f <- drawfont()
+  f$weight=600
+  ## draw annotations, recycle 2 colours between 4 images
+  annot <- drawtext(channel(ii,"rgb"), xy, labels, font=f, col=c("#F0B769","#ACEE3F"))
+  if (interactive()) display(annot)
 }
 
+}
 
 \keyword{file}
 
