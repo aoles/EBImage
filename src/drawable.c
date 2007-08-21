@@ -22,7 +22,7 @@ lib_drawText (SEXP obj, SEXP xylist, SEXP textlist, SEXP thefont, SEXP thecol) {
   PixelWand * pwand;
   double * dxy;
   Image * images, * image, * newimages;
-  char * str;
+  const char * str;
   
   if ( !isImage(obj) )
     error("'obj' must be an Image");
@@ -57,8 +57,8 @@ lib_drawText (SEXP obj, SEXP xylist, SEXP textlist, SEXP thefont, SEXP thecol) {
       if (str)
         DrawSetFontFamily(dwand, str);
       switch ( INTEGER(VECTOR_ELT(thefont, 1))[0]) {
-        case 1: DrawSetFontStyle(dwand, ItalicStyle); break;
-        case 2: DrawSetFontStyle(dwand, ObliqueStyle); break;
+        case 1:  DrawSetFontStyle(dwand, ItalicStyle); break;
+        case 2:  DrawSetFontStyle(dwand, ObliqueStyle); break;
         default: DrawSetFontStyle(dwand, NormalStyle);
       }
       DrawSetStrokeAntialias(dwand, INTEGER(VECTOR_ELT(thefont, 4))[0]);
@@ -109,8 +109,6 @@ lib_drawText (SEXP obj, SEXP xylist, SEXP textlist, SEXP thefont, SEXP thecol) {
   nprotect++;
   SET_SLOT(res, install("features"), Rf_duplicate(GET_SLOT(obj, mkString("features"))) );
   newimages = DestroyImageList(newimages);
-
-//  DestroyExceptionInfo(&exception);
 
   UNPROTECT( nprotect );
   return res;
