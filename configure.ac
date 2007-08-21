@@ -2,7 +2,7 @@ AC_INIT([EBImage], 2.2.0)
 
 AC_CHECK_PROG(magickfound, [Magick-config --cppflags], yes, no)
 if test "$magickfound" = "yes"; then
-    echo 'ImageMagick' version `Magick-config --version` found
+    echo "* found ImageMagick version `Magick-config --version`"
     ## check the version
     Magick-config --version | head -n 1 | awk '{
             x[1] = substr($1,1,1);
@@ -17,9 +17,9 @@ if test "$magickfound" = "yes"; then
           }'
     ext=$?
     if [[ $ext -ge 1 ]] ; then
-      AC_MSG_ERROR("'ImageMagick' version >= 6.2.4 required")
+      AC_MSG_ERROR("Required ImageMagick version >= 6.2.4")
     fi
-    echo 'ImageMagick' includes located in `Magick-config --cppflags`
+    echo "* found ImageMagick includes in `Magick-config --cppflags`"
     COMPILERFLAGS="`Magick-config --cflags`"
     COMPILERFLAGS="${COMPILERFLAGS} `Magick-config --cppflags`"
     CFLAGS="-Wall ${COMPILERFLAGS} ${CFLAGS}"
@@ -29,7 +29,7 @@ if test "$magickfound" = "yes"; then
     LINKERFLAGS="${LINKERFLAGS} -lWand"
     LIBS="${LINKERFLAGS} ${LIBS} ${LFLAGS}"
 else
-    AC_MSG_ERROR("'ImageMagick' or 'ImageMagick' includes not found!")
+    AC_MSG_ERROR("ImageMagick or ImageMagick includes not found!")
 fi
 
 PKGCONF=pkg-config
@@ -41,7 +41,7 @@ fi
 
 if test "$pkgfound" = "yes"; then
     if `$PKGCONF --cflags gtk+-2.0 > /dev/null` ; then
-        echo Compiling with GTK+ support
+        echo "* compiling with GTK+ support"
         COMPILERFLAGS="`$PKGCONF --cflags gtk+-2.0`"
         CFLAGS="-DUSE_GTK -DGLIB_GETTEXT ${COMPILERFLAGS} ${CFLAGS}"
         ## DO NOT ADD GTK keys to c++, that code does not use it
@@ -50,10 +50,10 @@ if test "$pkgfound" = "yes"; then
         LIBS="${LINKERFLAGS} ${LIBS} ${LFLAGS}"
         LFLAGS="${LIBS}"
     else
-        echo 'GTK+2.0' not found: compiling without GTK+
+        echo "* GTK+2.0 not found: compiling without GTK+ support"
     fi
 else
-    echo 'Package config' not found: compiling without GTK+
+    echo "* pkg-config/pkgconfig not found: compiling without GTK+ support"
 fi
 
 if test -z "${R_HOME}"; then
