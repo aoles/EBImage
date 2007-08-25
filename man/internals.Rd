@@ -8,8 +8,6 @@
 \alias{[,Image,array,missing-method}
 \alias{[,Image,logical,missing-method}
 \alias{affinet,Image-method}
-\alias{assert,Image,Image-method}
-\alias{assert,Image,missing-method}
 \alias{athresh,Image-method}
 \alias{blur,Image-method}
 \alias{cgamma,Image-method}
@@ -18,12 +16,9 @@
 \alias{closing,Image-method}
 \alias{colorMode,Image-method}
 \alias{colorMode<-,Image,numeric-method}
-\alias{combine,Image,Image-method}
-\alias{combine,list,missing-method}
 \alias{compression,Image-method}
 \alias{compression<-,Image,character-method}
 \alias{contrast,Image-method}
-\alias{copy,Image-method}
 \alias{cthresh,Image-method}
 \alias{denoise,Image-method}
 \alias{despeckle,Image-method}
@@ -44,7 +39,6 @@
 \alias{flip,Image-method}
 \alias{flop,Image-method}
 \alias{gblur,Image-method}
-\alias{header,Image-method}
 \alias{imageData,Image-method}
 \alias{imageData<-,Image,matrix-method}
 \alias{imageData<-,Image,array-method}

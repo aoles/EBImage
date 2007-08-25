@@ -38,17 +38,20 @@ setClass ("Image",
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Image <- function (data=0.5, dim=c(200,200), colormode=Grayscale, ...) {
-  if ( is.null(dim) ) {
-    if ( !is.array(data) )
-      .stop( "supply dim or convert data to 2D or 3D array" )
-    dim = dim (data)
-  }
-  if ( length(dim) == 2 ) dim <- c( dim, 1 )
-  if ( length(dim) != 3 ) .stop( "length(dim) must be 2 for single images or 3 for stacks" )
-  res <- new( "Image", colormode=colormode, ...)
-  if ( colormode == TrueColor ) res@.Data <- array( as.integer(data), dim )
-  else res@.Data <- array( as.double(data), dim )
+Image <- function(data=matrix(0,0,0), dim=base::dim(data), colormode=Grayscale, ...) {
+
+  ld = length(dim)
+  if(!(ld%in%(2:3)))
+    .stop(sprintf("length(dim) must be 2 or 3, is %d.", ld))
+  
+  if (ld==2L)
+    dim=c(dim, 1L)
+  
+  res = new("Image", colormode=colormode, ...)
+  res@.Data = array(
+    if(colormode==TrueColor) as.integer(data) else as.double(data),
+    dim=dim)
+  
   return( res )
 }
 
@@ -146,7 +149,7 @@ setMethod ("assert", signature (x="Image", y="Image"),
   }
 )
 setMethod ("assert", signature (x="Image", y="missing"),
-  function (x, y, ...) is.Image (x)
+  function (x, y, strict=FALSE, ...) is.Image (x)
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -375,9 +378,9 @@ setMethod ("show", signature(object="Image"),
     nd <- dimobject[1:2]
     if ( nd[1] > 5 ) nd[1] <- 5
     if ( nd[2] > 6 ) nd[2] <- 6
-    for ( i in 1:dimobject[3] ) {
+    for ( i in seq_len(dimobject[3]) ) {
       cat( "\nimage ", i, "/", dimobject[3], ":\n", sep="" )
-      print( object@.Data[1:nd[1], 1:nd[2], i] )
+      print( object@.Data[seq_len(nd[1]), seq_len(nd[2]), i] )
       if ( any(nd != dimobject[1:2]) ) cat(" ...\n")
       if ( length(object@features) > 0 ) {
         cat( "feature set ", i, "/", dimobject[3], ":\n", sep="" )
