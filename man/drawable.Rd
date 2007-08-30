@@ -83,7 +83,7 @@
 ## the problem, I do not have a test environment (MacOS). Please test it and
 ## report what goes wrong here and at which stage. Thank you. Oleg
 
-if ( length(grep("apple", Sys.getenv("R_PROFILE"))) == 0 ) {
+if ( length(grep("apple", Sys.getenv("R_PLATFORM"))) == 0 ) {
   ## load images
   f <- paste( system.file(package="EBImage"), "images/Gene1_G.tif", sep="/" )
   ii = normalize(read.image(f), separate=TRUE)

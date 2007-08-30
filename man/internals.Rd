@@ -7,6 +7,12 @@
 \alias{[,Image,numeric,numeric-method}
 \alias{[,Image,array,missing-method}
 \alias{[,Image,logical,missing-method}
+\alias{combine,Image,Image-method}
+\alias{combine,list,missing-method}
+\alias{assert,Image,Image-method}
+\alias{assert,Image,missing-method}
+\alias{header,Image-method}
+\alias{copy,Image-method}
 \alias{affinet,Image-method}
 \alias{athresh,Image-method}
 \alias{blur,Image-method}

@@ -1,21 +1,10 @@
 \name{Image}
 
 \alias{Image}
-
 \alias{combine}
-\alias{combine,Image,Image-method}
-\alias{combine,list,missing-method}
-
 \alias{copy}
-\alias{copy,Image-method}
-
 \alias{header}
-\alias{header,Image-method}
-
 \alias{assert}
-\alias{assert,Image,Image-method}
-\alias{assert,Image,missing-method}
-
 \alias{is.Image}
 \alias{stopIfNotImage}
 
