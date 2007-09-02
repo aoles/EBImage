@@ -1,10 +1,14 @@
 \name{closing}
 
 \alias{dilate}
+\alias{dilate,Image-method}
 \alias{closing}
+\alias{closing,Image-method}
 \alias{erode}
-\alias{morphKern}
+\alias{erode,Image-method}
 \alias{opening}
+\alias{opening,Image-method}
+\alias{morphKern}
 
 \concept{morphology}
 
@@ -14,42 +18,42 @@
   Functions to perform morphological operations on binary images.
 }
 
-\section{ Usage }{
-  \preformatted{
-    dilate(x, kern=morphKern(5), iter=1, ...)
-    erode(x, kern=morphKern(5), iter=1, ...)
-    opening(x, kern=morphKern(5), iter=1, ...)
-    closing(x, kern=morphKern(5), iter=1, ...)
+\usage{
+  
+  \S4method{dilate}{Image}(x, kern=morphKern(5), iter=1, ...)
+  \S4method{erode}{Image}(x, kern=morphKern(5), iter=1, ...)
+  \S4method{opening}{Image}(x, kern=morphKern(5), iter=1, ...)
+  \S4method{closing}{Image}(x, kern=morphKern(5), iter=1, ...)
 
-    morphKern(size=5, shape="round")
-  }
+  morphKern(size=5, shape="round")
 }
 
-\section{ Arguments }{ \describe{
+\arguments{
 
-  \item{\code{x}}{ An object of \code{\link{Image-class}}. \code{x} should
+  \item{x}{ An object of \code{\linkS4class{Image}}. \code{x} should
     be a binary image in the \code{\link{Grayscale}} mode. If image is
     not binary, all non-zero pixels will be considered as 1 to turn the image
     into a binary \code{\{0,1\}} image. }
 
-  \item{\code{kern}}{ Kernel mask matrix. }
+  \item{kern}{ Kernel mask matrix. }
 
-  \item{\code{iter}}{ Number of iterations. }
+  \item{iter}{ Number of iterations. }
 
-  \item{\code{size, shape}}{ Kernel matrix size and shape. }
+  \item{size, shape}{ Kernel matrix size and shape. }
 
-  \item{\code{...}}{ Reserved for future use. }
-}}
+  \item{...}{ Reserved. }
 
-\section{ Value }{
+}
 
-  A transformed image in an object of \code{\link{Image-class}}.
+\value{
+
+  A transformed image in an object of \code{\linkS4class{Image}}.
     
   \code{morphKern} returns a square matrix of 0 and 1 of a given size.
   
 }
 
-\section{ Details }{
+\details{
 
   \code{morphKern} can be used to generate a kernel matrix for the use with any
   of the morphological operators. The function can generate round and square 
@@ -70,23 +74,21 @@
   
 }
 
-\seealso{
-  \code{
-    \link{Image-class}, \link{thresh}, \link{segment}
-  }
-}
+\seealso{ \code{
+    \linkS4class{Image}, \link{thresh}, \link{segment}
+}}
 
 \references{
-    \emph{ImageMagick}: \url{http://www.imagemagick.org}.
+  \emph{ImageMagick}: \url{http://www.imagemagick.org}.
 }
 
 \author{
-    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006
 }
 
 \examples{
-  \dontrun{see ?watershed for examples}
+  ## see example(watershed)
 }
 
-\keyword{file}
+\keyword{manip}
 

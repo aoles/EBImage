@@ -1,7 +1,9 @@
 \name{getFeatures}
 
 \alias{getFeatures}
+\alias{getFeatures,IndexedImage-method}
 \alias{features}
+\alias{features,IndexedImage-method}
 
 \concept{object detection}
 
@@ -13,44 +15,46 @@
   every feature set like hull, texture (Haralick), edge, moment features etc.
 }
 
-\section{ Usage }{
-  \preformatted{
-    ## S4 methods for signature x='IndexedImage'
+\usage{
 
-    getFeatures(x, ref, N=12, R=30, apply.Gaussian=TRUE, nc=256)
-    features(x)
-}}
+  \S4method{getFeatures}{IndexedImage}(x, ref, N=12, R=30, apply.Gaussian=TRUE, nc=256, ...)
+  \S4method{features}{IndexedImage}(x, ...)
 
-\section{ Arguments }{ \describe{
+}
 
-  \item{\code{x}}{ An object of \code{\link{IndexedImage-class}} (like those
+\arguments{
+
+  \item{x}{ An object of \code{\linkS4class{IndexedImage}} (like those
     obtained from \code{\link{propagate}} or \code{\link{watershed}}. }
 
-  \item{\code{ref}}{ A reference image containing images of the objects in
+  \item{ref}{ A reference image containing images of the objects in
     Grayscale mode (intensity values)! }
 
-  \item{\code{N}}{ Passed to \code{\link{zernike.moments}}. Integer value 
+  \item{N}{ Passed to \code{\link{zernikeMoments}}. Integer value 
     defining the degree of the Zernike polynomials, which in turn defines the 
     number of features calculated. Defaults to 12.}
 
-  \item{\code{R}}{ Passed to \code{\link{zernike.moments}}. Defines the radius 
+  \item{R}{ Passed to \code{\link{zernikeMoments}}. Defines the radius 
     of the circle around an object centre from which the features are calculated. 
     It also defines the standard deviation for the 2D Gausian applied at the 
     centre of an object. See details. Defaults to 30. }
     
-  \item{\code{apply.Gaussian}}{Passed to \code{\link{zernike.moments}}. A logical 
+  \item{apply.Gaussian}{Passed to \code{\link{zernikeMoments}}. A logical 
     value that specifies if a local 2D Gaussian modification should be applied 
     to every object at its centre. Defaults to \code{TRUE}.}
 
-  \item{\code{nc}}{ Passed to \code{\link{haralick.features}}. A numeric value. 
+  \item{nc}{ Passed to \code{\link{haralickFeatures}}. A numeric value. 
     Specifies the number of gray levels to separate \code{ref} into when 
     calculating the co-occurrence matrix. Here defaults to 256.}
+  
+  \item{...}{ Reserved. }
 
-}}
+}
 
-\section{ Value }{
+\value{
+
   \code{getFeatures} calculates feature matrices and returns an object of 
-  \code{\link{IndexedImage-class}} with its \code{features} slot set. The typical
+  \code{\linkS4class{IndexedImage}} with its \code{features} slot set. The typical
   use would be to re-assign the result to the original image itself, 
   i.e. \code{x <- getFeatures(x, a)}.
   
@@ -61,21 +65,44 @@
 }
 
       
-\section{ Details }{
+\details{
   \code{ref} can be missing in calls to \code{getFeatures}. In this case texture
   and other intensity-dependent features will be omitted.
 }
  
 
-\section{See Also}{ \code{
-  \link{IndexedImage-class}, \link{propagate}, \link{paintObjects}, \link{stackObjects},
-  \link{hull.features}, \link{haralick.features}, \link{moments}, \link{edge.features},
-  \link{zernike.moments}
+\seealso{ \code{
+  \linkS4class{IndexedImage}, \link{propagate}, \link{paintObjects}, \link{stackObjects},
+  \link{hullFeatures}, \link{haralickFeatures}, \link{moments}, \link{edgeFeatures},
+  \link{zernikeMoments}
 }}
 
 \author{
-  Oleg Sklyar <\email{osklyar@ebi.ac.uk}>, 2007
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2007
 }
 
-\keyword{file}
+\examples{
+
+  ## load images
+  f <- paste( system.file(package="EBImage"), "images/Gene1_G.tif", sep="/" )
+  ii = normalize(readImage(f), separate=TRUE)
+  ## segment
+  mask = thresh(ii, 25, 25, 0.02)
+  mk3 = morphKern(3)
+  mk5 = morphKern(5)
+  mask = dilate(erode(closing(mask, mk5), mk3), mk5)
+  ## index objects in images and remove bad ones
+  io = watershed( distmap(mask), 1.5, 1)
+  ft = hullFeatures(io)
+  mf = moments(io, ii)   ## need these for intensity and size
+  for ( i in seq_along(ft) ) ft[[i]] = cbind(ft[[i]], mf[[i]])
+  io = rmObjects(io, lapply(ft, function(x) 
+         which(x[,"h.s"] < 150 | x[,"int"] < 50 | 0.3 * x[,"h.p"] < x[,"h.edge"] )
+       ))
+  io = getFeatures(io, ii)
+  str( features(io) )
+  
+}
+
+\keyword{manip}
 

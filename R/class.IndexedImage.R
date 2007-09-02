@@ -102,11 +102,11 @@ setMethod ("getFeatures", signature(x="IndexedImage"),
     if ( !missing(ref) && is.Image(ref) && !(colorMode(ref) == Grayscale) )
       .stop( "if present, 'ref' must be Grayscale" )
     .dim <- dim(x)
-    hf <- hull.features( x )
+    hf <- hullFeatures( x )
     if ( !missing(ref) ) {
-      ef <- edge.features( x=x, ref=ref )
-      tf <- haralick.features(x=x, ref=ref, nc=nc)
-      zf <- zernike.moments(x=x, ref=ref, N=N, R=R, apply.Gaussian=apply.Gaussian, pseudo=pseudo)
+      ef <- edgeFeatures( x=x, ref=ref )
+      tf <- haralickFeatures(x=x, ref=ref, nc=nc)
+      zf <- zernikeMoments(x=x, ref=ref, N=N, R=R, apply.Gaussian=apply.Gaussian, pseudo=pseudo)
       ## mf calculation
       mf <- moments(x=x, ref=ref)
       ## distance from COM to geometric centre

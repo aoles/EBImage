@@ -1,6 +1,10 @@
 \name{stackObjects}
 
 \alias{stackObjects}
+\alias{stackObjects,IndexedImage,Image,missing-method}
+\alias{stackObjects,IndexedImage,Image,character-method}
+\alias{stackObjects,IndexedImage,Image,list-method}
+\alias{stackObjects,IndexedImage,Image,numeric-method}
 
 \concept{image manipulation}
 
@@ -12,51 +16,54 @@
   automatically rotated to align them along the horizontal axis.
 }
 
-\section{ Usage }{
-  \preformatted{
-    ## S4 method for signature x='IndexedImage', ref='Image' and
-    ## index='character'/'list'/'numeric'/'missing'
+\usage{
+  ## S4 methods for signatures 'x=IndexedImage,ref=Image,index=character'
+  ## and 'x=IndexedImage,ref=Image,index=list'
+  ## and 'x=IndexedImage,ref=Image,index=numeric'
+  \S4method{stackObjects}{IndexedImage,Image,missing}(x, ref, index, combine, rotate, bg.col, ext, ...)
+  
+}
 
-    stackObjects(x, ref, index, combine, rotate, bg.col, ext)
-}}
-
-\section{ Arguments }{ \describe{
-  \item{\code{x}}{An object of \code{\link{IndexedImage-class}}.
+\arguments{
+  \item{x}{An object of \code{\linkS4class{IndexedImage}}.
     Images must be Grayscale and carry object indexing information, like those
     returned by \code{\link{watershed}} or \code{\link{propagate}}. }
 
-  \item{\code{ref}}{ A reference image containing images of the objects to be
+  \item{ref}{ A reference image containing images of the objects to be
     stacked using \code{x} both as index and the mask. Can be in any
     color mode. }
 
-  \item{\code{index}}{ Indexes of objects to stack. See Details for supported
+  \item{index}{ Indexes of objects to stack. See details for supported
     types. }
 
-  \item{\code{combine}}{ Called on a stack if images, specifies if the resulting
+  \item{combine}{ Called on a stack if images, specifies if the resulting
     list of image stacks with individual objects should be combined into a single
     image stack. Defaults to \code{FALSE}. }
 
-  \item{\code{rotate}}{ Specifies if the objects should be aligned rotationally.
+  \item{rotate}{ Specifies if the objects should be aligned rotationally.
     Defaults to \code{TRUE}. }
 
-  \item{\code{bg.col}}{ Color for pixels outside the mask defined by \code{x}.
+  \item{bg.col}{ Color for pixels outside the mask defined by \code{x}.
     Defaults to \code{TRUE}. }
 
-  \item{\code{ext}}{ Extension of the target bounding box. See details. If not
+  \item{ext}{ Extension of the target bounding box. See details. If not
     given, \code{ext} is calculated from data. }
-}}
+  
+  \item{...}{ Reserved. }
+  
+}
 
-\section{ Value }{
+\value{
   An image stack or a list of image stacks if \code{x} was itself a stack
   (contained more than one image).
 }
 
-\section{ Details }{
+\details{
   The bounding box is set to be a square, which centre coinsides with the geometric
   center of the object. The \code{ext} argument can be used to specified its size,
   where edge length will be given by \code{2*ext+1}. If \code{ext} is not specified,
   it is calculated from the data by taking the 95\% quantile of the vector of
-  \code{h.s2major} descriptor of \code{\link{hull.features}} taken over all,
+  \code{h.s2major} descriptor of \code{\link{hullFeatures}} taken over all,
   objects in the image. This descriptor specifies the extension of the object
   along its major axis starting from its center.
 
@@ -75,14 +82,13 @@
   the frame, e.g. \code{"2.035"} will specify frame 2 and object 35.
 }
 
-\seealso{
-  \code{
-    \link{tile}, \link{combine}, \link{paintObjects}
+\seealso{ \code{
+  \link{tile}, \link{combine}, \link{paintObjects}
 }}
 
 \author{
-  Oleg Sklyar <\email{osklyar@ebi.ac.uk}>, 2006-2007
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006-2007
 }
 
-\keyword{file}
+\keyword{manip}
 

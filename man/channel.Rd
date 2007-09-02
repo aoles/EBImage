@@ -1,6 +1,8 @@
 \name{channel}
 
 \alias{channel}
+\alias{channel,Image,character-method}
+\alias{channel,ANY,character-method}
 
 \concept{color conversion}
 \concept{color mode}
@@ -17,35 +19,37 @@
 }
 
 
-\section{ Usage }{ \preformatted{
+\usage{ 
+  ## S4 methods for signatures 'x=Image,mode=character'
+  ## and 'x=ANY,mode=character'
+  channel(x, mode, ...)
+}
 
-## S4 methods for signatures x='Image', x='ANY' and mode="character":
+\arguments{
 
-channel(x, mode)
-
-}}
-
-\section{Arguments}{
-
-  \item{x}{Either an object of \code{\link{Image-class}} or a vector of 
+  \item{x}{Either an object of \code{\linkS4class{Image}} or a vector of 
     \code{numeric}, \code{integer} or \code{character}. }
 
   \item{mode}{ A character value specifying the target mode for conversion. 
-    See section 'Conversion Modes' below. }
+    See 'Conversion Modes' below. }
+
+  \item{...}{ Reserved. }
 }
 
-\section{Value}{
+\value{
 
-  For an argument of \code{\link{Image-class}} the function returns a new object 
-  of \code{\link{Image-class}} in all modes except \code{'X11'}. In case of
+  For an argument of \code{\linkS4class{Image}} the function returns a new object 
+  of \code{\linkS4class{Image}} in all modes except \code{'X11'}. In case of
   \code{'X11'} it returns a \code{character} vector of the same length as the image.
 
   For vectors the function returns a \code{vector} of the same size in the target
   mode.
 }
 
-\section{ Conversion modes }{
+\details{
 
+  Conversion modes:
+  
   \describe{
 
     \item{\code{rgb}}{ The result is a true color representation of the input.
@@ -80,23 +84,23 @@ channel(x, mode)
 
 \seealso{
   \code{
-    \link{Image-class}, \link{Image}, \link{read.image}, \link{write.image}
+    \linkS4class{Image}, \link{readImage}, \link{writeImage}
   }
 }
 
 \examples{
-cl <- channel("pink", "rgb")
-r <- channel( channel(cl, "red"), "asred")
-g <- channel( channel("pink", "green"), "asgreen")
-b <- channel( channel(cl, "blue"), "asblue")
-rgb <- r + g + b
-print( rgb == cl )
-clg <- channel(cl, "gray")
-print( channel(cl, "x11"))
+  cl <- channel("pink", "rgb")
+  r <- channel( channel(cl, "red"), "asred")
+  g <- channel( channel("pink", "green"), "asgreen")
+  b <- channel( channel(cl, "blue"), "asblue")
+  rgb <- r + g + b
+  print( rgb == cl )
+  clg <- channel(cl, "gray")
+  print( channel(cl, "x11"))
 }
 
 \author{
-  Oleg Sklyar: \email{osklyar@ebi.ac.uk}
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}
 }
 
 \keyword{file}

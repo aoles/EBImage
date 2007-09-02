@@ -1,7 +1,9 @@
-\name{haralick}
+\name{haralickMatrix}
 
-\alias{haralick.matrix}
-\alias{haralick.features}
+\alias{haralickMatrix}
+\alias{haralickMatrix,IndexedImage,Image-method}
+\alias{haralickFeatures}
+\alias{haralickFeatures,IndexedImage,Image-method}
 
 \concept{object detection}
 
@@ -12,42 +14,42 @@
   co-occurrence matrix) and haralick texture features of objects in an indexed image.
 }
 
-\section{ Usage }{
-\preformatted{
+\usage{
 
-  ## S4 methods for signature x='IndexedImage', ref='Image'
+  \S4method{haralickMatrix}{IndexedImage,Image}(x, ref, nc = 32, ...)
+  \S4method{haralickFeatures}{IndexedImage,Image}(x, ref, nc = 32, ...)
 
-  haralick.matrix(x, ref, nc = 32)
-  haralick.features(x, ref, nc = 32)
+}
 
-}}
+\arguments{
 
-\section{ Arguments }{ \describe{
+  \item{x}{An object of \code{\linkS4class{IndexedImage}} used as a mask.}
 
-  \item{\code{x}}{An object of \code{\link{IndexedImage-class}} used as a mask.}
-
-  \item{\code{ref}}{A \code{\link{Grayscale}} object of \code{\link{Image-class}}.
+  \item{ref}{A \code{\link{Grayscale}} object of \code{\link{Image-class}}.
     The texture is calculated from the data in this image.}
 
-  \item{\code{nc}}{ A numeric value. Specifies the number of gray levels to separate
-  \code{ref} into when calculating the co-occurrence matrix. Defaults to 32}
+  \item{nc}{ A numeric value. Specifies the number of gray levels to separate
+    \code{ref} into when calculating the co-occurrence matrix. Defaults to 32}
   
-}}
+  \item{...}{ Reserved. }
+  
+}
 
-\section{ Value }{
+\value{
 
-  For a single frame in \code{x} the result of \code{haralick.matrix} is an array of 
+  For a single frame in \code{x} the result of \code{haralickMatrix} is an array of 
   dimensions \code{nc} * \code{nc} * "the number of objects in the frame". 
 
-  \code{haralick.features} returns a matrix of dimensions "number of objects in the frame" * 12. 
+  \code{haralickFeatures} returns a matrix of dimensions "number of objects in 
+  the frame" * 12. 
   
   For multiple frames a list of each of the above will be returned.
 
 }
 
-\section{ Details }{
+\details{
 
-  \code{haralick.matrix} computes a co-occurrence matrix of dimension \code{nc * nc} 
+  \code{haralickMatrix} computes a co-occurrence matrix of dimension \code{nc * nc} 
   for each object in an image.  The co-occurrence matrix is constructed
   by assigning to element \code{[i,j]} the number of times a pixel of value
   \code{i} is adjacent to a pixel of value \code{j}.
@@ -63,9 +65,9 @@
   Finally the entire matrix is divided by the total
   number of comparisons, giving a probability for each of the possible combinations.
 
-  \code{haralick.features} computes for each object in an image 12 Haralick 
-  texture features, calculated from the co-occurrence matrix. The feature names carry a \code{t.} prefix (t for texture). 
-  The features and their calculations are:
+  \code{haralickFeatures} computes for each object in an image 12 Haralick 
+  texture features, calculated from the co-occurrence matrix. The feature names 
+  carry a \code{t.} prefix (t for texture). The features and their calculations are:
   
   \describe{
     \item{\code{asm}}{Angular second moment: \code{sum[_i=1^nc] sum[_j=1^nc]p(i,j)^2}.}
@@ -119,19 +121,24 @@
   
 }
 
-\section{ References }{
+\references{
+
   R. M. Haralick, K Shanmugam and Its'Hak Deinstein (1979). \emph{Textural Features for Image 
   Classification}. IEEE Transactions on Systems, Man and Cybernetics.
   
 }
 
 \seealso{\code{
-  \link{IndexedImage-class}, \link{watershed}, \link{propagate}
+  \linkS4class{IndexedImage}, \link{watershed}, \link{propagate}
 }}
 
 \author{
-    Mike Smith <\email{msmith@ebi.ac.uk}>, Oleg Sklyar <\email{osklyar@ebi.ac.uk}>, 2007
+    Mike Smith, \email{msmith@ebi.ac.uk}; Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2007
 }
 
-\keyword{file}
+\examples{
+  ## see example(getFeatures)
+}
+
+\keyword{manip}
 

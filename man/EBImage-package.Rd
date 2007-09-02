@@ -32,8 +32,8 @@
   \code{\link{rotate}, \link{resize}}), image segmentation (e.g. \code{\link{edge}, 
   \link{segment}, \link{thresh}}), image morphology (e.g. \code{\link{dilate}, 
   \link{opening}, \link{distmap}}), object detection (e.g. \code{\link{watershed},
-  \link{propagate}}) abd feature extractuion (e.g. \code{\link{haralick.features},
-  \link{edge.features}} etc).
+  \link{propagate}}) abd feature extractuion (e.g. \code{\link{haralickFeatures},
+  \link{edgeFeatures}} etc).
 
   The project page is: \url{http://www.ebi.ac.uk/~osklyar/EBImage}
 }

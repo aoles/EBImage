@@ -72,32 +72,32 @@ library(EBImage)
 \section{Handling images}
 %%--------------------------------------------
 
-\EBImage{} provides two functions to read images, \Rfunction{read.image} and \Rfunction{choose.image}. They both allow users to specify whether the result should be in grayscale or RGB mode.  
+\EBImage{} provides two functions to read images, \Rfunction{readImage} and \Rfunction{chooseImage}. They both allow users to specify whether the result should be in grayscale or RGB mode.  
 
-An interactive window for loading images is provided by the \Rfunction{choose.image} function, which is available if the package was compiled with GTK+ support (always the case on Windows): 
+An interactive window for loading images is provided by the \Rfunction{chooseImage} function, which is available if the package was compiled with GTK+ support (always the case on Windows): 
 
 <<example.choose.image,echo=TRUE,results=hide,eval=FALSE>>=
-x = choose.image(TrueColor)
+x = chooseImage(TrueColor)
 @
 
-The \Rfunction{read.image} function can read local or network files via HTTP or anonymous FTP protocols. Multiple files can be loaded into a single object, an image stack. If the source image has multiple frames they all will be read into a stack. Single, multi-frame or multiple images read are stored in objects of class \code{Image}:
+The \Rfunction{readImage} function can read local or network files via HTTP or anonymous FTP protocols. Multiple files can be loaded into a single object, an image stack. If the source image has multiple frames they all will be read into a stack. Single, multi-frame or multiple images read are stored in objects of class \code{Image}:
  
 <<example.read.image,echo=TRUE,results=verbatim,eval=TRUE>>=
 ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
 fG = paste(ddir, dir(path=ddir, pattern="_G.tif"), sep="/")
-iG = read.image(fG[1], Grayscale)
+iG = readImage(fG[1], Grayscale)
 class(iG)
 dim(iG)
 
 fR = paste(ddir, dir(path=ddir, pattern="_R.tif"), sep="/")
-iR = read.image(fR[1])
+iR = readImage(fR[1])
 @
 
 Images can be read from remote URL's as in the following example:
 
 <<example.readRemote,echo=TRUE,results=hide,eval=FALSE>>=
 baseurl = "http://www.ebi.ac.uk/~osklyar/BioC2007/data/"
-a = read.image( paste(baseurl, c("Gene1_R.tif", "Gene2_R.tif"), sep="") )
+a = readImage( paste(baseurl, c("Gene1_R.tif", "Gene2_R.tif"), sep="") )
 @
 
 %%--------------------------------------------
@@ -112,7 +112,7 @@ display(iR)
 animate(iR)
 @
 
-Beside displaying one can use \Rfunction{hist} and standard \Rfunction{print} methods to explore the data contained in images. For example, for the image stack \code{iR} consisting of 4 images, individual histograms are obtained with the following code (results shown in Figure~\ref{figure:histbefore}):
+Beside displaying one can use \Rfunction{hist} and standard \Rfunction{print} methods to explore the data contained in images. For example, for the image stack \code{iR} consisting of 4 images, individual histograms are obtained with the following code (results shown in Figure~1):
 
 <<echo=FALSE,results=hide,eval=TRUE>>=
 pdf("01.pdf", width=10, height=10)
@@ -243,7 +243,7 @@ display( channel(iRG, "gray") )
 display( channel(iRG, "asred") )
 @
 <<echo=FALSE,results=hide,eval=TRUE>>=
-write.image(iRG[,,1], "04.png")
+writeImage(iRG[,,1], "04.png")
 @
 \begin{figure}[htbp]
   \begin{center}
@@ -277,9 +277,9 @@ channel(as.integer(c(3355443, 8355711, 11711154)), "gray")
 Images can be stored in files as in the following example for \code{iRG}:
 
 <<example.write.image,echo=TRUE,results=verbatim,eval=FALSE>>=
-write.image(iRG, "composite.tif")
+writeImage(iRG, "composite.tif")
 compression(iRG) = "JPEG"
-write.image(iRG, "composite.jpg", quality=98)
+writeImage(iRG, "composite.jpg", quality=98)
 @
 
 %%--------------------------------------------
@@ -351,7 +351,7 @@ b[ a < 0.1 ] = channel("#114D90", "rgb")
 display(b)
 @
 <<echo=FALSE,results=hide,eval=TRUE>>=
-write.image(b[,,1], "06.png")
+writeImage(b[,,1], "06.png")
 rm(a,b,x)
 gc()
 @
@@ -380,7 +380,7 @@ mask = thresh(iGn, 15, 15, 0.002)
 The parameters \Robject{w}, \Robject{h} of the function are related to the size of the objects we expect to find in the image: objects of different size would require adjustment of these parameters. The \Robject{offset} is determined by the local intensity differences. Try using different parameters and compare the segmentation. The quality of segmentation is vital for good quality of object indexing and feature extraction, therefore it worth to spend time tuning the parameters. For comparable results, images across the experiment should be segmented using the same parameter set. This might lead to artifacts in segmentation in some cases, but will ensure that same types of cells look similar in different images! The result of the above segmentation is shown in Figure~\ref{figure:nt1}.
  
 <<echo=FALSE,results=hide,eval=TRUE>>=
-write.image(mask[,,1], "07.png")
+writeImage(mask[,,1], "07.png")
 @
 
 \begin{figure}[htbp]
@@ -398,7 +398,7 @@ mk5 = morphKern(5)
 mask = dilate(erode(closing(mask, mk5), mk3), mk5)
 @
 <<echo=FALSE,results=hide,eval=TRUE>>=
-write.image(mask[,,1], "08.png")
+writeImage(mask[,,1], "08.png")
 @
 
 \noindent Here, several operators were used sequentially. You can observe the results of each of these operators separately by looking at the intermediate images. You can also try different kernels, i.\,e.\ different parameters for the function \Rfunction{morphKern}. The current result is shown in Figure~\ref{figure:nt2}.
@@ -416,7 +416,7 @@ As the next step, one needs to index regions in the segmented image that corresp
 sG = watershed( distmap(mask), 1.5, 1)
 @
 <<echo=FALSE,results=hide,eval=TRUE>>=
-write.image(normalize(sG[,,1]), "09.png")
+writeImage(normalize(sG[,,1]), "09.png")
 @
 
 \begin{figure}[htbp]
@@ -430,7 +430,7 @@ write.image(normalize(sG[,,1]), "09.png")
 Finally, when we are happy with the result of the watershed transform, we can remove nuclei that are either too small or too dark or fall on the edge of the images, etc (see Figure~\ref{figure:wsn2}): 
 
 <<example.removeBadG,echo=TRUE,results=verbatim,eval=TRUE>>=
-ft = hull.features(sG)  ## need these for edge and perimeter
+ft = hullFeatures(sG)  ## need these for edge and perimeter
 mf = moments(sG, iGn)   ## need these for intensity and size
 for ( i in seq_along(ft) ) ft[[i]] = cbind(ft[[i]], mf[[i]])
 sG = rmObjects(sG, 
@@ -441,10 +441,10 @@ sG = rmObjects(sG,
       ))
 @
 <<echo=FALSE,results=hide,eval=TRUE>>=
-write.image(normalize(sG[,,1]), "10.png")
+writeImage(normalize(sG[,,1]), "10.png")
 @
 
-\noindent here \code{h.s} and \code{h.p} stand for the hull size and perimeter, \code{h.edge} for the number of pixels at the image edge and \code{int} for the intensity of the region (as returned by \Rfunction{hull.features} and \Rfunction{moments}). Investigate the structure of \code{ft} and \code{mf} and explain what kind of objects were removed.
+\noindent here \code{h.s} and \code{h.p} stand for the hull size and perimeter, \code{h.edge} for the number of pixels at the image edge and \code{int} for the intensity of the region (as returned by \Rfunction{hullFeatures} and \Rfunction{moments}). Investigate the structure of \code{ft} and \code{mf} and explain what kind of objects were removed.
 
 What we have finally obtained is an \code{IndexedImage} for the nuclei, where each nucleus is given an index from $1$ to \code{max(sG)}. One can now directly use functions like \Rfunction{getFeatures} or \Rfunction{moments} etc.\ to obtain numerical descriptors of each nucleus.
  
@@ -464,7 +464,7 @@ mask = erode( erode( dilate(mask,mk5), mk5), mk3 )
 sR = propagate( iRn, sG, mask, 1e-5, 1.6)
 @
 <<echo=FALSE,results=hide,eval=TRUE>>=
-write.image(normalize(sR[,,1]), "11.png")
+writeImage(normalize(sR[,,1]), "11.png")
 @
 
 \noindent A weighting factor is used in propagate to either give more weight to the Euclidean distance or otherwise to the intensity-driven one. We use a very low value of $1e-5$ basically minimizing the effect of the Euclidean. Also please note that we used the \Rfunction{blur} filter to obtain the original mask. In case of cells we use seed points and we know where the cells are, therefore the mask we use is larger and smoother to accommodate more tiny settled changed in the overall image of every individual cell. The result is shown in Figure~\ref{figure:cells}.
@@ -490,7 +490,7 @@ for ( i in 1:dim(sR)[3] ) {
 Now as we ensured the 1-to-1 match of nuclei to cells, we can remove cells that are too small or too large to be plausible, are on the edge of the image, are too dark, etc. We also remove the corresponding nuclei (the result is given in Figure~\ref{figure:wsn3}):
  
 <<example.removeBadR,echo=TRUE,results=verbatim,eval=TRUE>>=
-ft = hull.features(sR)
+ft = hullFeatures(sR)
 mf = moments(sR, iRn)
 for ( i in seq_along(ft) ) ft[[i]] = cbind(ft[[i]], mf[[i]])
 index = lapply(ft, 
@@ -506,7 +506,7 @@ sG = rmObjects(sG, index)
 \noindent See above for the notations of the column names in \code{x}.
 
 <<echo=FALSE,results=hide,eval=TRUE>>=
-write.image(normalize(sR[,,1]), "12.png")
+writeImage(normalize(sR[,,1]), "12.png")
 @
 \begin{figure}[htbp]
   \begin{center}
@@ -536,7 +536,7 @@ ct = tile( combine(stackObjects(sR, iRn)) )
 nt = tile( combine(stackObjects(sG, iGn)) )
 @
 <<echo=FALSE,results=hide,eval=TRUE>>=
-write.image(rgb[,,1], "13.png")
+writeImage(rgb[,,1], "13.png")
 @
 The result is shown in Figure~\ref{figure:done}.
 \begin{figure}[htbp]

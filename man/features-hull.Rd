@@ -1,6 +1,7 @@
-\name{hull.features}
+\name{hullFeatures}
 
-\alias{hull.features}
+\alias{hullFeatures}
+\alias{hullFeatures,IndexedImage-method}
 
 \concept{feature extraction}
 
@@ -11,27 +12,27 @@
   include coordinates, perimeter, size, acircularity etc.
 }
 
-\section{ Usage }{
-  \preformatted{
+\usage{
 
-  ## S4 method for x='IndexedImage'
+  \S4method{hullFeatures}{IndexedImage}(x, ...)
+  
+}
 
-  hull.features(x)
-}}
+\arguments{
 
-\section{ Arguments }{ \describe{
+  \item{x}{An object of \code{\linkS4class{IndexedImage}}.}
+  
+  \item{...}{ Reserved. }
 
-  \item{\code{x}}{An object of \code{\link{IndexedImage-class}}.}
+}
 
-}}
-
-\section{ Value }{
+\value{
   For a single frame, a matrix of descriptors with objects in rows and features
   in columns. For image stacks, a list of such matrices.
 
 }
 
-\section{ Details }{
+\details{
   The extracted features are (names carry an \code{h.} prefix to indicate hull
   features): \code{x,y} - coordinates of the geometric center, \code{s} - size (area),
   \code{p} - perimeter, \code{pdm} - mean distance to perimeter (from the center),
@@ -50,13 +51,17 @@
 }
 
 \seealso{\code{
-  \link{IndexedImage-class}, \link{watershed}, \link{getFeatures}, 
-  \link{edge.features}, \link{moments}
+  \linkS4class{IndexedImage}, \link{watershed}, \link{getFeatures}, 
+  \link{edgeFeatures}, \link{moments}
 }}
 
 \author{
-  Oleg Sklyar <\email{osklyar@ebi.ac.uk}>, 2007
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2007
 }
 
-\keyword{file}
+\examples{
+  ## see example(getFeatures)
+}
+
+\keyword{manip}
 

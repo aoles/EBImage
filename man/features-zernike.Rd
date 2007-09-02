@@ -1,53 +1,55 @@
-\name{zernike.moments}
+\name{zernikeMoments}
 
-\alias{zernike.moments}
+\alias{zernikeMoments}
+\alias{zernikeMoments,IndexedImage,Image-method}
 
 \concept{feature extraction}
 
 \title{ Extraction of Zernike moments from images of indexed objects }
 
 \description{
-
+  Extraction of Zernike moments from images of indexed objects
 }
 
-\section{ Usage }{
-  \preformatted{
+\usage{
 
-  ## S4 method for x='IndexedImage', ref='Image'
+  \S4method{zernikeMoments}{IndexedImage,Image}(x, ref, N = 12, R = 30, apply.Gaussian=TRUE, pseudo=FALSE, ...)
+  
+}
 
-  zernike.moments(x, ref, N = 12, R = 30, apply.Gaussian=TRUE, pseudo=FALSE)
-}}
+\arguments{
 
-\section{ Arguments }{ \describe{
+  \item{x}{An object of \code{\linkS4class{IndexedImage}}.}
 
-  \item{\code{x}}{An object of \code{\link{IndexedImage-class}}.}
-
-  \item{\code{ref}}{An object of \code{\link{Image-class}} in the Grayscale
+  \item{ref}{An object of \code{\link{Image-class}} in the Grayscale
     mode.}
 
-  \item{\code{N}}{Integer value defining the degree of the Zernike polynomials,
+  \item{N}{Integer value defining the degree of the Zernike polynomials,
     which in turn defines the number of features calculated. Defaults to 12.}
 
-  \item{\code{R}}{ Defines the radius of the circle around an object centre
+  \item{R}{ Defines the radius of the circle around an object centre
     from which the features are calculated. It also defines the standard deviation
     for the 2D Gausian applied at the centre of an object. See details.
     Defaults to 30. }
 
-  \item{\code{apply.Gaussian}}{A logical value that specifies if a local
+  \item{apply.Gaussian}{A logical value that specifies if a local
     2D Gaussian modification should be applied to every object at its centre.
     Defaults to \code{TRUE}.}
 
-  \item{\code{pseudo}}{ Specifies if an alternative algorithm should be used
+  \item{pseudo}{ Specifies if an alternative algorithm should be used
     to calculate pseudo features. Defaults to \code{FALSE}. }
-}}
 
-\section{ Value }{
+  \item{...}{ Reserved. }
+  
+}
+
+\value{
   For a single frame, a matrix of descriptors with objects in rows and features
   in columns. For image stacks, a list of such matrices. Frames with no objects
   will result in 0-populated a matrix for 1 object.
 }
 
-\section{ Details }{
+\details{
   Zernike features are calculated as follows:
 
   \code{Z_nl = (n+1) / pi * ABS( sum_x,y(V*nl(x,y) * i(x,y)) )},
@@ -91,7 +93,7 @@
 
 }
 
-\section{references}{
+\references{
   F. Zernike. \emph{Beugungstheorie des Schneidenverfahrens und seiner verbesserten
   Form, der Phasenkontrastmethode (Diffraction theory of the cut procedure and
   its improved form, the phase contrast method)}. Physica, 1:pp. 689-704, 1934.
@@ -101,15 +103,17 @@
 }
 
 \seealso{\code{
-  \link{IndexedImage-class}, \link{watershed}, \link{getFeatures},
+  \linkS4class{IndexedImage}, \link{watershed}, \link{getFeatures},
   \link{moments}
 }}
 
-
-
 \author{
-  Oleg Sklyar <\email{osklyar@ebi.ac.uk}>, Mike Smith <\email{msmith@ebi.ac.uk}>, 2007
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}; Mike Smith, \email{msmith@ebi.ac.uk}, 2007
 }
 
-\keyword{file}
+\examples{
+  ## see example(getFeatures)
+}
+
+\keyword{manip}
 

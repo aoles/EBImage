@@ -38,7 +38,9 @@ setGeneric (".correctType",   function (x)             standardGeneric(".correct
 setGeneric ("display",        function (x, ...)        standardGeneric("display") )
 setGeneric ("animate",        function (x, ...)        standardGeneric("animate") )
 setGeneric ("header",         function (x, ...)        standardGeneric("header") )
-setGeneric ("write.image",    function (x, files, ...) standardGeneric("write.image") )
+# DEPRECATED
+setGeneric ("write.image",    function (x, ...)        standardGeneric("write.image") )
+setGeneric ("writeImage",     function (x, ...)        standardGeneric("writeImage") )
 setGeneric ("assert",         function (x, y, strict=FALSE, ...) standardGeneric("assert") )
 setGeneric ("combine",        function (x, y, ...)     standardGeneric("combine") )
 setGeneric ("tile",           function (x, ...)        standardGeneric("tile") )
@@ -96,14 +98,26 @@ setGeneric ("drawtext",       function (img, xy, labels, ...) standardGeneric("d
 
 ## feature extraction
 setGeneric ("getFeatures",    function (x, ...)        standardGeneric("getFeatures") )
+# DEPRECATED
 setGeneric ("hull.features",  function (x, ...)        standardGeneric("hull.features") )
-setGeneric ("edge.profile",   function (x, ref, ...)   standardGeneric("edge.profile") )
+setGeneric ("hullFeatures",   function (x, ...)        standardGeneric("hullFeatures") )
+# DEPRECATED
+setGeneric ("edge.profile",   function (x, ...)        standardGeneric("edge.profile") )
+setGeneric ("edgeProfile",    function (x, ...)        standardGeneric("edgeProfile") )
+# DEPRECATED
 setGeneric ("edge.features",  function (x, ...)        standardGeneric("edge.features") )
+setGeneric ("edgeFeatures",   function (x, ...)        standardGeneric("edgeFeatures") )
 setGeneric ("cmoments",       function (x, ref, ...)   standardGeneric("cmoments") )
 setGeneric ("smoments",       function (x, ref, ...)   standardGeneric("smoments") )
 setGeneric ("rmoments",       function (x, ref, ...)   standardGeneric("rmoments") )
 setGeneric ("moments",        function (x, ref, ...)   standardGeneric("moments") )
+# DEPRECATED
 setGeneric ("zernike.moments",function (x, ref, ...)   standardGeneric("zernike.moments") )
+setGeneric ("zernikeMoments", function (x, ref, ...)   standardGeneric("zernikeMoments") )
+# DEPRECATED
 setGeneric ("haralick.matrix",function (x, ref, ...)   standardGeneric("haralick.matrix") )
+setGeneric ("haralickMatrix", function (x, ref, ...)   standardGeneric("haralickMatrix") )
+# DEPRECATED
 setGeneric ("haralick.features",function (x, ref,...)  standardGeneric("haralick.features") )
+setGeneric ("haralickFeatures",function (x, ref,...)   standardGeneric("haralickFeatures") )
 

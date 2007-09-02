@@ -1,6 +1,7 @@
 \name{matchObjects}
 
 \alias{matchObjects}
+\alias{matchObjects,IndexedImage,IndexedImage-method}
 
 \concept{object detection}
 
@@ -12,23 +13,23 @@
   of objects in the original image.
 }
 
-\section{ Usage }{
-\preformatted{
-## S4 method for signature x='IndexedImage', ref='IndexedImage'
+\usage{
 
-matchObjects(x, ref)
-}}
+  \S4method{matchObjects}{IndexedImage,IndexedImage}(x, ref, ...)
 
-\section{ Arguments }{ \describe{
+}
 
-  \item{\code{x}}{An object of \code{\link{IndexedImage-class}}. }
+\arguments{
 
-  \item{\code{ref}}{A reference image \code{\link{IndexedImage-class}} with 
+  \item{x}{An object of \code{\linkS4class{IndexedImage}}. }
+
+  \item{ref}{A reference image \code{\linkS4class{IndexedImage}} with 
     objects to matched to. }
 
-}}
+  \item{...}{ Reserved. }
+}
 
-\section{ Value }{
+\value{
 
   If number of frames in \code{x} and \code{ref} is 1, then the result is an
   \code{\link{integer}} vector of matching indexes, similar to \code{\link{match}}.
@@ -37,12 +38,12 @@ matchObjects(x, ref)
 }
 
 \seealso{ \code{
-    \link{IndexedImage-class}, \link{watershed}, \link{getFeatures}
+    \linkS4class{IndexedImage}, \link{watershed}, \link{getFeatures}
 }}
 
 \author{
-  Oleg Sklyar: \email{osklyar@ebi.ac.uk}
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2007
 }
 
-\keyword{file}
+\keyword{manip}
 

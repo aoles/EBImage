@@ -15,7 +15,7 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("haralick.matrix", signature(x="IndexedImage", ref="Image"),
+setMethod ("haralickMatrix", signature(x="IndexedImage", ref="Image"),
   function(x, ref, nc=32, ...) {
     if ( colorMode(x) != Grayscale || colorMode(ref) != Grayscale)
       .stop( "'x' and 'ref' must be Grayscale" )
@@ -27,11 +27,16 @@ setMethod ("haralick.matrix", signature(x="IndexedImage", ref="Image"),
   }
 )
 
-
+setMethod ("haralick.matrix", signature(x="IndexedImage", ref="Image"),
+  function(x, ref, ...) {
+    .Deprecated("haralickMatrix", "EBImage")
+    haralickMatrix(x, ref, ...)
+  }
+)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("haralick.features", signature(x="IndexedImage", ref="Image"),
+setMethod ("haralickFeatures", signature(x="IndexedImage", ref="Image"),
   function(x, ref, nc=32, ...) {
-    hm <- haralick.matrix(x=x, ref=ref, nc=nc, ...)
+    hm <- haralickMatrix(x=x, ref=ref, nc=nc, ...)
     if ( is.null(hm) || !(is.array(hm) || is.list(hm)) ) return( NULL )
     do.features <- function(m) {
       res <- .DoCall( "lib_haralick", m )
@@ -44,3 +49,12 @@ setMethod ("haralick.features", signature(x="IndexedImage", ref="Image"),
     lapply( hm, do.features )
   }   
 )
+
+setMethod ("haralick.features", signature(x="IndexedImage", ref="Image"),
+  function(x, ref, ...) {
+    .Deprecated("haralickFeatures", "EBImage")
+    haralickFeatures(x, ref, ...)
+  }
+)
+
+

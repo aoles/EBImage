@@ -1,8 +1,11 @@
 \name{thresh}
 
 \alias{thresh}
+\alias{thresh,Image-method}
 \alias{athresh}
+\alias{athresh,Image-method}
 \alias{cthresh}
+\alias{cthresh,Image-method}
 
 \concept{image thresholding}
 
@@ -12,36 +15,36 @@
   Functions to threshold images and color channels of images.
 }
 
-\section{ Usage }{
-  \preformatted{
-    thresh(x, w=5, h=5, offset=0.01, ...)
-    athresh(x, w=10, h=10, offset=0, ...)
-    cthresh(x, threshold=0, ...)
-  }
+\usage{
+
+  \S4method{thresh}{Image}(x, w=5, h=5, offset=0.01, ...)
+  \S4method{athresh}{Image}(x, w=10, h=10, offset=0, ...)
+  \S4method{cthresh}{Image}(x, threshold=0, ...)
+  
 }
 
-\section{ Arguments}{ \describe{
+\arguments{
 
-  \item{\code{x}}{An object of \code{\link{Image-class}}. For \code{thresh} it must be
+  \item{x}{An object of \code{\linkS4class{Image}}. For \code{thresh} it must be
     in the \code{\link{Grayscale}} mode. }
 
-  \item{\code{w, h}}{ Thresholding frame width and height in pixel. } 
+  \item{w, h}{ Thresholding frame width and height in pixel. } 
 
-  \item{\code{offset}}{ Threshold offset from the mean value. }
+  \item{offset}{ Threshold offset from the mean value. }
 
-  \item{\code{threshold}}{ Threshold value for channel thresholding (uniform). }
+  \item{threshold}{ Threshold value for channel thresholding (uniform). }
 
-  \item{...}{ Reserved for future use. }
+  \item{...}{ Reserved. }
 
-} }
+}
 
-\section{ Value}{
+\value{
 
-  A new instance of \code{\link{Image-class}} in the same color mode as input.
+  A new instance of \code{\linkS4class{Image}} in the same color mode as input.
     
 }
 
-\section{ Details}{
+\details{
 
   If \code{thresh} and \code{athresh} are adaptive thresholind functions.
   While \code{athresh} can be used on both \code{\link{Grayscale}} and 
@@ -58,24 +61,22 @@
   
 }
 
-\seealso{
-  \code{
-    \link{Image-class}, \link{Image}, \link{distmap}, \link{segment}, 
-    \link{[,Image-method}
-  }
-}
+\seealso{ \code{
+  \linkS4class{Image}, \link{Image}, \link{distmap}, \link{segment}, 
+  \link{[,Image-method}
+}}
 
 \references{
-    \emph{ImageMagick}: \url{http://www.imagemagick.org}.
+  \emph{ImageMagick}: \url{http://www.imagemagick.org}.
 }
 
 \author{
-    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk},  2005-2007
 }
 
 \examples{
-  \dontrun{see ?watershed for examples}
+  ## see example(watershed)
 }
 
-\keyword{file}
+\keyword{manip}
 

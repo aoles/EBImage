@@ -1,8 +1,11 @@
 \name{normalize}
 
 \alias{negate}
+\alias{negate,Image-method}
 \alias{normalize}
+\alias{normalize,Image-method}
 \alias{normalize2}
+\alias{normalize2,Image-method}
 
 \concept{normalization}
 
@@ -12,32 +15,36 @@
   Functions to normalize images.
 }
 
-\section{ Usage }{
-  \preformatted{
-    negate(x)
-    normalize(x, separate=TRUE, ft=c(0,1))
-    normalize2(x)
-  }
+\usage{
+
+  \S4method{normalize}{Image}(x, separate=TRUE, ft=c(0,1), ...)
+
+  ## S4 methods for signature 'x=Image'
+  negate(x, ...)
+  normalize2(x, ...)
   
 }
 
-\section{ Arguments }{ \describe{
+\arguments{
 
-  \item{\code{x}}{ An object of \code{\link{Image-class}}. }
+  \item{x}{ An object of \code{\link{Image-class}}. }
 
-  \item{\code{separate}}{ If \code{TRUE} normalizes each frame separately. }
+  \item{separate}{ If \code{TRUE} normalizes each frame separately. }
 
-  \item{\code{ft}}{ A numeric vector of 2 values, target minimum and maximum 
+  \item{ft}{ A numeric vector of 2 values, target minimum and maximum 
     intensity values after normalization for \code{\link{Grayscale}} images. }
-}}
 
-\section{ Value }{
+  \item{...}{ Reserved. }
 
-  A transformed image in an object of \code{\link{Image-class}}.
+}
+
+\value{
+
+  A transformed image in an object of \code{\linkS4class{Image}}.
     
 }
 
-\section{ Details }{
+\details{
 
   \code{negate} negates the colors in the reference image. Operates on all image
     modes.
@@ -49,23 +56,21 @@
    
 }
 
-\seealso{
-  \code{
-    \link{Image-class}, \link{channel}
-  }
-}
+\seealso{ \code{
+  \linkS4class{Image}, \link{channel}
+}}
 
 \references{
-    \emph{ImageMagick}: \url{http://www.imagemagick.org}.
+  \emph{ImageMagick}: \url{http://www.imagemagick.org}.
 }
 
 \author{
-    Oleg Sklyar: \email{osklyar@ebi.ac.uk}   
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006-2007
 }
 
 \examples{
-  \dontrun{see ?watershed for examples}
+  ## see example(getFeatures)
 }
 
-\keyword{file}
+\keyword{manip}
 

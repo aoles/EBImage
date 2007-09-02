@@ -1,7 +1,11 @@
 \name{display}
 
 \alias{display}
+\alias{display,Image-method}
+\alias{display,IndexedImage-method}
 \alias{animate}
+\alias{animate,Image-method}
+\alias{animate,IndexedImage-method}
 
 \concept{display}
 
@@ -11,30 +15,31 @@
   Display images on the screen of a local or remote display. 
 }
 
-\section{Usage}{
-  \preformatted{
-    ## S4 methods for signature x='Image'    
+\usage{
+  \S4method{display}{Image}(x, no.GTK=FALSE, ...)
+  \S4method{display}{IndexedImage}(x, no.GTK=FALSE, ...)
 
-    display(x, no.GTK=FALSE)
-    animate(x)                 ## not available on Windows
-}}
+  \S4method{animate}{Image}(x, ...)   ## not available on Windows
+  \S4method{animate}{IndexedImage}(x, ...)   ## not available on Windows
+}
 
-\section{ Arguments }{ \describe{
+\arguments{
 
-  \item{\code{x}}{An object of \code{\link{Image-class}}. }
+  \item{x}{An object of \code{\linkS4class{Image}}. }
 
-  \item{\code{no.GTK}}{ A logical value, if \code{TRUE} an \emph{ImageMagick}
+  \item{no.GTK}{ A logical value, if \code{TRUE} an \emph{ImageMagick}
     display will be used instead of the GTK display (read details below). 
     On Windows the \emph{ImageMagick} display is not available. } 
 
-}}
+  \item{...}{ Reserved. }
+}
 
-\section{ Value }{
+\value{
 
   An invisible \code{NULL}.
 }
 
-\section{ Details}{
+\details{
 
   If available the \code{GTK} display will be used by default. This mode allows
   display of multiple images simultaneously. If the \code{GTK} mode is not used,
@@ -58,7 +63,8 @@
 }
 
 \seealso{ \code{
-    \link{Image-class}, \link{Image}, \link{read.image}, \link{write.image}
+    \linkS4class{Image}, \linkS4class{IndexedImage}, \link{Image}, 
+    \link{readImage}, \link{writeImage}
 }}
 
 \references{
@@ -67,7 +73,7 @@
 }
 
 \author{
-  Oleg Sklyar <\email{osklyar@ebi.ac.uk}>, 2005-2007
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2005-2007
 }
 
 \keyword{file}

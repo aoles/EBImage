@@ -1,11 +1,17 @@
 \name{resize}
 
 \alias{flip}
+\alias{flip,Image-method}
 \alias{flop}
+\alias{flop,Image-method}
 \alias{resample}
+\alias{resample,Image-method}
 \alias{resize}
+\alias{resize,Image-method}
 \alias{rotate}
+\alias{rotate,Image-method}
 \alias{affinet}
+\alias{affinet,Image-method}
 
 \concept{image transformation}
 \concept{rotation}
@@ -17,47 +23,46 @@
   Functions to rotate, mirror and resize images.
 }
 
-\section{ Usage }{
-  \preformatted{
-  ## S4 classes for signature x="Image"
+\usage{
 
-  affinet(x, sx=0, rx=0, ry=0, sy=0, tx=0, ty=0)
-  flip(x)
-  flop(x)
-  resample(x, w, h)
-  resize(x, w, h, blur=1, filter="Lanczos")
-  rotate(x, angle=90, col)
-}}
-
-\section{ Arguments }{ \describe{
-
-  \item{\code{x}}{An object of \code{\link{Image-class}}. }
-
-  \item{\code{sx, rx, ry, sy, tx, ty}}{Elements of the affine matrix. }
-
-  \item{\code{w, h}}{ Width and height of a new resized/resampled image.
-    One of these arguments can be missing to enable proportional resize. }
-
-  \item{\code{blur}}{ The blur factor, where 1 (\code{TRUE}) is blurry,
-    0 (\code{FALSE}) is sharp. }
-
-  \item{\code{filter}}{ Resize pixel sampling filter. }
-
-  \item{\code{angle}}{ Image rotation angle in degrees. }
-
-  \item{\code{col}}{ A numeric, integer or character specifying the background
-    color of the rotated image. Not implemented yet, defaults to black. }
-
-  \item{\code{...}}{ Reserved for future use. }
-}}
-
-\section{ Value }{
-
-  A transformed image in an object of \code{\link{Image-class}}.
+  \S4method{affinet}{Image}(x, sx=0, rx=0, ry=0, sy=0, tx=0, ty=0, ...)
+  \S4method{flip}{Image}(x, ...)
+  \S4method{flop}{Image}(x, ...)
+  \S4method{resample}{Image}(x, w, h, ...)
+  \S4method{resize}{Image}(x, w, h, blur=1, filter="Lanczos", ...)
+  \S4method{rotate}{Image}(x, angle=90, col, ...)
 
 }
 
-\section{ Details }{
+\arguments{
+
+  \item{x}{An object of \code{\linkS4class{Image}}. }
+
+  \item{sx, rx, ry, sy, tx, ty}{Elements of the affine matrix. }
+
+  \item{w, h}{ Width and height of a new resized/resampled image.
+    One of these arguments can be missing to enable proportional resize. }
+
+  \item{blur}{ The blur factor, where 1 (\code{TRUE}) is blurry,
+    0 (\code{FALSE}) is sharp. }
+
+  \item{filter}{ Resize pixel sampling filter. }
+
+  \item{angle}{ Image rotation angle in degrees. }
+
+  \item{col}{ A numeric, integer or character specifying the background
+    color of the rotated image. Not implemented yet, defaults to black. }
+
+  \item{...}{ Reserved. }
+}
+
+\value{
+
+  A transformed image in an object of \code{\linkS4class{Image}}.
+
+}
+
+\details{
 
   \code{affinet} transforms an image as dictated by the affine matrix.
 
@@ -86,19 +91,17 @@
 
 }
 
-\seealso{
-  \code{
-    \link{Image-class}
-  }
-}
+\seealso{ \code{
+    \linkS4class{Image}
+}}
 
 \references{
-    \emph{ImageMagick}: \url{http://www.imagemagick.org}.
+  \emph{ImageMagick}: \url{http://www.imagemagick.org}.
 }
 
 \author{
-    Oleg Sklyar: \email{osklyar@ebi.ac.uk}
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006-2007
 }
 
-\keyword{file}
+\keyword{manip}
 

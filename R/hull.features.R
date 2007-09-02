@@ -15,7 +15,7 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("hull.features", signature(x="IndexedImage"),
+setMethod ("hullFeatures", signature(x="IndexedImage"),
   function(x, ...) {
     if ( colorMode(x) != Grayscale )
       .stop( "'x' must be Grayscale" )
@@ -54,8 +54,14 @@ setMethod ("hull.features", signature(x="IndexedImage"),
   }
 )
 
+setMethod ("hull.features", signature(x="IndexedImage"),
+  function(x, ...) {
+    .Deprecated("hullFeatures", "EBImage")
+    hullFeatures(x, ...)
+  }
+)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-.edge.profile <- function(x, ref=NULL, n=32, fft=FALSE, scale=TRUE, rotate=TRUE, ...) {
+.edgeProfile <- function(x, ref=NULL, n=32, fft=FALSE, scale=TRUE, rotate=TRUE, ...) {
   if ( colorMode(x) != Grayscale ) .stop( "'x' must be Grayscale" )
   .dim <- dim(x)
   ## get centres of objects xy, rotation angle theta and if required effective
@@ -64,12 +70,12 @@ setMethod ("hull.features", signature(x="IndexedImage"),
   if ( .dim[3] == 1 ) {
     if ( is.null(ref) ) xyt <- moments(x=x)[, c(3,4,8), drop=FALSE]
     else xyt <- moments(x=x, ref=ref)[, c(3,4,8), drop=FALSE]
-    if ( scale ) s <- hull.features(x=x)[,7] else s <- NULL
+    if ( scale ) s <- hullFeatures(x=x)[,7] else s <- NULL
   }
   else {
     if ( is.null(ref) ) xyt <- lapply(moments(x), function(x) x[,c(3,4,8), drop=FALSE] )
     else xyt <- lapply(moments(x=x, ref=ref), function(x) x[,c(3,4,8), drop=FALSE] )
-    if ( scale ) s <- lapply(hull.features(x=x), function(x) x[,7] )
+    if ( scale ) s <- lapply(hullFeatures(x=x), function(x) x[,7] )
     else s <- vector("list", length(xyt))
   }
   ## returns for each image a matrix of border points with for each
@@ -126,24 +132,31 @@ setMethod ("hull.features", signature(x="IndexedImage"),
   res
 }
 
-setMethod ("edge.profile", signature(x="IndexedImage", ref="missing"),
+setMethod ("edgeProfile", signature(x="IndexedImage"),
   function (x, ref, n=32, fft=TRUE, scale=TRUE, rotate=TRUE, ...) {
-    .edge.profile(x, NULL, n, fft, scale, rotate, ...)
+    if ( missing(ref) ) 
+      ref = NULL
+    else {
+      if ( !is.Image(ref) )
+        .stop("'ref' must be of class Image or missing")
+    }
+    .edgeProfile(x, ref, n, fft, scale, rotate, ...)
   }
 )
 
-setMethod ("edge.profile", signature(x="IndexedImage", ref="Image"),
-  function (x, ref, n=32, fft=TRUE, scale=TRUE, rotate=TRUE, ...) {
-    .edge.profile(x, ref, n, fft, scale, rotate, ...)
+setMethod ("edge.profile", signature(x="IndexedImage"),
+  function (x, ...) {
+    .Deprecated("edgeProfile", "EBImage")
+    edgeProfile(x, ...)
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("edge.features", signature(x="IndexedImage"),
+setMethod ("edgeFeatures", signature(x="IndexedImage"),
   function (x, ref, ...) {
     .dim <- dim(x)
-    res <- if ( missing(ref) ) edge.profile(x=x, n=16, fft=FALSE, scale=TRUE, rotate=TRUE)
-    else edge.profile(x=x, ref=ref, n=16, fft=FALSE, scale=TRUE, rotate=TRUE)
+    if ( missing(ref) ) ref <- NULL
+    res <- edgeProfile(x=x, ref=ref, n=16, fft=FALSE, scale=TRUE, rotate=TRUE)
     do.profile <- function(e) {
       m <- matrix(0, ncol=5, nrow=nrow(e))
       colnames(m) <- c("e.irr", "e.f2Pi", "e.fPi", "e.f2Pi3", "e.fPi2")
@@ -153,6 +166,13 @@ setMethod ("edge.features", signature(x="IndexedImage"),
     }
     if ( dim(x)[3] == 1 ) return( do.profile(res) )
     return( lapply(res, do.profile) )
+  }
+)
+
+setMethod ("edge.features", signature(x="IndexedImage"),
+  function (x, ...) {
+    .Deprecated("edgeFeatures", "EBImage")
+    edgeFeatures(x, ...)
   }
 )
 

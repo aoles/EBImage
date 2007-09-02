@@ -1,9 +1,18 @@
 \name{moments}
 
 \alias{moments}
+\alias{moments,IndexedImage,Image-method}
+\alias{moments,IndexedImage,missing-method}
+\alias{moments,Image,missing-method}
 \alias{cmoments}
+\alias{cmoments,IndexedImage,Image-method}
+\alias{cmoments,IndexedImage,missing-method}
 \alias{smoments}
+\alias{smoments,IndexedImage,Image-method}
+\alias{smoments,IndexedImage,missing-method}
 \alias{rmoments}
+\alias{rmoments,IndexedImage,Image-method}
+\alias{rmoments,IndexedImage,missing-method}
 
 \concept{feature extraction}
 
@@ -15,43 +24,48 @@
   central moments.
 }
 
-\section{ Usage }{
-  \preformatted{
+\usage{
 
-  ## S4 methods for x='IndexedImage' and ref='Image'/'missing'
+  ## S4 methods for signatures 'x=IndexedImage,ref=Image'
+  ## and 'x=IndexedImage,ref=missing'
+  cmoments(x, ref, ...)
 
-  cmoments(x, ref)
-  smoments(x, ref, pw=3, what="s")
-  rmoments(x, ref)
+  \S4method{smoments}{IndexedImage,Image}(x, ref, pw=3, what="s", ...)
+  \S4method{smoments}{IndexedImage,missing}(x, ref, pw=3, what="s", ...)
 
-  moments(x, ref)
+  ## S4 methods for signatures 'x=IndexedImage,ref=Image'
+  ## and 'x=IndexedImage,ref=missing'
+  rmoments(x, ref, ...)
 
-  ## S4 method for signature x='Image'
+  ## S4 methods for signatures 'x=IndexedImage,ref=Image'
+  ## and 'x=IndexedImage,ref=missing'
+  ## and 'x=Image,ref=missing'
+  moments(x, ref, ...)
+  
+}
 
-  moments(x)
-}}
+\arguments{
 
-\section{ Arguments }{ \describe{
+  \item{x}{An object of \code{\linkS4class{Image}}; a \code{\link{Grayscale}}
+    object of \code{\linkS4class{Image}} in the last case.}
 
-  \item{\code{x}}{An object of \code{\link{Image-class}}; a \code{\link{Grayscale}}
-    object of \code{\link{Image-class}} in the last case.}
+  \item{ref}{A \code{\link{Grayscale}} object of \code{\linkS4class{Image}}.}
 
-  \item{\code{ref}}{A \code{\link{Grayscale}} object of \code{\link{Image-class}}.}
-
-  \item{\code{pw}}{ A numeric value. When calculating central os scale invariant 
+  \item{pw}{ A numeric value. When calculating central os scale invariant 
     moments using \code{smoments} \code{pw} specifies the order of the 
     matrix of moments to calculate. }
 
-  \item{\code{what}}{ A character string, or the first case insensitive letter, 
+  \item{what}{ A character string, or the first case insensitive letter, 
     for the type of the moments to calculate: \code{C}entral, \code{S}cale invariants,
     or \code{R}otation invariants (specifying \code{R} is essentiall the same
     as calling \code{rmoments}. }
   
-}}
+  \item{...}{ Reserved. }
+}
 
-\section{ Value }{
+\value{
 
-  For \code{x='IndexedImage'}:
+  For \code{x=IndexedImage}:
   
   For a single frame in \code{x} the result of \code{smoments} with types \code{S}
   and \code{C} is a 3D array with first two dimensions building square matrices
@@ -61,14 +75,14 @@
   
   For multiple frames a list of the above will be returned.
   
-  For \code{x='Image'}:
+  For \code{x=Image}:
   
   The result is a 2D matrix of with different moments or descriptors in 
   columns and objects in rows. (each frame is assumed to contain a single object).
 
 }
 
-\section{ Details }{
+\details{
 
   \code{cmoments} computes centers of the objects (\code{x=M10/M00, 
   y=M01/M00}), their "mass" (intensity, \code{int=M00}) and the area (number of 
@@ -85,7 +99,7 @@
   the covariance matrix and its eigenvalues, rotation angle and the Hu's 7 
   rotation invariants.
 
-  Functions with signature \code{x='IndexedImage'} work on images with multiple
+  Functions with signature \code{x=IndexedImage} work on images with multiple
   indexed objects in every frame. The index information is used to identify every
   object and serves as a mask resetting for every object pixels outside of the
   mask to background. The intensity is retrieved from the corresponding reference
@@ -97,7 +111,7 @@
   
 }
 
-\section{ References }{
+\references{
   M.K. Hu, \emph{Visual Pattern Recognition by Moment Invariants}, IRE Trans.
   Info. Theory, vol. IT-8, pp.179-187, 1962
   
@@ -105,31 +119,16 @@
 }
 
 \seealso{\code{
-  \link{IndexedImage-class}, \link{watershed}, \link{getFeatures}
+  \linkS4class{IndexedImage}, \link{watershed}, \link{getFeatures}
 }}
 
 \author{
-  Oleg Sklyar <\email{osklyar@ebi.ac.uk}>, 2007
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2007
 }
 
 \examples{
-if ( interactive() ) {
-  \dontrun{Load two images}
-  ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
-  a <- read.image( paste(ddir, c("A04w0.jpg", "A04w1.jpg"), sep="/") )
-
-  \dontrun{Detect nuclei}
-  t <- thresh( blur(a[,,2], 4, 2), 15, 15)
-  t <- opening( closing(t, morphKern(9)) )
-  seeds <- watershed( distmap(t) )
-
-  \dontrun{Segment cells without thresholding}
-  wx <- propagate(a[,,1], seeds, NULL, 0, 2)
-  
-  mom <- moments(wx, a[,,1])
-  print(mom[1:3,])
-}
+  ## see example(getFeatures)
 }
 
-\keyword{file}
+\keyword{manip}
 

@@ -67,7 +67,7 @@ setClass( "Image",
   Objects can be created using \code{\link{new}("Image")} supplying slot data
   as necessary. Additionally, wrapper functions are defined to simplify the
   construction of \code{Image} objects in different situations: the default 
-  constructor, \code{\link{Image}}, the \code{\link{read.image}} constructor that
+  constructor, \code{\link{Image}}, the \code{\link{readImage}} constructor that
   creates an object from reading image files and the \code{\link{copy}} constructor.
 }
 
@@ -150,31 +150,30 @@ setClass( "Image",
 }
 
 \seealso{\code{
-  \link{Image}, \link{IndexedImage-class}, \link{display}, \link{channel}, 
+  \link{Image}, \linkS4class{IndexedImage}, \link{display}, \link{channel}, 
   \link{image,Image-method}, \link{show,Image-method}, 
 }}
 
 \author{
-  Oleg Sklyar: \email{osklyar@ebi.ac.uk}
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2005-2007
 }
 
 \examples{
 
-\dontrun{New Grayscale image of a black-to-white vertical gradient}
-w <- 120
-a <- Image((0:(w^2))/w^2, c(w,w))
-if ( interactive() ) display(a)
-print(a)
+  ## New Grayscale image of a black-to-white vertical gradient
+  w <- 120
+  a <- Image((0:(w^2))/w^2, c(w,w))
+  if ( interactive() ) display(a)
+  print(a)
 
-\dontrun{Converts image to TrueColor}
-b <- a
-colorMode(b) <- TrueColor
-print(b)
+  ## Converts image to TrueColor
+  b <- a
+  colorMode(b) <- TrueColor
+  print(b)
 
-\dontrun{Fills values with intensities over 0.5 (50\%) with red}
-b[ a > 0.5 ] = as.integer(255)
-if ( interactive() ) display(b)
-
+  ## Fills values with intensities over 0.5 (50\%) with red
+  b[ a > 0.5 ] = as.integer(255)
+  if ( interactive() ) display(b)
 }
 
 \keyword{methods}

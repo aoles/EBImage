@@ -2,9 +2,15 @@
 
 \alias{Image}
 \alias{combine}
+\alias{combine,Image,Image-method}
+\alias{combine,list,missing-method}
 \alias{copy}
+\alias{copy,Image-method}
 \alias{header}
+\alias{header,Image-method}
 \alias{assert}
+\alias{assert,Image,Image-method}
+\alias{assert,Image,missing-method}
 \alias{is.Image}
 \alias{stopIfNotImage}
 
@@ -15,18 +21,22 @@
 }
 
 \usage{
-Image(data=matrix(0,0,0), dim=base::dim(data), colormode=Grayscale, ...)
-copy(x, ...)
-header(x, ...)
+  Image(data=matrix(0,0,0), dim=base::dim(data), colormode=Grayscale, ...)
 
-combine(x, y, ...) 
-\S4method{combine}{Image,Image}(x, y, ...)
-\S4method{combine}{list,missing}(x, y, ...)
+  is.Image(x)
+  stopIfNotImage(x)
 
-is.Image(x)
-stopIfNotImage(x)
+  ## S4 methods for signature 'x=Image'
+  copy(x, ...)
+  header(x, ...)
 
-assert(x, y, strict=FALSE, ...)
+  ## S4 methods for signatures 'x=Image,y=Image'
+  ## and 'x=list,y=missing'
+  combine(x, y, ...)
+
+  ## S4 methods for signatures 'x=Image,y=Image'
+  ## and 'x=Image,y=missing'
+  assert(x, y, strict=FALSE, ...)
 }
 
 
@@ -102,22 +112,21 @@ assert(x, y, strict=FALSE, ...)
 
 \seealso{
   \code{
-    \linkS4class{Image}, \linkS4class{IndexedImage}, \link{read.image}
+    \linkS4class{Image}, \linkS4class{IndexedImage}, \link{readImage}
   }
 }
 
 \author{
-  Oleg Sklyar: \email{osklyar@ebi.ac.uk}
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2005-2007
 }
 
 \examples{
-i1 = Image()
-sx = exp(24i*pi*seq(-1, 1, length=300)^2)
-i2 = Image(outer(Im(sx), Re(sx)))
-if (interactive())
-  display(normalize(i2))
-i3 <- copy(i2)
-is.Image(i2)
+  i1 = Image()
+  sx = exp(24i*pi*seq(-1, 1, length=300)^2)
+  i2 = Image(outer(Im(sx), Re(sx)))
+  if (interactive()) display(normalize(i2))
+  i3 <- copy(i2)
+  is.Image(i2)
 }
 
 \keyword{file}

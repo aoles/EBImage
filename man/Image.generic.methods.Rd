@@ -7,6 +7,8 @@
 \alias{image,Image-method}
 \alias{[,Image-method}
 \alias{Arith}
+\alias{print.Image}
+\alias{print.IndexedImage}
 
 \concept{image processing}
 \concept{image class}
@@ -15,7 +17,7 @@
 \title{ Generic methods for objects of class Image }
 
 \description{
-  \code{\link{Image-class}} supports all (or almost all) operations that are 
+  \code{\linkS4class{Image}} supports all (or almost all) operations that are 
   defined for \code{\link{array}}. However, the default behavior of some 
   generics was redefined in the package to better suit the class. Those are:
 }
@@ -67,12 +69,12 @@
 
 \seealso{ 
   \code{
-    \link{Image-class}, \link{IndexedImage-class}
+    \linkS4class{Image}, \linkS4class{IndexedImage}
   }
 }
 
 \author{
-  Oleg Sklyar: \email{osklyar@ebi.ac.uk}
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006-2007
 }
 
 \keyword{methods}

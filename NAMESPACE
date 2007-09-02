@@ -6,15 +6,18 @@ importFrom("graphics", "image")
 importFrom("graphics", "hist")
 
 export(
-  Image, is.Image, stopIfNotImage, read.image, choose.image,
+  Image, is.Image, stopIfNotImage, 
   TrueColor, Grayscale, morphKern, print.Image, print.IndexedImage,
-  drawfont
+  drawfont, readImage, chooseImage,
+
+  ### deprecated
+  read.image, choose.image
 )
 exportClasses(
   Image, IndexedImage
 )
 exportMethods(
-  copy, display, animate, write.image, header, assert, combine, tile,
+  copy, display, animate, header, assert, combine, tile, writeImage,
   show, "[", channel, as.Image, Arith,
 
   colorMode, "colorMode<-",
@@ -33,7 +36,11 @@ exportMethods(
 
   drawtext, 
     
-  features, getFeatures, hull.features, edge.profile, edge.features,
+  features, getFeatures, hullFeatures, edgeProfile, edgeFeatures,
+  haralickMatrix, haralickFeatures, zernikeMoments,
+  
+  ### deprecated
+  write.image, hull.features, edge.profile, edge.features,
   haralick.matrix, haralick.features, zernike.moments
 )
 

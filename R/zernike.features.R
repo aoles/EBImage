@@ -15,7 +15,7 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("zernike.moments", signature(x="IndexedImage", ref="Image"),
+setMethod ("zernikeMoments", signature(x="IndexedImage", ref="Image"),
   function(x, ref, N=12, R=30, apply.Gaussian=TRUE, pseudo=FALSE, ...) {
     if ( colorMode(x) != Grayscale || colorMode(ref) != Grayscale )
       .stop( "both 'x' and 'ref' must be Grayscale" )
@@ -32,3 +32,11 @@ setMethod ("zernike.moments", signature(x="IndexedImage", ref="Image"),
       return( .DoCall("lib_pseudo_zernike", x, ref, xy, as.numeric(R), as.integer(N), as.integer(apply.Gaussian)) )
   }
 )
+
+setMethod ("zernike.moments", signature(x="IndexedImage", ref="Image"),
+  function(x, ref, ...) {
+    .Deprecated("zernikeMoments", "EBImage")
+    zernikeMoments(x, ref, ...)
+  }
+)
+
