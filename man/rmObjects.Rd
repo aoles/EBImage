@@ -1,6 +1,8 @@
 \name{rmObjects}
 
 \alias{rmObjects}
+\alias{rmObjects,IndexedImage,numeric-method}
+\alias{rmObjects,IndexedImage,list-method}
 
 \concept{object detection}
 \concept{delete objects}
@@ -12,38 +14,39 @@
   integer vectors (indexes) from an image with indexed objects.
 }
 
-\section{ Usage }{
-\preformatted{
-## S4 methods for signature x='IndexedImage', index='numeric' and index='list'
+\usage{
 
-rmObjects(x, index)
-}}
+  ## S4 methods for signatures 'x=IndexedImage,index=numeric'
+  ## and 'x=IndexedImage,index=list'
 
-\section{ Arguments }{ \describe{
+  rmObjects(x, index, ...)
+  
+}
 
-  \item{\code{x}}{An object of \code{\link{IndexedImage-class}}. }
+\arguments{
 
-  \item{\code{index}}{ A numeric (integer) vector of indexes of objects to
+  \item{x}{An object of \code{\linkS4class{IndexedImage}}. }
+
+  \item{index}{ A numeric (integer) vector of indexes of objects to
     remove in the frame if \code{x} contains one frame only. For multiple
     frames, a list of such vectors.}
 
+  \item{...}{ Reserved. }
+}
+
+\value{
+
+  An image of \code{\linkS4class{IndexedImage}}.
+
+}
+
+\seealso{ \code{
+  \linkS4class{IndexedImage}, \link{watershed}, \link{getFeatures}, \link{paintObjects}
 }}
 
-\section{ Value }{
-
-  An image of \code{\link{IndexedImage-class}}.
-
-}
-
-\seealso{
-  \code{
-    \link{IndexedImage-class}, \link{watershed}, \link{getFeatures}, \link{paintObjects}
-  }
-}
-
 \author{
-    Oleg Sklyar: \email{osklyar@ebi.ac.uk}
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006-2007
 }
 
-\keyword{file}
+\keyword{manip}
 

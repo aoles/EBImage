@@ -1,6 +1,7 @@
 \name{watershed}
 
 \alias{watershed}
+\alias{watershed,Image-method}
 
 \concept{watershed transformation}
 \concept{watershed segmentation}
@@ -13,18 +14,18 @@
   Watershed transformation and watershed based object detection.
 }
 
-\section{ Usage }{
-  \preformatted{
-    watershed(x, tolerance=1, ext=1)
-  }
+\usage{
+
+  \S4method{watershed}{Image}(x, tolerance=1, ext=1, ...)
+
 }
 
-\section{ Arguments }{ \describe{
+\arguments{
 
-  \item{\code{x}}{An object of \code{\link{Image-class}} in the
+  \item{x}{An object of \code{\linkS4class{Image}} in the
     \code{\link{Grayscale}} mode. }
 
-  \item{\code{tolerance}}{ The minimum height of the object in the units of image
+  \item{tolerance}{ The minimum height of the object in the units of image
     intensity between its highest point (seed) and the point where it
     contacts another object (checked for every contact pixel). If the
     height is smaller than the tolerance, the object will be combined with
@@ -34,21 +35,23 @@
     intensity range \code{[0,1]} one should modify this value, down to 0.1
     or other which is image specific. }
 
-  \item{\code{ext}}{ Extension of the neighborhood for the detection
+  \item{ext}{ Extension of the neighborhood for the detection
     of neighboring objects. Higher value smoothes out small objects. }
 
-}}
+  \item{...}{ Reserved. }
 
-\section{ Value }{
+}
 
-  An object of \code{\link{Image-class}} in the \code{\link{Grayscale}} with
+\value{
+
+  An object of \code{\linkS4class{Image}} in the \code{\link{Grayscale}} with
   separate objects indexed be positive integers starting from 1. To preview
   the results visually, use \code{\link{display}( \link{normalize}(result) )}
   or use it in combination with \code{\link{paintObjects}}.
 
 }
 
-\section{ Details }{
+\details{
 
   The algorithm identifies and separates objects that stand out of the
   background (zero), in other words to use the water fill, the source image
@@ -58,34 +61,30 @@
 
 }
 
-\seealso{
-  \code{
-    \link{Image-class}, \link{distmap}, \link{thresh}, \link{getFeatures},
-    \code{matchObjects}
-  }
-}
+\seealso{ \code{
+  \linkS4class{Image}, \link{distmap}, \link{thresh}, \link{getFeatures},
+  \code{matchObjects}
+}}
 
 \examples{
-## REDO THE EXAMPLE
-  if ( interactive() ) {
-    ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
-    a <- read.image( paste(ddir, "A04w1.jpg", sep="/") )
+  
+  ## FIXME: redo the example to new image files
+  ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
+  a <- readImage( paste(ddir, "A04w1.jpg", sep="/") )
 
-    w <- watershed( distmap( thresh(a, 10, 10) ) )
-    display( normalize(w) )
+  w <- watershed( distmap( thresh(a, 10, 10) ) )
+  if ( interactive() ) display( normalize(w) )
 
-    \dontrun{often one needs to delete small objects}
-    \dontrun{here is the straightforward way to construct the index}
-##    index <- lapply( getFeatures(w), function(x) which( x[, "size"] < 40) )
-##    w <- rmObjects(w, index)
-    display( w )
+  ## often one needs to delete small objects
+  ## here is the straightforward way to construct the index
 
-  }
+  if ( interactive() ) display( w )
+
 }
 
 \author{
-    Oleg Sklyar: \email{osklyar@ebi.ac.uk}
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2007
 }
 
-\keyword{file}
+\keyword{manip}
 

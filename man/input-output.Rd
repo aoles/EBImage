@@ -1,10 +1,9 @@
-\name{read.image}
+\name{readImage}
 
-\alias{choose.image}
-\alias{read.image}
-\alias{write.image}
-\alias{quality}
-%\alias{ping.image}
+\alias{chooseImage}
+\alias{readImage}
+\alias{writeImage}
+\alias{writeImage,Image-method}
 
 \concept{image IO}
 
@@ -16,35 +15,31 @@
 }
 
 \usage{
-  choose.image(colormode = Grayscale)
-  read.image(files, colormode = Grayscale, ...)
+  chooseImage(colormode = Grayscale)
+  readImage(files, colormode = Grayscale, ...)
 
-  ## S4 class for signatures x='Image' and files='character'/'missing'
-
-  write.image(x, files, ...)
+  \S4method{writeImage}{Image}(x, files, ...)
 }
 
 \arguments{
 
-  \item{x}{An object of \code{\link{Image-class}}. }
+  \item{x}{An object of \code{\linkS4class{Image}}. }
 
   \item{files}{ A character vector of files/URL's to read from or to write to. }
 
   \item{colormode}{ An integer value for the color mode of images after they are
     read. By default all images will be converted to Grayscale on read. }
 
-  \item{...}{ Reserved for future use. }
+  \item{...}{ Reserved. }
 
 }
 
 \value{
 
-  For \code{read.image} a new instance of \code{\link{Image-class}}.
+  For \code{readImage} and \code{chooseImage} a new instance of 
+  \code{\linkS4class{Image}}.
 
-  For \code{choose.image} a new instance of  \code{\link{Image-class}} in the
-  \code{\link{TrueColor}} mode.
-
-  For \code{write.image} an invisible \code{NULL}.
+  For \code{writeImage} an invisible \code{NULL}.
 }
 
 \details{
@@ -80,7 +75,7 @@
 
 \seealso{
   \code{
-    \link{Image-class}, \link{Image}, \link{channel}
+    \linkS4class{Image}, \link{Image}, \link{channel}
   }
 }
 
@@ -89,17 +84,17 @@
 }
 
 \author{
-  Oleg Sklyar <\email{osklyar@ebi.ac.uk}>, 2005-2006
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2005-2006
 }
 
 \examples{
   if ( interactive() ) {
     ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
-    a <- read.image( paste(ddir, c("A04w0.jpg", "A04w1.jpg"), sep="/") )
+    a <- readImage( paste(ddir, c("A04w0.jpg", "A04w1.jpg"), sep="/") )
     url <- c("http://www.google.com/intl/en/images/logo.gif")
-    im <- read.image (url, TrueColor)
-    \dontrun{write.image (im, "googlelogo.tif")}
-    \dontrun{im1 <- channel ( choose.image(), "gray")}
+    im <- readImage (url, TrueColor)
+    \dontrun{writeImage (im, "googlelogo.tif")}
+    \dontrun{im1 <- channel ( chooseImage(), "gray")}
   }
 }
 

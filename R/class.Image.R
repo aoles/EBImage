@@ -247,37 +247,44 @@ setMethod ("animate", signature(x="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("write.image", signature(x="Image", files="character"),
+setMethod ("writeImage", signature(x="Image"),
   function (x, files, quality, ...) {
     if ( missing(quality) ) quality <- 95
     if ( quality < 1 || quality > 100 )
       .stop( "quality value is given in % between 1 and 100" )
+    if ( missing(files) ) files <- fileName(x)
     if ( !.isCorrectType(x) ) x <- .correctType (x)
     invisible ( .DoCall("lib_writeImages", x, as.character(files), as.integer(quality) ) )
   }
 )
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("write.image", signature(x="Image", files="missing"),
-  function (x, files, quality, ...) {
-    if ( missing(quality) ) quality <- 95
-#    else quality <- as.integer (quality)
-#    if ( quality < 1 || quality > 100 )
-#      .stop ( "quality value is given in % between 1 and 100" )
-#    if ( !.isCorrectType(x) ) x <- .correctType (x)
-#    invisible ( .DoCall("lib_writeImages", x, fileName(x), as.integer(quality) ) )
-    write.image(x, fileName(x), quality, ...)
+setMethod ("write.image", signature(x="Image"),
+  function (x, ...) {
+    .Deprecated("writeImage", "EBImage")
+    writeImage(x, ...)
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-read.image <- function(files, colormode=Grayscale, ...) {
+readImage <- function(files, colormode=Grayscale, ...) {
+  if ( missing(files) )
+    .stop("'files' argument must be present in calls to 'readImage'")
   .DoCall ("lib_readImages", as.character(files), as.integer(colormode) )
 }
 
+read.image <- function(files, colormode=Grayscale, ...) {
+  .Deprecated("readImage", "EBImage")
+  readImage(files, colormode, ...)
+}
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-choose.image <- function(colormode=Grayscale) {
+chooseImage <- function(colormode=Grayscale) {
   .DoCall ("lib_chooseImages", as.integer(colormode))
+}
+
+choose.image <- function(colormode=Grayscale) {
+  .Deprecated("chooseImage", "EBImage")
+  chooseImage(colormode)
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

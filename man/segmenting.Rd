@@ -1,8 +1,11 @@
 \name{segment}
 
 \alias{edge}
+\alias{edge,Image-method}
 \alias{fill}
+\alias{fill,Image-method}
 \alias{segment}
+\alias{segment,Image-method}
 
 \concept{segmentation}
 \concept{edge detection}
@@ -13,43 +16,44 @@
   Fucntions to segment images and detect edges.
 }
 
-\section{ Usage }{
-  \preformatted{
-    edge(x, r=0, ...)
-    segment(x, cl=10, s=1.5, ...)
-    fill(x, col, xoff, yoff, fuzz=10, method="floodfill", ...) ## FIXME: still not implemented, unclear API
-  }
+\usage{
+  \S4method{edge}{Image}(x, r=0, ...)
+  \S4method{segment}{Image}(x, cl=10, s=1.5, ...)
+  ## FIXME: 'fill' still not implemented, unclear API
+  \S4method{fill}{Image}(x, col, xoff, yoff, fuzz=10, method="floodfill", ...) 
 }
 
-\section{ Arguments }{ \describe{
+\arguments{
 
-  \item{\code{x}}{ An object of \code{\link{Image-class}}. }
+  \item{x}{ An object of \code{\linkS4class{Image}}. }
 
-  \item{\code{r}}{ The radius of the pixel neighbourhood to take into account. 
+  \item{r}{ The radius of the pixel neighbourhood to take into account. 
     The 0 value enables automatic radius selection. }
 
-  \item{\code{cl}}{ Minimum cluster size in pixels . } 
+  \item{cl}{ Minimum cluster size in pixels . } 
 
-  \item{\code{s}}{ The smoothing threshold. }
+  \item{s}{ The smoothing threshold. }
 
-  \item{\code{col}}{ The fill colour in any format (\code{character}, gray 
+  \item{col}{ The fill colour in any format (\code{character}, gray 
     value or integer byte-coded value).}
 
-  \item{\code{xoff, yoff}}{ Point to start fill at. }
+  \item{xoff, yoff}{ The point at which to start the fill. }
 
-  \item{\code{fuzz}}{ Colour tolerance, within this interval the colours are
+  \item{fuzz}{ Colour tolerance, within this interval the colours are
     considered the same. }
 
-  \item{\code{...}}{ Reserved for future use. }
-}}
+  \item{method}{ Fill method. }
 
-\section{ Value }{
+  \item{...}{ Reserved. }
+}
 
-  A transformed image in an object of \code{\link{Image-class}}.
+\value{
+
+  A transformed image in an object of \code{\linkS4class{Image}}.
     
 }
 
-\section{ Details }{
+\details{
 
   \code{edge} returns an image of edges between different colours in the 
     original image. Most effective on binary images.
@@ -68,19 +72,17 @@
    
 }
 
-\seealso{
-  \code{
-    \link{Image-class}
-  }
-}
+\seealso{ \code{
+  \linkS4class{Image}
+}}
 
 \references{
-    \emph{ImageMagick}: \url{http://www.imagemagick.org}.
+  \emph{ImageMagick}: \url{http://www.imagemagick.org}.
 }
 
 \author{
-    Copyright (c) 2005-2006 Oleg Sklyar : \email{osklyar@ebi.ac.uk}   
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2005-2006
 }
 
-\keyword{file}
+\keyword{manip}
 

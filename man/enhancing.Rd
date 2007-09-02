@@ -1,10 +1,15 @@
 \name{enhance}
 
 \alias{cgamma}
+\alias{cgamma,Image-method}
 \alias{contrast}
+\alias{contrast,Image-method}
 \alias{enhance}
+\alias{enhance,Image-method}
 \alias{equalize}
+\alias{equalize,Image-method}
 \alias{modulate}
+\alias{modulate,Image-method}
 
 \concept{image color enhancement}
 
@@ -14,36 +19,38 @@
   Functions to enhance and modify colors in images.
 }
 
-\section{ Usage }{
-\preformatted{
-## S4 methods for signature x='Image'
+\usage{
 
-cgamma(x, level=1)
-contrast(x, sharpen=TRUE)
-enhance(x)
-equalize(x)
-modulate(x, value=100)
-}
+  \S4method{cgamma}{Image}(x, level=1, ...)
+  \S4method{contrast}{Image}(x, sharpen=TRUE, ...)
+  \S4method{enhance}{Image}(x, ...)
+  \S4method{equalize}{Image}(x, ...)
+  \S4method{modulate}{Image}(x, value=100, ...)
+
 }
 
-\section{ Arguments }{ \describe{
+\arguments{
 
-  \item{\code{x}}{An object of \code{\link{Image-class}}. }
+  \item{x}{An object of \code{\linkS4class{Image}}. }
 
-  \item{\code{sharpen}}{A logical specifying whether the contrast should
+  \item{level}{ A numeric for the gamma level. }
+
+  \item{sharpen}{A logical specifying whether the contrast should
     be increased (\code{TRUE}) or decreased (\code{FALSE}). }
 
-  \item{\code{value}}{ A percent change in brightness, saturation, and hue. 
+  \item{value}{ A percent change in brightness, saturation, and hue. 
     The default value to keep the values unchanged. } 
-}}
+  
+  \item{...}{ Reserved. }
+}
 
-\section{ Value }{
+\value{
 
-  A transformed image in an object of \code{\link{Image-class}}.
+  A transformed image in an object of \code{\linkS4class{Image}}.
     
 }
 
-\section{ Details }{
+\details{
 
   \code{cgamma} gamma-corrects image. The same image viewed on different 
     devices will have perceptual differences in the way the image's intensities 
@@ -66,7 +73,7 @@ modulate(x, value=100)
 
 \seealso{
   \code{
-    \link{Image-class}
+    \linkS4class{Image}
   }
 }
 
@@ -75,8 +82,8 @@ modulate(x, value=100)
 }
 
 \author{
-  Oleg Sklyar: \email{osklyar@ebi.ac.uk}   
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006-2007
 }
 
-\keyword{file}
+\keyword{manip}
 
