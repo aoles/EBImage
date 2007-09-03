@@ -186,7 +186,7 @@ setMethod ("stackObjects", signature(x="IndexedImage", ref="Image", index="missi
       .stop( "dim(x) must equal dim(ref)" )
     .dim <- dim(x)
 
-    hf <- hull.features( x )
+    hf <- hullFeatures( x )
     ## determine the bounding box -- same for all images in stack
     if ( .dim[3] == 1 ) {
       xyt <- hf[,c(1,2,11), drop=FALSE]
