@@ -5,123 +5,125 @@
 
 \docType{package}
 
-\title{Package overview and changelog}
+\title{Package overview}
 
 \description{
-  \code{EBImage} is the image processing and analysis package for R. It is being
-  created primarily to enable automated analysis of large sets of
-  cytomicroscopy images, e.g. results of automated microscopy screens, however
-  other image can be analysed in a similar manner.
+  \code{EBImage} is the image processing and analysis package for R. Its primary 
+  goal is to enable automated analysis of large sets of images such as those
+  obtained in high throughput automated microscopy.
 
-  The package uses \code{ImageMagick} library for all of its I/O operations and
-  for many image processing routines; however, it does not inteface all
-  \code{ImageMagick} API functions. Algorithms for image analysis are
-  implemented natively. These include distance map and watershed transforms, 
-  adaptive thresholding, morphological transforms and image moments etc.
+  The package uses \code{ImageMagick} library for image I/O operations and
+  for many image processing routines. Algorithms for image analysis are
+  implemented natively including algorithms for feature extraction.
 
-  Image data are stored in objects of \code{\link{Image-class}}. This S4 class
-  is derived from \code{\link{array}} and inherits all of its properties and
-  methods like mathematical operations on arrays, subsetting, histograms
-  etc. Image processing and analysis routines work with objects of
-  \code{\link{Image-class}}.
+  Image data are stored in objects of the class \code{\linkS4class{Image}}, which
+  is derived as an S4 class from \code{\link{array}} and inherits all of its 
+  properties and methods.
 
-  The package provides many image processing filters that can
-  be subdivided into the following categories: colour and image enhancement
-  (e.g. \code{\link{enhance}, \link{contrast}}), sharpening and noise reduction
-  (e.g. \code{\link{denoise}, \link{despeckle}}), image transformation (e.g.
-  \code{\link{rotate}, \link{resize}}), image segmentation (e.g. \code{\link{edge}, 
-  \link{segment}, \link{thresh}}), image morphology (e.g. \code{\link{dilate}, 
-  \link{opening}, \link{distmap}}), object detection (e.g. \code{\link{watershed},
-  \link{propagate}}) abd feature extractuion (e.g. \code{\link{haralickFeatures},
-  \link{edgeFeatures}} etc).
-
-  The project page is: \url{http://www.ebi.ac.uk/~osklyar/EBImage}
+  The project page is \url{http://www.ebi.ac.uk/~osklyar/EBImage}
 }
 
-\section{Changelog}{
-  \preformatted{
-* 2.1.7, 2007-07-06: multiple feature extraction algorithms (hull, Haralick, 
-    edge features); new optimized 'stackObjects' (with rotation) and fast 'tile'
+\section{Package content}{
 
-* 2.1.2, 2007-05-15: new development version with image\link{moments}
-    implemented.
-
-* 2.0.0, 2007-04-26: Bioconductor 2.0 release with EBImage 2.0 release!
-
-* 1.9.26, 2007-02-08: Voronoi-based image segmentation
-  - added propagate(): Voronoi-based segmentation on image manifolds
-    with modified metric! Great thing for cell image segmentation
-
-* 1.9.25, 2007-02-02: (Critical) bug fixes
-  - corrected memory leak in functions using ImageMagick filters:
-    copied images were not deleted! Everyone should update!
-  - disabled setting GTK locale. This solves problem with GTK reseting
-    R locale and turning "." unusable on locales that use for example
-    "," instead of a "." (like German).
-  - added DestroyExceptionInfo() everywhere to ensure everything
-    is cleaned up in the ImageMagick related code
-  - welcome message is now printed only if getOption("verbose") is TRUE
-
-* 1.9.23, 2007-01-27: [,Image,numeric,missing now works as it should
-  - long going problem with nargs() in this method is now solved
-
-* 1.9.20, 2007-01-07: animate
-  - added (restored) animate()
-
-* 1.9.18, 2007-01-16: accircularity calculations in getObjects()
-  - added acircularity and other related object descriptors
-
-* 1.9.01, 2006-12-29: New EBImage development release
-  - new development version of EBImage, fully recoded. Now runs on
-    Windows as well. The new code is much cleaner and less buggy,
-
-* Earlier modifications:
-  - Jul 2006: morphological operators erode, dilate, opening, closing
-  - Jun 2006: watershed-based object detection
-  - Jun 2006: first full vignette
-  - Apr 2006: first major restructuring, removing Image2D and Image3D
-  - Apr 2006: EBImage first time in the Bioconductor release!
-  - Mar 2006: ./configure script with autoconf
+  Classes
+  
+  \itemize{
+    \item \link[=Image-class]{Class 'Image', its accessor method}
+    \item \link[=IndexedImage-class]{Class 'IndexedImage'}
+    \item \link[=Arith]{Common generic methods for class 'Image'}
+    \item \link[=Image]{'Image' object creation, copying and assertion}
+    \item \link[=readImage]{Image read/write operations}
   }
+  
+  Image processing
+  
+  \itemize{
+    \item \link[=cgamma]{Enhancing images and colors}
+    \item \link[=negate]{Image color manipulation}
+    \item \link[=tile]{Generate a tiled image from a stack}
+    \item \link[=cthresh]{Image and color channel thresholding}
+    \item \link[=rotate]{Image transformation, rotation, resize etc.}
+    \item \link[=denoise]{Noise removal, blurring and smoothing of images}
+  }
+  
+  Image analysis
+  
+  \itemize{
+    \item \link[=distmap]{Distance map transform of binary images}
+    \item \link[=dilate]{Morphological trasnsformations of binary images}
+    \item \link[=edge]{Segmentation and edge detection}
+    \item \link[=propagate]{Voronoi-based segmentation on image manifolds}
+    \item \link[=watershed]{Watershed transformation and watershed-based object
+      detection}
+  }
+
+  Feature extraction
+  
+  \itemize{
+    \item \link[=haralickMatrix]{Extraction of Haralick texture features
+      and co-occurance matrices (GLCM)}
+    \item \link[=edgeProfile]{Extraction of edge profiles and edge features}
+    \item \link[=hullFeatures]{Extraction of hull features}
+    \item \link[=zernikeMoments]{Extraction of Zernike moments}
+    \item \link[=moments]{Extraction of image moments and moment invariants}
+    \item \link[=getFeatures]{Combined feature extraction for objects in
+      indexed images}
+    \item \link[=rmObjects]{Object removal in indexed images}
+    \item \link[=paintObjects]{Marking detected objects in indexed images}
+    \item \link[=stackObjects]{Generate a stack of images for detected objects}
+    \item \link[=matchObjects]{Matching objects in two indexed images}
+  }  
+
+  Tools
+  
+  \itemize{
+    \item \link[=channel]{Color and image color mode conversions}
+    \item \link[=drawtext]{Drawing primitives on images, annotation}
+    \item \link[=display]{Interactive image display}
+  }
+  
 }
 
-\author{
-  Copyright (c) 2005-2007 Oleg Sklyar <\email{osklyar@ebi.ac.uk}>
+\section{Authors}{
 
-  Parts of the code by Wolfgang Huber <\email{huber@ebi.ac.uk}> and
-  Mike Smith <\email{msmith@ebi.ac.uk}>. The code of \code{\link{propagate}}
-  is based on \code{CellProfiler} with permission granted to distribute this
-  particular part under LGPL, the corresponding copyright applies.
-
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, Copyright 2005-2007
+  
+  Wolfgang Huber, \email{huber@ebi.ac.uk}
+  
+  Mike Smith, \email{msmith@ebi.ac.uk}
+  
   \preformatted{
   European Bioinformatics Institute
   European Molecular Biology Laboratory
   Wellcome Trust Genome Campus
-  Hinxton, Cambridgeshire
-  CB10 1SD
-  England
+  Hinxton 
+  Cambridge CB10 1SD
+  UK
   }
 
-  The full source code is released under \code{LGPL} (see the \code{LICENSE} 
-  file in the package root for the full license wording). \code{ImageMagick} and
-  \code{GTK} used from the package are distributed separately by the respective
-  copyright holders.
+  The code of \code{\link{propagate}} is based on the \code{CellProfiler} 
+  with permission granted to distribute this particular part under LGPL, the 
+  corresponding copyright (Jones, Carpenter) applies.
+
+  The source code is released under \code{LGPL} (see the \code{LICENSE} 
+  file in the package root for the complete license wording). \code{ImageMagick} 
+  and \code{GTK} used from the package are distributed separately by the 
+  respective copyright holders.
 
   \preformatted{
-  This library is free software; you can redistribute
-  it and/or modify it under the terms of the
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the
 
   GNU Lesser General Public License
 
-  as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any
-  later version. This library is distributed in the hope
-  that it will be useful, but WITHOUT ANY WARRANTY;
-  without even the implied warranty of MERCHANTABILITY
-  or FITNESS FOR A PARTICULAR PURPOSE.}
+  as published by the Free Software Foundation; either version 2.1 of the 
+  License, or (at your option) any later version. This library is distributed
+  in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even 
+  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  }
 
-  See the GNU Lesser General Public License for more details.
-
-  For LGPL license wording see \url{http://www.gnu.org/licenses/lgpl.html}
+  See the GNU Lesser General Public License for more details. For LGPL license 
+  wording see \url{http://www.gnu.org/licenses/lgpl.html}
 }
+
 \keyword{package}

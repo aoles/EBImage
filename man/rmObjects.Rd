@@ -7,7 +7,7 @@
 \concept{object detection}
 \concept{delete objects}
 
-\title{ Delete objects }
+\title{ Object removal }
 
 \description{
   The \code{rmObjects} functions deletes objects indexed by a list of
