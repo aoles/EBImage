@@ -3,6 +3,7 @@
 \alias{display}
 \alias{display,Image-method}
 \alias{display,IndexedImage-method}
+\alias{display,array-method}
 \alias{animate}
 \alias{animate,Image-method}
 \alias{animate,IndexedImage-method}

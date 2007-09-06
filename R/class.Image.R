@@ -231,14 +231,6 @@ setMethod("Arith", signature(e1="array", e2="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("display", signature(x="Image"),
-  function (x, no.GTK=FALSE, ...) {
-    if ( !.isCorrectType(x) ) x <- .correctType (x)
-    invisible ( .DoCall("lib_display", x, as.logical(no.GTK) ) )
-  }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("animate", signature(x="Image"),
   function (x, ...) {
     if ( !.isCorrectType(x) ) x <- .correctType (x)
