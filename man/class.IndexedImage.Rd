@@ -3,7 +3,6 @@
 \docType{class}
 
 \alias{IndexedImage-class}
-\alias{as.Image}
 \alias{as.Image,IndexedImage-method}
 
 \concept{image representation}

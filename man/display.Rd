@@ -7,6 +7,7 @@
 \alias{animate}
 \alias{animate,Image-method}
 \alias{animate,IndexedImage-method}
+\alias{animate,array-method}
 
 \concept{display}
 
@@ -19,14 +20,17 @@
 \usage{
   \S4method{display}{Image}(x, no.GTK=FALSE, ...)
   \S4method{display}{IndexedImage}(x, no.GTK=FALSE, ...)
+  \S4method{display}{array}(x, no.GTK=FALSE, ...)
 
-  \S4method{animate}{Image}(x, ...)   ## not available on Windows
-  \S4method{animate}{IndexedImage}(x, ...)   ## not available on Windows
+  \S4method{animate}{Image}(x, ...)        ## not available on Windows
+  \S4method{animate}{IndexedImage}(x, ...) ## not available on Windows
+  \S4method{animate}{array}(x, ...)        ## not available on Windows
 }
 
 \arguments{
 
-  \item{x}{An object of \code{\linkS4class{Image}}. }
+  \item{x}{An object of \code{\linkS4class{Image}}, \code{\linkS4class{IndexedImage}}
+    or \code{\link{array}}. }
 
   \item{no.GTK}{ A logical value, if \code{TRUE} an \emph{ImageMagick}
     display will be used instead of the GTK display (read details below). 

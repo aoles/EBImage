@@ -56,6 +56,13 @@ Image <- function(data=matrix(0,0,0), dim=base::dim(data), colormode=Grayscale, 
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("as.Image", signature(x="array"),
+  function (x, ...) {
+    return( Image(x) )
+  }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("colorMode", signature (x="Image"),
   function (x, ...) x@colormode
 )
@@ -228,14 +235,6 @@ setMethod("Arith", signature(e1="array", e2="Image"),
 		imageData(e2) <- callGeneric(e1, imageData(e2))
 		return( e2 )
 	}
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("animate", signature(x="Image"),
-  function (x, ...) {
-    if ( !.isCorrectType(x) ) x <- .correctType (x)
-    invisible ( .DoCall("lib_animate", x ) )
-  }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

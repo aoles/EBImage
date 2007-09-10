@@ -9,6 +9,8 @@
 \alias{Arith}
 \alias{print.Image}
 \alias{print.IndexedImage}
+\alias{as.Image}
+\alias{as.Image,array-method}
 
 \concept{image processing}
 \concept{image class}
@@ -52,6 +54,9 @@
     \item{\code{Arith}}{ Redefined arithmetic operators acting on any 
       combination of \code{Image} with another \code{Image} or \code{array}
       will return an object of class \code{Image}. }
+    
+    \item{\code{as.Image)(x, ...)}}{ S4 method for the signature \code{x=array}.
+      Is equivalent to \code{Image(x)} when \code{x} is \code{array}.}
   }
   
   Other important methods that directly applicable due to inheritance from the 

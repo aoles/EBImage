@@ -29,25 +29,6 @@ setMethod ("as.Image", signature(x="IndexedImage"),
 print.IndexedImage <- function(x, ...) show(x)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("display", signature(x="IndexedImage"),
-  function (x, no.GTK=FALSE, ...) {
-    if ( !.isCorrectType(x) )
-      x <- .correctType ( normalize(x))
-    else
-      x <- normalize (x)
-    invisible ( .DoCall("lib_display", x, as.logical(no.GTK) ) )
-  }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("animate", signature(x="IndexedImage"),
-  function (x, ...) {
-    if ( !.isCorrectType(x) ) x <- .correctType (x)
-    invisible ( .DoCall("lib_animate", normalize(x) ) )
-  }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("tile", signature(x="list"),
     function (x, nx=10, lwd=1, fg.col="#E4AF2B", bg.col="black", ...) {
         lapply(x, tile, nx=nx, lwd=lwd, fg.col=fg.col, bg.col=bg.col, ...)
