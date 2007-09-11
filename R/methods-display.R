@@ -23,7 +23,18 @@ display <- function(x, no.GTK=FALSE, ...) {
   if ( is.null(main) || is(main, "try-error") ) main <- paste(deparse(substitute(x), 500), collapse="\n")
   if ( !is.Image(x) ) x <- Image(x)
   if ( !.isCorrectType(x) ) x <- .correctType (x)
-  if ( is(x, "IndexedImage") ) x <- normalize(x)
+  if ( is(x, "IndexedImage") ) {
+    colorize <- try(list(...)$colorize, silent=TRUE)
+    if ( is.null(colorize) || is(colorize, "try-error") ) x <- normalize(x)
+    else {
+      mx <- max(x)
+      # cr <- colorRamp(c("#FF0000", "#FFAA00", "#FFFF00", "#00FF00", "#00FFFF", "#0000FF", "#FF00FF"))
+      # cols <- channel(c("black", sample(rgb(cr(seq_len(mx)/mx)/255), mx)), "rgb")
+      index <- match(imageData(x), c(0,seq_len(mx)))
+      cols <- as.integer(c(0, runif(mx, 1, 0xFFFFFF)))
+      x <- Image(cols[index], dim(x), colormode=TrueColor)
+    }
+  }
   invisible ( .DoCall("lib_display", x, as.character(main), as.logical(no.GTK) ) )
 }
 

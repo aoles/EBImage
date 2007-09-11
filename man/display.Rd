@@ -43,6 +43,10 @@
   The argument \code{main} can be used with the GTK display to substitute the
   default window title. By default, the GTK display shows the expression used
   in call to \code{display} for the window title.
+  
+  When used with \code{\linkS4class{IndexedImage}} \code{display} additionally 
+  accepts a \code{colorize} argument. If it is provided with any value of any 
+  class, then objects are mapped on the display using random RGB colors.
 
   If available the \code{GTK} display will be used by default. This mode allows
   display of multiple images simultaneously. If the \code{GTK} mode is not used,
