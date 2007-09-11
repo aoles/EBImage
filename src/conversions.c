@@ -36,6 +36,8 @@ sexp2Magick (SEXP x) {
     nx = dim[0];
     ny = dim[1];
     nz = dim[2];
+    if ( nx == 0 || ny == 0 || nz == 0 )
+      error("at least one dimension of the image is zero");
     colormode = INTEGER ( GET_SLOT(x, mkString("colormode") ) )[0];
     /* conversion */
     res = NewImageList ();

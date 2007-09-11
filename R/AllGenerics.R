@@ -35,7 +35,6 @@ setGeneric ("channel",        function (x, mode, ...)  standardGeneric("channel"
 setGeneric ("copy",           function (x, ...)        standardGeneric("copy") )
 setGeneric (".isCorrectType", function (x)             standardGeneric(".isCorrectType") )
 setGeneric (".correctType",   function (x)             standardGeneric(".correctType") )
-setGeneric ("display",        function (x, ...)        standardGeneric("display") )
 setGeneric ("animate",        function (x, ...)        standardGeneric("animate") )
 setGeneric ("header",         function (x, ...)        standardGeneric("header") )
 # DEPRECATED

@@ -9,6 +9,7 @@
 \alias{Arith}
 \alias{print.Image}
 \alias{print.IndexedImage}
+\alias{median.Image}
 \alias{as.Image}
 \alias{as.Image,array-method}
 
@@ -43,6 +44,10 @@
 
     \item{\code{hist(x, ...)}}{ Slightly modyfied to better suit the 
       assumed grayscale data range \code{[0,1]}.  }
+
+    \item{\code{median(x, na.rm=FALSE)}}{ \code{stats:\link{median}} redefinition 
+      for images (bug workaround: without it \code{median} takes forever to
+      execute without no apparent reason)}
 
     \item{\code{image(x, ...)}}{ Draws image data using \code{graphics::image} 
       keeping image aspect ratio. }
