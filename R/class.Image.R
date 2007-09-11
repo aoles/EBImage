@@ -497,3 +497,7 @@ setMethod ("tile", signature(x="Image"),
   }
 )
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+median.Image <- function(x, na.rm = FALSE) {
+  median(imageData(x), na.rm=na.rm)
+}

@@ -4,11 +4,12 @@ importFrom("methods", "Arith")
 importFrom("methods", "show")
 importFrom("graphics", "image")
 importFrom("graphics", "hist")
+importFrom("stats", "median")
 
 export(
-  Image, is.Image, stopIfNotImage, 
+  Image, is.Image, stopIfNotImage, display,
   TrueColor, Grayscale, morphKern, print.Image, print.IndexedImage,
-  drawfont, readImage, chooseImage,
+  median.Image, drawfont, readImage, chooseImage,
 
   ### deprecated
   read.image, choose.image
@@ -17,7 +18,7 @@ exportClasses(
   Image, IndexedImage
 )
 exportMethods(
-  copy, display, animate, header, assert, combine, tile, writeImage,
+  copy, animate, header, assert, combine, tile, writeImage,
   show, "[", channel, as.Image, Arith,
 
   colorMode, "colorMode<-",

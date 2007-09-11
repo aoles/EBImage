@@ -1,9 +1,6 @@
 \name{display}
 
 \alias{display}
-\alias{display,Image-method}
-\alias{display,IndexedImage-method}
-\alias{display,array-method}
 \alias{animate}
 \alias{animate,Image-method}
 \alias{animate,IndexedImage-method}
@@ -18,9 +15,7 @@
 }
 
 \usage{
-  \S4method{display}{Image}(x, no.GTK=FALSE, ...)
-  \S4method{display}{IndexedImage}(x, no.GTK=FALSE, ...)
-  \S4method{display}{array}(x, no.GTK=FALSE, ...)
+  display(x, no.GTK=FALSE, ...)
 
   \S4method{animate}{Image}(x, ...)        ## not available on Windows
   \S4method{animate}{IndexedImage}(x, ...) ## not available on Windows
@@ -45,6 +40,9 @@
 }
 
 \details{
+  The argument \code{main} can be used with the GTK display to substitute the
+  default window title. By default, the GTK display shows the expression used
+  in call to \code{display} for the window title.
 
   If available the \code{GTK} display will be used by default. This mode allows
   display of multiple images simultaneously. If the \code{GTK} mode is not used,
