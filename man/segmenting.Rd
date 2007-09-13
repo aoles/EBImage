@@ -19,7 +19,7 @@
 \usage{
   \S4method{edge}{Image}(x, r=0, ...)
   \S4method{segment}{Image}(x, cl=10, s=1.5, ...)
-  ## FIXME: 'fill' still not implemented, unclear API
+  ## FIXME: 'fill' implemented incorrectly because of unclear API
   \S4method{fill}{Image}(x, col, xoff, yoff, fuzz=10, method="floodfill", ...) 
 }
 

@@ -228,7 +228,7 @@ lib_stack_objects ( SEXP obj, SEXP ref, SEXP hdr, SEXP xy_list, SEXP extension, 
   int ext = floor( REAL(extension)[0] );
   int snx = 2 * ext + 1;
   int sny = 2 * ext + 1;
-  int rot = INTEGER(rotate)[0]; // FIXME: rotate unused
+  int rot = INTEGER(rotate)[0];
   int mode = INTEGER ( GET_SLOT(ref, mkString("colormode") ) )[0];
   nx = INTEGER ( GET_DIM(obj) )[0];
   ny = INTEGER ( GET_DIM(obj) )[1];

@@ -52,6 +52,10 @@
   \link{stackObjects}, \link{combine}
 }}
 
+\examples{
+  ## see example(stackObjects)
+}
+
 \author{
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006-2007
 }

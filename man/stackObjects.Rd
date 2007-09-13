@@ -86,6 +86,35 @@
   \link{tile}, \link{combine}, \link{paintObjects}
 }}
 
+\examples{
+
+  ## load images
+  f <- paste( system.file(package="EBImage"), "images/Gene1_G.tif", sep="/" )
+  ii = readImage(f)
+  ## normalize images
+  ii = normalize(ii, separate=TRUE)
+  ## segment
+  mask = thresh(ii, 25, 25, 0.02)
+  ## refine segmentation with morphology filters
+  mk3 = morphKern(3)
+  mk5 = morphKern(5)
+  mask = dilate(erode(closing(mask, mk5), mk3), mk5)
+  ## index objects with 'watershed'
+  io = watershed( distmap(mask), 1.5, 1)
+  if (interactive()) display(io)
+
+  ## stack individual objects
+  s = stackObjects(io, ii)
+  ## display stack of objects of from the first image
+  if (interactive()) display(s[[1]])
+  ## combine stacks of objects into a single stack
+  s = combine(s)
+  ## tile the stack into one frame
+  t = tile(s)
+  if (interactive()) display(t)
+  
+}
+
 \author{
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006-2007
 }

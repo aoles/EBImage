@@ -44,6 +44,10 @@
   \linkS4class{IndexedImage}, \link{watershed}, \link{getFeatures}, \link{paintObjects}
 }}
 
+\examples{
+  ## see example(drawtext)
+}
+
 \author{
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006-2007
 }

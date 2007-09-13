@@ -88,9 +88,9 @@
 }
 
 \examples{
+    f <- paste( system.file(package="EBImage"), "images/Gene1_G.tif", sep="/" )
+    ii = readImage(f)
   if ( interactive() ) {
-    ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
-    a <- readImage( paste(ddir, c("A04w0.jpg", "A04w1.jpg"), sep="/") )
     url <- c("http://www.google.com/intl/en/images/logo.gif")
     im <- readImage (url, TrueColor)
     \dontrun{writeImage (im, "googlelogo.tif")}

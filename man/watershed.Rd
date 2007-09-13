@@ -68,17 +68,20 @@
 
 \examples{
   
-  ## FIXME: redo the example to new image files
-  ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
-  a <- readImage( paste(ddir, "A04w1.jpg", sep="/") )
-
-  w <- watershed( distmap( thresh(a, 10, 10) ) )
-  if ( interactive() ) display( normalize(w) )
-
-  ## often one needs to delete small objects
-  ## here is the straightforward way to construct the index
-
-  if ( interactive() ) display( w )
+  ## load images
+  f <- paste( system.file(package="EBImage"), "images/Gene1_G.tif", sep="/" )
+  ii = readImage(f)
+  ## normalize images
+  ii = normalize(ii, separate=TRUE)
+  ## segment
+  mask = thresh(ii, 25, 25, 0.02)
+  ## refine segmentation with morphology filters
+  mk3 = morphKern(3)
+  mk5 = morphKern(5)
+  mask = dilate(erode(closing(mask, mk5), mk3), mk5)
+  ## index objects with 'watershed'
+  io = watershed( distmap(mask), 1.5, 1)
+  if (interactive()) display(io)
 
 }
 

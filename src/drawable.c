@@ -92,9 +92,9 @@ lib_drawText (SEXP obj, SEXP xylist, SEXP textlist, SEXP thefont, SEXP thecol) {
       newimages->x_resolution = images->x_resolution;
       newimages->y_resolution = images->y_resolution;
     }
-    // FIXME: I believe image is destroyed below in DestroyImage, 
-    // but this needs testing
-    // mwand = DestroyMagickWand(mwand);
+    /* the image is destroyed below in DestroyImage 
+    mwand = DestroyMagickWand(mwand);
+    */
     image = GetFirstImageInList(images);
     RemoveFirstImageFromList(&images);
     image = DestroyImage(image);
