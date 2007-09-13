@@ -456,7 +456,7 @@ GdkPixbuf * newPixbufFromImages (Image * images, int index) {
 void updateStatusBar(GtkStatusbar * stbarWG, double * stats) {
   gchar str[255];
   /* 0: nx, 1: ny, 2: nz, 3: x, 4: y, 5: zoom, 6: index */
-  /* FIXME, add position: sprintf(str, "Frame: %d/%d\tImage: %dx%dx%d\tZoom: %d%%\t Position: (%d:%d)", 
+  /* FIXME add position: sprintf(str, "Frame: %d/%d\tImage: %dx%dx%d\tZoom: %d%%\t Position: (%d:%d)", 
     (int)(stats[6]+1), (int)stats[2], (int)stats[0], (int)stats[1], (int)stats[2], (int)(stats[5]*100), (int)stats[3], (int)stats[4]); 
   */
   sprintf(str, "Frame: %d/%d    Image: %dx%dx%d    Zoom: %d%%", 

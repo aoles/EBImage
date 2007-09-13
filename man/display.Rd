@@ -79,6 +79,27 @@
   \url{http://www.gtk.org}; \emph{GTK on Windows}: \url{http://gladewin32.sf.net}
 }
 
+\examples{
+
+  ## load images of nuclei (seed points later)
+  f <- paste( system.file(package="EBImage"), "images/Gene1_G.tif", sep="/" )
+  ii = readImage(f)
+  ## normalize images
+  ii = normalize(ii, separate=TRUE)
+  ## segment
+  mask = thresh(ii, 25, 25, 0.02)
+  ## refine segmentation with morphology filters
+  mk3 = morphKern(3)
+  mk5 = morphKern(5)
+  mask = dilate(erode(closing(mask, mk5), mk3), mk5)
+  ## index objects with 'watershed'
+  io = watershed( distmap(mask), 1.5, 1)
+  if (interactive()) {
+    display(io)
+    display(io, main="Watershed segmentation", colorize=T)
+  }
+}
+
 \author{
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2005-2007
 }

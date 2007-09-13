@@ -78,32 +78,35 @@
 
 \examples{
   
-  ## FIXME: change to new images
+  ## load images of nuclei (seed points later)
+  f <- paste( system.file(package="EBImage"), "images/Gene1_G.tif", sep="/" )
+  ii = readImage(f)
+  ## normalize images
+  ii = normalize(ii, separate=TRUE)
+  ## segment
+  mask = thresh(ii, 25, 25, 0.02)
+  ## refine segmentation with morphology filters
+  mk3 = morphKern(3)
+  mk5 = morphKern(5)
+  mask = dilate(erode(closing(mask, mk5), mk3), mk5)
+  ## index objects with 'watershed'
+  io = watershed( distmap(mask), 1.5, 1)
+  if (interactive()) display(io)
 
-  ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
-  a <- readImage( paste(ddir, c("A04w0.jpg", "A04w1.jpg"), sep="/") )
-  rgb <- channel(a[,,1],"asred") + channel(a[,,2],"asgreen")
-
-  ## detecting nuclei by watershed
-  t <- thresh( blur(a[,,2], 4, 2), 15, 15)
-  t <- opening( closing(t, morphKern(9)) )
-  w <- watershed( distmap(t) )
-
-  ## generating mask for propagate
-  mask <- thresh( a[,,1], 50, 50, -0.01)
-  mask <- closing( mask, morphKern(13) )
-  mask <- opening( mask, morphKern(11) )
-  mask <- erode(mask)
-
-  ## propagate with the mask and gradient-driven metric
-  wx <- propagate( a[,,1], w, mask, 0.0001, 2)
-  prev <- paintObjects(wx, paintObjects(w, rgb))
-  if ( interactive() ) display(prev)
-
-  ## pure Voronoi: no mask and almost no gradient term in metric
-  wx1 <- propagate( a[,,1], w, NULL, 1e8, 2)
-  prev1 <- paintObjects(wx1, rgb)
-  if ( interactive() ) display(prev1)
+  ## load images of cells (the ones to segment with propagate)
+  f <- paste( system.file(package="EBImage"), "images/Gene1_R.tif", sep="/" )
+  xi = readImage(f)
+  ## normalize images
+  xi = normalize(xi, separate=TRUE)
+  ## segment
+  mask = thresh(xi, 40, 40, 0.0)
+  ## refine segmentation with morphology filters
+  mk7 = morphKern(7)
+  mask = dilate(erode(closing(mask, mk7), mk5), mk7)
+  ## index objects of xi with 'propagate' using ii as seeds
+  xo = propagate(xi, io, mask, 1e-5, 1.5)
+  if (interactive()) display(xo)
+  
 }
 
 \author{

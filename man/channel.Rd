@@ -97,6 +97,8 @@
   print( rgb == cl )
   clg <- channel(cl, "gray")
   print( channel(cl, "x11"))
+  
+  ## further example in 'paintObjects'
 }
 
 \author{

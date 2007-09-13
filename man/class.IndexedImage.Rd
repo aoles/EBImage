@@ -58,17 +58,21 @@
 }
 
 \examples{
-  ## Load an image
-  ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
-  a <- readImage( paste(ddir, "A04w0.jpg", sep="/") )
+  ## load images
+  f <- paste( system.file(package="EBImage"), "images/Gene1_G.tif", sep="/" )
+  ii = readImage(f)
+  ## normalize images
+  ii = normalize(ii, separate=TRUE)
+  ## segment
+  mask = thresh(ii, 25, 25, 0.02)
+  ## refine segmentation with morphology filters
+  mk3 = morphKern(3)
+  mk5 = morphKern(5)
+  mask = dilate(erode(closing(mask, mk5), mk3), mk5)
+  ## index objects with 'watershed'
+  io = watershed( distmap(mask), 1.5, 1)
 
-  ## Detect nuclei
-  t <- thresh( blur(a, 4, 2), 15, 15)
-  t <- opening( closing(t, morphKern(9)) )
-  objects <- watershed( distmap(t) )
-
-  class(objects)
-  if ( interactive() ) display(normalize(objects))
+  class(io)
 }  
 
 \keyword{methods}

@@ -54,7 +54,42 @@
 }}
 
 \examples{
-  \dontrun{See ?watershed for example}
+
+  ## load images of nuclei (seed points later)
+  f <- paste( system.file(package="EBImage"), "images/Gene1_G.tif", sep="/" )
+  ii = readImage(f)
+  ## normalize images
+  ii = normalize(ii, separate=TRUE)
+  ## segment
+  mask = thresh(ii, 25, 25, 0.02)
+  ## refine segmentation with morphology filters
+  mk3 = morphKern(3)
+  mk5 = morphKern(5)
+  mask = dilate(erode(closing(mask, mk5), mk3), mk5)
+  ## index objects with 'watershed'
+  io = watershed( distmap(mask), 1.5, 1)
+
+  ## load images of cells (the ones to segment with propagate)
+  f <- paste( system.file(package="EBImage"), "images/Gene1_R.tif", sep="/" )
+  xi = readImage(f)
+  ## normalize images
+  xi = normalize(xi, separate=TRUE)
+  ## segment
+  mask = thresh(xi, 40, 40, 0.0)
+  ## refine segmentation with morphology filters
+  mk7 = morphKern(7)
+  mask = dilate(erode(closing(mask, mk7), mk5), mk7)
+  ## index objects of xi with 'propagate' using ii as seeds
+  xo = propagate(xi, io, mask, 1e-5, 1.5)
+  
+  ## create an RGB preview of a combination of ii and xi
+  rgb = channel(ii, "asred") + channel(xi, "asgreen")
+  ## paint cells on the preview
+  rgb = paintObjects(xo, rgb)
+  ## paint nuclei on the preview
+  rgb = paintObjects(io, rgb)
+  if (interactive()) display(rgb)
+  
 }
 
 \author{

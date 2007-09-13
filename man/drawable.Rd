@@ -82,7 +82,7 @@
 }
 
 \examples{
-## This example is currently excluded from MacOS builds as it fails in 
+## FIXME: This example is currently excluded from MacOS builds as it fails in 
 ## ImageMagick string assertion. Although I tried to find the reason for
 ## the problem, I do not have a test environment (MacOS). Please test it and
 ## report what goes wrong here and at which stage.

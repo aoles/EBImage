@@ -122,7 +122,8 @@ lib_filterMagick (SEXP x, SEXP filter, SEXP parameters) {
                 image = ResizeImage (image, (unsigned long)par[0], (unsigned long)par[1], images->filter, par[2], &exception);
                 break;
             case FLT_ROTATE:
-                /* this doesn't work, it is not purely correct either, but this
+                /* FIXME: implement BG specification in rotate()
+                 * this doesn't work, it is not purely correct either, but this
                  * is the way to go later
                  * col = (int)par[1];
                  * image->background_color.red = colb[0] / 255.0;
@@ -257,7 +258,8 @@ lib_filterFill (SEXP x, SEXP colStrSXP, SEXP coords, SEXP methodSXP, SEXP fuzzSX
     GetDrawInfo (&iinfo, &dinfo);
     dinfo.fill = pp;
 
-warning ("FIXME: the fill function does not seem to fill anything, no idea why\n");
+    /* FIXME: fill() does not work in current implementation */
+    warning("the 'fill' is not yet correctly implemented, expected result: black image");
 
     for ( i = 0; i < nz; i++ ) {
         image = GetFirstImageInList (images);

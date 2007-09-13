@@ -85,13 +85,16 @@
 
   ## load images
   f <- paste( system.file(package="EBImage"), "images/Gene1_G.tif", sep="/" )
-  ii = normalize(readImage(f), separate=TRUE)
+  ii = readImage(f)
+  ## normalize images
+  ii = normalize(ii, separate=TRUE)
   ## segment
   mask = thresh(ii, 25, 25, 0.02)
+  ## refine segmentation with morphology filters
   mk3 = morphKern(3)
   mk5 = morphKern(5)
   mask = dilate(erode(closing(mask, mk5), mk3), mk5)
-  ## index objects in images and remove bad ones
+  ## index objects with 'watershed'
   io = watershed( distmap(mask), 1.5, 1)
   ft = hullFeatures(io)
   mf = moments(io, ii)   ## need these for intensity and size

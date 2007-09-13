@@ -127,6 +127,8 @@
   if (interactive()) display(normalize(i2))
   i3 <- copy(i2)
   is.Image(i2)
+  
+  ## see 'stackObjects' for example on combine
 }
 
 \keyword{file}

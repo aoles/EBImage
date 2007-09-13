@@ -87,7 +87,7 @@
 }
 
 \examples{
-  ## see example(watershed)
+  ## see example(propagate)
 }
 
 \keyword{manip}

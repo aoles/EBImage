@@ -75,7 +75,7 @@ morphKern <- function (size=5, shape="round") {
 setMethod ("erode", signature(x="Image"),
     function (x, kern=morphKern(5), iter=1, ...) {
         if ( colorMode(x) != Grayscale )
-            stop ( .("2-color bitmap images only are supported in grayscale format") ) ## FIXME
+            stop ( .("'x' must be a binary image in Grayscale mode") )
         if ( !is.integer(kern) || !is.matrix(kern) )
             stop ( .("kernel must be an integer matrix of 0's and 1's") )
         if ( iter < 1 )
@@ -88,7 +88,7 @@ setMethod ("erode", signature(x="Image"),
 setMethod ("dilate", signature(x="Image"),
     function (x, kern=morphKern(5), iter=1, ...) {
         if ( colorMode(x) != Grayscale )
-            stop ( .("2-color bitmap images only are supported in grayscale format") ) ## FIXME
+            stop ( .("'x' must be a binary image in Grayscale mode") )
         if ( !is.integer(kern) || !is.matrix(kern) )
             stop ( .("kernel must be an integer matrix of 0's and 1's") )
         if ( iter < 1 )
