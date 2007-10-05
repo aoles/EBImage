@@ -33,7 +33,7 @@ exportMethods(
   normalize, normalize2, fill, flip, flop, erode, dilate, opening, closing,
   distmap, watershed, paintObjects,
   matchObjects, stackObjects, rmObjects, propagate, image, show, hist,
-  cmoments, smoments, rmoments, moments,
+  cmoments, smoments, rmoments, moments, floodFill, fillHull,
 
   drawtext, 
     

@@ -17,6 +17,7 @@ See: ../LICENSE for license, LGPL
 #include "filters_normalize.h"
 #include "filters_watershed.h"
 #include "filters_thresh.h"
+#include "filters_floodfill.h"
 
 #include "features_hull.h"
 #include "features_moments.h"
@@ -60,6 +61,8 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_erode_dilate",   (DL_FUNC) &lib_erode_dilate,   4},
     {"lib_filterThresh",   (DL_FUNC) &lib_filterThresh,   2},
     {"lib_filterFill",     (DL_FUNC) &lib_filterFill,     5},
+    {"lib_floodFill",      (DL_FUNC) &lib_floodFill,      4},
+    {"lib_fillHull",       (DL_FUNC) &lib_fillHull,       1},
     {"lib_normalize",      (DL_FUNC) &lib_normalize,      3},
     {"lib_distMap",        (DL_FUNC) &lib_distMap,        4},
     {"lib_filterInvWS",    (DL_FUNC) &lib_filterInvWS,    3},

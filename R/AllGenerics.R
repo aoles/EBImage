@@ -74,6 +74,7 @@ setGeneric ("negate",         function (x, ...)        standardGeneric("negate")
 setGeneric ("normalize",      function (x, ...)        standardGeneric("normalize") )
 setGeneric ("normalize2",     function (x, ...)        standardGeneric("normalize2") )
 setGeneric ("fill",           function (x, ...)        standardGeneric("fill") )
+setGeneric ("floodFill",      function (x, pt, ...)    standardGeneric("floodFill") )
 setGeneric ("flip",           function (x, ...)        standardGeneric("flip") )
 setGeneric ("flop",           function (x, ...)        standardGeneric("flop") )
 
@@ -91,6 +92,7 @@ setGeneric ("paintObjects",   function (x, tgt, ...)   standardGeneric("paintObj
 setGeneric ("matchObjects",   function (x, ref, ...)   standardGeneric("matchObjects") )
 setGeneric ("stackObjects",   function (x, ref, index, ...) standardGeneric("stackObjects") )
 setGeneric ("rmObjects",      function (x, index, ...) standardGeneric("rmObjects") )
+setGeneric ("fillHull",       function (x, ...)        standardGeneric("fillHull") )
 
 ## drawables
 setGeneric ("drawtext",       function (img, xy, labels, ...) standardGeneric("drawtext"))
