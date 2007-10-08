@@ -39,9 +39,9 @@ setMethod ("tile", signature(x="list"),
 setMethod("fillHull", signature(x="IndexedImage"),
   function(x, ...) {
     # FIXME: remove when mode changed
-    mode(x) = "integer"
+#    mode(x) = "integer"
     x <- .DoCall("lib_fillHull", x)
-    mode(x) = "double"
+#    mode(x) = "double"
     return(x)
   }
 )

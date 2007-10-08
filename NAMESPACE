@@ -30,7 +30,7 @@ exportMethods(
   blur, gblur, contrast, denoise, despeckle, edge, enhance, equalize,
   cgamma, mediansmooth, noise, resize, rotate, resample, segment,
   sharpen, umask, thresh, athresh, cthresh, affinet, modulate, negate,
-  normalize, normalize2, fill, flip, flop, erode, dilate, opening, closing,
+  normalize, normalize2, flip, flop, erode, dilate, opening, closing,
   distmap, watershed, paintObjects,
   matchObjects, stackObjects, rmObjects, propagate, image, show, hist,
   cmoments, smoments, rmoments, moments, floodFill, fillHull,

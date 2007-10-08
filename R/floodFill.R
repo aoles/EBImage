@@ -1,10 +1,38 @@
+# Flood fill for images and matrices
+
+# Copyright (c) 2005 Oleg Sklyar
+
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public License
+# as published by the Free Software Foundation; either version 2.1
+# of the License, or (at your option) any later version.
+
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+# See the GNU Lesser General Public License for more details.
+# LGPL license wording: http://www.gnu.org/licenses/lgpl.html
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("floodFill", signature(x="array", pt="ANY"),
   function(x, pt, col, tolerance=1e-3, ...) {
+    .dim = dim(x)
+    if (length(.dim)<2)
+      stop("'x' must have (at least) 2 dimensions")
     pt = as.integer(pt)
-    if (missing(col)) stop("'col' must be specified")
-#    if (missing(col)) col=x[pt[1]+pt[2]*dim(x)[1]]
-    if (is.integer(x)) col=as.integer(col) else
-    if (is.double(x)) col=as.double(col)
-    return( .Call("lib_floodFill", x, pt, col, as.numeric(tolerance)))
+    if (length(pt)<2)
+      stop("'pt' must contain at least 2 values for x and y coordinates")
+    if (any(pt)<1 || any(pt[1:2]>.dim[1:2]))
+      stop("coordinates of the start point must be inside the image boundaries")
+    tolerance = as.numeric(tolerance)
+    if (missing(col)) col=x[pt[1]+pt[2]*.dim[1]]
+    # allows for conversion from X11 color string to its RGB or grayscale value
+    if (is.character(col))
+      col <- if (is.integer(x)) channel(col,"rgb") else channel(col,"gray")
+    else
+      col <- if (is.integer(x)) as.integer(col) else col=as.double(col)
+    return( .DoCall("lib_floodFill", x, pt, col, tolerance))
   }
 )
+

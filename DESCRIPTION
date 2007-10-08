@@ -2,7 +2,7 @@ Package: EBImage
 Version: 2.3.1
 Date: 5 Oct 2007
 Title: Image processing and image analysis toolkit for R
-Author: Oleg Sklyar, Wolfgang Huber, Mike Smith
+Author: Oleg Sklyar, Gregoire Pau, Mike Smith, Wolfgang Huber
 Maintainer: Oleg Sklyar <osklyar@ebi.ac.uk>
 SystemRequirements: ImageMagick (>= 6.2.4), GTK+ (> 2.6) -- Windows dependencies are available from the URL below! See package vignette for installation instructions.
 Depends: R (>= 2.4.0), methods, graphics, utils

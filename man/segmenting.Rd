@@ -2,8 +2,6 @@
 
 \alias{edge}
 \alias{edge,Image-method}
-\alias{fill}
-\alias{fill,Image-method}
 \alias{segment}
 \alias{segment,Image-method}
 
@@ -19,8 +17,6 @@
 \usage{
   \S4method{edge}{Image}(x, r=0, ...)
   \S4method{segment}{Image}(x, cl=10, s=1.5, ...)
-  ## FIXME: 'fill' implemented incorrectly because of unclear API
-  \S4method{fill}{Image}(x, col, xoff, yoff, fuzz=10, method="floodfill", ...) 
 }
 
 \arguments{
@@ -33,16 +29,6 @@
   \item{cl}{ Minimum cluster size in pixels . } 
 
   \item{s}{ The smoothing threshold. }
-
-  \item{col}{ The fill colour in any format (\code{character}, gray 
-    value or integer byte-coded value).}
-
-  \item{xoff, yoff}{ The point at which to start the fill. }
-
-  \item{fuzz}{ Colour tolerance, within this interval the colours are
-    considered the same. }
-
-  \item{method}{ Fill method. }
 
   \item{...}{ Reserved. }
 }
@@ -65,11 +51,6 @@
     histogram. As the value is increased, you can expect a smoother second
     derivative.
     
-  \code{fill} should allow colour fill, but ImageMagick API is not clear and the
-    current implementation does not seem to produce any reasonable result.
-    Therefore the function will currently produce an error message, should be
-    corrected in future releases.
-   
 }
 
 \seealso{ \code{

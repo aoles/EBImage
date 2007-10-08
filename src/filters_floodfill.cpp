@@ -1,5 +1,11 @@
 #include "filters_floodfill.h"
 
+/* -------------------------------------------------------------------------
+Flood fill for images and flood-fill-based hull filling for objects
+Copyright (c) 2007 Gregoire Pau, Oleg Sklyar
+See: ../LICENSE for license, LGPL
+------------------------------------------------------------------------- */
+
 #include <R_ext/Error.h>
 #include <stack>
 
@@ -10,8 +16,9 @@ struct XYPoint {
   int x, y;
 };
 
-template <class T>void floodFill(T*, XYPoint, XYPoint, T, double tolerance = 1e-3);
-void fillHull(int *, const XYPoint &);
+template <class T> void floodFill(T*, XYPoint, XYPoint, T, double tol=1e-3);
+// void fillHull(int *, const XYPoint &);
+template <class T> void fillHullT(T *, const XYPoint &, double tol=1e-3);
 
 /* -------------------------------------------------------------------------- */
 SEXP
@@ -19,20 +26,23 @@ lib_floodFill(SEXP x, SEXP point, SEXP col, SEXP tol) {
   int *dim = INTEGER(GET_DIM(x));
   XYPoint size(dim[0], dim[1]);
   if (LENGTH(GET_DIM(x))>2 && dim[2]>1)
-    error("'floodFill' function is not defined for arrays or multi-frame images");
-  XYPoint pt(INTEGER(point)[0], INTEGER(point)[1]);
-  /* if nothing to fill quit */
-  if (size.x <= 0 || pt.x >= size.x || size.y <= 0 || pt.y >= size.y) return x;
+    warning("'floodFill' function is not defined for arrays or multi-frame images, the function will be applied to the first frame only");
+  /* -1 as R has 1-based indexing */
+  XYPoint pt(INTEGER(point)[0]-1, INTEGER(point)[1]-1);
+  /* if nothing to fill: this check is also done in R, but here to be fool-proof */
+  if (size.x <= 0 || pt.x < 0 || pt.x >= size.x || 
+      size.y <= 0 || pt.y < 0 || pt.y >= size.y)
+    error("coordinates of the start point must be inside the image boundaries");
   SEXP m;
   int nprotect=0;
   /* copy existing image/matrix to result */
   PROTECT(m = Rf_duplicate(x));
   nprotect++;
   /* do floodfil, templated version used depending on the storage mode */
-  if (IS_INTEGER(x)) {
+  if (IS_INTEGER(m)) {
     floodFill<int>(INTEGER(m), size, pt, INTEGER(col)[0], REAL(tol)[0]);
   }
-  else if (IS_NUMERIC(x)) {
+  else if (IS_NUMERIC(m)) {
     floodFill<double>(REAL(m), size, pt, REAL(col)[0], REAL(tol)[0]);
   }
   
@@ -43,7 +53,9 @@ lib_floodFill(SEXP x, SEXP point, SEXP col, SEXP tol) {
 /* -------------------------------------------------------------------------- */
 SEXP
 lib_fillHull(SEXP x) {
-  if (!IS_INTEGER(x)) error("'fillHull' is defined only for integer-based data");
+/*  if (!IS_INTEGER(x))
+    error("'fillHull' is defined only for integer-based data");
+*/
   int *dim = INTEGER(GET_DIM(x));
   XYPoint size(dim[0], dim[1]);
   /* check if array or multiple images */
@@ -56,8 +68,14 @@ lib_fillHull(SEXP x) {
   /* do fillHull */  
   PROTECT(m=Rf_duplicate(x));
   nprotect++;
-  for (int i=0; i < nz; i++)
-    fillHull(&(INTEGER(m)[i*size.x*size.y]), size);
+  if (IS_INTEGER(m)) {
+    for (int i=0; i < nz; i++)
+      fillHullT<int>(&(INTEGER(m)[i*size.x*size.y]), size);
+  }
+  else if (IS_NUMERIC(m)) {
+    for (int i=0; i < nz; i++)
+      fillHullT<double>(&(REAL(m)[i*size.x*size.y]), size);
+  }
   
   UNPROTECT (nprotect);
   return m;
@@ -97,39 +115,58 @@ typedef PopCheckStack<XYPoint> XYStack;
 */
 
 template <class T>void 
-floodFill(T *m, XYPoint size, XYPoint xy, T rc, double tolerance = 1e-3) {
-  XYStack s;
+floodFill(T *m, XYPoint size, XYPoint xy, T rc, double tol=1e-3) {
+  XYStack s, offsets;
   XYPoint pt = xy;
-  bool spanLeft,spanRight;
+  bool spanLeft,spanRight,offset=false;
   /* set the target color tc */
   T tc = m[pt.x+pt.y*size.x];
+
+  /* FIXME: the offset workaround with another stack is ONLY used when
+   * the reset color (rc) is the same as target color (tc). In this case
+   * we reset to an offset color from rc first, keep coordinates of all
+   * reset points and reset them to what we need at the end of the loop.
+   * This does not affect the speed when the color is different as the 
+   * stack is not used then.
+   */
+  T resetc = rc;
+  if (fabs(tc-rc) <= tol) {
+    offset=true;
+    resetc = (T)(rc+tol+1);
+  }
     
   // pushes the seed starting pixel
   s.push(pt);
     
   while(s.pop(pt)) {    
     // climbs up along the column x as far as possible
-    while(pt.y>=0 && fabs(m[pt.x+pt.y*size.x]-tc) <= tolerance) pt.y--;
+    while(pt.y>=0 && fabs(m[pt.x+pt.y*size.x]-tc) <= tol) pt.y--;
     pt.y++;
     spanLeft=false;
     spanRight=false;
 
     // processes the column x
-    while(pt.y<size.y && fabs(m[pt.x+pt.y*size.x]-tc) <= tolerance) {
-      m[pt.x+pt.y*size.x]=rc;
-      if(!spanLeft && pt.x>0 && fabs(m[pt.x-1+pt.y*size.x]-tc) <= tolerance) {
+    while(pt.y<size.y && fabs(m[pt.x+pt.y*size.x]-tc) <= tol) {
+      R_CheckUserInterrupt();
+      m[pt.x+pt.y*size.x]=resetc;
+      /* to enable users to terminate this function */
+      // FIXME: delete when the solution for "the same color" problem is found
+      if (offset) offsets.push(pt);
+      if(!spanLeft && pt.x>0 && fabs(m[pt.x-1+pt.y*size.x]-tc) <= tol) {
     	  s.push(XYPoint(pt.x-1,pt.y));
     	  spanLeft=true;
     	}
-      else if(spanLeft && pt.x>0 && fabs(m[pt.x-1+pt.y*size.x]-tc) > tolerance) spanLeft=false;
-      if(!spanRight && pt.x<size.x-1 && fabs(m[pt.x+1+pt.y*size.x]-tc) <= tolerance) {
+      else if(spanLeft && pt.x>0 && fabs(m[pt.x-1+pt.y*size.x]-tc) > tol) spanLeft=false;
+      if(!spanRight && pt.x<size.x-1 && fabs(m[pt.x+1+pt.y*size.x]-tc) <= tol) {
     	  s.push(XYPoint(pt.x+1,pt.y));
     	  spanRight=true;
     	}
-      else if(spanRight && pt.x<size.x-1 && fabs(m[pt.x+1+pt.y*size.x]-tc) > tolerance) spanRight=false;
+      else if(spanRight && pt.x<size.x-1 && fabs(m[pt.x+1+pt.y*size.x]-tc) > tol) spanRight=false;
       pt.y++;
     }
   }
+  // FIXME: delete when the solution for "the same color" problem is found
+  while(offsets.pop(pt)) m[pt.x+pt.y*size.x]=rc;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -156,6 +193,7 @@ struct Box {
   - with a starting at top-left corner
   
 */
+/*
 void 
 fillAroundObjectHull(int **m, int **canvas, const XYPoint &size, const Box &box, 
                      const int &rc) {
@@ -192,15 +230,16 @@ fillAroundObjectHull(int **m, int **canvas, const XYPoint &size, const Box &box,
     }
   }
 }
+*/
 
-/* Templated version:
+/* -------------------------------------------------------------------------- */
+/* Templated version by Oleg Sklyar */
 template <class T> void 
-fillAroundObjectHull(T **m, T **canvas, const XYPoint &size, const Box &box, 
-                     const T &rc, double tolerance=1e-3) {
+fillAroundObjectHullT(T **m, T **canvas, const XYPoint &size, const Box &box, 
+                     const T &rc, double tol=1e-3) {
   XYStack s;
   XYPoint pt;
   bool spanLeft,spanRight;
-  T ntc = rc;
   
   pt.x = box.l;
   pt.y = box.t;
@@ -210,44 +249,45 @@ fillAroundObjectHull(T **m, T **canvas, const XYPoint &size, const Box &box,
     
   while(s.pop(pt)) {    
     // climbs up along the column x as far as possible
-    while(pt.y>=box.t && fabs(m[pt.x][pt.y]-ntc) > tolerance && fabs(canvas[pt.x][pt.y]-rc) > tolerance) pt.y--;
+    while(pt.y>=box.t && fabs(m[pt.x][pt.y]-rc) > tol && fabs(canvas[pt.x][pt.y]-rc) > tol) pt.y--;
     pt.y++;
     spanLeft=false;
     spanRight=false;
     // processes the column x
-    while(pt.y<=box.b && fabs(m[pt.x][pt.y]-ntc) > tolerance) {
+    while(pt.y<=box.b && fabs(m[pt.x][pt.y]-rc) > tol) {
+      R_CheckUserInterrupt();
       canvas[pt.x][pt.y]=rc;
-      if(!spanLeft && pt.x>box.l && fabs(m[pt.x-1][pt.y]-ntc) > tolerance && fabs(canvas[pt.x-1][pt.y]-rc) > tolerance) {
+      if(!spanLeft && pt.x>box.l && fabs(m[pt.x-1][pt.y]-rc) > tol && fabs(canvas[pt.x-1][pt.y]-rc) > tol) {
     	  s.push(XYPoint(pt.x-1,pt.y));
     	  spanLeft=true;
     	}
-      else if(spanLeft && pt.x>box.l && (fabs(m[pt.x-1][pt.y]-ntc) <= tolerance || fabs(canvas[pt.x-1][pt.y]-rc) <= tolerance)) spanLeft=false;
-      if(!spanRight && pt.x<box.r && fabs(m[pt.x+1][pt.y]-ntc) > tolerance && fabs(canvas[pt.x+1][pt.y]-rc) > tolerance) {
+      else if(spanLeft && pt.x>box.l && (fabs(m[pt.x-1][pt.y]-rc) <= tol || fabs(canvas[pt.x-1][pt.y]-rc) <= tol)) spanLeft=false;
+      if(!spanRight && pt.x<box.r && fabs(m[pt.x+1][pt.y]-rc) > tol && fabs(canvas[pt.x+1][pt.y]-rc) > tol) {
     	  s.push(XYPoint(pt.x+1,pt.y));
     	  spanRight=true;
     	}
-      else if(spanRight && pt.x<box.r && (fabs(m[pt.x+1][pt.y]-ntc) <= tolerance || fabs(canvas[pt.x+1][pt.y]-rc) <= tolerance)) spanRight=false;
+      else if(spanRight && pt.x<box.r && (fabs(m[pt.x+1][pt.y]-rc) <= tol || fabs(canvas[pt.x+1][pt.y]-rc) <= tol)) spanRight=false;
       pt.y++;
     }
   }
 }
-*/
 
 /* -------------------------------------------------------------------------- */
+/*
 void
 fillHull(int *_m, const XYPoint &srcsize) {
   int nobj = 0, i, x, y;
   XYPoint size = srcsize;
 
-  /* computes maximum number of different objects */
+  // computes maximum number of different objects
   for (i=0; i < srcsize.x*srcsize.y; i++)
     if (_m[i] > nobj) nobj = _m[i];
 
-  /* nothing to do if no objects */
+  // nothing to do if no objects
   if (nobj < 1) return;
 
-  /* extend m 2 pixels, copy content of _m inside, the frame - 0;
-     initialize temporary canvas with 0 */
+  // extend m 2 pixels, copy content of _m inside, the frame - 0;
+  // initialize temporary canvas with 0
   size.x += 2;
   size.y += 2;
 
@@ -264,7 +304,7 @@ fillHull(int *_m, const XYPoint &srcsize) {
     }
   }
 
-  /* allocate and compute bounding boxes for all objects (the one for 0 never used) */
+  // allocate and compute bounding boxes for all objects (the one for 0 never used)
   Box * bbox = new Box[nobj+1];
 
   for (i=1; i <= nobj; i++) {
@@ -286,7 +326,7 @@ fillHull(int *_m, const XYPoint &srcsize) {
     Box box = bbox[i];
     box.expand(1);
     fillAroundObjectHull(m, canvas, size, box, i);
-    /* fill back the original matrix! */
+    // fill back the original matrix!
   	for (x=box.l; x <= box.r; x++)
       for (y=box.t; y <= box.b; y++) {
 	      if (canvas[x][y]==i || x-1<0 || x-1>=srcsize.x || y-1<0 || y-1>=srcsize.y) continue;
@@ -294,7 +334,7 @@ fillHull(int *_m, const XYPoint &srcsize) {
 	    }
   }
 
-  /* cleanup */
+  // cleanup
   for (x=0; x < size.x; x++) {
     delete[] m[x];
     delete[] canvas[x];
@@ -303,10 +343,12 @@ fillHull(int *_m, const XYPoint &srcsize) {
   delete[] canvas;
   delete[] bbox;
 }
+*/
 
-/* Templated version:
+/* -------------------------------------------------------------------------- */
+/* Templated version by Oleg Sklyar */
 template <class T> void
-fillHull(T *_m, const XYPoint &srcsize) {
+fillHullT(T *_m, const XYPoint &srcsize, double tol=1e-3) {
   int nobj = 0, i, x, y;
   XYPoint size = srcsize;
 
@@ -357,12 +399,12 @@ fillHull(T *_m, const XYPoint &srcsize) {
     Box box = bbox[i];
     box.expand(1);
     T col = (T)i;
-    fillAroundObjectHull<T>(m, canvas, size, box, col, col);
+    fillAroundObjectHullT<T>(m, canvas, size, box, col, tol);
     // fill back the original matrix!
   	for (x=box.l; x <= box.r; x++)
       for (y=box.t; y <= box.b; y++) {
-	      if (canvas[x][y]==i || x-1<0 || x-1>=srcsize.x || y-1<0 || y-1>=srcsize.y) continue;
- 	      _m[x-1+(y-1)*srcsize.x] = (T)i;
+	      if (fabs(canvas[x][y]-col) <= tol || x-1<0 || x-1>=srcsize.x || y-1<0 || y-1>=srcsize.y) continue;
+ 	      _m[x-1+(y-1)*srcsize.x] = col;
 	    }
   }
   // cleanup
@@ -374,5 +416,4 @@ fillHull(T *_m, const XYPoint &srcsize) {
   delete[] canvas;
   delete[] bbox;
 }
-*/
 
