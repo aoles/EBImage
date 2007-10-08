@@ -46,26 +46,6 @@ setMethod ("flop", signature(x="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("fill", signature(x="Image"),
-    function (x, col, xoff, yoff, fuzz=10, method="floodfill", ...) {
-        if ( missing(xoff) || missing(yoff) || missing(col) )
-            stop ( .("missing 'xoff', 'yoff' or 'col'") )
-        # color is converted into it's x11 representation, i.e. #112233
-        col <- channel (col[1], "x11")
-        xoff <- as.integer (xoff - 1)
-        yoff <- as.integer (yoff - 1)
-        if ( xoff < 0 || xoff >= dim(x)[1] || yoff < 0 || yoff >= dim(x)[2] )
-            stop ( .("start point outside of image") )
-        if ( fuzz < 0 )
-            stop ( .("fuzz must be non negative") )
-        method <- tolower(method)
-        if ( !switch(method, floodfill=TRUE, replace=TRUE, FALSE) )
-            stop ( .("wrong fill method specified, supported methods are: floodfill and replace") )
-        return ( .DoCall("lib_filterFill", x, as.character(col), as.integer(xoff, yoff), as.character(method), as.integer(fuzz) ) )
-    }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # ImageMagick filters below
 flt.blur      <- as.integer(0)
 flt.gaussblur <- as.integer(1)

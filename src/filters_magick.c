@@ -219,6 +219,7 @@ lib_filterMagick (SEXP x, SEXP filter, SEXP parameters) {
     return res;
 }
 
+/* use own implementation of floodFill
 SEXP
 lib_filterFill (SEXP x, SEXP colStrSXP, SEXP coords, SEXP methodSXP, SEXP fuzzSXP) {
     Image * images, * newimages, * image;
@@ -258,7 +259,7 @@ lib_filterFill (SEXP x, SEXP colStrSXP, SEXP coords, SEXP methodSXP, SEXP fuzzSX
     GetDrawInfo (&iinfo, &dinfo);
     dinfo.fill = pp;
 
-    /* FIXME: fill() does not work in current implementation */
+    // FIXME: fill() does not work in current implementation
     warning("the 'fill' is not yet correctly implemented, expected result: black image");
 
     for ( i = 0; i < nz; i++ ) {
@@ -273,7 +274,7 @@ lib_filterFill (SEXP x, SEXP colStrSXP, SEXP coords, SEXP methodSXP, SEXP fuzzSX
         }
         AppendImageToList (&newimages, image);
         if ( nappended == 0 ) {
-            /* copy attributes once and only if image contains more than 1 element */
+            // copy attributes once and only if image contains more than 1 element
             nappended = 1;
             newimages->compression = images->compression;
             strcpy (newimages->filename, image->filename);
@@ -295,3 +296,4 @@ lib_filterFill (SEXP x, SEXP colStrSXP, SEXP coords, SEXP methodSXP, SEXP fuzzSX
     UNPROTECT (1);
     return res;
 }
+*/

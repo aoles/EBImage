@@ -60,7 +60,6 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_filterMagick",   (DL_FUNC) &lib_filterMagick,   3},
     {"lib_erode_dilate",   (DL_FUNC) &lib_erode_dilate,   4},
     {"lib_filterThresh",   (DL_FUNC) &lib_filterThresh,   2},
-    {"lib_filterFill",     (DL_FUNC) &lib_filterFill,     5},
     {"lib_floodFill",      (DL_FUNC) &lib_floodFill,      4},
     {"lib_fillHull",       (DL_FUNC) &lib_fillHull,       1},
     {"lib_normalize",      (DL_FUNC) &lib_normalize,      3},

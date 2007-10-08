@@ -436,6 +436,7 @@ setMethod ("channel", signature(x="Image", mode="character"),
     res@colormode <- switch (EXPR=mode, rgb=, asred=, asgreen=,
                      asblue=TrueColor, Grayscale)
     res@.Data <- resData
+    class(res) = "Image"
     return (res)
   }
 )

@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 SEXP lib_filterMagick (SEXP, SEXP, SEXP);
-SEXP lib_filterFill (SEXP, SEXP, SEXP, SEXP, SEXP);
+/* SEXP lib_filterFill (SEXP, SEXP, SEXP, SEXP, SEXP); */
 
 #ifdef __cplusplus
 };
