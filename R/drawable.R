@@ -54,7 +54,11 @@ setMethod ("drawtext", signature(img="Image", xy="list", labels="list"),
     font$size <- as.numeric(font$size)
     font$weight <- as.numeric(font$weight)
     font$antialias <- as.logical(font$antialias)
-    .DoCall("lib_drawText", img, xy, labels, font, col)
+    if (is(img, "IndexedImage")) {
+      img = normalize(img)
+      warning("IndexedImage 'img' is normalized to [0,1] prior to applying the filter")
+    }
+    return(.DoCall("lib_drawText", img, xy, labels, font, col))
   }
 )
   

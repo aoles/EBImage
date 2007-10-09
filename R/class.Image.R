@@ -38,27 +38,28 @@ setClass ("Image",
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Image <- function(data=matrix(0,0,0), dim=base::dim(data), colormode=Grayscale, ...) {
-
+Image <- function(data=array(0.0,c(0,0,1)), dim=base::dim(data), colormode, ...) {
   ld = length(dim)
   if(!(ld%in%(2:3)))
-    .stop(sprintf("length(dim) must be 2 or 3, is %d.", ld))
-  
+    stop(sprintf("length(dim) must be 2 or 3, is %d.", ld))
   if (ld==2L)
     dim=c(dim, 1L)
-  
+  if (missing(colormode)) colormode = Grayscale
   res = new("Image", colormode=colormode, ...)
   res@.Data = array(
     if(colormode==TrueColor) as.integer(data) else as.double(data),
     dim=dim)
-  
   return( res )
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("as.Image", signature(x="array"),
   function (x, ...) {
-    return( Image(x) )
+    if (is.integer(x)) return(Image(x, colormode=TrueColor))
+    r = range(x)
+    x = Image(x, colormode=Grayscale)
+    if (diff(r) > 1 || any(r) < 0 || any(r) > 2) class(x) = "IndexedImage"
+    return(x)
   }
 )
 
@@ -68,11 +69,11 @@ setMethod ("colorMode", signature (x="Image"),
 )
 setReplaceMethod ("colorMode", signature (x="Image", value="numeric"),
   function (x, ..., value) {
-    if ( value == x@colormode ) return (x)
-    if ( value == TrueColor ) return ( channel(x, "RGB") )
-    if ( value == Grayscale ) return ( channel(x, "gray") )
+    if (value == x@colormode) return (x)
+    if (value == TrueColor) return ( channel(x, "RGB") )
+    if (value == Grayscale) return ( channel(x, "gray") )
     # on any other unsupported value
-    return (x)
+    return(x)
   }
 )
 
@@ -95,7 +96,7 @@ setReplaceMethod ("compression", signature (x="Image", value="character"),
   function (x, ..., value) {
     value <- toupper( value )
     if ( switch (EXPR=value, NONE=, LZW=, ZIP=, JPEG=, BZIP=, GROUP4=, FALSE, TRUE) )
-      .stop( "wrong compression type. Please specify, NONE, LZW, ZIP, JPEG, BZIP or GROUP4" )
+      stop( "wrong compression type. Please specify, NONE, LZW, ZIP, JPEG, BZIP or GROUP4" )
     x@compression <- value
     return (x)
   }
@@ -108,9 +109,9 @@ setMethod ("resolution", signature (x="Image"),
 setReplaceMethod ("resolution", signature (x="Image", value="numeric"),
   function (x, ..., value) {
     if ( length(value) != 2 )
-      .stop( "resolution attribute needs 2 values, for x and y in pixels per inch" )
+      stop("resolution attribute needs 2 values, for x and y in pixels per inch")
     if ( any( value <= 0 ) )
-      .stop( "resolution must be positive" )
+      stop("resolution must be positive")
     x@resolution <- value
     return (x)
   }
@@ -122,8 +123,10 @@ setMethod ("imageData", signature (x="Image"),
 )
 setReplaceMethod ("imageData", signature (x="Image", value="matrix"),
   function (x, ..., value) {
-    dim (value) <- c( dim(value), 1)
-    x@.Data <- value
+    dim(value) = c(dim(value), 1)
+    x@.Data = value
+    if (is.integer(value)) x@colormode = TrueColor
+    else x@colormode = Grayscale
     return (x)
   }
 )
@@ -131,17 +134,23 @@ setReplaceMethod ("imageData", signature (x="Image", value="array"),
   function (x, ..., value) {
     diml <- length ( dim(value) )
     if ( diml < 2 || diml > 3 )
-      .stop( "supplied array must be 2 or 3 dimensional" )
-    if ( diml == 2 ) dim (value) <- c( dim(value), 1)
-    x@.Data <- value
+      stop( "supplied array must be 2 or 3 dimensional" )
+    if (diml == 2 ) dim (value) <- c( dim(value), 1)
+    x@.Data = value
+    if (is.integer(value)) x@colormode = TrueColor
+    else x@colormode = Grayscale
     return (x)
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 is.Image <- function (x) {
-  if ( !is(x, "Image") ) return (FALSE)
-  if ( length( dim(x) ) != 3) return (FALSE)
+  if (!is(x, "Image")) return(FALSE)
+
+  if (length(dim(x)) != 3) {
+    warning("incorrectly formed object, too few dimensions")
+    return(FALSE)
+  }
   return (TRUE)
 }
 
@@ -162,32 +171,33 @@ setMethod ("assert", signature (x="Image", y="missing"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 stopIfNotImage <- function (x) {
   if ( !is(x, "Image") )
-    .stop( "argument must be of class 'Image'" )
+    stop( "argument must be of class 'Image'" )
   if ( length( dim(x) ) != 3)
-    .stop( "array dimensions for the object of class 'Image' must be 3" )
+    stop( "array dimensions for the object of class 'Image' must be 3" )
   invisible (NULL)
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("header", signature(x="Image"),
   function (x, ...) {
-    if ( x@colormode == TrueColor )
-      return ( new(class(x), colormode=TrueColor, .Data=integer(0), filename=fileName(x),
-        compression=compression(x), resolution=resolution(x), features=x@features ) )
-    return ( new(class(x), colormode=Grayscale, .Data=numeric(0), filename=fileName(x),
-      compression=compression(x), resolution=resolution(x), features=x@features ) )
+    x = new(class(x), colormode=Grayscale, filename=fileName(x),
+            compression=compression(x), resolution=resolution(x), 
+            features=x@features )
+    x@.Data = if (x@colormode == TrueColor) array(as.integer(0), c(0,0,1)) 
+              else array(0.0,c(0,0,1))
+    return(x)
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("copy", signature (x="Image"),
   function (x, ...) {
-    res = header (x)
-    if ( x@colormode == TrueColor )
-      res@.Data = array (as.integer(x@.Data), dim(x@.Data) )
+    x = header(x)
+    if (x@colormode == TrueColor )
+      x@.Data = array(as.integer(x@.Data), dim(x@.Data))
     else
-      res@.Data = array (as.double(x@.Data), dim(x@.Data) )
-    return(res)
+      x@.Data = array(as.double(x@.Data), dim(x@.Data))
+    return(x)
   }
 )
 
@@ -209,10 +219,14 @@ setMethod (".isCorrectType", signature(x="Image"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod (".correctType", signature(x="Image"),
   function(x) {
-    if ( x@colormode == TrueColor && !is.integer(x) )
-      x@.Data = array (as.integer(x@.Data), dim(x@.Data) )
-    else if ( x@colormode == Grayscale && !is.double(x) )
-      x@.Data = array (as.double(x@.Data), dim(x@.Data) )
+    if (is(x, "IndexedImage")) x@colormode = Grayscale
+    if (x@colormode == TrueColor) 
+      mode(x@.Data) = "integer"
+    else 
+      mode(x@.Data) = "double"
+#      x@.Data = array (as.integer(x@.Data), dim(x@.Data) )
+#    else if ( x@colormode == Grayscale && !is.double(x) )
+#      x@.Data = array (as.double(x@.Data), dim(x@.Data) )
     return (x)
   }
 )
@@ -240,11 +254,13 @@ setMethod("Arith", signature(e1="array", e2="Image"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("writeImage", signature(x="Image"),
   function (x, files, quality, ...) {
+    if (is(x, "IndexedImage"))
+      stop("cannot write images of class IndexedImage due to data range problems. Convert the object to Image and normalize it first, or save as an R object")
     if ( missing(quality) ) quality <- 95
     if ( quality < 1 || quality > 100 )
-      .stop( "quality value is given in % between 1 and 100" )
+      stop( "quality value is given in % between 1 and 100" )
     if ( missing(files) ) files <- fileName(x)
-    if ( !.isCorrectType(x) ) x <- .correctType (x)
+    if ( !.isCorrectType(x) ) x <- .correctType(x)
     invisible ( .DoCall("lib_writeImages", x, as.character(files), as.integer(quality) ) )
   }
 )
@@ -259,7 +275,7 @@ setMethod ("write.image", signature(x="Image"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 readImage <- function(files, colormode=Grayscale, ...) {
   if ( missing(files) )
-    .stop("'files' argument must be present in calls to 'readImage'")
+    stop("argument 'files' must be present in calls to 'readImage'")
   .DoCall ("lib_readImages", as.character(files), as.integer(colormode) )
 }
 
@@ -295,7 +311,7 @@ setMethod ("[", signature(x="Image", i="numeric", j="missing"),
   function (x, i, j, ..., drop) {
     n <- nargs()
     if ( n == 2 ) return( x@.Data[i] )
-    if ( n != 4 ) .stop( "incorrect number of dimensions" )
+    if ( n != 4 ) stop( "incorrect number of dimensions" )
     res <- header(x)
     imageData (res) <- x@.Data[i,,...,drop=FALSE]
     return( res )
@@ -329,7 +345,7 @@ setMethod ("[", signature(x="Image", i="numeric", j="numeric"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("[", signature(x="Image", i="array", j="missing"),
   function (x, i, j, k, ..., drop) {
-    if ( !missing(k) ) .stop( "array index cannot be combined with any other index" )
+    if ( !missing(k) ) stop( "array index cannot be combined with any other index" )
       tmp = x@.Data[i, drop=FALSE]
       if ( !is.array(tmp) ) return (tmp)
       res <- header (x)
@@ -341,7 +357,7 @@ setMethod ("[", signature(x="Image", i="array", j="missing"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("[", signature(x="Image", i="logical", j="missing"),
   function (x, i, j, k, ..., drop) {
-    if ( !missing(k) ) .stop( "logical index cannot be combined with any other index" )
+    if ( !missing(k) ) stop( "logical index cannot be combined with any other index" )
     tmp = x@.Data[i, drop=FALSE]
     if ( !is.array(tmp) ) return (tmp)
     res <- header (x)
@@ -407,9 +423,9 @@ setMethod ("image", signature(x="Image"),
     }
     i <- as.integer ( i[1] )
     if ( i < 1 || i > dimx[3] )
-      .stop( "index i out of range" )
+      stop( "index 'i' out of range" )
     if ( any(dimx == 0) )
-      .stop( "image size is zero, nothing to plot" )
+      stop( "image size is zero, nothing to plot" )
     X <- 1:dimx[1]
     Y <- 1:dimx[2]
     Z <- imageData(x[,,i])[, rev(Y), 1, drop=TRUE]
@@ -424,20 +440,23 @@ setMethod ("channel", signature(x="Image", mode="character"),
     mode <- tolower (mode)
     modeNo <- as.integer( switch (EXPR=mode, rgb=0, grey=, gray=1, r=, red=2, g=,
               green=3, b=, blue=4, asred=5, asgreen=6, asblue=7, x11=8, -1) )
-    if ( modeNo < 0 )
-      .stop( "wrong conversion mode" )
-    resData <- .DoCall("lib_channel", x@.Data, modeNo )
-    if ( is.null(resData) )
-      .stop( "error converting colors, check if all supplied values majke sense for color representation" )
-    resData [ which( is.na(x) ) ] = NA
-    resData <- array (resData, dim(x) )
-    if ( mode == "x11" ) return (resData)
-    res <- header (x)
+    if (modeNo < 0)
+      stop("wrong conversion mode")
+    if (is(x, "IndexedImage")) {
+      x = normalize(x)
+      warning("IndexedImage 'x' is normalized to [0,1] prior to applying the filter")
+    }      
+    resData <- .DoCall("lib_channel", x@.Data, modeNo)
+    if (is.null(resData))
+      stop("error converting colors, check if all supplied values majke sense for color representation")
+    resData[which(is.na(x))] = NA
+    resData = array (resData, dim(x) )
+    if (mode == "x11") return(resData)
+    res <- header(x)
     res@colormode <- switch (EXPR=mode, rgb=, asred=, asgreen=,
                      asblue=TrueColor, Grayscale)
     res@.Data <- resData
-    class(res) = "Image"
-    return (res)
+    return(res)
   }
 )
 
@@ -457,22 +476,22 @@ setMethod ("hist", signature(x="Image"),
 setMethod ("combine", signature(x="Image", y="Image"),
   function (x, y, ...) {
     if ( !assert(x, y) )
-      .stop( "images must have the same size and color mode" )
+      stop( "images must have the same size and color mode" )
     nz <- dim(x)[3] + dim(y)[3]
     args <- list ( ... )
     if ( length(args) > 0 ) {
       for (i in seq_along(args ) ) {
         stopIfNotImage ( args[[i]] )
         if ( !assert(x, args[[i]]) )
-          .stop( "images must have the same size and color mode" )
+          stop( "images must have the same size and color mode" )
         nz <- nz + dim(args[[i]])[3]
       }
     }
-    res <- header (x)
-    if ( colorMode(x) == TrueColor )
-      res@.Data <- array ( as.integer( c(x, y, ...) ), c( dim(x)[1:2], nz ) )
+    res <- header(x)
+    if (colorMode(x) == TrueColor)
+      res@.Data <- array(as.integer(c(x,y,...)), c(dim(x)[1:2],nz))
     else
-      res@.Data <- array ( c(x, y, ...), c( dim(x)[1:2], nz ) )
+      res@.Data <- array(as.double(c(x,y,...)), c(dim(x)[1:2],nz))
     return (res)
   }
 )
@@ -489,12 +508,14 @@ setMethod ("combine", signature(x="list", y="missing"),
 setMethod ("tile", signature(x="Image"),
   function (x, nx=10, lwd=1, fg.col="#E4AF2B", bg.col="gray", ...) {
     if ( nx < 1 || lwd < 0 || lwd > 100 )
-      .stop( "wrong range of arguments, see help for range details" )
+      stop( "wrong range of arguments, see help for range details" )
     if ( colorMode(x) == TrueColor ) cols <- channel(c(fg.col,bg.col), "rgb")
     else cols <- channel(c(fg.col,bg.col), "gray")
     hdr <- header(x)
     hdr@.Data <- array(cols, c(2,1,1))
-    .DoCall("lib_tile_stack", x, hdr, as.integer(c(nx, lwd)) )
+    x = .DoCall("lib_tile_stack", x, hdr, as.integer(c(nx, lwd)) )
+    if (is(x, "IndexedImage")) x = as.Image(x)
+    return(x)
   }
 )
 
