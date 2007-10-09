@@ -21,7 +21,7 @@
 }
 
 \usage{
-  Image(data=matrix(0,0,0), dim=base::dim(data), colormode=Grayscale, ...)
+  Image(data=array(0,c(0,0,1)), dim=base::dim(data), colormode, ...)
 
   is.Image(x)
   stopIfNotImage(x)
