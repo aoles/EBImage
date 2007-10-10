@@ -92,6 +92,7 @@ setGeneric ("paintObjects",   function (x, tgt, ...)   standardGeneric("paintObj
 setGeneric ("matchObjects",   function (x, ref, ...)   standardGeneric("matchObjects") )
 setGeneric ("stackObjects",   function (x, ref, index, ...) standardGeneric("stackObjects") )
 setGeneric ("rmObjects",      function (x, index, ...) standardGeneric("rmObjects") )
+setGeneric ("reenumerate",    function (x, ...)        standardGeneric("reenumerate"))
 setGeneric ("fillHull",       function (x, ...)        standardGeneric("fillHull") )
 
 ## drawables

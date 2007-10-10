@@ -3,6 +3,8 @@
 \alias{rmObjects}
 \alias{rmObjects,IndexedImage,numeric-method}
 \alias{rmObjects,IndexedImage,list-method}
+\alias{reenumerate}
+\alias{reenumerate,IndexedImage-method}
 
 \concept{object detection}
 \concept{delete objects}
@@ -11,16 +13,18 @@
 
 \description{
   The \code{rmObjects} functions deletes objects indexed by a list of
-  integer vectors (indexes) from an image with indexed objects.
+  integer vectors (indexes) from an image with indexed objects. \code{reenumerate}
+  re-enumerates all objects in an \linkS4class{IndexedImage} from 0 - background
+  to the actual number of objects.
 }
 
 \usage{
 
   ## S4 methods for signatures 'x=IndexedImage,index=numeric'
   ## and 'x=IndexedImage,index=list'
-
   rmObjects(x, index, ...)
-  
+
+  \S4method{reenumerate}{IndexedImage}(x, ...)
 }
 
 \arguments{

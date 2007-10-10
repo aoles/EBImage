@@ -32,8 +32,8 @@ exportMethods(
   sharpen, umask, thresh, athresh, cthresh, affinet, modulate, negate,
   normalize, normalize2, flip, flop, erode, dilate, opening, closing,
   distmap, watershed, paintObjects,
-  matchObjects, stackObjects, rmObjects, propagate, image, show, hist,
-  cmoments, smoments, rmoments, moments, floodFill, fillHull,
+  matchObjects, stackObjects, rmObjects, reenumerate, propagate, image, show, 
+  hist, cmoments, smoments, rmoments, moments, floodFill, fillHull,
 
   drawtext, 
     
