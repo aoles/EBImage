@@ -282,3 +282,21 @@ setMethod ("rmObjects", signature(x="IndexedImage", index="numeric"),
   }
 )
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod("reenumerate", signature(x="IndexedImage"),
+  function(x, ...) {
+    if (any(max(x)<0))
+      stop("'x' contains negative values and is incorrectly formed")
+    mode(x) = "integer"
+    y = apply(imageData(x), 3, function(im) {
+      from = as.integer(names(table(im)))
+      to = seq_along(from)-1
+      to[match(im, from)]
+    })
+    mode(y) = "double"
+    dim(y) = dim(x)
+    x = header(x)
+    x@.Data = y
+    x
+  }
+)
