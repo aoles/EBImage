@@ -70,3 +70,16 @@ setMethod("floodFill", signature(x="array", pt="ANY"),
   }
 )
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+rgbImage = function(r,g,b) {
+  res = list()
+  if (!missing(r)) res$r = channel(r,"asred")
+  if (!missing(g)) res$g = channel(g,"asgreen")
+  if (!missing(b)) res$b = channel(b,"asblue")
+  switch(length(res),
+    res[[1]],
+    res[[1]]+res[[2]],
+    res[[1]]+res[[2]]+res[[3]]
+  )
+}
+

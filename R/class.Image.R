@@ -180,7 +180,7 @@ stopIfNotImage <- function (x) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("header", signature(x="Image"),
   function (x, ...) {
-    x = new(class(x), colormode=Grayscale, filename=fileName(x),
+    x = new(class(x), colormode=colorMode(x), filename=fileName(x),
             compression=compression(x), resolution=resolution(x), 
             features=x@features )
     x@.Data = if (x@colormode == TrueColor) array(as.integer(0), c(0,0,1)) 
