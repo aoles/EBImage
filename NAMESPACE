@@ -9,7 +9,7 @@ importFrom("stats", "median")
 export(
   Image, is.Image, stopIfNotImage, display,
   TrueColor, Grayscale, morphKern, print.Image, print.IndexedImage,
-  median.Image, drawfont, readImage, chooseImage,
+  median.Image, drawfont, readImage, chooseImage, rgbImage,
 
   ### deprecated
   read.image, choose.image

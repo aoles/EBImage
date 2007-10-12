@@ -523,3 +523,23 @@ setMethod ("tile", signature(x="Image"),
 median.Image <- function(x, na.rm = FALSE) {
   median(imageData(x), na.rm=na.rm)
 }
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+rgbImage = function(r,g,b) {
+  res = list()
+  if (!missing(r)) res$r = channel(r,"asred")
+  if (!missing(g)) res$g = channel(g,"asgreen")
+  if (!missing(b)) res$b = channel(b,"asblue")
+  if (length(res)==0)
+    stop("at least one image must be provided")
+  dim1 = dim(res[[1]])
+  for (i in seq_along(res))
+    if (any(dim(res[[i]])!=dim1))
+      stop("all images must have the same dimensions")
+  switch(length(res),
+    res[[1]],
+    res[[1]]+res[[2]],
+    res[[1]]+res[[2]]+res[[3]]
+  )
+}
+
