@@ -3,6 +3,7 @@
 \alias{channel}
 \alias{channel,Image,character-method}
 \alias{channel,ANY,character-method}
+\alias{rgbImage}
 
 \concept{color conversion}
 \concept{color mode}
@@ -23,6 +24,8 @@
   ## S4 methods for signatures 'x=Image,mode=character'
   ## and 'x=ANY,mode=character'
   channel(x, mode, ...)
+  
+  rgbImage(r, g, b)
 }
 
 \arguments{
@@ -34,6 +37,9 @@
     See 'Conversion Modes' below. }
 
   \item{...}{ Reserved. }
+  
+  \item{r,g,b}{Objects of class \code{\linkS4class{Image}} to be converted to 
+    red, green and blue channels correspondingly. }
 }
 
 \value{
@@ -44,6 +50,9 @@
 
   For vectors the function returns a \code{vector} of the same size in the target
   mode.
+  
+  \code{rgbImage} generated a TrueColor image using \code{r}, \code{g} and \code{b}
+  as values for red, green and blue channels correspondingly.
 }
 
 \details{
