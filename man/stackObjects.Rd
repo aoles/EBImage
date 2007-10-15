@@ -18,9 +18,10 @@
 
 \usage{
   ## S4 methods for signatures 'x=IndexedImage,ref=Image,index=character'
-  ## and 'x=IndexedImage,ref=Image,index=list'
-  ## and 'x=IndexedImage,ref=Image,index=numeric'
-  \S4method{stackObjects}{IndexedImage,Image,missing}(x, ref, index, combine, rotate, bg.col, ext, ...)
+  ## and 'x=IndexedImage,ref=Image,index=list' and
+  \S4method{stackObjects}{IndexedImage,Image,numeric}(x, ref, index, ...)
+
+  \S4method{stackObjects}{IndexedImage,Image,missing}(x, ref, index, combine, rotate, bg.col, ext, centerby, rotateby, ...)
   
 }
 
@@ -49,6 +50,11 @@
   \item{ext}{ Extension of the target bounding box. See details. If not
     given, \code{ext} is calculated from data. }
   
+  \item{centerby,rotateby}{ If \code{ref} is a TrueColor image, these character 
+    values specify which channel should be used to center and rotate objects. 
+    By default the image is converted by \code{\link{channel}(ref,"gray")}. 
+    Other possible values are \code{"red", "green"} or \code{"blue"}. }
+
   \item{...}{ Reserved. }
   
 }
