@@ -167,44 +167,65 @@ setMethod ("matchObjects", signature(x="IndexedImage", ref="IndexedImage"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("stackObjects", signature(x="IndexedImage", ref="Image", index="missing"),
-  function (x, ref, index, combine, rotate, bg.col, ext, ...) {
+  function (x, ref, index, combine, rotate, bg.col, ext, centerby, rotateby, ...) {
     if ( colorMode(x) != Grayscale )
-      .stop( "'x' must be Grayscale" )
-    if ( any(dim(x) != dim(ref)) )
-      .stop( "dim(x) must equal dim(ref)" )
-    .dim <- dim(x)
+      stop( "'x' must be Grayscale" )
+    dimx <- dim(x)
+    if ( any(dimx != dim(ref)) )
+      stop( "dim(x) must equal dim(ref)" )
 
-    hf <- hullFeatures( x )
-    ## determine the bounding box -- same for all images in stack
-    if ( .dim[3] == 1 ) {
-      xyt <- hf[,c(1,2,11), drop=FALSE]
-      if ( missing(ext) )
-        ext <- hf[,12] ## h.s2major ~ h.pdm + h.pdsd
+    if (missing(rotate)) rotate = TRUE
+    if (missing(combine)) combine = TRUE
+    
+    # get centres
+    if (colorMode(ref)==Grayscale && (!missing(centerby)||!missing(rotateby)))
+      warning("'centerby' and 'rotateby' are only meaningful for TrueColor images")
+    if (missing(centerby)) centerby = "gray"
+    if (missing(rotateby)) rotateby = "gray"
+
+    centerby = tolower(centerby)
+    rotateby = tolower(rotateby)
+    if (!all(centerby%in%c("gray","grey","red","green","blue")) ||
+        !all(rotateby%in%c("gray","grey","red","green","blue")))
+      stop("'centerby' and 'rotateby' must be any one of 'gray', 'grey', 'red', 'green', 'blue'")
+
+    # for grayscale images default conversion to gray will not do anything
+    # get centers (using cmoments) and theta using moments
+    if (centerby==rotateby || !rotate) {
+      # use 'moments' to get both centers and theta
+      xyt = moments(x, channel(ref, centerby))
+      if (dimx[3]==1) xyt = list(xyt)
+      if (missing(ext)) extx = unlist(sapply(xyt, function(m) m[,9])) #  l1: 2*sqrt(l1) ~ h.pdm + h.pdsd
+      xyt = lapply(xyt, function(m) m[,c(3,4,8),drop=FALSE])
+    } else {
+      # use cmoments to get xy
+      xy = cmoments(x, channel(ref, centerby))
+      if (dimx[3]==1) xy = list(xy)
+      # use moments to get theta
+      xyt = moments(x, channel(ref, rotateby))
+      if (dimx[3]==1) xyt = list(xyt)
+      if (missing(ext)) extx = unlist(sapply(xyt, function(m) m[,9])) #  l1: 2*sqrt(l1) ~ h.pdm + h.pdsd
+      xyt = mapply(function(coord,theta) cbind(coord[,c(3,4),drop=FALSE],theta[,8]),
+                   xy, xyt, SIMPLIFY=FALSE, USE.NAMES=FALSE)
     }
-    else {
-      xyt <- lapply( hf, function(x) x[,c(1,2,11), drop=FALSE] )
-      if ( missing(ext) )
-        ext <- unlist( lapply(hf, function(x) x[,12]) ) ## h.s2major ~ h.pdm + h.pdsd
-    }
-    if ( length(ext) > 1 )
-      ext <- quantile(ext, 0.95, na.rm=TRUE)
+    if (missing(ext)) ext = 2.0*sqrt(quantile(extx,0.98,na.rm=TRUE)) # 2*sqrt(l1) ~ h.pdm + h.pdsd
+
     if ( missing(bg.col) ) bg.col <- "black"
     if ( colorMode(ref) == TrueColor ) col <- channel(bg.col, "rgb")
     else col <- channel(bg.col, "gray")
-    if ( missing(rotate) ) rotate <- TRUE
-    if ( missing(combine) ) combine <- FALSE
+
     ## create image headers for the result: better to do in C, but too complicated
     ## this hdr will be copied in C code, not modified
     hdr <- header(ref)
     hdr@.Data <- array(col, c(1,1,1))
-    res <- .DoCall ("lib_stack_objects", x, ref, hdr, xyt, as.numeric(ext), as.integer(rotate))
+    res <- .Call ("lib_stack_objects", x, ref, hdr, xyt, as.numeric(ext), as.integer(rotate))
     if (!combine || !is.list(res)) return( res )
-    ## if we are here, we have more than one frame and hf is a list
-    ## index of frames with no objects, these are to remove
-    index <- which( unlist( lapply(hf, function(x) all(x[,"h.s"] == 0)) ) )
-    ## if all are empty we return the first empty one
-    if ( length(index) == .dim[3] ) return( res[[1]] )
-    if ( length(index) > 0 ) res <- res[ -index ]
+#    ## if we are here, we have more than one frame and hf is a list
+#    ## index of frames with no objects, these are to remove
+#    index <- which( unlist( lapply(hf, function(x) all(x[,"h.s"] == 0)) ) )
+#    ## if all are empty we return the first empty one
+#    if ( length(index) == .dim[3] ) return( res[[1]] )
+#    if ( length(index) > 0 ) res <- res[ -index ]
     return( combine(res) )
   }
 )
