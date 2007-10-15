@@ -38,13 +38,10 @@ setMethod ("tile", signature(x="list"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("fillHull", signature(x="IndexedImage"),
   function(x, ...) {
-    # FIXME: remove when mode changed
-#    mode(x) = "integer"
-    x <- .DoCall("lib_fillHull", x)
-#    mode(x) = "double"
-    return(x)
+    return(.DoCall("lib_fillHull", x))
   }
 )
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("watershed", signature(x="Image"),
   function (x, tolerance=1, ext=1, ...) {
