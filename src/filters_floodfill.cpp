@@ -299,7 +299,7 @@ fillHull(int *_m, const XYPoint &srcsize) {
     canvas[x] = new int[size.y];
     for (y=0; y < size.y; y++) {
       canvas[x][y] = 0;
-      if (x== 0 || x == size.x-1) m[x][y] = 0;
+      if (x==0 || x==size.x-1 || y==0 || y==size.y-1) m[x][y] = 0;
       else m[x][y] = _m[x-1 + (y-1)*srcsize.x];
     }
   }
@@ -308,8 +308,8 @@ fillHull(int *_m, const XYPoint &srcsize) {
   Box * bbox = new Box[nobj+1];
 
   for (i=1; i <= nobj; i++) {
-    bbox[i].l = size.x-1;
-    bbox[i].t = size.y-1;
+    bbox[i].l = size.x-2;
+    bbox[i].t = size.y-2;
   }
 
   for (x=1; x < size.x-1; x++)
@@ -327,9 +327,12 @@ fillHull(int *_m, const XYPoint &srcsize) {
     box.expand(1);
     fillAroundObjectHull(m, canvas, size, box, i);
     // fill back the original matrix!
-  	for (x=box.l; x <= box.r; x++)
-      for (y=box.t; y <= box.b; y++) {
-	      if (canvas[x][y]==i || x-1<0 || x-1>=srcsize.x || y-1<0 || y-1>=srcsize.y) continue;
+  	for (x=box.l+1; x <= box.r-1; x++)
+      for (y=box.t+1; y <= box.b-1; y++) {
+	      // if ((int)_m[x-1+(y-1)*srcsize.x] > 0) continue;
+	      if (m[x][y] != 0 || canvas[x][y]==i) continue;
+        // this should never happen, but just in case
+	      if (x-1<0 || x-1>=srcsize.x || y-1<0 || y-1>=srcsize.y) continue;
  	      _m[x-1+(y-1)*srcsize.x] = i;
 	    }
   }
@@ -374,7 +377,7 @@ fillHullT(T *_m, const XYPoint &srcsize) {
     canvas[x] = new T[size.y];
     for (y=0; y < size.y; y++) {
       canvas[x][y] = (T)0;
-      if (x== 0 || x == size.x-1) m[x][y] = (T)0;
+      if (x==0 || x==size.x-1 || y==0 || y==size.y-1) m[x][y] = (T)0;
       else m[x][y] = _m[x-1 + (y-1)*srcsize.x];
     }
   }
@@ -383,8 +386,8 @@ fillHullT(T *_m, const XYPoint &srcsize) {
   Box * bbox = new Box[nobj+1];
 
   for (i=1; i <= nobj; i++) {
-    bbox[i].l = size.x-1;
-    bbox[i].t = size.y-1;
+    bbox[i].l = size.x-2;
+    bbox[i].t = size.y-2;
   }
 
   for (x=1; x < size.x-1; x++)
@@ -402,10 +405,11 @@ fillHullT(T *_m, const XYPoint &srcsize) {
     box.expand(1);
     fillAroundObjectHullT<T>(m, canvas, size, box, i);
     // fill back the original matrix!
-  	for (x=box.l; x <= box.r; x++)
-      for (y=box.t; y <= box.b; y++) {
+  	for (x=box.l+1; x <= box.r-1; x++)
+      for (y=box.t+1; y <= box.b-1; y++) {
 	      // if ((int)_m[x-1+(y-1)*srcsize.x] > 0) continue;
 	      if ((int)m[x][y] != 0 || (int)canvas[x][y]==i) continue;
+        // this should never happen, but just in case
 	      if (x-1<0 || x-1>=srcsize.x || y-1<0 || y-1>=srcsize.y) continue;
  	      _m[x-1+(y-1)*srcsize.x] = (T)i;
 	    }
