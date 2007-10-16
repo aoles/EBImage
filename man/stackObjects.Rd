@@ -110,7 +110,7 @@
   if (interactive()) display(io)
 
   ## stack individual objects
-  s = stackObjects(io, ii)
+  s = stackObjects(io, ii, combine=FALSE)
   ## display stack of objects of from the first image
   if (interactive()) display(s[[1]])
   ## combine stacks of objects into a single stack

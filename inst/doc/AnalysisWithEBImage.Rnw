@@ -532,8 +532,8 @@ You can now try out the following visualisations, with the first one shown in Fi
 rgb = paintObjects(sR, iRG)
 rgb = paintObjects(sG, rgb)
 
-ct = tile( combine(stackObjects(sR, iRn)) )
-nt = tile( combine(stackObjects(sG, iGn)) )
+ct = tile(stackObjects(sR, iRn))
+nt = tile(stackObjects(sG, iGn))
 @
 <<echo=FALSE,results=hide,eval=TRUE>>=
 writeImage(rgb[,,1], "13.png")
