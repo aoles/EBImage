@@ -9,7 +9,8 @@ importFrom("stats", "median")
 export(
   Image, is.Image, stopIfNotImage, display,
   TrueColor, Grayscale, morphKern, print.Image, print.IndexedImage,
-  median.Image, drawfont, readImage, chooseImage, rgbImage,
+  median.Image, drawfont, readImage, chooseImage, rgbImage, mkball, mkbox, 
+  channelMix, 
 
   ### deprecated
   read.image, choose.image
@@ -28,13 +29,14 @@ exportMethods(
   imageData, "imageData<-",
 
   blur, gblur, contrast, denoise, despeckle, edge, enhance, equalize,
-  cgamma, mediansmooth, noise, resize, rotate, resample, segment,
+  cgamma, mediansmooth, noise, resize, rotate, resample, segment, filter2, sharpen2,
   sharpen, umask, thresh, athresh, cthresh, affinet, modulate, negate,
   normalize, normalize2, flip, flop, erode, dilate, opening, closing,
   distmap, watershed, paintObjects,
   matchObjects, stackObjects, rmObjects, reenumerate, propagate, image, show, 
   hist, cmoments, smoments, rmoments, moments, floodFill, fillHull,
-
+  frameDist,
+  
   drawtext, 
     
   features, getFeatures, hullFeatures, edgeProfile, edgeFeatures,

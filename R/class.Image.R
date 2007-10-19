@@ -543,3 +543,17 @@ rgbImage = function(r,g,b) {
   )
 }
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+channelMix = function(r,g,b) {
+  mix = list()
+  if (!missing(r)) mix[["r"]] = r
+  if (!missing(g)) mix[["g"]] = g
+  if (!missing(b)) mix[["b"]] = b
+  if (length(res)==0)
+    stop("at least one image must be provided")
+  if (length(mix)==1) return(mix[[1]])
+  res = mix[[1]]^2 + mix[[2]]^2
+  if (length(mix)==3) res = res + mix[[3]]^2
+  sqrt(res)
+}
+

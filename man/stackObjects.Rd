@@ -22,7 +22,6 @@
   \S4method{stackObjects}{IndexedImage,Image,numeric}(x, ref, index, ...)
 
   \S4method{stackObjects}{IndexedImage,Image,missing}(x, ref, index, combine, rotate, bg.col, ext, centerby, rotateby, ...)
-  
 }
 
 \arguments{

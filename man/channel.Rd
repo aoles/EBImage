@@ -4,6 +4,7 @@
 \alias{channel,Image,character-method}
 \alias{channel,ANY,character-method}
 \alias{rgbImage}
+\alias{channelMix}
 
 \concept{color conversion}
 \concept{color mode}
@@ -26,6 +27,7 @@
   channel(x, mode, ...)
   
   rgbImage(r, g, b)
+  channelMix(r, g, b)
 }
 
 \arguments{
@@ -38,8 +40,7 @@
 
   \item{...}{ Reserved. }
   
-  \item{r,g,b}{Objects of class \code{\linkS4class{Image}} to be converted to 
-    red, green and blue channels correspondingly. }
+  \item{r,g,b}{Objects of class \code{\linkS4class{Image}}. }
 }
 
 \value{
@@ -53,6 +54,9 @@
   
   \code{rgbImage} generated a TrueColor image using \code{r}, \code{g} and \code{b}
   as values for red, green and blue channels correspondingly.
+  
+  \code{channelMix} generates a grayscale image as if the image was converted from
+    a TrueColor one that was composed using \code{r}, \code{g} and \code{b}.
 }
 
 \details{
@@ -89,6 +93,9 @@
   If the input is a \code{character} vector, its values may contain color names
   instead of color hex codes, like \code{red, purple, white} etc. However,
   the result of the \code{X11} mode will always contain hex codes.
+  
+  \code{channelMix} uses the following formula to calculate the mix:
+  \code{mix = sqrt(r^2+g^+b^2)}. Any of the values can be missing.
 }
 
 \seealso{
