@@ -218,6 +218,7 @@ setMethod ("stackObjects", signature(x="IndexedImage", ref="Image", index="missi
     ## this hdr will be copied in C code, not modified
     hdr <- header(ref)
     hdr@.Data <- array(col, c(1,1,1))
+    if (dimx[3]==1) xyt = xyt[[1]]
     res <- .Call ("lib_stack_objects", x, ref, hdr, xyt, as.numeric(ext), as.integer(rotate))
     if (!combine || !is.list(res)) return( res )
 #    ## if we are here, we have more than one frame and hf is a list
