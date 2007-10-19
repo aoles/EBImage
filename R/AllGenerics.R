@@ -77,6 +77,8 @@ setGeneric ("fill",           function (x, ...)        standardGeneric("fill") )
 setGeneric ("floodFill",      function (x, pt, ...)    standardGeneric("floodFill") )
 setGeneric ("flip",           function (x, ...)        standardGeneric("flip") )
 setGeneric ("flop",           function (x, ...)        standardGeneric("flop") )
+setGeneric ("filter2",        function (x, filter, ...) standardGeneric("filter2"))
+setGeneric ("sharpen2",       function (x, ...)        standardGeneric("sharpen2"))
 
 ## morphology
 setGeneric ("distmap",        function (x, ...)        standardGeneric("distmap") )
@@ -91,6 +93,7 @@ setGeneric ("closing",        function (x, ...)        standardGeneric("closing"
 setGeneric ("paintObjects",   function (x, tgt, ...)   standardGeneric("paintObjects") )
 setGeneric ("matchObjects",   function (x, ref, ...)   standardGeneric("matchObjects") )
 setGeneric ("stackObjects",   function (x, ref, index, ...) standardGeneric("stackObjects") )
+setGeneric ("frameDist",      function(x, y, ...)      standardGeneric("frameDist"))
 setGeneric ("rmObjects",      function (x, index, ...) standardGeneric("rmObjects") )
 setGeneric ("reenumerate",    function (x, ...)        standardGeneric("reenumerate"))
 setGeneric ("fillHull",       function (x, ...)        standardGeneric("fillHull") )

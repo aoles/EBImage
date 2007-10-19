@@ -27,6 +27,7 @@ See: ../LICENSE for license, LGPL
 #include "drawable.h"
 
 #include "objects.h"
+#include "frameDist.h"
 
 #include <R.h>
 #include <Rdefines.h>
@@ -70,8 +71,9 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_paintFeatures",  (DL_FUNC) &lib_paintFeatures,  4},
     {"lib_matchFeatures",  (DL_FUNC) &lib_matchFeatures,  2},
     {"lib_deleteFeatures", (DL_FUNC) &lib_deleteFeatures, 2},
-    {"lib_stack_objects",  (DL_FUNC) &lib_stack_objects,  6},
     {"lib_tile_stack",     (DL_FUNC) &lib_tile_stack,     3},
+    {"lib_stack_objects",  (DL_FUNC) &lib_stack_objects,  6},
+    {"lib_frameDist",      (DL_FUNC) &lib_frameDist,      4},
 
     {"lib_drawText",       (DL_FUNC) &lib_drawText,       5},
 

@@ -21,6 +21,7 @@
 \alias{Arith,array,Image-method}
 \alias{resolution,Image-method}
 \alias{resolution<-,Image,numeric-method}
+\alias{x}
 
 \title{ Internals }
 
