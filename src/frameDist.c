@@ -27,7 +27,7 @@ lib_frameDist(SEXP im1, SEXP im2, SEXP weights, SEXP verbose) {
 SEXP
 distGray(SEXP im1, SEXP im2, SEXP verbose) {
   int i, j, x, nx, ny, nz1, nz2, nprotect=0, verb;
-  double *dat1, *dat2, *c, sum, scale;
+  double *dat1, *dat2, *c, sum;
   SEXP res, dm;
   
   nx =  INTEGER(GET_DIM(im1))[0];
@@ -53,13 +53,9 @@ distGray(SEXP im1, SEXP im2, SEXP verbose) {
         if (i==j || c[i+j*nz1]<R_PosInf) continue;
       dat1 = &(REAL(im1)[i*nx*ny]);
       dat2 = &(REAL(im2)[j*nx*ny]);
-      sum = 0.0; scale = 0.0;
-      for (x=0; x<nx*ny; x++)
-        if (dat1[x]!=0.0 || dat2[x]!=0.0) {
-          sum += fabs(dat1[x]-dat2[x]);
-          scale += 1.0;
-        }
-      if (scale!=0.0) sum /= scale;
+      sum = 0.0; 
+      for (x=0; x<nx*ny; x++) sum += fabs(dat1[x]-dat2[x]);
+      sum /= (double)(nx*ny);
       c[i+j*nz1] = sum;
       if (im1==im2) c[j+i*nz1] = sum;
       R_CheckUserInterrupt();
@@ -78,7 +74,7 @@ distGray(SEXP im1, SEXP im2, SEXP verbose) {
 }
 
 /* -------------------------------------------------------------------------*/
-inline double distInt(char *x, char *y, double *wgts) {
+inline double distInt(unsigned char *x, unsigned char *y, double *wgts) {
   double sum = 0.0; 
   int i;
   for (i=0; i<4; i++) sum += wgts[i]*(x[i]-y[i])*(x[i]-y[i]);
@@ -90,7 +86,7 @@ SEXP
 distRGB(SEXP im1, SEXP im2, SEXP weights, SEXP verbose) {
   int i, j, x, nx, ny, nz1, nz2, nprotect=0, verb;
   int *dat1, *dat2;
-  double *c, sum, scale, *wgts;
+  double *c, sum, *wgts;
   SEXP res, dm;
   
   nx =  INTEGER(GET_DIM(im1))[0];
@@ -117,17 +113,16 @@ distRGB(SEXP im1, SEXP im2, SEXP weights, SEXP verbose) {
         if (i==j || c[i+j*nz1]<R_PosInf) continue;
       dat1 = &(INTEGER(im1)[i*nx*ny]);
       dat2 = &(INTEGER(im2)[j*nx*ny]);
-      sum = 0.0; scale = 0.0;
+      sum = 0.0; 
       for (x=0; x<nx*ny; x++)
         if (dat1[x]!=0 || dat2[x]!=0) {
-          sum += distInt((char*)&dat1[x],(char*)&dat2[x],wgts);
-          scale += 1.0;
+          sum += distInt((unsigned char*)&dat1[x],(unsigned char*)&dat2[x],wgts);
         }
-      if (scale!=0.0) sum /= scale;
+      sum /= (double)(nx*ny);
       c[i+j*nz1] = sum;
       if (im1==im2) c[j+i*nz1] = sum;
-      R_CheckUserInterrupt();
     }
+    R_CheckUserInterrupt();
   }
   if (verb) Rprintf("\n");
   
