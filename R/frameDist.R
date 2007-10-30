@@ -25,7 +25,7 @@ setMethod("frameDist", signature(x="Image",y="Image"),
     if (missing(r)) r = 1.0
     if (missing(g)) g = 1.0
     if (missing(b)) b = 1.0
-    method = as.integer(switch(tolower(substr(method,1,3)), dis=0, dot=1))
+    method = as.integer(switch(tolower(substr(method,1,3)), dis=0, dot=1, cor=2))
     weights = as.double(c(r,g,b,0.0))
     if (blur) {
       if (colorMode(x)==Grayscale) {
@@ -50,7 +50,7 @@ setMethod("frameDist", signature(x="Image",y="missing"),
     if (missing(r)) r = 1.0
     if (missing(g)) g = 1.0
     if (missing(b)) b = 1.0
-    method = as.integer(switch(tolower(substr(method,1,3)), dis=0, dot=1))
+    method = as.integer(switch(tolower(substr(method,1,3)), dis=0, dot=1, cor=2))
     weights = as.double(c(r,g,b,0.0))
     if (blur) {
       if (colorMode(x)==Grayscale) {
