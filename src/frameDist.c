@@ -49,20 +49,19 @@ distGray(SEXP im1, SEXP im2, SEXP method, SEXP verbose) {
   for (i=0; i<nz1; i++) {
     if (verb) Rprintf("*");
     for (j=0; j<nz2; j++) {
-      // if we compare same images, do not take same frame and matrix symmatric
-      if (im1==im2)
-        if (i==j || c[i+j*nz1]<R_PosInf) continue;
       dat1 = &(REAL(im1)[i*nx*ny]);
       dat2 = &(REAL(im2)[j*nx*ny]);
       sum = 0.0; 
       switch (mthd) {
         // dot product
         case 1:
+          if (im1==im2 && c[i+j*nz1]<R_PosInf) continue;
           for (x=0; x<nx*ny; x++) sum += dat1[x]*dat2[x];
           sum /= (double)(nx*ny);
         break;
         // distance
         default:
+          if (im1==im2 && (i==j || c[i+j*nz1]<R_PosInf)) continue;
           for (x=0; x<nx*ny; x++) sum += fabs(dat1[x]-dat2[x]);
           sum /= (double)(nx*ny);
       }
@@ -111,15 +110,13 @@ distRGB(SEXP im1, SEXP im2, SEXP weights, SEXP method, SEXP verbose) {
   for (i=0; i<nz1; i++) {
     if (verb) Rprintf("*");
     for (j=0; j<nz2; j++) {
-      // if we compare same images, do not take same frame and matrix symmatric
-      if (im1==im2)
-        if (i==j || c[i+j*nz1]<R_PosInf) continue;
       dat1 = (unsigned char *)&(INTEGER(im1)[i*nx*ny]);
       dat2 = (unsigned char *)&(INTEGER(im2)[j*nx*ny]);
       sum = 0.0; 
       switch (mthd) {
         // dot product
         case 1:
+          if (im1==im2 && c[i+j*nz1]<R_PosInf) continue;
           for (x=0; x<nx*ny; x++) {
             if (dat1[x]!=0 || dat2[x]!=0) {
               sum0 = 0.0;
@@ -132,6 +129,7 @@ distRGB(SEXP im1, SEXP im2, SEXP weights, SEXP method, SEXP verbose) {
         break;
         // distance
         default:
+          if (im1==im2 && (i==j || c[i+j*nz1]<R_PosInf)) continue;
           for (x=0; x<nx*ny; x++) {
             if (dat1[x]!=0 || dat2[x]!=0) {
               sum0 = 0.0;
