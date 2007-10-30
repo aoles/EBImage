@@ -16,7 +16,7 @@
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 setMethod("frameDist", signature(x="Image",y="Image"),
-  function(x, y, r, g, b, blur=TRUE, verbose, ...) {
+  function(x, y, r, g, b, blur=TRUE, method="dist", verbose, ...) {
     if (missing(verbose)) verbose = options()$verbose
     if (colorMode(x)!=colorMode(y))
       stop("'x' and 'y' must be in the same color mode")
@@ -25,6 +25,7 @@ setMethod("frameDist", signature(x="Image",y="Image"),
     if (missing(r)) r = 1.0
     if (missing(g)) g = 1.0
     if (missing(b)) b = 1.0
+    method = as.integer(switch(tolower(substr(method,1,3)), dis=0, dot=1))
     weights = as.double(c(r,g,b,0.0))
     if (blur) {
       if (colorMode(x)==Grayscale) {
@@ -36,19 +37,20 @@ setMethod("frameDist", signature(x="Image",y="Image"),
         y = blur(y, 1.5, 1.0)
       }
     }
-    return(.Call("lib_frameDist", x, y, weights, as.integer(verbose)))
+    return(.Call("lib_frameDist", x, y, weights, method, as.integer(verbose)))
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 setMethod("frameDist", signature(x="Image",y="missing"),
-  function(x, y, r, g, b, blur=TRUE, verbose, ...) {
+  function(x, y, r, g, b, blur=TRUE, method="dist", verbose, ...) {
     if (missing(verbose)) verbose = options()$verbose
     if (colorMode(x)==Grayscale && (!missing(r)||!missing(g)||!missing(b)))
       warning("r, g, b are used only for TrueColor images")
     if (missing(r)) r = 1.0
     if (missing(g)) g = 1.0
     if (missing(b)) b = 1.0
+    method = as.integer(switch(tolower(substr(method,1,3)), dis=0, dot=1))
     weights = as.double(c(r,g,b,0.0))
     if (blur) {
       if (colorMode(x)==Grayscale) {
@@ -56,7 +58,7 @@ setMethod("frameDist", signature(x="Image",y="missing"),
         x = filter2(x, m)
       } else x = blur(x, 1.5, 1.0)
     }
-    return(.Call("lib_frameDist", x, x, weights, as.integer(verbose)))
+    return(.Call("lib_frameDist", x, x, weights, method, as.integer(verbose)))
   }
 )
 

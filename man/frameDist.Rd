@@ -17,8 +17,10 @@
 }
 
 \usage{
-  \S4method{frameDist}{Image,Image}(x, y, r, g, b, blur=TRUE, verbose, ...)
-  \S4method{frameDist}{Image,missing}(x, y, r, g, b, blur=TRUE, verbose, ...)
+  \S4method{frameDist}{Image,Image}(x, y, r, g, b, blur=TRUE, 
+      method="dist", verbose, ...)
+  \S4method{frameDist}{Image,missing}(x, y, r, g, b, blur=TRUE, 
+      method="dist", verbose, ...)
 }
 
 \arguments{
@@ -29,6 +31,9 @@
 
   \item{blur}{ A logical indicating whether frames ought to be blurred before
     comparison (\code{TRUE} recommended). }
+
+  \item{method}{ Method to use: \code{dist} - Euclidian distance, \code{dot} -
+    dot product. }
 
   \item{verbose}{ Provides additional output as the function can be lengthy. }
 

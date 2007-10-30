@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-SEXP lib_frameDist(SEXP, SEXP, SEXP, SEXP);
+SEXP lib_frameDist(SEXP, SEXP, SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus
 };
