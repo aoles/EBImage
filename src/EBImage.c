@@ -73,7 +73,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_deleteFeatures", (DL_FUNC) &lib_deleteFeatures, 2},
     {"lib_tile_stack",     (DL_FUNC) &lib_tile_stack,     3},
     {"lib_stack_objects",  (DL_FUNC) &lib_stack_objects,  6},
-    {"lib_frameDist",      (DL_FUNC) &lib_frameDist,      4},
+    {"lib_frameDist",      (DL_FUNC) &lib_frameDist,      5},
 
     {"lib_drawText",       (DL_FUNC) &lib_drawText,       5},
 
