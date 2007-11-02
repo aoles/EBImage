@@ -81,7 +81,7 @@ setMethod("sharpen2", signature(x="Image"),
     if (colorMode(x)!=Grayscale)
       stop("'x' must be a Grayscale image")
     mx = mean(x)
-    m = matrix(c(1,1,1,1,-1,1,1,1,1),3,3)
+    m = matrix(c(0.5,1,0.5,1,-0.5,1,0.5,1,0.5),3,3)
     x = x - filter2(x, m/sum(m)/2)
     x[x<0] = 0.0
     x*mx/mean(x)
