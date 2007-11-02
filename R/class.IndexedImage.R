@@ -59,14 +59,14 @@ setMethod ("watershed", signature(x="Image"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("propagate", signature(x="Image", seeds="IndexedImage"),
-  function (x, seeds, mask=NULL, lambda=0.005, ext=1, ...) {
+  function (x, seeds, mask=NULL, lambda=0.1, ext=1, ...) {
     if ( colorMode(x) != Grayscale )
       .stop("'x' must be Grayscale" )
     if ( !assert(x, seeds, strict=TRUE) || (!is.null(mask) && !assert(x, mask, strict=TRUE)) )
       .stop( "dim(x) must equal dim(seeds) and dim(mask) if mask is not NULL, all images must be Grayscale" )
     ext <- as.integer (ext)
-    if ( ext < 1 )
-      .stop("'ext' must be a positive integer" )
+    if ( ext < 0 )
+      .stop("'ext' must be non-negative" )
     lambda <- as.numeric (lambda)
     if ( lambda < 0.0 )
       .stop("'lambda' must be non-negative" )

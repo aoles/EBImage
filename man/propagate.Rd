@@ -14,7 +14,7 @@
 
 \usage{
 
-  \S4method{propagate}{Image,IndexedImage}(x, seeds, mask=NULL, lambda=0.005, ext=1, ...)
+  \S4method{propagate}{Image,IndexedImage}(x, seeds, mask=NULL, lambda=0.1, ext=1, ...)
 }
 
 \arguments{
