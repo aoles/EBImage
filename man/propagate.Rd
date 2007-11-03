@@ -15,7 +15,7 @@
 \usage{
 
   \S4method{propagate}{Image,IndexedImage}(x, seeds, mask=NULL, lambda=0.1, 
-     ext=1, seed.centers=TRUE, ...)
+     ext=1, seed.centers=FALSE, ...)
 }
 
 \arguments{

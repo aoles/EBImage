@@ -59,7 +59,7 @@ setMethod ("watershed", signature(x="Image"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("propagate", signature(x="Image", seeds="IndexedImage"),
-  function (x, seeds, mask=NULL, lambda=0.1, ext=1, seed.centers=TRUE, ...) {
+  function (x, seeds, mask=NULL, lambda=0.1, ext=1, seed.centers=FALSE, ...) {
     if ( colorMode(x) != Grayscale )
       .stop("'x' must be Grayscale" )
     if ( !assert(x, seeds, strict=TRUE) || (!is.null(mask) && !assert(x, mask, strict=TRUE)) )
