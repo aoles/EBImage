@@ -1,30 +1,18 @@
 #include "filters_propagate.h"
 
 /* -------------------------------------------------------------------------
-Implementation of the Voronoi-based segmentation on image manifolds [2]
+Implementation of the Voronoi-based segmentation on image manifolds [1]
 
 The code below is based on the 'IdentifySecPropagateSubfunction.cpp'
-module (revision 3667) of CellProfiler [1,3]. CellProfiler is released
+module (revision 3667) of CellProfiler [2]. CellProfiler is released
 under the terms of GPL, however the LGPL license was granted by T. Jones
 on Feb 7, 07 to use the code in the above file for this project.
 
-If you reuse this code under the LGPL terms, you cannot
-apply the terms of LGPL to CellProfiler itself or any code derived from
-it, not even to the module for which LGPL was granted in this project.
-You are only allowed to reuse under LGPL the code which you find here.
-
-[1] A. Carpenter, T.R. Jones, M.R. Lamprecht, C. Clarke, I.H. Kang,
-    O. Friman, D. Guertin, J.H. Chang, R.A. Lindquist, J. Moffat,
-    P. Golland and D.M. Sabatini
-    "CellProfiler: image analysis software for identifying and
-    quantifying cell phenotypes", Genome Biology 2006, 7:R100
-
-[2] T. Jones, A. Carpenter and P. Golland,
+[1] T. Jones, A. Carpenter and P. Golland,
     "Voronoi-Based Segmentation of Cells on Image Manifolds"
     CVBIA05 (535-543), 2005
 
-[3] CellProfiler: http://www.cellprofiler.org
-
+[2] CellProfiler: http://www.cellprofiler.org
 
 Copyright (C) of the original CellProfiler code:
  - Anne Carpenter <carpenter@wi.mit.edu>
@@ -37,9 +25,6 @@ Copyright (C) of the implementation below:
 
 See: ../LICENSE for license, LGPL.
 
-When reusing the code please cite all of the above to clearly state
-the authors of the algorithm and the code and provide the corresponding
-references!
 ------------------------------------------------------------------------- */
 
 #include <R_ext/Error.h>
@@ -77,7 +62,7 @@ static int jy[8] = { 0, 1,  0, -1, -1, +1, +1, -1};
 
 /* ----  R Interface entry point  --------------------------------------- */
 SEXP
-lib_propagate (SEXP x, SEXP seeds_, SEXP mask_, SEXP dx_, SEXP lambda_) {
+lib_propagate (SEXP x, SEXP seeds_, SEXP mask_, SEXP ext_, SEXP lambda_) {
   SEXP res;
   int i, ii, j, jj, cntr, nprotect = 0;
 
@@ -85,7 +70,7 @@ lib_propagate (SEXP x, SEXP seeds_, SEXP mask_, SEXP dx_, SEXP lambda_) {
   int ny = INTEGER ( GET_DIM(x) )[1];
   int nz = INTEGER ( GET_DIM(x) )[2];
 
-  int dx = INTEGER( dx_ )[0];
+  int ext = INTEGER( ext_ )[0];
   double lambda = REAL( lambda_ )[0];
 
   PROTECT ( res = Rf_duplicate(x) );
@@ -140,7 +125,7 @@ lib_propagate (SEXP x, SEXP seeds_, SEXP mask_, SEXP dx_, SEXP lambda_) {
           /* at this initialization step we do not push pixels on the queue which are
             * already assigned, i.e. which are seeds because their distance is 0 and cannot be smaller */
           if ( tgt[ INDEX(ii, jj) ] > 0.9 ) continue;
-          pixel_queue.push( Pixel(deltaG(src, i, j, ii, jj, nx, ny, lambda, dx), ii, jj, seed) );
+          pixel_queue.push( Pixel(deltaG(src, i, j, ii, jj, nx, ny, lambda, ext), ii, jj, seed) );
         }
       }
 
@@ -177,7 +162,7 @@ lib_propagate (SEXP x, SEXP seeds_, SEXP mask_, SEXP dx_, SEXP lambda_) {
           * smaller later on (in L.163 above). anyway this should be much faster than
           * CellProfile'r original algorithm as we do not resize the queue on
           * pixels that we are not going to reassign */
-        d = px.distance + deltaG(src, px.i, px.j, ii, jj, nx, ny, lambda, dx);
+        d = px.distance + deltaG(src, px.i, px.j, ii, jj, nx, ny, lambda, ext);
         if ( tgt[ index ] == px.seed ) {
           if ( dists[ index ] > d )
             dists[ index ] = d;
@@ -204,26 +189,27 @@ clamped_fetch (double * data, int i, int j, int nx, int ny) {
 
 /* this is the distance evaluation in the modified metric */
 inline double
-deltaG ( double * src, int i1,  int j1, int i2,  int j2,
-        int nx, int ny, double lambda, int dx) {
-  int i, j;
+deltaG ( double * src, int x1,  int y1, int x2,  int y2,
+        int nx, int ny, double lambda, int ext) {
+  int x, y;
   double dI = 0.0;
 
-  for ( i = -dx; i <= dx; i++)
-    for ( j = -dx; j <= dx; j++)
-      dI += fabs( clamped_fetch(src, i1 + i, j1 + j, nx, ny) -
-                  clamped_fetch(src, i2 + i, j2 + j, nx, ny));
+  for (x=-ext; x<=ext; x++)
+    for (y=-ext; y<=ext; y++)
+      dI += fabs(clamped_fetch(src, x1+x, y1+y, nx, ny) -
+                 clamped_fetch(src, x2+x, y2+y, nx, ny));
   /* this is not because we calculate dI/dx as it is dx*(dI/dx)=dI, this is
   * because we want the mean value of the gradient in the region */
-  dI /= (2.0*dx+1.0)*(2.0*dx+1.0);
+  dI /= (2.0*ext+1.0)*(2.0*ext+1.0);
 
-  double dEucl = (i2 - i1) * (i2 - i1) + (j2 - j1) * (j2 - j1);
+  double dEucl = (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1);
+  /* we downplay sharp changes in intensity and penalize high Eucl distances */
   return sqrt(dI) + 1e-3*lambda*dEucl*dEucl;
   /* Our original formula
       return sqrt((dI*dI + lambda*dEucl)/(1.0 + lambda));
   */ 
   /* CellProfiler uses this formula
-      double dManh = abs(i2 - i1) + abs(j2 - j1);
+      double dManh = abs(x2 - x1) + abs(y2 - y1);
       return sqrt( dI*dI + dManh * lambda * lambda);
   */
 }
