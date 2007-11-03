@@ -59,7 +59,7 @@ setMethod ("watershed", signature(x="Image"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("propagate", signature(x="Image", seeds="IndexedImage"),
-  function (x, seeds, mask=NULL, lambda=0.1, ext=1, ...) {
+  function (x, seeds, mask=NULL, lambda=0.1, ext=1, seed.centers=TRUE, ...) {
     if ( colorMode(x) != Grayscale )
       .stop("'x' must be Grayscale" )
     if ( !assert(x, seeds, strict=TRUE) || (!is.null(mask) && !assert(x, mask, strict=TRUE)) )
@@ -70,7 +70,21 @@ setMethod ("propagate", signature(x="Image", seeds="IndexedImage"),
     lambda <- as.numeric (lambda)
     if ( lambda < 0.0 )
       .stop("'lambda' must be non-negative" )
-    return( .DoCall( "lib_propagate", x, seeds, mask, ext, lambda) )
+    if (seed.centers) {
+      cm = cmoments(seeds)
+      dimx = dim(seeds)
+      if (dimx[3]==1) cm = list(cm)
+      index = lapply(cm, function(xy) {
+        floor(xy[,3]) + floor(xy[,4])*dimx[1]
+      })
+      for (i in 1:dimx[3]) index[[i]] = index[[i]] + (i-1)*dimx[1]*dimx[2]
+      index = unlist(index)
+      s = seeds
+      s[] = 0.0
+      s[index] = seeds[index]
+      seeds = s
+    }
+    return( .Call( "lib_propagate", x, seeds, mask, ext, lambda) )
   }
 )
 

@@ -14,7 +14,8 @@
 
 \usage{
 
-  \S4method{propagate}{Image,IndexedImage}(x, seeds, mask=NULL, lambda=0.1, ext=1, ...)
+  \S4method{propagate}{Image,IndexedImage}(x, seeds, mask=NULL, lambda=0.1, 
+     ext=1, seed.centers=TRUE, ...)
 }
 
 \arguments{
@@ -37,6 +38,9 @@
   \item{ext}{ Extension of the neighborhood to estimate image
     gradient, in pixels in every direction from the central point, i.e.
     ext=1 means a 3x3 neighborhood. }
+
+  \item{seed.centers}{ If \code{TRUE}, only centers of the seed points are left
+    in the seeds image supplied to the propagate algorithm. }
 
   \item{...}{ Reserved. }
 }
@@ -62,6 +66,16 @@
   (propagate) is
 
   \preformatted{d^2 = (grad(I)^2 + lambda * (dx^2 + dy^2)) / (lambda + 1)}
+
+  The above formulation was proposed by Carpenter et al, however in the 
+  calculation we use a modified distance measture, in which sharp gradients
+  are downregulated and large distances additionally penalized. Effectively,
+  we use the following formula:
+  
+  \preformatted{d = sqrt(grad(I)) + 1e-3*lambda * (dx^2+dy^2)^2}
+  
+  The denominator is left out for speed reasons, so is the square root of the 
+  distance.
 
   The gradient is calculated on a neighborhood of pixels (the width of which
   is controlled by the argument \code{ext}) to avoid relying on single
@@ -104,7 +118,7 @@
   mk7 = morphKern(7)
   mask = dilate(erode(closing(mask, mk7), mk5), mk7)
   ## index objects of xi with 'propagate' using ii as seeds
-  xo = propagate(xi, io, mask, 1e-5, 1.5)
+  xo = propagate(xi, io, mask, 1e-2, 2)
   if (interactive()) display(xo)
   
 }
