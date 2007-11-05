@@ -20,8 +20,11 @@ setMethod ("haralickMatrix", signature(x="IndexedImage", ref="Image"),
     if ( colorMode(x) != Grayscale || colorMode(ref) != Grayscale)
       .stop( "'x' and 'ref' must be Grayscale" )
     rref <- range(ref)
-    if ( rref[1] < 0 || rref[2] > 1 )
-      .stop( "'ref' image must be in the range [0,1]" )
+    if ( rref[1] < 0 || rref[2] > 1 ) {
+      ref[ref<0] = 0.0
+      ref[ref>1] = 1.0
+      warning( "'ref' will be clipped to the range [0,1]" )
+    }
     res <- .DoCall( "lib_co_occurrence", x, ref, as.integer(nc) )
     return( res )
   }
