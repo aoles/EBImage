@@ -51,7 +51,7 @@
 
 \maketitle
 
-The package was tested to work on Linux (32/64 bit), MacOS, Windows XP (32 bit) and Solaris (64 bit). It should be possible to install and run the package on other versions of UNIX-like and Windows systems in a similar manner. It is advisable to install recommended dependencies as well to enjoy the full functionality of the package. On Windows, all dependencies are required, not recommended. \lib{GTK+} support was not tested on MacOS, but there is no apparent reason for the package to fail to support it.
+The package was tested to work on Linux (32/64 bit), MacOS, Windows XP (32 bit) and Solaris (64 bit). It should be possible to install and run the package on other versions of UNIX-like and Windows systems in a similar manner. On Windows, all dependencies are required. On other systems, some dependencies are recommended (but not required) in order to enjoy the full functionality of the package. \lib{GTK+} support was not tested on MacOS, but there is no apparent reason for the package to fail to support it.
 
 %--------------------------------------------------
 \section{UNIX/Linux Installation}
@@ -66,7 +66,7 @@ The installation should be performed from the source after the following depende
 
 On most Linux distributions, these are available as precompiled binaries \lib{rpm} or \lib{deb} format with a \code{-dev} or \code{-devel} suffix. Hereafter, the package names are for Ubuntu Linux, but other distributions have similar packages with only slight naming differences.
 
-For \lib{ImageMagick}, you will need to install  \code{libmagick9-dev} with all dependencies using \code{apt-get} or Synaptic. Alternatively, you can download the latest version of \lib{ImageMagick} from \url{http://www.imagemagick.org} and install it from source as usual using \code{./configure \&\& make \&\& make install}. The latter will install all the required development files as well.
+For \lib{ImageMagick}, you will need to install  \code{libmagick9-dev} with all dependencies using \code{apt-get} or the Synaptic package manager. Alternatively, you can download the latest version of \lib{ImageMagick} from \url{http://www.imagemagick.org} and install it from source as usual using \code{./configure \&\& make \&\& make install}. The latter will install all the required development files as well.
 
 \Rpackage{EBImage} will function without \lib{GTK+}, but most of its GUI functionality (image chooser, interactive image display with zoom features etc) will be disabled. You will need \code{libgtk2.0-dev} with all the dependencies, which normally include \code{glib}, \code{pango-dev}, \code{libcairo-dev}, \code{atk-dev} and some others. Alternatively, all these packages can be installed from source available at \url{http://www.gtk.org} along with the corresponding installation instructions. When installing \lib{GTK+}, please ensure that you also install \code{pkg-config} as it is used to determine the location of \lib{GTK+} include files and its compile flags. Without this package, \lib{GTK+} will not be located on your system by the package installer. \code{pkg-config} is normally installed in UNIX/Linux systems running the \lib{GNOME} desktop manager, it is also likely in this case that you have necessary \lib{GTK+} development files because \lib{GNOME} is build upon \lib{GTK+}.
 
@@ -81,34 +81,36 @@ Analogously to the UNIX/Linux installation, this should be performed from source
 One can use the \lib{fink} project (\url{http://fink.sf.net}) to download and install dependencies, or install them from
 source as in Linux. Both work fine. Sometimes, MacOS users get problems with a UNIX \code{libtool}, it is likely that a MacOS-specific \code{libtool} should be installed, which is named \code{glibtool}. It is also available from \lib{fink}. 
 
-The author did not have any possibility to check if \lib{GTK+}-enabled version works on MacOS due to the lack of hardware when the \lib{GTK+} support was added, but since \code{gtk+2-dev} and \code{gtk+2-shlib} are available at \lib{fink}, it is worth trying. Please remember again, that you will need \code{pkgconfig} (also available from \lib{fink}), in order for the installation script to find your \lib{GTK+} includes.
+I have not yet checked if the \lib{GTK+}-enabled version works on MacOS, but since \code{gtk+2-dev} and \code{gtk+2-shlib} are available at \lib{fink}, it is worth trying. Please note that you will need \code{pkgconfig} (also available from \lib{fink}) in order for the installation script to find your \lib{GTK+} includes.
 
 %--------------------------------------------------
 \section{Windows 32bit Installation}
 %--------------------------------------------------
 
-The author did not check if the package compiles on Windows 64 bit due to the lack of the corresponding hardware. The Windows package contains a \lib{DLL} that was precompiled on 32 bit Windows XP machine. The tarball is distributed with a \emph{precompiled} Windows \lib{DLL} included in \code{.\\inst\\winlibs\\}. This file is moved to the package's \code{.\\lisb\\} during the Windows build process (\code{R CMD build --binary}) avoiding the compilation. If you want to recompile the source package on Windows, please delete the \code{.\\inst\\winlibs\\} directory from the source tarball.
+The Windows binary package (extension \code{.zip}) contains a \lib{DLL} that was compiled on a 32 bit Windows XP machine. The source package (extension \code{.tar.gz}) is distributed with a \emph{precompiled} Windows \lib{DLL} included in \code{.\textbackslash inst\textbackslash winlibs\textbackslash}. This file is moved to the package's \code{.\textbackslash libs\textbackslash} during the Windows build process (\code{R CMD build --binary}) avoiding the compilation. If you do want to recompile the source package on Windows, please delete the \code{.\textbackslash inst\textbackslash winlibs\textbackslash} directory from the source tarball.
 
 Whether you are installing a binary package or compiling it from source on Windows, you will need to have \emph{both} \lib{ImageMagick} and \lib{GTK+} installed and \emph{added} to your or system-wide \code{PATH} variable prior to the package installation.
 
-If you plan to compile the package from source, first follow the \lib{R} instructions on compiling Windows packages and install all the necessary tools (Cygwin, MSYS, MinGW, MS Help Compiler etc). In the latter case it is recommended to install MinGW and MSYS into \code{c:\\mingw} as this path is hard coded into \code{.\\src\\Makevars.win} of the package. Otherwise you will need to edit this file. You do not need MinGW or MSYS if you install the binary package. For the binary package, just install the dependencies so that the library could function.
+If you plan to compile the package from source, first follow the \lib{R} instructions on compiling Windows packages and install all the necessary tools (Cygwin, MSYS, MinGW, MS Help Compiler etc). In the latter case it is recommended to install MinGW and MSYS into \code{c:\textbackslash mingw} as this path is hard coded into \code{.\textbackslash src\textbackslash Makevars.win} of the package. Otherwise you will need to edit this file. You do not need MinGW or MSYS if you install the binary package. For the binary package, just install the dependencies so that the library could function.
+
+I have not checked if the package compiles on 64 bit Windows since I don't have such hardware. 
 
 \subsection{Installing ImageMagick}
 
 The Windows version of \lib{ImageMagick} is also available from \url{http://www.imagemagick.org}. Please ensure that you download a package named like \code{ImageMagick-6.x.x-x-Q16-windows-dll.exe}, where \code{x.x-x} stand for the minor version number. You need to pay attention that you download \code{*-windows-dll.exe} and not \code{*-static.exe} otherwise the shared libraries to use with the package will not be installed. You also should use the version with 16 bit \code{QUANTUM} depth (\code{*-Q16-*}) to ensure the best possible color range.
 
-After starting the installation wizard, you can select the default settings and let the installer to register environmental variables for you. Ensure that the path to \lib{ImageMagick} was added to your \code{PATH} variable, e.g. that it contains somthing like \code{c:\\ImageMagick;}.
+After starting the installation wizard, you can select the default settings and let the installer to register environmental variables for you. Ensure that the path to \lib{ImageMagick} was added to your \code{PATH} variable, e.g. that it contains somthing like \code{c:\textbackslash ImageMagick;}.
 
-If you are planning to compile \Rpackage{EBImage} from source, select during the installation that you want development files to be installed as well of. In this case, it is strongly recommended to install \lib{ImageMagick} into a path that does not contain spaces. The recommended, and hard coded into \code{.\\src\\Makevars.win} is \code{c:\\ImageMagick}. If select another location, please be sure to update this file.
+If you are planning to compile \Rpackage{EBImage} from source, select during the installation that you want development files to be installed as well of. In this case, it is strongly recommended to install \lib{ImageMagick} into a path that does not contain spaces. The recommended, and hard coded into \code{.\textbackslash src\textbackslash Makevars.win} is \code{c:\textbackslash ImageMagick}. If select another location, please be sure to update this file.
 
 \subsection{Installing GTK+}
 
 It is recommended to use the \lib{GladeWin32} project, \url{http://gladewin32.sf.net} for the source of \lib{GTK+} installer. The \url{www.gtk.org} site has its own installers, but the above one is an all-in-one installation which perfectly fits the needs of \Rpackage{EBImage}. Please download the latest available release of \emph{Gtk+/Win32 Development Environment} if you are planning to recompile the package from source, or \emph{Gtk+/Win32 
 Runtime Environment} if you are just planning to use the binary. For the binary installation just run the installer and accept the default suggestions: the installer will register all environmental variables for you.
 
-Please ensure now that the installer added the path to \lib{GTK+} \code{\\bin} directory \emph{before} the path to \code{c:\\Windows\\} and \code{c:\\Windows\\System32}. Otherwise, the package might find the wrong \code{xmlparser.dll} which is included in both, \lib{GTK+} and Windows itself (and is significantly outdated in Windows).
+Please ensure now that the installer added the path to \lib{GTK+} \code{\textbackslash bin} directory \emph{before} the path to \code{c:\textbackslash Windows\textbackslash } and \code{c:\textbackslash Windows\textbackslash System32}. Otherwise, the package might find the wrong \code{xmlparser.dll} which is included in both, \lib{GTK+} and Windows itself (and is significantly outdated in Windows).
 
-If you are planning to compile \Rpackage{EBImage} from source, install \lib{GTK+} into a path that does not contain spaces. It is strongly recommended to use the same directory where you installed MSYS and MinGW, namely \code{c:\\mingw}. This directory is hard coded into \code{.\\src\\Makevars.win} and you will need to modify this file if installing \lib{GTK+} elsewhere.
+If you are planning to compile \Rpackage{EBImage} from source, install \lib{GTK+} into a path that does not contain spaces. It is strongly recommended to use the same directory where you installed MSYS and MinGW, namely \code{c:\textbackslash mingw}. This directory is hard coded into \code{.\textbackslash src\textbackslash Makevars.win} and you will need to modify this file if installing \lib{GTK+} elsewhere.
 
 \subsection{Installing the package}
 
