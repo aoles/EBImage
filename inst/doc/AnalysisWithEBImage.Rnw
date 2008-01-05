@@ -1,4 +1,4 @@
-%\VignetteIndexEntry{EBImage: image processing and analysis toolkit for R}
+%\VignetteIndexEntry{Introduction to EBImage, an image processing and analysis toolkit for R}
 %\VignetteDepends{}
 %\VignetteKeywords{image processing, visualization}
 %\VignettePackage{EBImage}
@@ -31,117 +31,109 @@
 \newcommand{\email}[1]{\mbox{\href{mailto:#1}{\textcolor{darkblue}{\normalfont{#1}}}}}
 \newcommand{\web}[2]{\mbox{\href{#2}{\textcolor{darkblue}{\normalfont{#1}}}}}
 
-\usepackage{theorem}
-\theoremstyle{break} \newtheorem{Ex}{Exercise}
-\newenvironment{Sol}{\tiny}{}
-
 %\usepackage[baseurl={http://www.ebi.ac.uk/~osklyar/EBImage/},pdftitle={EBImage - Image Processing Toolkit For R},pdfauthor={Oleg Sklyar},pdfsubject={EBImage},pdfkeywords={image processing},pagebackref,bookmarks,colorlinks,linkcolor=darkblue,citecolor=darkblue,pagecolor=darkblue,raiselinks,plainpages,pdftex]{hyperref}
 
-%% Uncomment the second to show solutions
-%\SweaveOpts{echo=FALSE,results=hide}
-%\SweaveOpts{echo=FALSE,results=hide,eval=FALSE}
-\SweaveOpts{echo=TRUE,results=verbatim,eval=TRUE}
+\SweaveOpts{keep.source=TRUE,eps=FALSE}
 
 \begin{document}
 
 \begin{figure}
-%\vspace*{.1in}
 \begin{center}
 \scalebox{0.2}{\includegraphics{logo.png}}
 \end{center}
 \end{figure}
 
 %------------------------------------------------------------
-\title{Analysis of biological images with \lib{EBImage}}
+\title{Analysis of biological images with \Rpackage{EBImage}}
 %------------------------------------------------------------
 \author{Oleg Sklyar, Wolfgang Huber\\\email{osklyar@ebi.ac.uk}}
 \maketitle
 
+\tableofcontents
 
-In this manual the \EBImage{} package is used to analyse a set of images acquired in a large-scale RNAi microscopy screen and to extract numerical descriptors of the cells in these images.  The descriptors define biological phenotypes. The descriptors can be further analysed statistically e.\,g.\ to classify genes by their phenotypic effect.
+%%--------------------------------------------
+\section{Introduction}
+%%--------------------------------------------
+In this manual we demonstrate the \EBImage{} package. The main application that we have in mind is the analysis of sets of images acquired in cell-based RNAi or compound screens with automated microscopy readout, and the extraction of numerical descriptors of the cells in these images.  The descriptors relate to biological phenotypes. The descriptors can be further analysed statistically e.\,g.\ to classify genes by their loss (more precisely, suppression) of function phenotye.
 
-The images used in this manual are available in the package lab can be downloaded from\\ \web{http://www.ebi.ac.uk/\~{}osklyar/BioC2007/data}.
-
-The images are 16-bit grayscale TIFF's and were measured at two different wavelengths corresponding to two different stainings: DNA content measured in the green channel (suffix G) and one of a cytoplasm protein in red (suffix R). 
-
-<<loadlib,echo=FALSE,results=hide,eval=TRUE>>=
-library(EBImage)
+%%--------------------------------------------
+\section{Importing images}
+%%--------------------------------------------
+%
+<<loadlib,results=hide>>=
+library("EBImage")
 @
-
-%%--------------------------------------------
-\section{Handling images}
-%%--------------------------------------------
-
-\EBImage{} provides two functions to read images, \Rfunction{readImage} and \Rfunction{chooseImage}. They both allow users to specify whether the result should be in grayscale or RGB mode.  
-
-An interactive window for loading images is provided by the \Rfunction{chooseImage} function, which is available if the package was compiled with GTK+ support (always the case on Windows): 
-
-<<example.choose.image,echo=TRUE,results=hide,eval=FALSE>>=
+%
+\EBImage{} provides two functions to read images, \Rfunction{readImage} and \Rfunction{chooseImage}. They both allow users to specify whether the result should be in grayscale or RGB mode. The \Rfunction{chooseImage} function provides a dialogue window that lets the user interactively choose an image from the file system. It is available if the package was compiled with GTK+ support (this is always the case on Windows): 
+%
+<<example.choose.image,echo=TRUE,eval=FALSE>>=
 x = chooseImage(TrueColor)
 @
-
-The \Rfunction{readImage} function can read local or network files via HTTP or anonymous FTP protocols. Multiple files can be loaded into a single object, an image stack. If the source image has multiple frames they all will be read into a stack. Single, multi-frame or multiple images read are stored in objects of class \code{Image}:
- 
-<<example.read.image,echo=TRUE,results=verbatim,eval=TRUE>>=
-ddir <- paste( system.file(package="EBImage"), "images", sep="/" )
-fG = paste(ddir, dir(path=ddir, pattern="_G.tif"), sep="/")
+%
+For programmatic use, the \Rfunction{readImage} function can read local files, or files on the internet via the HTTP or anonymous FTP protocols. Multiple files can be loaded into a single object, an image stack. If the source image has multiple frames they all will be read into a stack. Images and image stacks are stored in objects of class \code{Image}:
+% 
+<<example.read.image>>=
+imgdir = file.path(system.file(package="EBImage"), "images")
+fG = dir(imgdir, pattern="_G.tif", full.names=TRUE)
 iG = readImage(fG[1], Grayscale)
 class(iG)
 dim(iG)
 
-fR = paste(ddir, dir(path=ddir, pattern="_R.tif"), sep="/")
+fR = dir(imgdir, pattern="_R.tif", full.names=TRUE)
 iR = readImage(fR[1])
 @
+%
+The images are 16-bit grayscale TIFFs and were measured at two different wavelengths corresponding to two different stainings: DNA content measured in the green channel (suffix G) and one of a cytoplasm protein in red (suffix R). 
 
 Images can be read from remote URL's as in the following example:
-
+%
 <<example.readRemote,echo=TRUE,results=hide,eval=FALSE>>=
 baseurl = "http://www.ebi.ac.uk/~osklyar/BioC2007/data/"
 a = readImage( paste(baseurl, c("Gene1_R.tif", "Gene2_R.tif"), sep="") )
 @
 
 %%--------------------------------------------
-\section{Exploring data}
+\section{Exploring image data}
 %%--------------------------------------------
-
-Objects of the class \Rclass{Image} can be displayed using either the \Rfunction{display} function or the standard \Rfunction{image} method for the \Rclass{Image} class: 
-
+Objects of class \Rclass{Image} can be displayed using either the \Rfunction{display} function or the \Rfunction{image} method for the \Rclass{Image} class.
+%
 <<example.imageDisplay,echo=TRUE,results=hide,eval=FALSE>>=
 image(iG[,,1])
 display(iR)
 animate(iR)
 @
-
-Beside displaying one can use \Rfunction{hist} and standard \Rfunction{print} methods to explore the data contained in images. For example, for the image stack \code{iR} consisting of 4 images, individual histograms are obtained with the following code (results shown in Figure~1):
-
-<<echo=FALSE,results=hide,eval=TRUE>>=
-pdf("01.pdf", width=10, height=10)
-@
-<<example.histograms,echo=TRUE,results=hide,eval=TRUE>>=
-split.screen(c(2,2))
-for ( i in 1:4 ) {
-  screen(i)
+%
+One can use all the statistical summaries and plotting functions for arrays, since the \Rclass{Image} class contains (inherits from) \Rclass{array}.
+%
+<<isArray>>=
+is(iG, "array")
+@ 
+<<isArrayCheck,echo=FALSE>>=
+stopifnot(is(iG, "array"))
+@ 
+%
+For example, for the image stack \code{iR}, which consists of 4 images, we can draw histogrammes of the intensities in each image (see Figure~\ref{figure:histsbefore}).
+%
+<<hists, include=FALSE, fig=TRUE, width=8, height=7>>=
+par(mfrow=c(2,2))
+for(i in 1:4) 
   hist(iR[,,i], xlim=c(0,1))
-}
-close.screen(all=TRUE)
 @
-<<echo=FALSE,results=hide,eval=TRUE>>=
-dev.off()
-@
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=0.75\textwidth]{01.pdf}
-    \caption{\label{figure:histsbefore} Histograms of individual images in \file{Gene1\_{}R.tif}. The frames have significantly different dynamic ranges and need to be normalized before intensity-based descriptors can be used.}
-  \end{center}
+%
+\begin{figure}[tp]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{AnalysisWithEBImage-hists}
+\caption{\label{figure:histsbefore}Histogrammes of intensities of the four images in \file{Gene1\_{}R.tif}.}
+\end{center}
 \end{figure}
-
+%
 Try additionally the following commands to investigate the structure of the data:
-
+%
 <<example.print.methods,echo=TRUE,results=hide,eval=FALSE>>=
-str(iR)
-print(iR)
 dim(iR)
 range(iR)
+print(iR)
+str(iR)
 @
 %
 Try also to do the same for \code{iG}, the images of the DNA content.
@@ -150,52 +142,54 @@ Try also to do the same for \code{iG}, the images of the DNA content.
 \section{Image processing}
 %%--------------------------------------------
 
-The \Rfunction{normalize} function allows you to perform normalization of image data to a given range (the default is $[0,1]$). Images in a stack can be normalized either separately from each other or simultaneously as parts of a large dataset. In our case, we want to normalize each image separately. Try the following two normalizations and compare the outputs:
+One often distiguishes between image processings, operations that map images into transformed images, and image analysis, operations that extract features of interest or compute numerical or categorical summaries.
+
+The image processing operation needed most frequently for our purpose is \emph{normalization} of the image intensities, i.\,e.\ adjusting the intensities from different images from the same screen to the same range. The intensities ranges can differ in the raw data due to subtle drifts of the experimental equipment or variations in reagent delivery.
+
+The \Rfunction{normalize} function allows you to perform a range normalization of image data (the default range is $[0,1]$). Images in a stack can be normalized either each separately, or simultaneously. In our case, we want to normalize each image separately. Try the following two normalizations and compare the outputs:
  
-<<example.normalizations,echo=TRUE,results=verbatim,eval=TRUE>>=
-iRn.wrong = normalize(iR, separate=FALSE)
-apply(iRn.wrong, 3, range)
+<<example.normalizations>>=
+iRnns = normalize(iR, separate=FALSE)
+apply(iRnns, 3, range)
 iRn = normalize(iR, separate=TRUE)
 apply(iRn, 3, range)
 iGn = normalize(iG, separate=TRUE)
 @
 
-\EBImage{} provides a set of functions to manipulate the quality of images like \Rfunction{enhance}, \Rfunction{contrast}, \Rfunction{despeckle} or \Rfunction{denoise}. Try them out on the images in \code{iRn}. Note that such manipulations can be useful for visualisation, but they are not appropriate for quantitative analyses, such as when intensity-derived features are used as phenotypic descriptors.
  
-We can also apply non-linear transformations to improve image quality. Another reason for some of these transformations is to achieve a higher object contrast against the background, which turns useful in consequent image segmentation. Please bear in mind the same note: images transformed in such a way cannot (should not) be used to extract intensity-based descriptors and are assumed for visualisation or segmentation purposes.
 
-Let us define several functions for transforming the range $[0,1]$ into itself.
+Functions from \lib{ImageMagick} are provided to manipulate images, such as \Rfunction{enhance}, \Rfunction{contrast}, \Rfunction{despeckle} and \Rfunction{denoise}. Try them out on the images in \code{iRn}. Such manipulations can be useful for visualisation, but they are not appropriate for quantitative analyses.
 
-<<example.modifFunctions,echo=TRUE,results=verbatim,eval=TRUE>>=
+Sometimes it is useful apply non-linear transformations. When displaying a greyscale image, this can improve contrast in regions of high interest. For example, a power transformation $x\mapsto x^{\alpha}$ with $0<\alpha<1$ will enhance contrast at lower intensities, and suppress contrast at higher intensities. Let us define several functions for transforming the range $[0,1]$ into itself.
+
+<<example.modifFunctions>>=
 modif1 = function(x) sin((x-1.2)^3)+1
 modif2 = function(x, s) (exp(-s*x) - 1) / (exp(-s) - 1)
 modif3 = function(x) x^1.5
 @
 
-The graphs of these functions are shown in Figure~\ref{figure:modif} on page~\pageref{figure:modif}. Non-linear transformations of the range $[0,1]$ into itself are often used in image processing to prepare an image for subsequent operations. I remark as a sidenote that this is also one of the most useful filters in Photoshop or GIMP when it comes to processing holiday photos. 
+The graphs of these functions are shown in Figure~\ref{figure:modif}. Non-linear transformations of the range $[0,1]$ into itself are often used in image processing to prepare an image for subsequent operations. I remark as a sidenote that this is also one of the most useful filters in Photoshop or GIMP when it comes to processing holiday photos. 
 
-<<modifPlots,echo=FALSE,results=hide,eval=TRUE>>=
-pdf("02.pdf", width=6,height=6)
-  x = (0:100)/100
-  plot(x, x, type="l", xlim=c(0,1), ylim=c(0,1), col="gray", lwd=1, lty=2,
+<<functions,fig=TRUE,width=6,height=6,include=FALSE>>=
+x = (0:100)/100
+plot(x, x, type="l", xlim=c(0,1), ylim=c(0,1), col="gray", lwd=1, lty=2,
      xlab="source intensity", ylab="target intensity")
-  lines(x, modif2(x,4), col="#10508B", lwd=2)
-  text(0.3, 0.83, "modif2(s=4)", col="#10508B")
-  lines(x, modif2(x,-4), col="#4E82B5", lwd=2)
-  text(0.7, 0.16, "modif2(s=-4)", col="#4E82B5")
-  lines(x, sqrt(x), col="#24A072", lwd=2)
-  text(0.2, 0.37, "sqrt")
-  lines(x, x^1.5, col="#421C80", lwd=2)
-  text(0.52, 0.3, "modif3", col="#421C80")
-  lines(x, modif1(x), col="red", lwd=2)
-  text(0.52, 0.6, "modif1", col="red")
-dev.off()
+lines(x, modif2(x,4), col="#10508B", lwd=2)
+text(0.3, 0.83, "modif2(s=4)", col="#10508B")
+lines(x, modif2(x,-4), col="#4E82B5", lwd=2)
+text(0.7, 0.16, "modif2(s=-4)", col="#4E82B5")
+lines(x, sqrt(x), col="#24A072", lwd=2)
+text(0.2, 0.37, "sqrt")
+lines(x, x^1.5, col="#421C80", lwd=2)
+text(0.52, 0.3, "modif3", col="#421C80")
+lines(x, modif1(x), col="red", lwd=2)
+text(0.52, 0.6, "modif1", col="red")
 @
 \begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=0.5\textwidth]{02.pdf}
-    \caption{\label{figure:modif} Non-linear transformations for data in the range $[0,1]$ onto $[0,1]$. The \emph{curves} filter in Photoshop or The GIMP.}
-  \end{center}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{AnalysisWithEBImage-functions}
+\caption{\label{figure:modif}Non-linear transformations of the range $[0,1]$ onto itself.}
+\end{center}
 \end{figure}
 
 We will use \code{modif1} to improve the contrast and proceed as follows. The modification used (if any) is problem specific and is determined by the quality of original images:
@@ -205,7 +199,7 @@ iGn = modif1(iGn)
 iRn = modif1(iRn)
 @
 
-The histograms after the normalization and the above transformation are given in Figure~\ref{figure:histsafter}:
+The histogrammes after the normalization and the above transformation are given in Figure~\ref{figure:histsafter}:
 
 <<echo=FALSE,results=hide,eval=TRUE>>=
 pdf("03.pdf", width=10,height=10)
@@ -223,8 +217,8 @@ dev.off()
 @
 \begin{figure}[htbp]
   \begin{center}
-    \includegraphics[width=0.75\textwidth]{03.pdf}
-    \caption{\label{figure:histsafter} Histograms of individual images in \file{Gene1\_{}R.tif} after the normalization.}
+    \includegraphics[width=0.7\textwidth]{03.pdf}
+    \caption{\label{figure:histsafter} Histogrammes of individual images in \file{Gene1\_{}R.tif} after the normalization.}
   \end{center}
 \end{figure}
 
