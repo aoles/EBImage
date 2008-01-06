@@ -44,7 +44,8 @@
 \end{figure}
 
 %------------------------------------------------------------
-\title{Analysis of biological images with \Rpackage{EBImage}}
+\title{Introduction to \Rpackage{EBImage}, an image 
+processing and analysis toolkit for R}
 %------------------------------------------------------------
 \author{Oleg Sklyar, Wolfgang Huber\\\email{osklyar@ebi.ac.uk}}
 \maketitle
@@ -54,23 +55,55 @@
 %%--------------------------------------------
 \section{Introduction}
 %%--------------------------------------------
-In this manual we demonstrate the \EBImage{} package. The main application that we have in mind is the analysis of sets of images acquired in cell-based RNAi or compound screens with automated microscopy readout, and the extraction of numerical descriptors of the cells in these images.  The descriptors relate to biological phenotypes. The descriptors can be further analysed statistically e.\,g.\ to classify genes by their loss (more precisely, suppression) of function phenotye.
+In this manual we demonstrate the \EBImage{} package. In creating this
+package, the application that we have in mind is the analysis of
+sets of images acquired in cell-based RNAi or compound screens with
+automated microscopy readout, and the extraction of numerical
+descriptors of the cells in these images.  Relations between the
+descriptor values and biological phenotypes are sought. Some of the
+choices we have made in the design of the package reflect this
+application. This vignette tries to give a general overview of the
+package functionality, it does not provide a recipe for the analysis
+of cell-based RNAi screens.
+
+The package makes use of two external libraries for some of its
+functionality, \lib{ImageMagick} and \lib{GTK+}. In particular,
+\lib{ImageMagick} is used for image import and export, and we provide
+an interface to many of its image processing capabilities. \lib{GTK+}
+provides facilities for the display of and user interaction with
+images. Reliance on these external (to R and the EBImage package)
+libraries makes the installation of \EBImage{} a bit more tricky than
+than that of a self-contained package.  Please see the vignette
+\textit{\Rpackage{EBImage} installation HOWTO} for hints on the
+installation.
+
 
 %%--------------------------------------------
-\section{Importing images}
+\section{Importing and exporting images}
 %%--------------------------------------------
 %
 <<loadlib,results=hide>>=
 library("EBImage")
 @
 %
-\EBImage{} provides two functions to read images, \Rfunction{readImage} and \Rfunction{chooseImage}. They both allow users to specify whether the result should be in grayscale or RGB mode. The \Rfunction{chooseImage} function provides a dialogue window that lets the user interactively choose an image from the file system. It is available if the package was compiled with GTK+ support (this is always the case on Windows): 
+\EBImage{} provides two functions to read images,
+\Rfunction{readImage} and \Rfunction{chooseImage}. They both allow
+users to specify whether the result should be in grayscale or RGB
+mode. The \Rfunction{chooseImage} function provides a dialogue window
+that lets you interactively choose an image from the file
+system. It is available if the package was compiled with GTK+ support
+(this is always the case on Windows): 
 %
 <<example.choose.image,echo=TRUE,eval=FALSE>>=
 x = chooseImage(TrueColor)
 @
 %
-For programmatic use, the \Rfunction{readImage} function can read local files, or files on the internet via the HTTP or anonymous FTP protocols. Multiple files can be loaded into a single object, an image stack. If the source image has multiple frames they all will be read into a stack. Images and image stacks are stored in objects of class \code{Image}:
+For programmatic use, the \Rfunction{readImage} function can read
+local files, or files on the internet via the HTTP or anonymous FTP
+protocols. Multiple files can be loaded into a single object, an image
+stack. If the source image has multiple frames they all will be read
+into a stack. Images and image stacks are stored in objects of class
+\code{Image}:
 % 
 <<example.read.image>>=
 imgdir = file.path(system.file(package="EBImage"), "images")
@@ -83,27 +116,66 @@ fR = dir(imgdir, pattern="_R.tif", full.names=TRUE)
 iR = readImage(fR[1])
 @
 %
-The images are 16-bit grayscale TIFFs and were measured at two different wavelengths corresponding to two different stainings: DNA content measured in the green channel (suffix G) and one of a cytoplasm protein in red (suffix R). 
+The images are 16-bit grayscale TIFFs and were measured at two
+different wavelengths corresponding to two different stainings: DNA
+content measured in the green channel (suffix G) and a
+cytoplasmic protein in red (suffix R).
 
-Images can be read from remote URL's as in the following example:
+Images can be read from remote URLs as in the following example:
 %
 <<example.readRemote,echo=TRUE,results=hide,eval=FALSE>>=
-baseurl = "http://www.ebi.ac.uk/~osklyar/BioC2007/data/"
-a = readImage( paste(baseurl, c("Gene1_R.tif", "Gene2_R.tif"), sep="") )
+baseurl = "http://www.ebi.ac.uk/~osklyar/BioC2007/data"
+a = readImage(paste(baseurl, c("Gene1_R.tif", "Gene2_R.tif"), sep="/"))
 @
 
-%%--------------------------------------------
-\section{Exploring image data}
-%%--------------------------------------------
-Objects of class \Rclass{Image} can be displayed using either the \Rfunction{display} function or the \Rfunction{image} method for the \Rclass{Image} class.
+The \Rfunction{writeImage} function can be used to write images to files.
 %
-<<example.imageDisplay,echo=TRUE,results=hide,eval=FALSE>>=
-image(iG[,,1])
+<<writeImage>>= 
+outdir = tempdir()
+writeImage(iR, file.path(outdir, "test.png"))
+compression(iR)
+writeImage(iR[,,1], file.path(outdir, "test.jpg"), quality=90)
+file.info(dir(outdir, full.names=TRUE))[,c(1,5)]
+@ 
+
+%% FIXME: 
+%% - the default for 'quality' should be 1, not 0.95, and should be part
+%%    of the function signature (because this is where users expect to see
+%%    the default value of function arguments).
+%% - why is compression a slot of the Image class? It does not  
+%%   belong there. It should be an argument of the writeImage function.
+
+%%------------------------------------------------------
+\section{Displaying images and accessing the image data}
+%%------------------------------------------------------
+The prefered method for displaying objects of class \Rclass{Image} is
+the \Rfunction{display} function. 
+%
+<<example.imageDisplay1,eval=FALSE>>=
 display(iR)
 animate(iR)
 @
 %
-One can use all the statistical summaries and plotting functions for arrays, since the \Rclass{Image} class contains (inherits from) \Rclass{array}.
+% FIXME: Explain what 'animate' does
+%
+\Rfunction{display} and \Rfunction{animate} create their own windows,
+using \lib{GTK+} or \lib{ImageMagick} functions. Sometimes it may also
+be useful to use the \Rfunction{image} method for the \Rclass{Image}
+class. This method plots the image on the current R device.
+%
+<<example.imageDisplay2,eval=FALSE>>=
+image(iR[,,1])
+@
+%
+One can access the data in the same way as for a 3-dimensional array,
+where the first two dimensions correspond to $x-$ and $y-$directions
+and applications can use the third dimension for the $z$-direction,
+for different channels, for a time covariate, or indeed for any other
+experimental covariate. Alternatively, the size of the third dimension
+can be set to 1, which corresponds to a simple 2-dimensional image.
+The \Rclass{Image} class contains (inherits from) the base R class
+\Rclass{array}, and one can use all the statistical summaries and
+plotting functions for arrays.
 %
 <<isArray>>=
 is(iG, "array")
@@ -112,7 +184,9 @@ is(iG, "array")
 stopifnot(is(iG, "array"))
 @ 
 %
-For example, for the image stack \code{iR}, which consists of 4 images, we can draw histogrammes of the intensities in each image (see Figure~\ref{figure:histsbefore}).
+For example, for the image stack \code{iR}, which consists of 4
+images, we can draw histogrammes of the intensities in each image (see
+Figure~\ref{figure:histsbefore}).
 %
 <<hists, include=FALSE, fig=TRUE, width=8, height=7>>=
 par(mfrow=c(2,2))
@@ -123,31 +197,46 @@ for(i in 1:4)
 \begin{figure}[tp]
 \begin{center}
 \includegraphics[width=0.7\textwidth]{AnalysisWithEBImage-hists}
-\caption{\label{figure:histsbefore}Histogrammes of intensities of the four images in \file{Gene1\_{}R.tif}.}
+\caption{\label{figure:histsbefore}Histogrammes of intensities of 
+the four images in \file{Gene1\_{}R.tif}.}
 \end{center}
 \end{figure}
 %
-Try additionally the following commands to investigate the structure of the data:
+Try additionally the following commands to explore the 
+structure of the data:
 %
-<<example.print.methods,echo=TRUE,results=hide,eval=FALSE>>=
+<<example.print.methods,results=hide>>=
 dim(iR)
 range(iR)
 print(iR)
 str(iR)
 @
 %
-Try also to do the same for \code{iG}, the images of the DNA content.
+Try to do the same for \code{iG}, the images of the DNA content.
 
 %%--------------------------------------------
 \section{Image processing}
 %%--------------------------------------------
 
-One often distiguishes between image processings, operations that map images into transformed images, and image analysis, operations that extract features of interest or compute numerical or categorical summaries.
+One often distiguishes between image processings, operations that map
+images into transformed images, and image analysis, operations that
+extract features of interest or compute numerical or categorical
+summaries.
 
-The image processing operation needed most frequently for our purpose is \emph{normalization} of the image intensities, i.\,e.\ adjusting the intensities from different images from the same screen to the same range. The intensities ranges can differ in the raw data due to subtle drifts of the experimental equipment or variations in reagent delivery.
-
-The \Rfunction{normalize} function allows you to perform a range normalization of image data (the default range is $[0,1]$). Images in a stack can be normalized either each separately, or simultaneously. In our case, we want to normalize each image separately. Try the following two normalizations and compare the outputs:
- 
+One of the simplest image processing operations is
+\emph{normalization} of the image intensities, i.\,e.\ adjusting the
+intensities from different images such that they are on the same
+range,
+\begin{equation}
+x\mapsto \frac{x-b}{s}
+\end{equation}
+This is provided by the \Rfunction{normalize} function. The default target
+range is $[0,1]$, which corresponds to $b=\min\{x\}$,
+$s=\max\{x\}-\min\{x\}$. The minimum and maximum can be computed
+either for each image separately, or simultaneously for all images in
+a stack. Let us try the following two normalizations and compare the
+results.
+% 
 <<example.normalizations>>=
 iRnns = normalize(iR, separate=FALSE)
 apply(iRnns, 3, range)
@@ -155,22 +244,40 @@ iRn = normalize(iR, separate=TRUE)
 apply(iRn, 3, range)
 iGn = normalize(iG, separate=TRUE)
 @
+%
+More generally, on might also normalize not on range but on other
+distribution properties such as interquantile ranges or other measures
+of location and scale.
 
- 
+Functions from \lib{ImageMagick} are provided to manipulate images,
+such as \Rfunction{enhance}, \Rfunction{contrast},
+\Rfunction{despeckle} and \Rfunction{denoise}. Try them out on the
+images in \code{iRn}. Such manipulations can be useful for
+visualisation, but their results are likely not appropriate for
+quantitative analyses.
 
-Functions from \lib{ImageMagick} are provided to manipulate images, such as \Rfunction{enhance}, \Rfunction{contrast}, \Rfunction{despeckle} and \Rfunction{denoise}. Try them out on the images in \code{iRn}. Such manipulations can be useful for visualisation, but they are not appropriate for quantitative analyses.
-
-Sometimes it is useful apply non-linear transformations. When displaying a greyscale image, this can improve contrast in regions of high interest. For example, a power transformation $x\mapsto x^{\alpha}$ with $0<\alpha<1$ will enhance contrast at lower intensities, and suppress contrast at higher intensities. Let us define several functions for transforming the range $[0,1]$ into itself.
-
+Sometimes it is useful apply non-linear transformations. When
+displaying a grayscale image, this can improve contrast in regions of
+high interest. For example, a power transformation $x\mapsto
+x^{\alpha}$ with $0<\alpha<1$ will enhance contrast at lower
+intensities and suppress contrast at higher
+intensities. Transformations are sometimes also used in model-based
+data anaylses. For example, when the noise component of a signal has a
+constant coefficient of variation, rather than a constant standard
+deviation, then a logarithimc transformation is often
+convenient. Box-Cox type transformations have many uses in regression
+analysis. Let us define several functions for transforming the range
+$[0,1]$ into itself.
+%
 <<example.modifFunctions>>=
 modif1 = function(x) sin((x-1.2)^3)+1
 modif2 = function(x, s) (exp(-s*x) - 1) / (exp(-s) - 1)
-modif3 = function(x) x^1.5
+modif3 = function(x) x^0.5
 @
-
-The graphs of these functions are shown in Figure~\ref{figure:modif}. Non-linear transformations of the range $[0,1]$ into itself are often used in image processing to prepare an image for subsequent operations. I remark as a sidenote that this is also one of the most useful filters in Photoshop or GIMP when it comes to processing holiday photos. 
-
-<<functions,fig=TRUE,width=6,height=6,include=FALSE>>=
+%
+The graphs of these functions are shown in Figure~\ref{figure:modif}.
+%
+<<functions,fig=TRUE,width=6,height=6,include=FALSE,echo=FALSE>>=
 x = (0:100)/100
 plot(x, x, type="l", xlim=c(0,1), ylim=c(0,1), col="gray", lwd=1, lty=2,
      xlab="source intensity", ylab="target intensity")
@@ -188,143 +295,131 @@ text(0.52, 0.6, "modif1", col="red")
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=0.5\textwidth]{AnalysisWithEBImage-functions}
-\caption{\label{figure:modif}Non-linear transformations of the range $[0,1]$ onto itself.}
+\caption{\label{figure:modif}Non-linear transformations of the range
+$[0,1]$ onto itself.}
 \end{center}
 \end{figure}
 
-We will use \code{modif1} to improve the contrast and proceed as follows. The modification used (if any) is problem specific and is determined by the quality of original images:
-
-<<example.do.modif1,echo=TRUE,results=hide,eval=TRUE>>=
-iGn = modif1(iGn)
-iRn = modif1(iRn)
+Transformations of image size and orientation 
+can be performed using \Rfunction{resize},
+\Rfunction{rotate} etc. 
+% FIXME - please not 'etc.' this not very helpful to anyone. Either say
+%  say what you mean or say nothing.
+The following increases the size of the image by a factor of 1.3 
+or rotates it by 15 degrees:
+%
+<<example.resize>>=
+a1 = resize(iRn, dim(iRn)[1]*1.3)
+a2 = rotate(iRn, 15)
+@
+<<echo=TRUE,eval=FALSE>>=
+display(a1)
+display(a2)
 @
 
-The histogrammes after the normalization and the above transformation are given in Figure~\ref{figure:histsafter}:
-
-<<echo=FALSE,results=hide,eval=TRUE>>=
-pdf("03.pdf", width=10,height=10)
-@
-<<example.histograms2,echo=TRUE,results=hide,eval=TRUE>>=
-split.screen(c(2,2))
-for ( i in 1:4 ) {
-  screen(i)
-  hist(iRn[,,i], xlim=c(0,1))
-}
-close.screen(all=TRUE)
-@
-<<echo=FALSE,results=hide,eval=TRUE>>=
-dev.off()
-@
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=0.7\textwidth]{03.pdf}
-    \caption{\label{figure:histsafter} Histogrammes of individual images in \file{Gene1\_{}R.tif} after the normalization.}
-  \end{center}
-\end{figure}
+% --- I don't like this: ----
+%We will use \code{modif1} to improve the contrast and proceed as
+%follows. The modification used (if any) is problem specific and is
+%determined by the quality of original images:
+%
+% <<example.do.modif1,echo=TRUE,results=hide,eval=TRUE>>=
+% iGn = modif1(iGn)
+% iRn = modif1(iRn)
+% @
+%
+% The histogrammes after the normalization and the above 
+% transformation are given in Figure~\ref{figure:histsafter}:
+% <<example.histograms2,echo=TRUE,results=hide,eval=TRUE>>=
+% split.screen(c(2,2))
+% for ( i in 1:4 ) {
+%  screen(i)
+%  hist(iRn[,,i], xlim=c(0,1))
+% }
+% close.screen(all=TRUE)
+% @
+%  \begin{figure}[htbp]
+%  \begin{center}
+%  \includegraphics[width=0.7\textwidth]{03.pdf}
+%  \caption{\label{figure:histsafter} Histogrammes of 
+%  individual images in \file{Gene1\_{}R.tif} after the normalization.}
+%  \end{center}
+% \end{figure}
 
 %%--------------------------------------------
 \section{Colour modes}
 %%--------------------------------------------
 
-For visual representations, images can be converted between the grayscale and true colour modes; a grayscale image can also be converted into one of the RGB channels if required and channels can be added together as in the following example:
-
-<<example.grayscaleToRGB,echo=TRUE,results=hide,eval=TRUE>>=
+For visual representations, images can be converted between 
+grayscale and true colour modes. A grayscale image can also be
+converted into one of the RGB channels if required, and channels can be
+added together as in the following example.
+%
+<<example.grayscaleToRGB>>=
 iRG = channel(iRn, "asred") + channel(iGn, "asgreen")
 @
-<<example.displayConversions,echo=TRUE,results=hide,eval=FALSE>>=
-display( iRG )
-display( channel(iRG, "gray") )
-display( channel(iRG, "asred") )
+%
+<<example.displayConversions,eval=FALSE>>=
+display(iRG)
+display(channel(iRG, "gray"))
+display(channel(iRG, "asred"))
+@ 
+<<write.iRG,echo=FALSE>>=
+writeImage(iRG[,,1], "iRG.png")
 @
-<<echo=FALSE,results=hide,eval=TRUE>>=
-writeImage(iRG[,,1], "04.png")
-@
+%
+The image \Robject{iRG} is shown in Figure~\ref{figure:screenshot}.
+%
 \begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=0.5\textwidth]{04.png}
-    \caption{\label{figure:screenshot} False-colour representation of
-      the data from two independent channels, red and green.}
-  \end{center}
+\begin{center}
+\includegraphics[width=0.49\textwidth]{iRG.png}
+\caption{\label{figure:screenshot}The image
+\Robject{iRG}, a false-colour representation of
+the data in the two channels \Robject{iRG} and \Robject{iG}.}
+\end{center}
 \end{figure}
-
-The \Rfunction{channel} function can also be used to convert vectors containing colour data from one format to another. Grayscale to RGB integers: 
-
-<<example.channel1,echo=TRUE,results=verbatim,eval=TRUE>>=
-ch=channel(c(0.2,0.5,0.7), "rgb") 
+%
+The \Rfunction{channel} function can also be used to convert vectors
+containing colour data from one format to another. Grayscale to RGB
+integers:
+%
+<<example.channel1>>=
+ch = channel(c(0.2, 0.5), "rgb") 
 ch
 sprintf("%X", ch)
 @ 
 \noindent Grayscale to X11 hexadecimal color strings:
-<<example.channel2,echo=TRUE,results=verbatim,eval=TRUE>>=
-channel(c(0.2,0.5,0.7), "x11") 
+<<example.channel2>>=
+channel(c(0.2, 0.5), "x11") 
 @ 
 \noindent Color strings to RGB:
-<<example.channel3,echo=TRUE,results=verbatim,eval=TRUE>>=
+<<example.channel3>>=
 channel(c("red","green","#0000FF"), "rgb") 
 @ 
-\noindent RGB to grayscale:
-<<example.channel4,echo=TRUE,results=verbatim,eval=TRUE>>=
-channel(as.integer(c(3355443, 8355711, 11711154)), "gray") 
-# channel(c(3355443L, 8355711L, 11711154L), "gray") # in newer R
+\noindent 24-bit RGB integers to grayscale:
+<<example.channel4>>=
+channel(as.integer(c(0x0000f0, 0x00f000, 0xf0000, 0x808080)), "gray") 
 @
 
-Images can be stored in files as in the following example for \code{iRG}:
-
-<<example.write.image,echo=TRUE,results=verbatim,eval=FALSE>>=
-writeImage(iRG, "composite.tif")
-compression(iRG) = "JPEG"
-writeImage(iRG, "composite.jpg", quality=98)
-@
-
-%%--------------------------------------------
+%%-------------------------------------------------------
 \section{Creating images and further data manipulation}
-%%--------------------------------------------
+%%-------------------------------------------------------
 
-Images can be created either using the default constructor \Rfunction{new} for class \code{Image} or using a wrapper function, \Rfunction{Image}:
-
-<<echo=FALSE,results=verbatim,eval=TRUE>>=
-pdf("05.pdf", width=6,height=4)
-par(mar=c(1,1,1,1))
-@
-<<example.runif.Image,echo=TRUE,results=verbatim,eval=TRUE>>=
+Images can be created either using the default constructor
+\Rfunction{new} for class \code{Image} or using a wrapper function,
+\Rfunction{Image}:
+%
+<<example.runif.Image>>=
 a = Image(runif(200*100), c(200,100))
-image(a)
 @
-<<echo=FALSE,results=hide,eval=TRUE>>=
-dev.off()
+<<echo=FALSE,results=hide>>=
+writeImage(a, "AnalysisWithEBImage-random.png")
 @
 \begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=0.5\textwidth]{05.pdf}
-    \caption{\label{figure:imx} An image of uniform random numbers.}
-  \end{center}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{AnalysisWithEBImage-random}
+\caption{\label{figure:imx} An image of uniform random numbers.}
+\end{center}
 \end{figure}
-
-\noindent One can also use the data of other images to create new ones:
-
-<<example.newFromExisting,echo=TRUE,results=verbatim,eval=TRUE>>=
-a = Image(iRn, dim(iRn), colormode=colorMode(iRn))
-@
-<<echo=TRUE,results=verbatim,eval=FALSE>>=
-display(a)
-@
-
-\noindent In the above example, it is not necessary to supply the dimensions as those will be automatically detected from the data if that has the \code{dim} method defined.
-
-Transformations can be performed using \Rfunction{resize}, \Rfunction{rotate} etc. Try the following two to increase the image by a factor of 1.3 or to rotate it by 15 degrees:
-
-<<example.resize,echo=TRUE,results=verbatim,eval=TRUE>>=
-a = resize(iRn, dim(iRn)[1]*1.3)
-@
-<<echo=TRUE,results=verbatim,eval=FALSE>>=
-display(a)
-@
-<<example.rotate,echo=TRUE,results=verbatim,eval=TRUE>>=
-a = rotate(iRn, 15)
-@
-<<echo=TRUE,results=verbatim,eval=FALSE>>=
-display(a)
-@
 
 Simple data manipulations can be performed by subsetting. For example, the following lines represent simple thresholding:
 
