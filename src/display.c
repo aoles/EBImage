@@ -139,6 +139,7 @@ gboolean onZoomOutPress (GtkToolButton *, gpointer);         // "button-press-ev
 gboolean onZoomOnePress (GtkToolButton *, gpointer);         // "button-press-event"
 gboolean onNextImPress  (GtkToolButton *, gpointer);         // "button-press-event"
 gboolean onPrevImPress  (GtkToolButton *, gpointer);         // "button-press-event"
+gboolean onMouseMove    (GtkWidget *, GdkEventMotion *, gpointer); // "motion-notify-event"
 void     updateStatusBar(GtkStatusbar * stbarWG, double * stats);
 
 typedef gpointer * ggpointer;
@@ -151,7 +152,7 @@ _showInGtkWindow (SEXP x, SEXP caption) {
     SEXP dim;
     Image * images;
     GdkPixbuf * pxbuf;
-    GtkWidget * imgWG, * winWG, * vboxWG, * tbarWG, * stbarWG, * scrollWG,
+    GtkWidget * imgWG, * evBox, * winWG, * vboxWG, * tbarWG, * stbarWG, * scrollWG,
               * btnZoomInWG, * btnZoomOutWG, * btnZoomOneWG,
               * btnNextWG, * btnPrevWG;
     GtkIconSize iSize;
@@ -180,6 +181,8 @@ _showInGtkWindow (SEXP x, SEXP caption) {
 
     /* create image display */
     imgWG = gtk_image_new_from_pixbuf (pxbuf);
+//    gtk_misc_set_alignment(GTK_MISC(imgWG),0.0,0.0);
+    
     winStr[1] = (gpointer *) imgWG;
     g_object_unref (pxbuf);
     /* create main window */
@@ -203,8 +206,13 @@ _showInGtkWindow (SEXP x, SEXP caption) {
     scrollWG = gtk_scrolled_window_new (NULL, NULL);
     gtk_box_pack_start ( GTK_BOX(vboxWG), scrollWG, TRUE, TRUE, 5);
     gtk_scrolled_window_set_policy ( GTK_SCROLLED_WINDOW(scrollWG), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    /* add image to event box */
+    evBox = gtk_event_box_new();
+    gtk_container_add(GTK_CONTAINER(evBox), imgWG);
     /* add image to scroll */
-    gtk_scrolled_window_add_with_viewport ( GTK_SCROLLED_WINDOW(scrollWG), imgWG);
+    gtk_scrolled_window_add_with_viewport ( GTK_SCROLLED_WINDOW(scrollWG), evBox);
+    
+    
     /* create status bar and push it to layout */
     stbarWG = gtk_statusbar_new ();
     gtk_box_pack_start ( GTK_BOX(vboxWG), stbarWG, FALSE, FALSE, 0);
@@ -239,6 +247,10 @@ _showInGtkWindow (SEXP x, SEXP caption) {
         gtk_container_add ( GTK_CONTAINER(tbarWG), btnNextWG);
         g_signal_connect ( G_OBJECT(btnNextWG), "clicked", G_CALLBACK(onNextImPress), winStr);
     }
+
+    gtk_signal_connect( GTK_OBJECT(evBox), "motion-notify-event", GTK_SIGNAL_FUNC(onMouseMove), winStr);
+    gtk_widget_set_events(evBox, GDK_POINTER_MOTION_MASK ); // GDK_BUTTON_PRESS_MASK | 
+    
     /* resize to fit image */
     width = gdk_screen_get_width ( gdk_screen_get_default() );
     height = gdk_screen_get_height ( gdk_screen_get_default () );
@@ -424,7 +436,37 @@ onPrevImPress (GtkToolButton * btn, gpointer ptr) {
 }
 
 /*----------------------------------------------------------------------- */
-GdkPixbuf * newPixbufFromImages (Image * images, int index) {
+gboolean 
+onMouseMove(GtkWidget * widget, GdkEventMotion * event, gpointer ptr) {
+    gpointer ** winStr;
+    double * stats;
+
+    winStr = (gpointer **) ptr;
+    GtkWidget * imgWG = GTK_WIDGET(winStr[1]);
+    stats = (double *)winStr[5];
+    gint x, y, x0=0, y0=0;
+
+    x0 = (imgWG->allocation.width - stats[0]*stats[5])/2;
+    if (x0 < 0) x0 = 0;
+    y0 = (imgWG->allocation.height - stats[1]*stats[5])/2;
+    if (y0 < 0) y0 = 0;
+
+    gtk_widget_get_pointer(imgWG, &x, &y);
+    stats[3] = (x-x0) / stats[5] + 1;
+    stats[4] = (y-y0) / stats[5] + 1;
+    if (stats[3]<1) stats[3] = 1;
+    if (stats[4]<1) stats[4] = 1;
+    if (stats[3]>stats[0]) stats[3] = stats[0];
+    if (stats[4]>stats[1]) stats[4] = stats[1];
+    
+    updateStatusBar((GtkStatusbar *)winStr[4], stats);
+    gdk_flush();
+    return TRUE;
+}
+
+/*----------------------------------------------------------------------- */
+GdkPixbuf * 
+newPixbufFromImages (Image * images, int index) {
     GdkPixbuf * res;
     Image * image;
     int nx, ny;
@@ -456,11 +498,11 @@ GdkPixbuf * newPixbufFromImages (Image * images, int index) {
 void updateStatusBar(GtkStatusbar * stbarWG, double * stats) {
   gchar str[255];
   /* 0: nx, 1: ny, 2: nz, 3: x, 4: y, 5: zoom, 6: index */
-  /* FIXME add position: sprintf(str, "Frame: %d/%d\tImage: %dx%dx%d\tZoom: %d%%\t Position: (%d:%d)", 
+  sprintf(str, "Frame: %d/%d\tImage: %dx%dx%d\tZoom: %d%%\t Position: (%d:%d)", 
     (int)(stats[6]+1), (int)stats[2], (int)stats[0], (int)stats[1], (int)stats[2], (int)(stats[5]*100), (int)stats[3], (int)stats[4]); 
-  */
-  sprintf(str, "Frame: %d/%d    Image: %dx%dx%d    Zoom: %d%%", 
+/*  sprintf(str, "Frame: %d/%d    Image: %dx%dx%d    Zoom: %d%%", 
     (int)(stats[6]+1), (int)stats[2], (int)stats[0], (int)stats[1], (int)stats[2], (int)(stats[5]*100));
+*/
   gtk_statusbar_pop(stbarWG, 0);
   gtk_statusbar_push(stbarWG, 0, str);
 }
