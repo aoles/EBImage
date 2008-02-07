@@ -520,6 +520,19 @@ setMethod ("tile", signature(x="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("untile", signature(x="Image", nim="numeric"),
+  function (x, nim, lwd=1, ...) {
+    nim = as.integer(nim)
+    lwd = as.integer(lwd)
+    if (length(nim)<2)
+      stop("'nim' must contain two values for the number of images in x and y directions")
+    if (lwd<0)
+      stop("wrong line width")
+    return(.DoCall("lib_untile", x, header(x), nim, lwd))
+  }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 median.Image <- function(x, na.rm = FALSE) {
   median(imageData(x), na.rm=na.rm)
 }

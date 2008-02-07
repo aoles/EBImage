@@ -14,6 +14,7 @@ SEXP lib_deleteFeatures (SEXP, SEXP);
 
 SEXP lib_stack_objects (SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP lib_tile_stack    (SEXP, SEXP, SEXP);
+SEXP lib_untile        (SEXP, SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus
 };

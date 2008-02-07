@@ -19,7 +19,7 @@ exportClasses(
   Image, IndexedImage
 )
 exportMethods(
-  copy, animate, header, assert, combine, tile, writeImage,
+  copy, animate, header, assert, combine, tile, untile, writeImage,
   show, "[", channel, as.Image, Arith,
 
   colorMode, "colorMode<-",
