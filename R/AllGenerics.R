@@ -43,6 +43,7 @@ setGeneric ("writeImage",     function (x, ...)        standardGeneric("writeIma
 setGeneric ("assert",         function (x, y, strict=FALSE, ...) standardGeneric("assert") )
 setGeneric ("combine",        function (x, y, ...)     standardGeneric("combine") )
 setGeneric ("tile",           function (x, ...)        standardGeneric("tile") )
+setGeneric ("untile",         function (x, nim, ...)   standardGeneric("untile") )
 setGeneric ("image",          function (x, ...)        standardGeneric("image") )
 setGeneric ("hist",           function (x, ...)        standardGeneric("hist") )
 setGeneric ("as.Image",       function (x, ...)        standardGeneric("as.Image") )

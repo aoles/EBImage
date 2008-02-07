@@ -1,8 +1,10 @@
 \name{tile}
 
 \alias{tile}
+\alias{untile}
 \alias{tile,Image-method}
 \alias{tile,list-method}
+\alias{untile,Image,numeric-method}
 
 \concept{image manipulation}
 
@@ -10,13 +12,15 @@
 
 \description{
   Given an image stack (or a list of such those), \code{tile} generates
-  for each stack a single image with frames tiled. 
+  for each stack a single image with frames tiled. \code{untile} does exactly
+  the opposite dividing a tiled image into a stack.
 }
 
 \usage{
 
   \S4method{tile}{Image}(x, nx=10, lwd=1, fg.col="#E4AF2B", bg.col="gray", ...)
   \S4method{tile}{list}(x, nx=10, lwd=1, fg.col="#E4AF2B", bg.col="gray", ...)
+  \S4method{untile}{Image,numeric}(x, nim, lwd=1, ...)
 
 }
 
@@ -35,6 +39,8 @@
   \item{bg.col}{ The color of the background for extra tiles. This will be
     converted to Grayscale if the color mode of \code{x} is \code{Grayscale}. }
 
+  \item{nim}{A numeric vector of 2 elements for the number of images in both directions.}
+
   \item{...}{ Reserved. }
 }
 
@@ -43,7 +49,7 @@
 }
 
 \details{
-  The function for \code{x=list} is a useful addition to \code{stackObjects},
+  \code{tile} for \code{x=list} is a useful addition to \code{stackObjects},
   which returns a list of stacks, thus it can be directly used on the result of
   the latter.
 }

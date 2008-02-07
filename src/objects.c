@@ -451,6 +451,61 @@ lib_tile_stack (SEXP obj, SEXP hdr, SEXP params) {
   return res;
 }
 
+/*----------------------------------------------------------------------- */
+SEXP
+lib_untile(SEXP img, SEXP hdr, SEXP nim, SEXP linewd) {
+  int mode = INTEGER(GET_SLOT(img, mkString("colormode")))[0];
+  int nimx = INTEGER(nim)[0];
+  int nimy = INTEGER(nim)[1];
+  int lwd  = INTEGER(linewd)[0];
+  int *sdim = INTEGER(GET_DIM(img));
+  int nx = (sdim[0]-(nimx+1)*lwd) / nimx;
+  int ny = (sdim[1]-(nimy+1)*lwd) / nimy;
+  int nz = sdim[2] * nimx * nimy;
+  int nprotect=0, i, j, im, y, iim;
+  SEXP res, dim, dat;
+  void *src, *tgt; double *dd; int *id;
+
+  if (mode==MODE_RGB) {
+    PROTECT(dat = allocVector(INTSXP, nx*ny*nz)); 
+    nprotect++;
+    id = INTEGER(dat);
+    for (i=0; i<nx*ny*nz; i++) id[i] = 0.0;
+  } else  {
+    PROTECT(dat = allocVector(REALSXP, nx*ny*nz)); 
+    nprotect++;
+    dd = REAL(dat);
+    for (i=0; i<nx*ny*nz; i++) dd[i] = 0.0;
+  }
+  PROTECT(dim = allocVector(INTSXP, 3)); nprotect++;
+  INTEGER(dim)[0] = nx;
+  INTEGER(dim)[1] = ny;
+  INTEGER(dim)[2] = nz;
+  SET_DIM(dat, dim);
+
+  for (im=0; im<nz; im++) {
+    iim = im / (nimx*nimy);
+    i = im % nimx;
+    j = (im-iim*nimx*nimy) / nimx;
+    //Rprintf("%d %d %d\n", iim, i, j);
+    if (mode==MODE_RGB) {
+      for (y=0; y<ny; y++) {
+        src = &(INTEGER(img)[iim*sdim[0]*sdim[1] + (j*ny+lwd*(j+1) + y)*sdim[0] + (i*nx+lwd*(i+1))]);
+        tgt = &(INTEGER(dat)[im*nx*ny + y*nx]);
+        memcpy(tgt, src, nx*sizeof(int));
+      }
+    } else {
+      for (y=0; y<ny; y++) {
+        src = &(REAL(img)[iim*sdim[0]*sdim[1] + (j*ny+lwd*(j+1) + y)*sdim[0] + (i*nx+lwd*(i+1))]);
+        tgt = &(REAL(dat)[im*nx*ny + y*nx]);
+        memcpy(tgt, src, nx*sizeof(double));
+      }
+    }
+  }
+  res = SET_SLOT(Rf_duplicate(hdr), install(".Data"), dat);
+  UNPROTECT(nprotect);
+  return res;
+}
 
 
 
