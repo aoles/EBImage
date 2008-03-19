@@ -42,8 +42,7 @@
     \item{\code{as.matrix(x, ...)}}{ Removed to avoid incompatibilities with 
       R < 2.5. Use \code{as.matrix(\link{imageData}(x))} instead. }
 
-    \item{\code{hist(x, ...)}}{ Slightly modyfied to better suit the 
-      assumed grayscale data range \code{[0,1]}.  }
+    \item{\code{hist(x, ...)}}{ A histogramme method.  }
 
     \item{\code{median(x, na.rm=FALSE)}}{ \code{stats:\link{median}} redefinition 
       for images (bug workaround: without it \code{median} takes forever to

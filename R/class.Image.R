@@ -462,14 +462,27 @@ setMethod ("channel", signature(x="Image", mode="character"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("hist", signature(x="Image"),
-  function (x, breaks=255, main=paste("Image histogram. Total", length(x), "pxs"), xlab="colors", ...) {
-    if ( xlab == "colors" ) {
-      if ( colorMode(x) == Grayscale )
-        xlab = "Shades of gray, 0: black, 1: white"
-      if ( colorMode(x) == TrueColor )
-        xlab = "RGB values, non-informative"
+  function (x, breaks=64L, main=paste("Image histogram:", length(x), "pixels"), xlab="Intensity", ...) {
+
+    if ( colorMode(x) == TrueColor ) {
+      colores = c("red", "green", "blue")
+      y = lapply(colores, function(m) imageData(channel(x, m)))
+      names(y) = colores
+    } else {
+      y = list(black=imageData(x))
     }
-    graphics:::hist ( imageData(x), breaks=breaks, main=main, xlab=xlab, ...)
+    
+    rg = range(unlist(y), na.rm=TRUE)
+    if(length(breaks)==1L) {
+      dr = (rg[2]-rg[1])/(breaks*2L+2L)
+      breaks = seq(rg[1]-dr, rg[2]+dr, length=breaks+1L)
+    }
+    
+    h = lapply(y, hist, breaks=breaks, plot=FALSE)
+    px = sapply(h, "[[", "breaks")[-1L,,drop=FALSE]
+    matplot(x = px + dr*(col(px)-ncol(px)/2)/2,
+            y = sapply(h, "[[", "counts"), type="s", lty=1L, 
+            main=main, xlab=xlab, col=names(y), ylab="counts", ...)
   }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

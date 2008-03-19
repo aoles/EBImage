@@ -191,14 +191,19 @@ Figure~\ref{figure:histsbefore}).
 <<hists, include=FALSE, fig=TRUE, width=8, height=7>>=
 par(mfrow=c(2,2))
 for(i in 1:4) 
-  hist(iR[,,i], xlim=c(0,1))
+  hist(iR[,,i], breaks=20, xlim=c(0,1))
 @
 %
 \begin{figure}[tp]
 \begin{center}
 \includegraphics[width=0.7\textwidth]{AnalysisWithEBImage-hists}
-\caption{\label{figure:histsbefore}Histogrammes of intensities of 
-the four images in \file{Gene1\_{}R.tif}.}
+\caption{\label{figure:histsbefore}%
+Histogrammes of intensities of the four images in \file{Gene1\_{}R.tif}.
+Note that, in general, histogrammes may be subject to binning artifacts,
+and smooth density estimates (as for example provided by the 
+\Rfunction{density} function from the \Rpackage{stats} package 
+or the \Rfunction{multidensity} function from the \Rpackage{geneplotter} 
+package) are often more appropriate.}
 \end{center}
 \end{figure}
 %
