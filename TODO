@@ -1,0 +1,54 @@
+
+'filename' and 'compression slots of Image objects:
+---------------------------------------------------
+WH thinks that these shouldn't be slots of the Image class.  They are
+not properties of an image, but rather of a saved file.  They should
+be arguments to the 'writeImage' function, but nothing else
+(otherwise, with the same logic, data.frames, matrices, etc.  could
+have slots for 'filename' and 'separator character', which would be
+just as odd).
+
+'features' slot:
+----------------
+This shouldn't be a slot of the basic Image class, since it
+corresponds to a rather specialized use case. For example, there could
+be a derived class 'ImageWithFeatures' with that slot (and then some
+validity checking that the list has the right length, contains the
+right type and size of elements etc.)
+
+'resolution' slot:
+------------------
+Again, this is a rather special use case, only applicable to
+microscopy images of real-life objects. What's the resolution of an
+image from a space telescope, a holiday picture, or pictures from a
+CCTV camera on which you want to do novelty detection?
+
+I think there is some value in allowing to store "tags" or image
+attributes that were found e.g. in a TIFF file, or to add additional
+ones by the user. For this, I would suggest just having a slot named
+"tags" that is of type list, with arbitrary length, and its elements
+can be, for example, list(resolution=2.5e6, units="ppi")
+
+'colorMode'
+-----------
+Why is this sometimes spelt with uppercase 'M' (e.g. in accessor
+functions) and sometimes with lowercase (e.g. in the 'Image' 
+constructor and in the slotname)?  Both are exposed to users - 
+and they might be happier about some more consistency.
+
+'validity'
+----------
+There should be a validity method for Image objects. Currently it is 
+possible to create invalid object e.g. with "new" that break e.g. the "show" 
+method:
+
+> a=new("Image")
+> a
+
+'Image'
+  colorMode()   : Grayscale
+  storage class : numeric 3D array, writable images in range [0..1]
+Errore in if (dimobject[3] > 1) cat(sprintf("  dim()         : %dx%d, %d image(s)\n",  : 
+  valore mancante dove è richiesto TRUE/FALSE
+
+

@@ -64,9 +64,13 @@ The installation should be performed from the source after the following depende
     \item \lib{GTK+} version at least 2.6 (recommended).
 \end{description}
 
-On most Linux distributions, these are available as precompiled binaries \lib{rpm} or \lib{deb} format with a \code{-dev} or \code{-devel} suffix. Hereafter, the package names are for Ubuntu Linux, but other distributions have similar packages with only slight naming differences.
+On most Linux distributions, these libraries are available as precompiled binaries in \lib{rpm} or \lib{deb} format. You will also need the corresponding header files\footnote{A library's header files are necessary to compile other programs, such as \lib{EBImage}, that use the library. The header files contain necessary information about the functionality of the library.}, these are in equinomous package with suffix \code{-dev} or \code{-devel}. The following instructions work for Ubuntu Linux, but other distributions have similar packages with slight naming differences.
 
-For \lib{ImageMagick}, you will need to install  \code{libmagick9-dev} with all dependencies using \code{apt-get} or the Synaptic package manager. Alternatively, you can download the latest version of \lib{ImageMagick} from \url{http://www.imagemagick.org} and install it from source as usual using \code{./configure \&\& make \&\& make install}. The latter will install all the required development files as well.
+For \lib{ImageMagick}, you will need to install  \code{libmagick9-dev} (including its dependencies) using \code{apt-get} or the Synaptic package manager. Alternatively, you can download the latest version of \lib{ImageMagick} from \url{http://www.imagemagick.org} and install it from source using 
+\begin{verbatim}
+./configure && make && make install
+\end{verbatim}
+This will also install the header files.
 
 \Rpackage{EBImage} will function without \lib{GTK+}, but most of its GUI functionality (image chooser, interactive image display with zoom features etc) will be disabled. You will need \code{libgtk2.0-dev} with all the dependencies, which normally include \code{glib}, \code{pango-dev}, \code{libcairo-dev}, \code{atk-dev} and some others. Alternatively, all these packages can be installed from source available at \url{http://www.gtk.org} along with the corresponding installation instructions. When installing \lib{GTK+}, please ensure that you also install \code{pkg-config} as it is used to determine the location of \lib{GTK+} include files and its compile flags. Without this package, \lib{GTK+} will not be located on your system by the package installer. \code{pkg-config} is normally installed in UNIX/Linux systems running the \lib{GNOME} desktop manager, it is also likely in this case that you have necessary \lib{GTK+} development files because \lib{GNOME} is build upon \lib{GTK+}.
 
