@@ -6,7 +6,7 @@ Copyright (c) 2006 Oleg Sklyar
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
 
-#include <Rgraphics.h>
+// #include <Rgraphics.h>
 #include <R_ext/Error.h>
 
 /*----------------------------------------------------------------------- */
