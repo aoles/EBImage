@@ -12,7 +12,7 @@
   In the distance map, each pixel contains the distance from that pixel to the nearest
   background pixel, or to the border of the image.
   Note: this is a trivial brute force implementation. Please look
-  elsewhere for efficient implementations.
+  elsewhere for efficient implementations; see also the references.
 }
 
 \usage{
@@ -32,8 +32,7 @@
   \item{bg}{A numeric numeric vector of length 1, the allowed minimum of the fraction of 
     background pixels in the image. Deprecated.}
   
-  \item{exact}{A logical vector of length 1, controlling the metric that
-    is used (L1 vs L2). \code{TRUE} corresponds to L1.}
+  \item{exact}{???}
   
   \item{...}{Further arguments.}
 }
@@ -42,6 +41,15 @@
   A \code{\link{Grayscale}} object of \code{\linkS4class{Image}} with pixels
   containing the \code{\link{floor}} values of their distances to the nearest 
   background points. 
+}
+
+\references{2D Euclidean Distance Transform Algorithms: A Comparative Survey.
+R. Fabbri, L. da F. Costa, J.C. Torelli and O.M. Bruno. ACM Computing
+Surveys, Vol. 40, No. 1, Article 2 (Feb. 2008).
+
+The Image Processing Handbook. John Russ. 5th edition, 2006, CRC Press.
+
+VIGRA by Ullrich Koethe: http://kogs-www.informatik.uni-hamburg.de/~koethe/vigra
 }
 
 \seealso{

@@ -1,6 +1,7 @@
 \name{filter2}
 
 \alias{filter2}
+\alias{filter2-methods}
 \alias{filter2,array,matrix-method}
 \alias{filter2,Image,matrix-method}
 
@@ -14,7 +15,7 @@
 }
 
 \usage{
-  \S4method{filter2}{Image, matrix}(x, filter, ...)
+  \S4method{filter2}{Image,matrix}(x, filter, ...)
 
   mkball(n, shape="step")
   mkbox(n)
