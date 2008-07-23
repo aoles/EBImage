@@ -11,6 +11,8 @@
   \emph{background}. 
   In the distance map, each pixel contains the distance from that pixel to the nearest
   background pixel, or to the border of the image.
+  Note: this is a trivial brute force implementation. Please look
+  elsewhere for efficient implementations.
 }
 
 \usage{
