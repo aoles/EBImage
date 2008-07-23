@@ -5,30 +5,21 @@
 \alias{filter2,Image,matrix-method}
 \alias{filter2,array,missing-method}
 \alias{filter2,Image,missing-method}
-\alias{sharpen2}
-\alias{sharpen2,Image-method}
 
 \alias{mkball}
 \alias{mkbox}
 
-\concept{image color enhancement}
-
-\title{ 2D Convolution Filter }
+\title{2D Convolution Filter}
 
 \description{
   2D convolution-based linear filter for images and matrix data.
 }
 
 \usage{
+  \S4method{filter2}{Image, matrix}(x, filter, ...)
 
-  ## S4 methods for signatures 'x=Image' or 'x=array' and
-  ## 'filter=matrix' or 'filter=missing'
-  filter2(x, filter, ...)
-  
-  \S4method{sharpen2}{Image}(x, ...)
-  
-  mkball(n=15, pow=1)
-  mkbox(n=15)
+  mkball(n, shape="step")
+  mkbox(n)
 }
 
 \arguments{
@@ -36,34 +27,37 @@
   \item{x}{An object of \code{\linkS4class{Image}} in Grayscale mode, a numeric 
     \code{array} or a \code{matrix}. }
 
-  \item{filter}{ A square matrix with odd dimensions. }
+  \item{filter}{A square matrix with odd dimensions.}
 
-  \item{n}{The size of the filter matrix (odd number). }
+  \item{n}{A positive integer of length 1, specifying the size (number
+  of rows and columns) of the returned square matrix.}
 
-  \item{pow}{ The power of the function used to fill in the matrix. } 
+  \item{shape}{A character vector of length 1, with one of two values:
+  \code{step} for a step function, \code{ball} for a semisphere.} 
   
-  \item{...}{ Reserved. }
+  \item{...}{Further arguments.}
 }
 
 \value{
-
-  \code{filter2} and \code{} return a transformed object of the same class as 
+  \code{filter2} returns a transformed object of the same class as 
   \code{x}.
   
-  \code{mkball} and \code{mkbox} return a square matrix that can be used for 
-  \code{filter2}.
-    
+  \code{mkball} and \code{mkbox} return a square matrix that can be used
+  for the \code{filter} argument of \code{filter2}. Its dimensions
+  (number of rows and columns) are given by \code{n}. For
+  \code{shape="step"}, the entries of the matrix are the integers 0
+  and 1, and the 1s correspond to the interior of a circle of radius 
+  \code{n/2} around the center element of the matrix.
+  For \code{shape="ball"}, the non-zero elements of
+  the matrix are \code{z = sqrt(radius^2 - x^2 - y^2)}, a
+  parameterization of a semisphere.
 }
 
 \details{
 
   The convolution filter is based on \code{fft} transforms.
-
   If \code{x} is an \code{array}, the filter is applied per frame (as to images).
   
-  \code{sharpen2} uses \code{filter2} to sharpen grayscale images by subtracting
-    a slightly blurred image with the center pixel excluded.
-    
 }
 
 \seealso{
@@ -72,11 +66,5 @@
   }
 }
 
-\author{
-  \code{filter2} author: Gregoire Pau, \email{gpau@ebi.ac.uk}, 2007
-  
-  \code{sharpen2} author: Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2007
-}
-
-\keyword{manip}
+\author{Gregoire Pau, \email{gpau@ebi.ac.uk}}
 

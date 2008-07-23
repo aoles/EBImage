@@ -52,3 +52,22 @@ Errore in if (dimobject[3] > 1) cat(sprintf("  dim()         : %dx%d, %d image(s
   valore mancante dove è richiesto TRUE/FALSE
 
 
+'distmap'
+---------
+The function should check its argument 'x', verify that 'x' takes
+   exactly two values, and then consider the larger one as foreground,
+   the smaller one as background.
+
+The result should NOT be 'floor'ed!
+
+What exactly is this parameter 'bg' doing? Can we drop it? It seems
+   odd to have it in this function.
+
+What exactly is 'exact' doing? Do we need it? Can it get a more
+   precise name, e.g. one that signifies that it controls the choice of the
+   metric (L1 vs L2)?
+
+Drop the parameter 't'. It is weird to convolute thresholding
+   with this particular algorithm. If the function is called on an
+   image with more than two values, then it should just throw an
+   error, and not make up some thresholding.

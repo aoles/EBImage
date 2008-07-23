@@ -75,39 +75,33 @@ setMethod("filter2", signature(x="Image",filter="missing"),
   }
 )
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-setMethod("sharpen2", signature(x="Image"),
-  function(x, ...) {
-    if (colorMode(x)!=Grayscale)
-      stop("'x' must be a Grayscale image")
-    mx = mean(x)
-    m = matrix(c(0.5,1,0.5,1,-0.5,1,0.5,1,0.5),3,3)
-    x = x - filter2(x, m/sum(m)/2)
-    x[x<0] = 0.0
-    x*mx/mean(x)
-  }
-)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-clip = function(z,min=0,max=1) {
-  z[z>max] = max
-  z[z<min] = min
-  z
-}
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-mkball = function(n=15,pow=1) {
-  n2 = n%/%2
-  ball = matrix(seq(-n2,n2),nc=n,nr=n)
-  ball = ball*ball+t(ball)^2
-  ball = 2.0*max(ball)/3.0 - ball
-  ball[ball<0] = 0
-  ball = ball^pow
-  ball = ball/sum(ball)
-  ball = clip(ball)
-  ball
+##------------------------------
+## mkball
+##------------------------------
+mkball = function(n, shape="step") {
+  if(! (is.numeric(n) && (length(n)==1L) && (n>=1)) )
+    stop("'n' must be a numeric of length 1 with value >=1.")
+
+  ## pixel center coordinates
+  x = 1:n -((n+1)/2)
+  
+  ## for each pixel, compute the distance from its center to the origin
+  d = outer(x, x, FUN=function(X,Y) (X*X+Y*Y))
+
+  ## radius and z^2
+  rsq = (n%/%2)^2
+  z2 = (rsq - d)
+  print(z2)
+  
+  switch(shape,
+         step = ifelse(z2>=0, 1L, 0L),
+         ball = sqrt(ifelse(z2>0, z2, 0)),
+         stop(sprintf("Invalid 'shape': %s", shape))
+  )
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-mkbox = function(n=15) {
+mkbox = function(n) {
   matrix(1.0/(n*n),nc=n,nr=n)
 }
 

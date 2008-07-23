@@ -79,7 +79,6 @@ setGeneric ("floodFill",      function (x, pt, ...)    standardGeneric("floodFil
 setGeneric ("flip",           function (x, ...)        standardGeneric("flip") )
 setGeneric ("flop",           function (x, ...)        standardGeneric("flop") )
 setGeneric ("filter2",        function (x, filter, ...) standardGeneric("filter2"))
-setGeneric ("sharpen2",       function (x, ...)        standardGeneric("sharpen2"))
 
 ## morphology
 setGeneric ("distmap",        function (x, ...)        standardGeneric("distmap") )

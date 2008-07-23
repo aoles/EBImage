@@ -21,9 +21,9 @@ setMethod ("haralickMatrix", signature(x="IndexedImage", ref="Image"),
       .stop( "'x' and 'ref' must be Grayscale" )
     rref <- range(ref)
     if ( rref[1] < 0 || rref[2] > 1 ) {
-      ref[ref<0] = 0.0
-      ref[ref>1] = 1.0
-      warning( "'ref' will be clipped to the range [0,1]" )
+      ref[ref<0] = 0
+      ref[ref>1] = 1
+      warning( "Values in 'ref' have been limited to the range [0,1]" )
     }
     res <- .DoCall( "lib_co_occurrence", x, ref, as.integer(nc) )
     return( res )
