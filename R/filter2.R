@@ -57,24 +57,6 @@ setMethod("filter2", signature(x="Image",filter="matrix"),
   }
 )
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-setMethod("filter2", signature(x="array",filter="missing"),
-  function(x, filter, ...) {
-    filter = mkball()
-    filter2(x, filter, ...)
-  }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-setMethod("filter2", signature(x="Image",filter="missing"),
-  function(x, filter, ...) {
-    if (colorMode(x)!=Grayscale)
-      stop("'x' must be a Grayscale image")
-    imageData(x) = filter2(imageData(x),mkball(),...)
-    x
-  }
-)
-
 ##------------------------------
 ## mkball
 ##------------------------------

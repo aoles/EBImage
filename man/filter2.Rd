@@ -3,8 +3,6 @@
 \alias{filter2}
 \alias{filter2,array,matrix-method}
 \alias{filter2,Image,matrix-method}
-\alias{filter2,array,missing-method}
-\alias{filter2,Image,missing-method}
 
 \alias{mkball}
 \alias{mkbox}
@@ -27,7 +25,7 @@
   \item{x}{An object of \code{\linkS4class{Image}} in Grayscale mode, a numeric 
     \code{array} or a \code{matrix}. }
 
-  \item{filter}{A square matrix with odd dimensions.}
+  \item{filter}{A square \code{matrix} with odd dimensions.}
 
   \item{n}{A positive integer of length 1, specifying the size (number
   of rows and columns) of the returned square matrix.}
