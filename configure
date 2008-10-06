@@ -1290,6 +1290,7 @@ echo "$as_me: error: \"Required ImageMagick version >= 6.2.4\"" >&2;}
     CXXFLAGS="-Wall ${COMPILERFLAGS} ${CXXFLAGS}"
     LINKERFLAGS="`Magick-config --ldflags`"
     LINKERFLAGS="${LINKERFLAGS} `Magick-config --libs`"
+    LINKERFLAGS="${LINKERFLAGS} `Wand-config --libs`"
     LIBS="${LINKERFLAGS} ${LIBS} ${LFLAGS}"
 else
     { { echo "$as_me:$LINENO: error: \"ImageMagick or ImageMagick includes not found!\"" >&5

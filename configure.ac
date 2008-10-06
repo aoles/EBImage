@@ -26,6 +26,7 @@ if test "$magickfound" = "yes"; then
     CXXFLAGS="-Wall ${COMPILERFLAGS} ${CXXFLAGS}"
     LINKERFLAGS="`Magick-config --ldflags`"
     LINKERFLAGS="${LINKERFLAGS} `Magick-config --libs`"
+    LINKERFLAGS="${LINKERFLAGS} `Wand-config --libs`"
     LIBS="${LINKERFLAGS} ${LIBS} ${LFLAGS}"
 else
     AC_MSG_ERROR("ImageMagick or ImageMagick includes not found!")
