@@ -36,8 +36,6 @@ lib_drawText (SEXP obj, SEXP xylist, SEXP textlist, SEXP thefont, SEXP thecol) {
   images = sexp2Magick(obj);
   newimages = NewImageList();
 
-  /* start magick wand */
-  MagickWandGenesis();
   /* create empty wand */
   dwand = NewDrawingWand();
   pwand = NewPixelWand();
@@ -101,7 +99,6 @@ lib_drawText (SEXP obj, SEXP xylist, SEXP textlist, SEXP thefont, SEXP thecol) {
   }
   pwand = DestroyPixelWand(pwand);
   dwand = DestroyDrawingWand(dwand);
-  MagickWandTerminus();
   
   images = DestroyImageList(images);
 

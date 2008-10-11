@@ -35,8 +35,9 @@ See: ../LICENSE for license, LGPL
 #include <R_ext/Error.h>
 
 #include <magick/ImageMagick.h>
+#include <wand/magick-wand.h>
 
-/* GTK+ includes */
+/* nan GTK+ includes */
 #ifdef USE_GTK
 #   include <gtk/gtk.h>
 #   ifdef WIN32
@@ -129,19 +130,19 @@ R_init_EBImage (DllInfo * winDll) {
 #endif
     R_registerRoutines (winDll, NULL, libraryRCalls, NULL, NULL);
     R_useDynamicSymbols (winDll, FALSE);
-    /* this initialization is not required on Linux */
-    /* in fact I am not sure this is required on Windows! */
 #   ifdef WIN32
     InitializeMagick ("");
     if ( !IsMagickInstantiated () )
         error ( "cannot initialize ImageMagick" );
 #   endif
+    /* MagickWand must be started */
+    MagickWandGenesis();
 }
 
 void
 R_unload_EBImage (DllInfo * winDll) {
-    /* this destroy is not required on Linux */
-    /* in fact I am not sure this is required on Windows! */
+  /* MagickWand must be terminated at the end of the process since MagickWandTerminus() closes all the Wand AND ALSO the MagickCore services ! */
+  MagickWandTerminus();
 #   ifdef WIN32
     if ( IsMagickInstantiated() )
         DestroyMagick();
