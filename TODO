@@ -1,3 +1,30 @@
+##########
+1) Objects
+##########
+
+general:
+--------
+
+GP thinks that it would nice that EBImage can seamlessly work with:
+- Indexed images
+- Gray levels images
+
+And that there should be an automatic mapping between R primitives and these objects. 
+EBImage has been written is this may but there are some cases where one have to cast, 
+tweak the dimension or the mode to perform some operations.
+
+The mapping could be the following:
+- int, logi 2D-like arrays (matrices, 2D arrays or multi-dimensional arrays with an 
+effective 2D dimension (e.g. dim(x)=c(1,1,2,1,5))) could map to Indexed images
+- num 2D-like arrays map to Gray levels images
+
+3D-like or nD-like should be also supported.
+
+Binary images are just images with two indexes.
+
+GP thinks it is misleading to have a color image object since it is a rendering task and 
+not an image representation feature. A 3D matrix could be therefore seen as a RGB 
+image or a set of gray images.
 
 'filename' and 'compression slots of Image objects:
 ---------------------------------------------------
@@ -29,14 +56,14 @@ ones by the user. For this, I would suggest just having a slot named
 "tags" that is of type list, with arbitrary length, and its elements
 can be, for example, list(resolution=2.5e6, units="ppi")
 
-'colorMode'
+'colorMode':
 -----------
 Why is this sometimes spelt with uppercase 'M' (e.g. in accessor
 functions) and sometimes with lowercase (e.g. in the 'Image' 
 constructor and in the slotname)?  Both are exposed to users - 
 and they might be happier about some more consistency.
 
-'validity'
+'validity':
 ----------
 There should be a validity method for Image objects. Currently it is 
 possible to create invalid object e.g. with "new" that break e.g. the "show" 
@@ -51,8 +78,19 @@ method:
 Errore in if (dimobject[3] > 1) cat(sprintf("  dim()         : %dx%d, %d image(s)\n",  : 
   valore mancante dove è richiesto TRUE/FALSE
 
+##########
+2) Methods
+##########
 
-'distmap'
+general:
+-------
+GP thinks that methods should be clearly sorted according to their level (low-level, high-level) 
+depending on the genericity of their behavior and according to the field they 
+belong to (i/o, displaying, linear filtering, morphological operations...).
+
+Matlab's image toolbox is a good example of how an image processing toolbox should be.
+
+'distmap':
 ---------
 The function should check its argument 'x', verify that 'x' takes
    exactly two values, and then consider the larger one as foreground,
@@ -71,3 +109,10 @@ Drop the parameter 't'. It is weird to convolute thresholding
    with this particular algorithm. If the function is called on an
    image with more than two values, then it should just throw an
    error, and not make up some thresholding.
+
+
+'readImage':
+-----------
+Should be able to read color channels in a third dimension, without any options.
+An attribute colordim should be added to the Image object to handle multidimensional color images.
+
