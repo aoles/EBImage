@@ -46,7 +46,7 @@ See: ../LICENSE for license, LGPL
 	}
 	#ifdef WIN32
         	typedef unsigned long ulong;
-		#ifdef RTLCDO_METHOD
+		#ifdef _RTCLDO_METHOD
         		extern  __declspec(dllimport) void (* R_tcldo) ();
 			void R_gtk_handle_events() {
 				R_gtk_eventHandler(NULL);
@@ -130,7 +130,7 @@ R_init_EBImage (DllInfo * winDll) {
 #ifndef WIN32
         addInputHandler(R_InputHandlers, ConnectionNumber(GDK_DISPLAY()), _doIter, -1);
 #else
-	#ifdef RTLCDO_METHOD
+	#ifdef _RTCLDO_METHOD
         	R_tcldo = R_gtk_handle_events;
 	#else
 		LPCTSTR class="EBImage";
