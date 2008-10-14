@@ -39,16 +39,33 @@ See: ../LICENSE for license, LGPL
 
 /* nan GTK+ includes */
 #ifdef USE_GTK
-#   include <gtk/gtk.h>
-#   ifdef WIN32
-        typedef unsigned long ulong;
-        extern  __declspec(dllimport) void (* R_tcldo) ();
-#       include <sys/types.h>
-#   else
-#       include "R_ext/eventloop.h"
-#       include <gdk/gdkx.h>
-#   endif
-#endif
+	#include <gtk/gtk.h>
+	// GTK/Windows interface copied from the RGtk2 pacakge by Michael Lawrence (src/Rgtk.c)
+	void R_gtk_eventHandler(void *userData) {
+		while(gtk_events_pending()) gtk_main_iteration();
+	}
+	#ifdef WIN32
+        	typedef unsigned long ulong;
+		#ifdef RTLCDO_METHOD
+        		extern  __declspec(dllimport) void (* R_tcldo) ();
+			void R_gtk_handle_events() {
+				R_gtk_eventHandler(NULL);
+			}
+		#else
+			#include <windows.h>
+			#define HWND_MESSAGE	((HWND)-3)
+			#define RGTK2_TIMER_ID	0
+			#define RGTK2_TIMER_DELAY 50
+			VOID CALLBACK R_gtk_timer_proc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) {
+				R_gtk_eventHandler(NULL);
+			}
+		#endif // R < 2.8.0
+		#include <sys/types.h>
+	#else
+		#include "R_ext/eventloop.h"
+		#include <gdk/gdkx.h>
+	#endif // Windows
+#endif // GTK
 
 /*----------------------------------------------------------------------- */
 static R_CallMethodDef libraryRCalls[] = {
@@ -92,17 +109,6 @@ static R_CallMethodDef libraryRCalls[] = {
     {NULL, NULL, 0}
 };
 
-#ifdef USE_GTK
-void _doIter (void * userData) {
-    while ( gtk_events_pending() ) gtk_main_iteration();
-}
-#    ifdef WIN32
-void _doIterWin32 () {
-    _doIter (NULL);
-}
-#    endif
-#endif
-
 char ** argv;
 int argc;
 
@@ -121,13 +127,22 @@ R_init_EBImage (DllInfo * winDll) {
     else {
         GTK_OK = 1;
         // add R event handler to enable automatic window redraw
-#       ifndef WIN32
+#ifndef WIN32
         addInputHandler(R_InputHandlers, ConnectionNumber(GDK_DISPLAY()), _doIter, -1);
-#       else
-        R_tcldo = _doIterWin32;
-#       endif
+#else
+	#ifdef RTLCDO_METHOD
+        	R_tcldo = R_gtk_handle_events;
+	#else
+		LPCTSTR class="EBImage";
+		HINSTANCE instance = GetModuleHandle(NULL);
+		WNDCLASS wndClass = {0, DefWindowProc, 0, 0, instance, NULL, 0, 0, NULL, class};
+		RegisterClass(&wndClass);
+		HWND win = CreateWindow(class, NULL, 0, 1, 1, 1, 1, HWND_MESSAGE, NULL, instance, NULL);
+		SetTimer(win, RGTK2_TIMER_ID, RGTK2_TIMER_DELAY, (TIMERPROC)R_gtk_timer_proc);
+	#endif // R < 2.8.0
+#endif // Win32
     }
-#endif
+#endif // GTK
     R_registerRoutines (winDll, NULL, libraryRCalls, NULL, NULL);
     R_useDynamicSymbols (winDll, FALSE);
 #   ifdef WIN32
