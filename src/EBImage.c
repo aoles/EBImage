@@ -128,7 +128,7 @@ R_init_EBImage (DllInfo * winDll) {
         GTK_OK = 1;
         // add R event handler to enable automatic window redraw
 #ifndef WIN32
-        addInputHandler(R_InputHandlers, ConnectionNumber(GDK_DISPLAY()), _doIter, -1);
+        addInputHandler(R_InputHandlers, ConnectionNumber(GDK_DISPLAY()), R_gtk_eventHandler, -1);
 #else
 	#ifdef _RTCLDO_METHOD
         	R_tcldo = R_gtk_handle_events;
