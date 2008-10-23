@@ -73,7 +73,6 @@ mkball = function(n, shape="step") {
   ## radius and z^2
   rsq = (n%/%2)^2
   z2 = (rsq - d)
-  print(z2)
   
   switch(shape,
          step = ifelse(z2>=0, 1L, 0L),
