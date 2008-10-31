@@ -11,23 +11,12 @@ See: ../LICENSE for license, LGPL
 #include <R_ext/Error.h>
 
 /*----------------------------------------------------------------------- */
-#define COMP_LENGTH 6
-
-const char * COMP_IDS [] = {
-    "NONE", "LZW", "ZIP", "JPEG", "BZIP", "GROUP4" };
-
-const CompressionType COMP_VALS [] = {
-    NoCompression, LZWCompression, ZipCompression,
-    JPEGCompression, BZipCompression, Group4Compression };
-
-/*----------------------------------------------------------------------- */
 Image *
 sexp2Magick (SEXP x) {
-    int nx, ny, nz, colormode, i, j, * dim;
+    int nx, ny, nz, colormode, i, * dim;
     Image * image, * res;
     ExceptionInfo exception;
     void * data;
-    const char * compressStr;
 
     /* basic checks */
     if ( !isImage(x) )
@@ -71,35 +60,6 @@ sexp2Magick (SEXP x) {
         AppendImageToList (&res, image);
     }
 
-    /* copy attributes: filename */
-    strcpy ( res->filename, CHAR( asChar( GET_SLOT(x, mkString("filename") ) ) ) );
-    /* propagate to all images */
-    for ( i = 0; i < (int) GetImageListLength(res); i++ ) {
-        image = GetImageFromList (res, i);
-        strcpy ( image->filename, CHAR( asChar( GET_SLOT(x, mkString("filename") ) ) ) );
-    }
-    /* copy attributes: compression */
-    compressStr = CHAR( asChar( GET_SLOT(x, mkString("compression") ) ) );
-    for ( i = 0; i < COMP_LENGTH; i++ )
-        if ( strcmp(compressStr, COMP_IDS[i]) == 0 ) {
-            res->compression = COMP_VALS[i];
-            /* propagate to all images */
-            for ( j = 0; j < (int) GetImageListLength(res); j++ ) {
-                image = GetImageFromList (res, j);
-                image->compression = COMP_VALS[i];
-            }
-            break;
-        }
-    /* copy attributes: resolution */
-    res->x_resolution = REAL ( GET_SLOT(x, mkString("resolution") ) )[0];
-    res->y_resolution = REAL ( GET_SLOT(x, mkString("resolution") ) )[1];
-    /* propagate to all images */
-    for ( i = 0; i < (int) GetImageListLength(res); i++ ) {
-        image = GetImageFromList (res, i);
-        image->x_resolution = REAL ( GET_SLOT(x, mkString("resolution") ) )[0];
-        image->y_resolution = REAL ( GET_SLOT(x, mkString("resolution") ) )[1];
-    }
-
     DestroyExceptionInfo(&exception);
     return res;
 }
@@ -112,7 +72,7 @@ magick2SEXP (Image * images, int colormode) {
     SEXP res, resd, dim;
     void * data;
     ExceptionInfo exception;
-    SEXP modeSlot, filenameSlot, compSlot, resSlot, features;
+    SEXP modeSlot;
 
     if ( images == (Image *)NULL )
         return R_NilValue;
@@ -188,31 +148,6 @@ magick2SEXP (Image * images, int colormode) {
     nprotect++;
     INTEGER (modeSlot)[0] = colormode;
     SET_SLOT (res, install("colormode"), modeSlot);
-
-    /* copy attributes: filename */
-    PROTECT ( filenameSlot = allocVector(STRSXP, 1) );
-    nprotect++;
-    SET_STRING_ELT (filenameSlot, 0, mkChar(images->filename) );
-    SET_SLOT (res, install("filename"), filenameSlot);
-    /* copy attributes: compression */
-    PROTECT ( compSlot = allocVector(STRSXP, 1) );
-    nprotect++;
-    for ( i = 0; i < COMP_LENGTH; i++ )
-        if ( images->compression == COMP_VALS[i] ) {
-            SET_STRING_ELT (compSlot, 0, mkChar(COMP_IDS[i]) );
-            break;
-        }
-    SET_SLOT (res, install("compression"), compSlot);
-    /* copy attributes: resolution */
-    PROTECT ( resSlot = allocVector(REALSXP, 2) );
-    nprotect++;
-    REAL (resSlot)[0] = images->x_resolution;
-    REAL (resSlot)[1] = images->y_resolution;
-    SET_SLOT (res, install("resolution"), resSlot);
-
-    PROTECT ( features = NEW_OBJECT(MAKE_CLASS("list")) );
-    nprotect++;
-    SET_SLOT (res, install("features"), features);
 
     DestroyExceptionInfo(&exception);
 

@@ -212,7 +212,6 @@ lib_deleteFeatures (SEXP x, SEXP _index) {
         Free (indexes);
 
     }
-    SET_SLOT (res, install("features"), allocVector(VECSXP, 0) );
 
     UNPROTECT (nprotect);
     return res;

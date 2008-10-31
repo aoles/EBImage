@@ -116,7 +116,7 @@ distGray(SEXP im1, SEXP im2, SEXP method, SEXP verbose) {
 
 /* -------------------------------------------------------------------------*/
 // compute dot product between two integer images
-inline double i_dot(unsigned char *x, unsigned char *y, double nxny, double *wgts) {
+double i_dot(unsigned char *x, unsigned char *y, double nxny, double *wgts) {
   int k, l;
   double sum=0.0;
   for (k=0; k<nxny; k++)
@@ -127,7 +127,7 @@ inline double i_dot(unsigned char *x, unsigned char *y, double nxny, double *wgt
 
 /* -------------------------------------------------------------------------*/
 // compute correlation between two integer images
-inline double i_cor(unsigned char *x, unsigned char *y, double nxny, double *wgts) {
+double i_cor(unsigned char *x, unsigned char *y, double nxny, double *wgts) {
   int k, l;
   double dx, dy, mx[3], my[3], sdx[3], sdy[3], suml[3], sum=0.0;
   for (l=0; l<3; l++) {
@@ -166,7 +166,7 @@ inline double i_cor(unsigned char *x, unsigned char *y, double nxny, double *wgt
 
 /* -------------------------------------------------------------------------*/
 // compute distance between two integer images
-inline double i_dist(unsigned char *x, unsigned char *y, double nxny, double *wgts) {
+double i_dist(unsigned char *x, unsigned char *y, double nxny, double *wgts) {
   int k, l, i;
   double sum=0.0, sum0;
   for (k=0; k<nxny; k++) {

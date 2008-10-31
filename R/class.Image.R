@@ -21,18 +21,10 @@ TrueColor  <- as.integer (1)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setClass ("Image",
   representation (
-    colormode    = "integer",    ## 0 - gray, 1 - RGB etc
-    filename     = "character",
-    compression  = "character",  ##
-    resolution   = "numeric",    ## length = 2 ## lost in jpeg, pixels per inch
-    features     = "list"
+    colormode    = "integer"    ## 0 - gray, 1 - RGB etc
   ),
   prototype (
-    colormode    = Grayscale,
-    filename     = "no-name",
-    compression  = "JPEG",
-    resolution   = c(2.5e+6, 2.5e+6), ## 1 px per 1um in pixels per inch
-    features     = list()
+    colormode    = Grayscale
   ),
   contains = "array"
 )
@@ -74,46 +66,6 @@ setReplaceMethod ("colorMode", signature (x="Image", value="numeric"),
     if (value == Grayscale) return ( channel(x, "gray") )
     # on any other unsupported value
     return(x)
-  }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("fileName", signature (x="Image"),
-  function (x, ...) x@filename
-)
-setReplaceMethod ("fileName", signature (x="Image", value="character"),
-  function (x, ..., value) {
-    x@filename <- value
-    return (x)
-  }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("compression", signature (x="Image"),
-  function (x, ...) x@compression
-)
-setReplaceMethod ("compression", signature (x="Image", value="character"),
-  function (x, ..., value) {
-    value <- toupper( value )
-    if ( switch (EXPR=value, NONE=, LZW=, ZIP=, JPEG=, BZIP=, GROUP4=, FALSE, TRUE) )
-      stop( "wrong compression type. Please specify, NONE, LZW, ZIP, JPEG, BZIP or GROUP4" )
-    x@compression <- value
-    return (x)
-  }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("resolution", signature (x="Image"),
-  function (x, ...) x@resolution
-)
-setReplaceMethod ("resolution", signature (x="Image", value="numeric"),
-  function (x, ..., value) {
-    if ( length(value) != 2 )
-      stop("resolution attribute needs 2 values, for x and y in pixels per inch")
-    if ( any( value <= 0 ) )
-      stop("resolution must be positive")
-    x@resolution <- value
-    return (x)
   }
 )
 
@@ -180,9 +132,7 @@ stopIfNotImage <- function (x) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("header", signature(x="Image"),
   function (x, ...) {
-    x = new(class(x), colormode=colorMode(x), filename=fileName(x),
-            compression=compression(x), resolution=resolution(x), 
-            features=x@features )
+    x = new(class(x), colormode=colorMode(x))
     x@.Data = if (x@colormode == TrueColor) array(as.integer(0), c(0,0,1)) 
               else array(0.0,c(0,0,1))
     return(x)
@@ -259,7 +209,7 @@ setMethod ("writeImage", signature(x="Image"),
     if ( missing(quality) ) quality <- 95
     if ( quality < 1 || quality > 100 )
       stop( "quality value is given in % between 1 and 100" )
-    if ( missing(files) ) files <- fileName(x)
+    if ( missing(files) ) stop('\'files\' must be specified')
     if ( !.isCorrectType(x) ) x <- .correctType(x)
     invisible ( .DoCall("lib_writeImages", x, as.character(files), as.integer(quality) ) )
   }
@@ -369,10 +319,8 @@ setMethod ("[", signature(x="Image", i="logical", j="missing"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("show", signature(object="Image"),
   function (object) {
-    if ( length( object@features ) > 0 )
-      cat ("\n'", class(object),"' with extracted object features\n", sep="")
-    else
-      cat ("\n'", class(object),"'\n", sep="")
+    cat ("\n'", class(object),"'\n", sep="")
+    
     if ( colorMode(object) == TrueColor ) {
       cat ("  colorMode()   : TrueColor\n")
       cat ("  storage class : integer 3D array, 8-bit/color RGB-, no alpha\n")
@@ -386,9 +334,7 @@ setMethod ("show", signature(object="Image"),
       cat ( sprintf ("  dim()         : %dx%d, %d image(s)\n", dimobject[1], dimobject[2], dimobject[3]) )
     else
       cat ( sprintf ("  dim()         : %dx%d\n", dimobject[1], dimobject[2]) )
-    cat ( sprintf ("  fileName()    : %s \n", fileName(object) ) )
-    cat ( sprintf ("  compression() : %s \n", compression(object) ) )
-    cat ( sprintf ("  resolution()  : dx = %.1f, dy = %.1f \n", resolution(object)[1], resolution(object)[2]) )
+
     nd <- dimobject[1:2]
     if ( nd[1] > 5 ) nd[1] <- 5
     if ( nd[2] > 6 ) nd[2] <- 6
@@ -396,16 +342,6 @@ setMethod ("show", signature(object="Image"),
       cat( "\nimage ", i, "/", dimobject[3], ":\n", sep="" )
       print( object@.Data[seq_len(nd[1]), seq_len(nd[2]), i] )
       if ( any(nd != dimobject[1:2]) ) cat(" ...\n")
-      if ( length(object@features) > 0 ) {
-        cat( "feature set ", i, "/", dimobject[3], ":\n", sep="" )
-        x <- object@features[[i]]
-        if (nrow(x) < 10)
-          print(x)
-        else {
-          print( x[1:10,] )
-          cat(" ...\n")
-        }
-      }
     }
     invisible(NULL)
   }
