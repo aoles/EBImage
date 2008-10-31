@@ -10,7 +10,7 @@
 \title{ Feature extraction for objects in indexed images }
 
 \description{
-  Functions to extract numerical descriptors for objects in indexed images.
+  Extract numerical descriptors for objects in indexed images.
   The functions here call a set of individual feature extraction routines for
   every feature set like hull, texture (Haralick), edge, moment features etc.
 }
@@ -18,7 +18,6 @@
 \usage{
 
   \S4method{getFeatures}{IndexedImage}(x, ref, N=12, R=30, apply.Gaussian=TRUE, nc=256, ...)
-  \S4method{features}{IndexedImage}(x, ...)
 
 }
 
@@ -53,15 +52,7 @@
 
 \value{
 
-  \code{getFeatures} calculates feature matrices and returns an object of 
-  \code{\linkS4class{IndexedImage}} with its \code{features} slot set. The typical
-  use would be to re-assign the result to the original image itself, 
-  i.e. \code{x <- getFeatures(x, a)}.
-  
-  \code{features} extracts the content of the \code{features} slot of the 
-  \code{IndexedImage}. If it is empty, the function calls \code{getFeatures}
-  without a reference image and returns the generated feature set. In this
-  case the \code{features} slot of the original image is not updated.
+  \code{getFeatures} returns feature matrices.
 }
 
       
@@ -102,8 +93,8 @@
   io = rmObjects(io, lapply(ft, function(x) 
          which(x[,"h.s"] < 150 | x[,"int"] < 50 | 0.3 * x[,"h.p"] < x[,"h.edge"] )
        ))
-  io = getFeatures(io, ii)
-  str( features(io) )
+  ft = getFeatures(io, ii)
+  str( ft )
   
 }
 

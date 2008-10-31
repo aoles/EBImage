@@ -210,7 +210,6 @@ lib_filterMagick (SEXP x, SEXP filter, SEXP parameters) {
     images = DestroyImageList (images);
 
     PROTECT ( res = magick2SEXP(newimages, mode) );
-    SET_SLOT (res, install("features"), Rf_duplicate( GET_SLOT(x, mkString("features") ) ) );
     newimages = DestroyImageList (newimages);
 
     DestroyExceptionInfo(&exception);

@@ -89,16 +89,6 @@ setMethod ("propagate", signature(x="Image", seeds="IndexedImage"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("features", signature (x="IndexedImage"),
-  function (x, ...) {
-    if ( length(x@features) > 0 )
-      return( x@features )
-    else
-      return( getFeatures(x)@features )
-  }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("getFeatures", signature(x="IndexedImage"),
   function (x, ref, N = 12, R = 30, apply.Gaussian=TRUE, nc = 256, pseudo=FALSE, ...) {
     if ( !missing(ref) && is.Image(ref) && !(colorMode(ref) == Grayscale) )
@@ -136,18 +126,18 @@ setMethod ("getFeatures", signature(x="IndexedImage"),
 
     if ( .dim[3] == 1 ) {
       if ( !missing(ref) )
-        x@features <- list( cbind(hf, ef, tf, mf, zf) )
+        features <- list( cbind(hf, ef, tf, mf, zf) )
       else
-        x@features <- list( cbind(hf, ef) )
+        features <- list( cbind(hf, ef) )
     }
     else {
-      x@features <- vector("list", length(hf))
+      features <- vector("list", length(hf))
       if ( !missing(ref) )
-        for ( i in seq_along(hf) ) x@features[[i]] <- cbind(hf[[i]], ef[[i]], tf[[i]], mf[[i]], zf[[i]])
+        for ( i in seq_along(hf) ) features[[i]] <- cbind(hf[[i]], ef[[i]], tf[[i]], mf[[i]], zf[[i]])
       else
-        for ( i in seq_along(hf) ) x@features[[i]] <- cbind(hf[[i]], ef[[i]])
+        for ( i in seq_along(hf) ) features[[i]] <- cbind(hf[[i]], ef[[i]])
     }
-    return( x )
+    return(features)
   }
 )
 

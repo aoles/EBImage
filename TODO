@@ -14,13 +14,11 @@ EBImage has been written is this may but there are some cases where one have to 
 tweak the dimension or the mode to perform some operations.
 
 The mapping could be the following:
-- int, logi 2D-like arrays (matrices, 2D arrays or multi-dimensional arrays with an 
-effective 2D dimension (e.g. dim(x)=c(1,1,2,1,5))) could map to Indexed images
+- int, logi 2D-like arrays map to Indexed images
 - num 2D-like arrays map to Gray levels images
 
-3D-like or nD-like should be also supported.
-
-Binary images are just images with two indexes.
+2D-like array means that 2 dimensions of n-dimensional arrays should be considered.
+Everything here should work with 2D arrays (not 3 !).
 
 GP thinks it is misleading to have a color image object since it is a rendering task and 
 not an image representation feature. A 3D matrix could be therefore seen as a RGB 
@@ -113,6 +111,58 @@ Drop the parameter 't'. It is weird to convolute thresholding
 
 'readImage':
 -----------
-Should be able to read color channels in a third dimension, without any options.
+Should be able BY DEFAULT to read color channels in a third dimension.
 An attribute colordim should be added to the Image object to handle multidimensional color images.
 
+consider removing:
+------------------
+GP thinks the following functions should be removed
+- 'copy' (what is the difference with a<-b ??)
+- 'header' (weird function, is it still useful since several attributes are now gone ?)
+- 'frameDist' (experimental, too vaguely defined, too specific usage)
+- 'animate' (should be combined with 'display' when GTK is absent)
+- 'morphKern' (should be merged with mkball, mkbox into a mkshape)
+- 'mkbox' (see morphKern)
+- 'mkball' (see morphKern)
+- 'fill' floodFill is doing the job
+- 'rgbImage' (won't be useful in a new color management system)
+- 'channelMix' (won't be useful in a new color management system)
+- 'chooseImage' (file selector, out of subject, RGtk2) 
+
+comments:
+----------------
+- blur, 
+- gblur
+- contrast, is it really needed ?
+- denoise
+- despeckle
+- edge,
+- enhance, supervague, is it really needed ?
+- equalize,
+- cgamma, 
+- mediansmooth, 
+- noise, 
+- resize, OK
+- rotate, OK
+- resample, is it really needed ?
+- segment,
+- sharpen, 
+- umask, 
+- thresh, is it really needed ? (should be in R !)
+- athresh, is it really needed ? (should be in R !)
+- cthresh, is it really needed ? (should be in R !)
+- affinet, 
+- modulate, unclear, is it really needed ?
+- negate, is it really needed ?
+- normalize (should be in R !)
+- normalize2, is it really needed ?
+- flip  is it really needed ?
+- flop, is it really needed ?
+
+##############
+3) Source code
+##############
+
+renaming files
+--------------
+GP thinks it would be nice to have a coherent R method/R source/C filename naming...

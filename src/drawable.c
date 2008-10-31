@@ -104,7 +104,6 @@ lib_drawText (SEXP obj, SEXP xylist, SEXP textlist, SEXP thefont, SEXP thecol) {
 
   PROTECT( res = magick2SEXP(newimages, mode) );
   nprotect++;
-  SET_SLOT(res, install("features"), Rf_duplicate(GET_SLOT(obj, mkString("features"))) );
   newimages = DestroyImageList(newimages);
 
   UNPROTECT( nprotect );
