@@ -44,7 +44,6 @@
 }
 
 \author{
-  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006\\
   Gregoire Pau, \email{gpau@ebi.ac.uk}, 2008
 }
 

@@ -63,6 +63,35 @@ morphKern <- function (size=5, shape="round") {
     return(res)
 }
 
+##------------------------------
+## mkball
+##------------------------------
+mkball = function(n, shape="step") {
+  if(! (is.numeric(n) && (length(n)==1L) && (n>=1)) )
+    stop("'n' must be a numeric of length 1 with value >=1.")
+
+  ## pixel center coordinates
+  x = 1:n -((n+1)/2)
+  
+  ## for each pixel, compute the distance from its center to the origin
+  d = outer(x, x, FUN=function(X,Y) (X*X+Y*Y))
+
+  ## radius and z^2
+  rsq = (n%/%2)^2
+  z2 = (rsq - d)
+  
+  switch(shape,
+         step = ifelse(z2>=0, 1, 0),
+         ball = sqrt(ifelse(z2>0, z2, 0)),
+         stop(sprintf("Invalid 'shape': %s", shape))
+  )
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+mkbox = function(n) {
+  matrix(1.0/(n*n),nc=n,nr=n)
+}
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("erode", signature(x="Image"),
     function (x, kern=morphKern(5), iter=1) {

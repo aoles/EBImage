@@ -186,21 +186,21 @@ setMethod (".correctType", signature(x="Image"),
 setMethod("Ops", signature(e1="Image", e2="Image"),
 	function(e1, e2) {
           imageData(e1) <- callGeneric(imageData(e1), imageData(e2))
-          if (storage.mode(imageData(e1))!='numeric') storage.mode(imageData(e1))='numeric'
+          if ( colorMode(e1)==Grayscale & storage.mode(imageData(e1))!='numeric') storage.mode(imageData(e1))='numeric'
           return( e1 )
 	}
 )
 setMethod("Ops", signature(e1="Image", e2="numeric"),
 	function(e1, e2) {
           imageData(e1) <- callGeneric(imageData(e1), e2)
-          if (storage.mode(imageData(e1))!='numeric') storage.mode(imageData(e1))='numeric'
+          if (colorMode(e1)==Grayscale & storage.mode(imageData(e1))!='numeric') storage.mode(imageData(e1))='numeric'
           return( e1 )
 	}
 )
 setMethod("Ops", signature(e1="numeric", e2="Image"),
 	function(e1, e2) {
           imageData(e2) <- callGeneric(e1, imageData(e2))
-          if (storage.mode(imageData(e2))!='numeric') storage.mode(imageData(e2))='numeric'
+          if (colorMode(e2)==Grayscale & storage.mode(imageData(e2))!='numeric') storage.mode(imageData(e2))='numeric'
           return( e2 )
 	}
 )
