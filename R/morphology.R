@@ -28,20 +28,12 @@ setMethod ("thresh", signature(x="Image"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("distmap", signature(x="Image"),
-  function (x, t=0.05, exact=FALSE, bg=0.05, ...) {
-    if ( colorMode(x) != Grayscale ) {
-      stop( "'x' must be Grayscale" )
-    }
-    t <- as.numeric (t)
-    if ( t < 0 || t >= 1 ) {
-      stop( "'t' must be in the range [0,1)" )
-    }
-    bg <- as.numeric (bg)
-    if ( bg < 0 || bg >= 1 ) {
-      stop( "'bg' must be in the range [0,1), bg >= 0.05 recommended" )
-    }
-    exact <- as.integer (exact)
-    return ( .DoCall("lib_distMap", x, t, bg, exact) )
+  function (x, metric=c("euclidean",'manhattan')) {
+    if (colorMode(x)!=Grayscale) stop("'x' must be Grayscale")
+    if (any(is.na(x))) stop("'x' shouldn't contain any NAs")
+    metric=match.arg(metric)
+    imetric=switch(metric,euclidean=0,manhattan=1)
+    return (.DoCall("distmap", x, as.integer(imetric)))
   }
 )
 
@@ -51,61 +43,53 @@ morphKern <- function (size=5, shape="round") {
         stop ( .("kernel size must be an odd number >= 3: [3, 5, 7, ...") )
     if ( switch(shape, round=, square=FALSE, TRUE) )
         stop("available shapes 'round' and 'square'")
-    res <- matrix ( as.integer(FALSE), size, size, byrow = TRUE )
+    res <- matrix (0, size, size, byrow = TRUE )
     cx = as.integer(size / 2) + 1
     if (shape == "round") {
-        res[cx,] = as.integer(TRUE)
-        res[,cx] = as.integer(TRUE)
+        res[cx,] = 1
+        res[,cx] = 1
         for ( i in 1:(cx-1) )
             for ( j in 1:(cx-1) )
                 if ( (cx - i)^2 + (cx - j)^2 <= (cx - 1)^2 ) {
-                    res[i, j] = as.integer (TRUE)
-                    res[size - i + 1, j] = as.integer (TRUE)
-                    res[i, size - j + 1] = as.integer (TRUE)
-                    res[size - i + 1, size - j + 1] = as.integer (TRUE)
+                    res[i, j] = 1
+                    res[size - i + 1, j] = 1
+                    res[i, size - j + 1] = 1
+                    res[size - i + 1, size - j + 1] =1
                 }
         return (res)
     }
     # otherwise square
-    res[] = as.integer (TRUE)
+    res[] = 1
     return(res)
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("erode", signature(x="Image"),
-    function (x, kern=morphKern(5), iter=1, ...) {
-        if ( colorMode(x) != Grayscale )
-            stop ( .("'x' must be a binary image in Grayscale mode") )
-        if ( !is.integer(kern) || !is.matrix(kern) )
-            stop ( .("kernel must be an integer matrix of 0's and 1's") )
-        if ( iter < 1 )
-            stop ( .("'iter' is assumed to be a positive integer") )
-        return ( .DoCall("lib_erode_dilate", x, kern, as.integer(iter), as.integer(0) ) )
-    }
+    function (x, kern=morphKern(5), iter=1) {
+      if ( colorMode(x) != Grayscale ) stop ( .("'x' must be a binary image in Grayscale mode") )
+      if ( iter < 1 ) stop ( .("'iter' must be a positive integer") )
+      return ( .DoCall("lib_erode_dilate", x, kern, as.integer(iter), as.integer(0) ) )
+     }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("dilate", signature(x="Image"),
-    function (x, kern=morphKern(5), iter=1, ...) {
-        if ( colorMode(x) != Grayscale )
-            stop ( .("'x' must be a binary image in Grayscale mode") )
-        if ( !is.integer(kern) || !is.matrix(kern) )
-            stop ( .("kernel must be an integer matrix of 0's and 1's") )
-        if ( iter < 1 )
-            stop ( .("'iter' is assumed to be a positive integer") )
-        return ( .DoCall("lib_erode_dilate", x, kern, as.integer(iter), as.integer(1) ) )
+    function (x, kern=morphKern(5), iter=1) {
+      if ( colorMode(x) != Grayscale ) stop ( .("'x' must be a binary image in Grayscale mode") )
+      if ( iter < 1 ) stop ( .("'iter' is assumed to be a positive integer") )    
+      return ( .DoCall("lib_erode_dilate", x, kern, as.integer(iter), as.integer(1) ) )
     }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("opening", signature(x="Image"),
-    function (x, kern=morphKern(5), iter=1, ...)
-        dilate ( erode(x, kern, iter, ...), kern, iter, ... )
+    function (x, kern=morphKern(5), iter=1)
+        dilate ( erode(x, kern, iter), kern, iter)
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("closing", signature(x="Image"),
-    function (x, kern=morphKern(5), iter=1, ...)
-        erode ( dilate(x, kern, iter, ...), kern, iter, ... )
+    function (x, kern=morphKern(5), iter=1)
+        erode ( dilate(x, kern, iter), kern, iter)
 )
 

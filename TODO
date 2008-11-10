@@ -2,58 +2,6 @@
 1) Objects
 ##########
 
-general:
---------
-
-GP thinks that it would nice that EBImage can seamlessly work with:
-- Indexed images
-- Gray levels images
-
-And that there should be an automatic mapping between R primitives and these objects. 
-EBImage has been written is this may but there are some cases where one have to cast, 
-tweak the dimension or the mode to perform some operations.
-
-The mapping could be the following:
-- int, logi 2D-like arrays map to Indexed images
-- num 2D-like arrays map to Gray levels images
-
-2D-like array means that 2 dimensions of n-dimensional arrays should be considered.
-Everything here should work with 2D arrays (not 3 !).
-
-GP thinks it is misleading to have a color image object since it is a rendering task and 
-not an image representation feature. A 3D matrix could be therefore seen as a RGB 
-image or a set of gray images.
-
-'filename' and 'compression slots of Image objects:
----------------------------------------------------
-WH thinks that these shouldn't be slots of the Image class.  They are
-not properties of an image, but rather of a saved file.  They should
-be arguments to the 'writeImage' function, but nothing else
-(otherwise, with the same logic, data.frames, matrices, etc.  could
-have slots for 'filename' and 'separator character', which would be
-just as odd).
-
-'features' slot:
-----------------
-This shouldn't be a slot of the basic Image class, since it
-corresponds to a rather specialized use case. For example, there could
-be a derived class 'ImageWithFeatures' with that slot (and then some
-validity checking that the list has the right length, contains the
-right type and size of elements etc.)
-
-'resolution' slot:
-------------------
-Again, this is a rather special use case, only applicable to
-microscopy images of real-life objects. What's the resolution of an
-image from a space telescope, a holiday picture, or pictures from a
-CCTV camera on which you want to do novelty detection?
-
-I think there is some value in allowing to store "tags" or image
-attributes that were found e.g. in a TIFF file, or to add additional
-ones by the user. For this, I would suggest just having a slot named
-"tags" that is of type list, with arbitrary length, and its elements
-can be, for example, list(resolution=2.5e6, units="ppi")
-
 'colorMode':
 -----------
 Why is this sometimes spelt with uppercase 'M' (e.g. in accessor
@@ -76,6 +24,28 @@ method:
 Errore in if (dimobject[3] > 1) cat(sprintf("  dim()         : %dx%d, %d image(s)\n",  : 
   valore mancante dove è richiesto TRUE/FALSE
 
+IndexedImage & storage.mode:
+----------------------------
+GP thinks that this class is useless and can be easily combined with Image.
+storage.mode of Images must remain 'numeric' and everything can be done in 'numeric'. 
+
+n-dimension:
+--------------
+GP thinks that EBImage should be able to deal with n-dimensional images and NOT cast 
+everything into 3D arrays. 
+
+arrays, matrices:
+----------------
+GP thinks that EBImage should also be able to work with matrices and arrays, not only with Images.
+
+color handling:
+--------------
+GP thinks that EBImage color management should include:
+- remove the TrueColor and Grayscale modes
+- readImage should read by default color
+- render the colors only during display() using channels
+- don't restrict to RGB !
+
 ##########
 2) Methods
 ##########
@@ -88,31 +58,7 @@ belong to (i/o, displaying, linear filtering, morphological operations...).
 
 Matlab's image toolbox is a good example of how an image processing toolbox should be.
 
-'distmap':
----------
-The function should check its argument 'x', verify that 'x' takes
-   exactly two values, and then consider the larger one as foreground,
-   the smaller one as background.
-
-The result should NOT be 'floor'ed!
-
-What exactly is this parameter 'bg' doing? Can we drop it? It seems
-   odd to have it in this function.
-
-What exactly is 'exact' doing? Do we need it? Can it get a more
-   precise name, e.g. one that signifies that it controls the choice of the
-   metric (L1 vs L2)?
-
-Drop the parameter 't'. It is weird to convolute thresholding
-   with this particular algorithm. If the function is called on an
-   image with more than two values, then it should just throw an
-   error, and not make up some thresholding.
-
-
-'readImage':
------------
-Should be able BY DEFAULT to read color channels in a third dimension.
-An attribute colordim should be added to the Image object to handle multidimensional color images.
+GP thinks that default arguments in many methods are overused.
 
 consider removing:
 ------------------
@@ -159,10 +105,16 @@ comments:
 - flip  is it really needed ?
 - flop, is it really needed ?
 
-##############
-3) Source code
-##############
+#################
+3) Miscelleaneous
+#################
 
-renaming files
---------------
+source code: renaming files:
+----------------------------
 GP thinks it would be nice to have a coherent R method/R source/C filename naming...
+
+installation:
+-------------
+ease the MacOS Gtk+ and installalation procedure
+
+

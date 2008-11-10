@@ -181,23 +181,27 @@ setMethod (".correctType", signature(x="Image"),
   }
 )
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("Arith", signature(e1="Image", e2="Image"),
+## overloading binary operators, ensuring that the storage.mode of the data remains numeric
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+setMethod("Ops", signature(e1="Image", e2="Image"),
 	function(e1, e2) {
-		imageData(e1) <- callGeneric(imageData(e1), imageData(e2))
-		return( e1 )
+          imageData(e1) <- callGeneric(imageData(e1), imageData(e2))
+          if (storage.mode(imageData(e1))!='numeric') storage.mode(imageData(e1))='numeric'
+          return( e1 )
 	}
 )
-setMethod("Arith", signature(e1="Image", e2="array"),
+setMethod("Ops", signature(e1="Image", e2="numeric"),
 	function(e1, e2) {
-		imageData(e1) <- callGeneric(imageData(e1), e2)
-		return( e1 )
+          imageData(e1) <- callGeneric(imageData(e1), e2)
+          if (storage.mode(imageData(e1))!='numeric') storage.mode(imageData(e1))='numeric'
+          return( e1 )
 	}
 )
-setMethod("Arith", signature(e1="array", e2="Image"),
+setMethod("Ops", signature(e1="numeric", e2="Image"),
 	function(e1, e2) {
-		imageData(e2) <- callGeneric(e1, imageData(e2))
-		return( e2 )
+          imageData(e2) <- callGeneric(e1, imageData(e2))
+          if (storage.mode(imageData(e2))!='numeric') storage.mode(imageData(e2))='numeric'
+          return( e2 )
 	}
 )
 

@@ -133,7 +133,6 @@ The \Rfunction{writeImage} function can be used to write images to files.
 <<writeImage>>= 
 outdir = tempdir()
 writeImage(iR, file.path(outdir, "test.png"))
-compression(iR)
 writeImage(iR[,,1], file.path(outdir, "test.jpg"), quality=90)
 file.info(dir(outdir, full.names=TRUE))[,c(1,5)]
 @ 
@@ -142,8 +141,6 @@ file.info(dir(outdir, full.names=TRUE))[,c(1,5)]
 %% - the default for 'quality' should be 1, not 0.95, and should be part
 %%    of the function signature (because this is where users expect to see
 %%    the default value of function arguments).
-%% - why is compression a slot of the Image class? It does not  
-%%   belong there. It should be an argument of the writeImage function.
 
 %%------------------------------------------------------
 \section{Displaying images and accessing the image data}
@@ -612,10 +609,10 @@ writeImage(normalize(sR[,,1]), "12.png")
 Finally, having the indexed images for cells and nuclei, the full set of descriptors can be extracted using the \Rfunction{getFeatures} function:
  
 <<example.getFeatures,echo=TRUE,results=verbatim,eval=TRUE>>=
-sG = getFeatures(sG, iGn)
-sR = getFeatures(sR, iRn)
-nucl = do.call("rbind", features(sG))
-cells = do.call("rbind", features(sR))
+fsG = getFeatures(sG, iGn)
+fsR = getFeatures(sR, iRn)
+nucl = do.call("rbind", fsG)
+cells = do.call("rbind", fsR)
 stopifnot(identical(dim(nucl), dim(cells)))
 @
 The resulting matrices have \Sexpr{nrow(nucl)} rows (one for each of cell/nucleus) and \Sexpr{ncol(nucl)} columns (one for each object descriptor).  

@@ -7,10 +7,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+  
 #ifdef USE_GTK
 #   ifdef __cplusplus
-    extern
+extern
 #   endif
     int GTK_OK;
 #endif
@@ -18,10 +18,12 @@ extern "C" {
 #define MAX_MODE  1
 #define MODE_GRAY 0
 #define MODE_RGB  1
-
+  
 typedef struct {
     int x, y;
 } PointXY;
+  
+typedef double numeric;
 
 double distanceXY (const PointXY, const PointXY);
 double distancexy (int, int, int, int);
