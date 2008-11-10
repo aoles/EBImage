@@ -125,7 +125,3 @@ setGeneric ("edge.features",  function (x, ...)        standardGeneric("edge.fea
 setGeneric ("haralick.matrix",function (x, ref, ...)   standardGeneric("haralick.matrix") )
 setGeneric ("haralick.features",function (x, ref,...)  standardGeneric("haralick.features") )
 setGeneric ("zernike.moments",function (x, ref, ...)   standardGeneric("zernike.moments") )
-
-
-
-

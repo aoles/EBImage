@@ -10,9 +10,9 @@ See: ../LICENSE for license, LGPL
 #include "display.h"
 #include "io.h"
 
-#include "filters_distmap.h"
+#include "distmap.h"
 #include "filters_magick.h"
-#include "filters_morph.h"
+#include "morphology.h"
 #include "filters_propagate.h"
 #include "filters_normalize.h"
 #include "filters_watershed.h"
@@ -82,7 +82,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_floodFill",      (DL_FUNC) &lib_floodFill,      4},
     {"lib_fillHull",       (DL_FUNC) &lib_fillHull,       1},
     {"lib_normalize",      (DL_FUNC) &lib_normalize,      3},
-    {"lib_distMap",        (DL_FUNC) &lib_distMap,        4},
+    {"distmap",            (DL_FUNC) &distmap,            2},
     {"lib_filterInvWS",    (DL_FUNC) &lib_filterInvWS,    3},
     {"lib_propagate",      (DL_FUNC) &lib_propagate,      5},
 

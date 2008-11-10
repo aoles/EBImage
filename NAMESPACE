@@ -1,6 +1,6 @@
 useDynLib(EBImage)
 
-importFrom("methods", "Arith")
+importFrom("methods", "Ops")
 importFrom("methods", "show")
 importFrom("graphics", "image")
 importFrom("graphics", "hist")
@@ -12,7 +12,7 @@ exportClasses(Image, IndexedImage)
 ## image class, copy, assertion, accessors
 export(Image, is.Image, stopIfNotImage, print.Image)
 export(print.IndexedImage,  TrueColor, Grayscale)
-exportMethods(header, copy, assert, Arith, "[", as.Image)
+exportMethods(header, copy, assert, Ops, "[", as.Image)
 exportMethods(colorMode, "colorMode<-",imageData, "imageData<-")
 
 ## image IO, display

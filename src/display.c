@@ -30,6 +30,14 @@ See: ../LICENSE for license, LGPL
 #   endif
 #endif
 
+typedef struct {
+  double nx,ny,nz;
+  double x,y;
+  double zoom;
+  double index;
+} dstats;
+
+#define INTERP_METHOD GDK_INTERP_NEAREST
 int THREAD_ON = 0;
 
 /*----------------------------------------------------------------------- */
@@ -139,8 +147,9 @@ gboolean onZoomOutPress (GtkToolButton *, gpointer);         // "button-press-ev
 gboolean onZoomOnePress (GtkToolButton *, gpointer);         // "button-press-event"
 gboolean onNextImPress  (GtkToolButton *, gpointer);         // "button-press-event"
 gboolean onPrevImPress  (GtkToolButton *, gpointer);         // "button-press-event"
+gboolean onScroll       (GtkAdjustment *adjustment, gpointer ptr) ;  // "value-changed"
 gboolean onMouseMove    (GtkWidget *, GdkEventMotion *, gpointer); // "motion-notify-event"
-void     updateStatusBar(GtkStatusbar * stbarWG, double * stats);
+void     updateStatusBar(GtkStatusbar * stbarWG, dstats * stats);
 
 typedef gpointer * ggpointer;
 
@@ -148,7 +157,7 @@ typedef gpointer * ggpointer;
 void
 _showInGtkWindow (SEXP x, SEXP caption) {
     int nx, ny, nz, width, height;
-    double * stats;    /* 0: nx, 1: ny, 2: nz, 3: x, 4: y, 5: zoom, 6: index */
+    dstats *stats;
     SEXP dim;
     Image * images;
     GdkPixbuf * pxbuf;
@@ -156,8 +165,8 @@ _showInGtkWindow (SEXP x, SEXP caption) {
               * btnZoomInWG, * btnZoomOutWG, * btnZoomOneWG,
               * btnNextWG, * btnPrevWG;
     GtkIconSize iSize;
-    gpointer ** winStr; /* 5 pointers, 0 - window, 1 - imageWG, 2 - images, 3 - *int - index of current image on display,
-                                       4 - statusbar, 5 - pointer to doubles of status bar values  */
+    gpointer ** winStr; /* 6 pointers, 0 - window, 1 - imageWG, 2 - images, 3 - *int - index of current image on display,
+                                       4 - statusbar, 5 - pointer to dstats  */
 
     if ( !GTK_OK )
         error ( "failed to initialize GTK+, use 'read.image' instead" );
@@ -211,19 +220,22 @@ _showInGtkWindow (SEXP x, SEXP caption) {
     gtk_container_add(GTK_CONTAINER(evBox), imgWG);
     /* add image to scroll */
     gtk_scrolled_window_add_with_viewport ( GTK_SCROLLED_WINDOW(scrollWG), evBox);
-    
-    
+    gtk_signal_connect(GTK_OBJECT(gtk_scrolled_window_get_hadjustment(GTK_SCROLLED_WINDOW(scrollWG))),"value-changed", GTK_SIGNAL_FUNC(onScroll), winStr);
+    gtk_signal_connect(GTK_OBJECT(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrollWG))),"value-changed", GTK_SIGNAL_FUNC(onScroll), winStr);
+
     /* create status bar and push it to layout */
     stbarWG = gtk_statusbar_new ();
     gtk_box_pack_start ( GTK_BOX(vboxWG), stbarWG, FALSE, FALSE, 0);
-    stats = g_new ( gdouble, 7 );
-    stats[0] = nx;
-    stats[1] = ny;
-    stats[2] = nz;
-    stats[3] = 0; /* x coord */
-    stats[4] = 0; /* y coord */
-    stats[5] = 1; /* zoom */
-    stats[6] = 0; /* index */
+
+    stats = g_new ( dstats, 1 );
+    stats->nx=nx;
+    stats->ny=ny;
+    stats->nz=nz;
+    stats->x=0;
+    stats->y=0;
+    stats->zoom=1.0;
+    stats->index=0;
+
     winStr[4] = (gpointer *) stbarWG;
     winStr[5] = (gpointer *) stats;
     /* add zoom buttons */
@@ -286,7 +298,7 @@ gboolean
 onZoomInPress (GtkToolButton * btn, gpointer ptr) {
     gpointer ** winStr;
     int width, height, index;
-    double * stats;
+    dstats * stats;
     GdkPixbuf * pxbuf, * newPxbuf;
     GtkImage * imgWG;
     Image * images;
@@ -296,13 +308,13 @@ onZoomInPress (GtkToolButton * btn, gpointer ptr) {
     images = (Image *) winStr[2];
     index = *(int *)winStr[3];
     pxbuf = newPixbufFromImages (images, index );
-    stats = (double *)winStr[5];
+    stats = (dstats *)winStr[5];
 
     width = gdk_pixbuf_get_width ( gtk_image_get_pixbuf(imgWG) );
     height = gdk_pixbuf_get_height ( gtk_image_get_pixbuf(imgWG) );
 
-    newPxbuf = gdk_pixbuf_scale_simple ( pxbuf, (int)(width * 1.25), (int)(height * 1.25), GDK_INTERP_BILINEAR );
-    stats[5] *= 1.25;
+    newPxbuf = gdk_pixbuf_scale_simple ( pxbuf, (int)(width *2), (int)(height * 2), INTERP_METHOD);
+    stats->zoom *= 2;
     gtk_image_set_from_pixbuf (imgWG, newPxbuf);
     g_object_unref (newPxbuf);
     g_object_unref (pxbuf);
@@ -316,7 +328,7 @@ gboolean
 onZoomOutPress (GtkToolButton * btn, gpointer ptr) {
     gpointer ** winStr;
     int width, height, index;
-    double * stats;
+    dstats * stats;
     GdkPixbuf * pxbuf, * newPxbuf;
     GtkImage * imgWG;
     Image * images;
@@ -326,13 +338,14 @@ onZoomOutPress (GtkToolButton * btn, gpointer ptr) {
     images = (Image *) winStr[2];
     index = *(int *)winStr[3];
     pxbuf = newPixbufFromImages (images, index );
-    stats = (double *)winStr[5];
+    stats = (dstats *)winStr[5];
 
     width = gdk_pixbuf_get_width ( gtk_image_get_pixbuf(imgWG) );
     height = gdk_pixbuf_get_height ( gtk_image_get_pixbuf(imgWG) );
 
-    newPxbuf = gdk_pixbuf_scale_simple ( pxbuf, (int)(width * 0.75), (int)(height * 0.75), GDK_INTERP_BILINEAR );
-    stats[5] *= 0.75;
+    newPxbuf = gdk_pixbuf_scale_simple ( pxbuf, (int)(width/2), (int)(height/2), INTERP_METHOD);
+    stats->zoom /= 2;
+
     gtk_image_set_from_pixbuf (imgWG, newPxbuf);
     g_object_unref (newPxbuf);
     g_object_unref (pxbuf);
@@ -349,21 +362,27 @@ onZoomOnePress (GtkToolButton * btn, gpointer ptr) {
     GtkImage * imgWG;
     Image * images;
     int index;
-    double * stats;
+    dstats * stats;
 
     winStr = (gpointer **) ptr;
     imgWG = GTK_IMAGE (winStr[1]);
     images = (Image *) winStr[2];
     index = *(int *)winStr[3];
     pxbuf = newPixbufFromImages (images, index );
-    stats = (double *)winStr[5];
+    stats = (dstats *)winStr[5];
 
     gtk_image_set_from_pixbuf (imgWG, pxbuf);
-    stats[5] = 1.0;
+    stats->zoom = 1.0;
     g_object_unref (pxbuf);
     updateStatusBar((GtkStatusbar *)winStr[4], stats);
     gdk_flush();
     return TRUE;
+}
+
+/*----------------------------------------------------------------------- */
+gboolean onScroll(GtkAdjustment *adjustment, gpointer ptr)
+{
+  return onMouseMove(NULL,NULL,ptr);
 }
 
 /*----------------------------------------------------------------------- */
@@ -374,12 +393,12 @@ onNextImPress (GtkToolButton * btn, gpointer ptr) {
     GdkPixbuf * pxbuf, * newPxbuf;
     GtkImage * imgWG;
     Image * images;
-    double * stats;
+    dstats * stats;
 
     winStr = (gpointer **) ptr;
     imgWG = GTK_IMAGE (winStr[1]);
     images = (Image *) winStr[2];
-    stats = (double *)winStr[5];
+    stats = (dstats *)winStr[5];
 
     width = gdk_pixbuf_get_width ( gtk_image_get_pixbuf(imgWG) );
     height = gdk_pixbuf_get_height ( gtk_image_get_pixbuf(imgWG) );
@@ -390,9 +409,9 @@ onNextImPress (GtkToolButton * btn, gpointer ptr) {
         return TRUE;
     pxbuf = newPixbufFromImages (images, index);
     *(int *)winStr[3] = index;
-    stats[6] = index;
+    stats->index = index;
 
-    newPxbuf = gdk_pixbuf_scale_simple ( pxbuf, width, height, GDK_INTERP_BILINEAR );
+    newPxbuf = gdk_pixbuf_scale_simple ( pxbuf, width, height, INTERP_METHOD);
     gtk_image_set_from_pixbuf (imgWG, newPxbuf);
     g_object_unref (newPxbuf);
     g_object_unref (pxbuf);
@@ -408,12 +427,12 @@ onPrevImPress (GtkToolButton * btn, gpointer ptr) {
     GdkPixbuf * pxbuf, * newPxbuf;
     GtkImage * imgWG;
     Image * images;
-    double * stats;
+    dstats * stats;
 
     winStr = (gpointer **) ptr;
     imgWG = GTK_IMAGE (winStr[1]);
     images = (Image *) winStr[2];
-    stats = (double *)winStr[5];
+    stats = (dstats *)winStr[5];
 
     width = gdk_pixbuf_get_width ( gtk_image_get_pixbuf(imgWG) );
     height = gdk_pixbuf_get_height ( gtk_image_get_pixbuf(imgWG) );
@@ -424,9 +443,9 @@ onPrevImPress (GtkToolButton * btn, gpointer ptr) {
         return TRUE;
     pxbuf = newPixbufFromImages (images, index);
     *(int *)winStr[3] = index;
-    stats[6] = index;
+    stats->index = index;
 
-    newPxbuf = gdk_pixbuf_scale_simple ( pxbuf, width, height, GDK_INTERP_BILINEAR );
+    newPxbuf = gdk_pixbuf_scale_simple ( pxbuf, width, height, INTERP_METHOD);
     gtk_image_set_from_pixbuf (imgWG, newPxbuf);
     g_object_unref (newPxbuf);
     g_object_unref (pxbuf);
@@ -439,25 +458,26 @@ onPrevImPress (GtkToolButton * btn, gpointer ptr) {
 gboolean 
 onMouseMove(GtkWidget * widget, GdkEventMotion * event, gpointer ptr) {
     gpointer ** winStr;
-    double * stats;
+    dstats * stats;
 
     winStr = (gpointer **) ptr;
     GtkWidget * imgWG = GTK_WIDGET(winStr[1]);
-    stats = (double *)winStr[5];
+    stats = (dstats *)winStr[5];
     gint x, y, x0=0, y0=0;
 
-    x0 = (imgWG->allocation.width - stats[0]*stats[5])/2;
+    x0 = (imgWG->allocation.width - stats->nx*stats->zoom)/2;
     if (x0 < 0) x0 = 0;
-    y0 = (imgWG->allocation.height - stats[1]*stats[5])/2;
+    y0 = (imgWG->allocation.height - stats->ny*stats->zoom)/2;
     if (y0 < 0) y0 = 0;
 
     gtk_widget_get_pointer(imgWG, &x, &y);
-    stats[3] = (x-x0) / stats[5] + 1;
-    stats[4] = (y-y0) / stats[5] + 1;
-    if (stats[3]<1) stats[3] = 1;
-    if (stats[4]<1) stats[4] = 1;
-    if (stats[3]>stats[0]) stats[3] = stats[0];
-    if (stats[4]>stats[1]) stats[4] = stats[1];
+    stats->x = (x-x0) / stats->zoom + 1;
+    stats->y = (y-y0) / stats->zoom + 1;
+
+    if (stats->x<1) stats->x = 1;
+    if (stats->y<1) stats->y = 1;
+    if (stats->x>stats->nx) stats->x = stats->nx;
+    if (stats->y>stats->ny) stats->y = stats->ny;
     
     updateStatusBar((GtkStatusbar *)winStr[4], stats);
     gdk_flush();
@@ -495,14 +515,13 @@ newPixbufFromImages (Image * images, int index) {
 }
 
 /*----------------------------------------------------------------------- */
-void updateStatusBar(GtkStatusbar * stbarWG, double * stats) {
+void updateStatusBar(GtkStatusbar * stbarWG, dstats * stats) {
   gchar str[255];
+
   /* 0: nx, 1: ny, 2: nz, 3: x, 4: y, 5: zoom, 6: index */
-  sprintf(str, "Frame: %d/%d\tImage: %dx%dx%d\tZoom: %d%%\t Position: (%d:%d)", 
-    (int)(stats[6]+1), (int)stats[2], (int)stats[0], (int)stats[1], (int)stats[2], (int)(stats[5]*100), (int)stats[3], (int)stats[4]); 
-/*  sprintf(str, "Frame: %d/%d    Image: %dx%dx%d    Zoom: %d%%", 
-    (int)(stats[6]+1), (int)stats[2], (int)stats[0], (int)stats[1], (int)stats[2], (int)(stats[5]*100));
-*/
+  sprintf(str, "Frame: %d/%d\tImage: %dx%dx%d\tZoom: %d%%\t Position: (%d,%d)", 
+	  (int)(stats->index+1), (int)stats->nz, (int)stats->nx, (int)stats->ny, (int)stats->nz, (int)(stats->zoom*100), (int)stats->x, (int)stats->y); 
+
   gtk_statusbar_pop(stbarWG, 0);
   gtk_statusbar_push(stbarWG, 0, str);
 }

@@ -3,63 +3,49 @@
 \alias{distmap}
 \alias{distmap,Image-method}
 
-\title{ Distance map transform of binary images }
+\title{Distance map transform}
 
 \description{
-  The function computes a distance map transformation of a binary image,
-  i.e. of an image whose pixels are labeled as \emph{foreground} and
-  \emph{background}. 
-  In the distance map, each pixel contains the distance from that pixel to the nearest
-  background pixel, or to the border of the image.
-  Note: this is a trivial brute force implementation. Please look
-  elsewhere for efficient implementations; see also the references.
+  Computes the distance map transform of a binary image.
+  The distance map is a matrix which contains for each pixel
+  the distance to its nearest background pixel.
 }
 
 \usage{
-  \S4method{distmap}{Image}(x, t=0.05, exact=FALSE, bg=0.05, ...)
+  \S4method{distmap}{Image}(x, metric=c('euclidean','manhattan'))
 }
 
 \arguments{
 
   \item{x}{A \code{\link{Grayscale}} object of \code{\linkS4class{Image}}.
-    \code{x} is considered as a binary image, consisting of 0's for background
-    and all other values for foreground. }
+    \code{x} is considered as a binary image, whose pixels of value 0
+    are considered as background ones and the other pixels as
+    foreground ones.}
 
-  \item{t}{A numeric vector of length 1, the background threshold in the range 
-    \code{[0,1)}. Pixels with intensity smaller than \code{t} are considered 
-    as background. } 
-
-  \item{bg}{A numeric numeric vector of length 1, the allowed minimum of the fraction of 
-    background pixels in the image. Deprecated.}
-  
-  \item{exact}{???}
-  
-  \item{...}{Further arguments.}
+  \item{metric}{A character indicating which metric to use, L2 distance
+    (Euclidean) or L1 distance (Manhattan). Default is \code{euclidean}.} 
 }
 
 \value{
   A \code{\link{Grayscale}} object of \code{\linkS4class{Image}} with pixels
-  containing the \code{\link{floor}} values of their distances to the nearest 
-  background points. 
+  containing the distances to the nearest background points. 
 }
 
-\references{2D Euclidean Distance Transform Algorithms: A Comparative Survey.
-R. Fabbri, L. da F. Costa, J.C. Torelli and O.M. Bruno. ACM Computing
-Surveys, Vol. 40, No. 1, Article 2 (Feb. 2008).
-
-The Image Processing Handbook. John Russ. 5th edition, 2006, CRC Press.
-
-VIGRA by Ullrich Koethe: http://kogs-www.informatik.uni-hamburg.de/~koethe/vigra
+\details{
+  A fast algorithm of complexity O(N*M*log(N)), where (M,N) are the
+  dimension of \code{x}), is used to compute the distance map.
 }
+
+\references{M. N. Kolountzakis, K. N. Kutulakos. Fast Computation of the Euclidean
+  Distance Map for Binary Images, Infor. Proc. Letters 43 (1992).}
 
 \seealso{
-  \code{
-    \linkS4class{Image}, \link{watershed}, \link{thresh}, \link{propagate}
-  }
+  \code{\linkS4class{Image}}
 }
 
 \author{
-  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006\\
+  Gregoire Pau, \email{gpau@ebi.ac.uk}, 2008
 }
 
 \examples{
