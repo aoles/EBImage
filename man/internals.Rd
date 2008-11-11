@@ -16,9 +16,9 @@
 \alias{imageData,Image-method}
 \alias{imageData<-,Image,matrix-method}
 \alias{imageData<-,Image,array-method}
-\alias{Arith,Image,Image-method}
-\alias{Arith,Image,array-method}
-\alias{Arith,array,Image-method}
+\alias{Ops,Image,Image-method}
+\alias{Ops,Image,numeric-method}
+\alias{Ops,numeric,Image-method}
 \alias{resolution,Image-method}
 \alias{resolution<-,Image,numeric-method}
 \alias{x}
