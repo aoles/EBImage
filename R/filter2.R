@@ -16,14 +16,14 @@
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-setMethod("filter2", signature(x="array",filter="matrix"),
-  function(x, filter, ...) {
+setMethod("filter2", signature(x="array",filter="array"),
+  function(x, filter) {
     df = dim(filter)
     if (any(df%%2==0) || df[1]!=df[2])
       stop("dimensions of 'filter' matrix must be equal and odd")
     dx = dim(x)
-    if (length(dx)<2 || length(dx)>3)
-      stop("'x' must be a matrix or a 3D array")
+    if (length(dx)<2) stop("'x' must have at least two dimensions")
+    
     if (any(dx[1:2]<df[1]))
       stop("first two dimensions of 'x' are too small")
     # find centres of x and filter
@@ -33,8 +33,10 @@ setMethod("filter2", signature(x="array",filter="matrix"),
     fltr = matrix(0.0,nr=dx[1],nc=dx[2])
     fltr[(cx[1]-cf[1]):(cx[1]+cf[1]),(cx[2]-cf[2]):(cx[2]+cf[2])] = filter
     fltr = fft(fltr)
-    # if matrix, convert it to array with 3rd dim 1 (to allow general apply)
-    if (length(dx)==2) dim(x) = c(dx,1)
+    
+    ## convert to a frame-based 3D array
+    dim(x) = c(dx[1:2],prod(dx)/prod(dx[1:2]))
+        
     index1 = c(cx[1]:dx[1],1:(cx[1]-1))
     index2 = c(cx[2]:dx[2],1:(cx[2]-1))
     pdx = prod(dim(x)[1:2])
@@ -42,17 +44,18 @@ setMethod("filter2", signature(x="array",filter="matrix"),
       dim(xx) = dx[1:2]
       Re(fft(fft(xx)*fltr,inverse=T)/pdx)[index1,index2]
     })
+
+    ## convert it back
     dim(x) = dx
     x
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-setMethod("filter2", signature(x="Image",filter="matrix"),
-  function(x, filter, ...) {
-    if (colorMode(x)!=Grayscale)
-      stop("'x' must be a Grayscale image")
-    imageData(x) = filter2(imageData(x),filter,...)
+setMethod("filter2", signature(x="Image",filter="array"),
+  function(x, filter) {
+    if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
+    imageData(x) = filter2(imageData(x),filter)
     x
   }
 )

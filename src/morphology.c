@@ -30,7 +30,8 @@ lib_erode_dilate (SEXP x, SEXP kernel, SEXP iters, SEXP what) {
     dim = INTEGER ( GET_DIM(x) );
     size.x = dim[0];
     size.y = dim[1];
-    nz = dim[2];
+    nz = getNumberOfFrames(x,0);
+
     kern = REAL (kernel);
     ksize.x = INTEGER ( GET_DIM(kernel) )[0];
     ksize.y = INTEGER ( GET_DIM(kernel) )[1];
@@ -41,15 +42,15 @@ lib_erode_dilate (SEXP x, SEXP kernel, SEXP iters, SEXP what) {
     nprotect++;
 
     for ( i = 0; i < nz; i++ ) {
-        tgt = &( REAL(res)[i * size.x * size.y] );
-        src = &( REAL(x)[i * size.x * size.y] );
-        for ( it = 0; it < nt; it++ )
-            for ( j = 0; j < size.x * size.y; j++ ) {
-                if ( tgt[j] == resetTo ) continue;
-                pt = pointFromIndex (j, size.x);
-                if ( !_match(kern, &ksize, src, &size, &pt, resetTo) )
-                    tgt[j] = resetTo;
-            }
+      tgt = &( REAL(res)[i * size.x * size.y] );
+      src = &( REAL(x)[i * size.x * size.y] );
+      for ( it = 0; it < nt; it++ )
+	for ( j = 0; j < size.x * size.y; j++ ) {
+	  if ( tgt[j] == resetTo ) continue;
+	  pt = pointFromIndex (j, size.x);
+	  if ( !_match(kern, &ksize, src, &size, &pt, resetTo) )
+	    tgt[j] = resetTo;
+	}
     }
 
     UNPROTECT (nprotect);

@@ -18,8 +18,8 @@
 ## half width and height: moving frame will be 2 times + 1 px larger
 setMethod ("thresh", signature(x="Image"),
     function (x, w=5, h=5, offset=0.01, ...) {
-        if ( colorMode(x) != Grayscale )
-            stop ( .("'thresh' is only defined for grayscale images, use 'athresh' instead or 'channel' to convert") )
+        if ( colorMode(x) == TrueColor )
+            stop ( .("'thresh' doesn't support the \'TrueColor\' color mode, use 'athresh' instead or 'channel' to convert") )
         if ( w < 2 || h < 2 )
             stop ( .("width 'w' and height 'h' must be larger than 1") )
         return ( .DoCall("lib_filterThresh", x, as.numeric( c(w, h, offset) ) ) )
@@ -29,11 +29,20 @@ setMethod ("thresh", signature(x="Image"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("distmap", signature(x="Image"),
   function (x, metric=c("euclidean",'manhattan')) {
-    if (colorMode(x)!=Grayscale) stop("'x' must be Grayscale")
+    if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
     if (any(is.na(x))) stop("'x' shouldn't contain any NAs")
     metric=match.arg(metric)
     imetric=switch(metric,euclidean=0,manhattan=1)
     return (.DoCall("distmap", x, as.integer(imetric)))
+  }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("translate", signature(x="Image"),
+  function (x, v) {
+    cat('@GP TODO\n')
+    if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")    
+    return (.DoCall("translate", x, v))
   }
 )
 
@@ -95,7 +104,7 @@ mkbox = function(n) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("erode", signature(x="Image"),
     function (x, kern=morphKern(5), iter=1) {
-      if ( colorMode(x) != Grayscale ) stop ( .("'x' must be a binary image in Grayscale mode") )
+      if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
       if ( iter < 1 ) stop ( .("'iter' must be a positive integer") )
       return ( .DoCall("lib_erode_dilate", x, kern, as.integer(iter), as.integer(0) ) )
      }
@@ -104,7 +113,7 @@ setMethod ("erode", signature(x="Image"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("dilate", signature(x="Image"),
     function (x, kern=morphKern(5), iter=1) {
-      if ( colorMode(x) != Grayscale ) stop ( .("'x' must be a binary image in Grayscale mode") )
+      if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
       if ( iter < 1 ) stop ( .("'iter' is assumed to be a positive integer") )    
       return ( .DoCall("lib_erode_dilate", x, kern, as.integer(iter), as.integer(1) ) )
     }

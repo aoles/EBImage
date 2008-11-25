@@ -17,8 +17,8 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("haralickMatrix", signature(x="IndexedImage", ref="Image"),
   function(x, ref, nc=32, ...) {
-    if ( colorMode(x) != Grayscale || colorMode(ref) != Grayscale)
-      .stop( "'x' and 'ref' must be Grayscale" )
+    if ( colorMode(x) == TrueColor || colorMode(ref) == TrueColor)
+      stop("this method doesn't support the \'TrueColor\' color mode")
     rref <- range(ref)
     if ( rref[1] < 0 || rref[2] > 1 ) {
       ref[ref<0] = 0

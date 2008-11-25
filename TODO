@@ -1,120 +1,35 @@
-##########
-1) Objects
-##########
+md means multi-dimensional modes
 
-'colorMode':
------------
-Why is this sometimes spelt with uppercase 'M' (e.g. in accessor
-functions) and sometimes with lowercase (e.g. in the 'Image' 
-constructor and in the slotname)?  Both are exposed to users - 
-and they might be happier about some more consistency.
-
-'validity':
-----------
-There should be a validity method for Image objects. Currently it is 
-possible to create invalid object e.g. with "new" that break e.g. the "show" 
-method:
-
-> a=new("Image")
-> a
-
-'Image'
-  colorMode()   : Grayscale
-  storage class : numeric 3D array, writable images in range [0..1]
-Errore in if (dimobject[3] > 1) cat(sprintf("  dim()         : %dx%d, %d image(s)\n",  : 
-  valore mancante dove è richiesto TRUE/FALSE
-
-IndexedImage & storage.mode:
-----------------------------
-GP thinks that this class is useless and can be easily combined with Image.
-storage.mode of Images must remain 'numeric' and everything can be done in 'numeric'. 
-
-n-dimension:
---------------
-GP thinks that EBImage should be able to deal with n-dimensional images and NOT cast 
-everything into 3D arrays. 
-
-arrays, matrices:
-----------------
-GP thinks that EBImage should also be able to work with matrices and arrays, not only with Images.
-
-color handling:
---------------
-GP thinks that EBImage color management should include:
-- remove the TrueColor and Grayscale modes
-- readImage should read by default color
-- render the colors only during display() using channels
-- don't restrict to RGB !
-
-##########
-2) Methods
-##########
-
-general:
--------
-GP thinks that methods should be clearly sorted according to their level (low-level, high-level) 
-depending on the genericity of their behavior and according to the field they 
-belong to (i/o, displaying, linear filtering, morphological operations...).
-
-Matlab's image toolbox is a good example of how an image processing toolbox should be.
-
-GP thinks that default arguments in many methods are overused.
-
-consider removing:
-------------------
-GP thinks the following functions should be removed
-- 'copy' (what is the difference with a<-b ??)
-- 'header' (weird function, is it still useful since several attributes are now gone ?)
-- 'frameDist' (experimental, too vaguely defined, too specific usage)
-- 'animate' (should be combined with 'display' when GTK is absent)
-- 'morphKern' (should be merged with mkball, mkbox into a mkshape)
-- 'mkbox' (see morphKern)
-- 'mkball' (see morphKern)
-- 'fill' floodFill is doing the job
-- 'rgbImage' (won't be useful in a new color management system)
-- 'channelMix' (won't be useful in a new color management system)
-- 'chooseImage' (file selector, out of subject, RGtk2) 
-
-comments:
-----------------
-- blur, 
-- gblur
-- contrast, is it really needed ?
-- denoise
-- despeckle
-- edge,
-- enhance, supervague, is it really needed ?
-- equalize,
-- cgamma, 
-- mediansmooth, 
-- noise, 
-- resize, OK
-- rotate, OK
-- resample, is it really needed ?
-- segment,
-- sharpen, 
-- umask, 
-- thresh, is it really needed ? (should be in R !)
-- athresh, is it really needed ? (should be in R !)
-- cthresh, is it really needed ? (should be in R !)
-- affinet, 
-- modulate, unclear, is it really needed ?
-- negate, is it really needed ?
-- normalize (should be in R !)
-- normalize2, is it really needed ?
-- flip  is it really needed ?
-- flop, is it really needed ?
-
-#################
-3) Miscelleaneous
-#################
-
-source code: renaming files:
-----------------------------
-GP thinks it would be nice to have a coherent R method/R source/C filename naming...
-
-installation:
--------------
-ease the MacOS Gtk+ and installalation procedure
-
-
+- watershed: hangs when used on distmap(lena>0.5)
+- floodFill: check md and Color
+- fillHull works only with IndexedImage
+- tile: doesn't work on Color
+- untile: doesn't work on Color
+- documentation: major update to be done
+- hullFeatures, edgeProfile, edgeFeatures: check md and Color
+- cmoments, smoments, rmoments, moments: check md and Color
+- drawtext: check md and Color (IM, should be OK)
+- haralickFeatures, haralickMatrix, zernikeMoments: check md and Color
+- zernikeMoments: check md and Color
+- thresh: check md and Color ([2])
+- translate: check param input
+- classUnion between Image, array and matrix
+- md: remove all INTEGER(GET_DIM())[2]
+- paintObjects, matchObjects, rmObjects, stackObjects, tile, untile: check md and Color
+- remove lib_ things
+- toremove: frameDist (unclear, experimental function)
+- installation: ease the installation on MacOS
+- toremove: enhance (vague)
+- toremove: header (not useful anymore)
+- merge morphKern, mkball and mkbox
+- merge animate and display
+- make a deprecated file
+- change colormode/colorMode case
+- main doc EBImage
+- default arguments to be checked
+- overuse of '...'
+- clean display.c (winStr, newPixbufFromImages to remove)
+- class.IndexedImage.R : check stop message if given a TrueColor
+- merge IndexedImage class within Image
+- assert is misnamed
+- image, hist: are they useful ?

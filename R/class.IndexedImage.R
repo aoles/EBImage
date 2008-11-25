@@ -45,8 +45,7 @@ setMethod("fillHull", signature(x="IndexedImage"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("watershed", signature(x="Image"),
   function (x, tolerance=1, ext=1, ...) {
-    if ( colorMode(x) != Grayscale )
-      .stop( "'x' must be Grayscale" )
+    if ( colorMode(x) == Color )  stop("this method doesn't support the \'TrueColor\' color mode")
     tolerance <- as.numeric (tolerance)
     if ( tolerance < 0 )
       .stop( "'tolerance' must be non-negative" )
@@ -60,8 +59,7 @@ setMethod ("watershed", signature(x="Image"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("propagate", signature(x="Image", seeds="IndexedImage"),
   function (x, seeds, mask=NULL, lambda=0.1, ext=1, seed.centers=FALSE, ...) {
-    if ( colorMode(x) != Grayscale )
-      .stop("'x' must be Grayscale" )
+    if ( colorMode(x) == Color )  stop("this method doesn't support the \'TrueColor\' color mode")
     if ( !assert(x, seeds, strict=TRUE) || (!is.null(mask) && !assert(x, mask, strict=TRUE)) )
       .stop( "dim(x) must equal dim(seeds) and dim(mask) if mask is not NULL, all images must be Grayscale" )
     ext <- as.integer (ext)
@@ -91,8 +89,9 @@ setMethod ("propagate", signature(x="Image", seeds="IndexedImage"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("getFeatures", signature(x="IndexedImage"),
   function (x, ref, N = 12, R = 30, apply.Gaussian=TRUE, nc = 256, pseudo=FALSE, ...) {
-    if ( !missing(ref) && is.Image(ref) && !(colorMode(ref) == Grayscale) )
-      .stop( "if present, 'ref' must be Grayscale" )
+    if ( !missing(ref) && is.Image(ref) && (colorMode(ref) == TrueColor) )
+      .stop("\'ref\' must be an Image not in \'TrueColor\' color mode")
+    
     .dim <- dim(x)
     hf <- hullFeatures( x )
     if ( !missing(ref) ) {
@@ -144,36 +143,39 @@ setMethod ("getFeatures", signature(x="IndexedImage"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("paintObjects", signature(x="IndexedImage", tgt="Image"),
   function (x, tgt, opac=c(0.4, 0.05, 0.4), col=c("#FFC72C","#5BABF6","#FF372C"), ...) {
-    if ( colorMode(x) != Grayscale )
-      .stop( "'x' must be Grayscale" )
-    if ( any( dim(x) != dim(tgt) ) )
-      .stop( "dim(x) must equal dim(tgt)" )
+    if ( colorMode(x) == TrueColor ) stop("this method doesn't support the \'TrueColor\' color mode")
+    
+    if ( any( dim(x)[1:2] != dim(tgt)[1:2] ) )
+      .stop( "'x' and 'tgt' must have the same size" )
+    
+    if (getNumberOfFrames(x,'render') != getNumberOfFrames(tgt,'render'))
+      .stop( "'x' and 'tgt' must have the same number of render frames" )                           
+      
     if ( length(opac) < 3 || length(col) < 3 )
       .stop( "'opac' and 'col' must have at least 3 elements each: opacity and color of the edge, of the background, of the object contact" )
     opac <- as.numeric (opac)
     if ( any(opac < 0) || any(opac > 1) )
       .stop("all opacity values must be in the range [0,1]" )
     col <- as.character (col)
-    return ( .DoCall("lib_paintFeatures", x, tgt, opac, col) )
+    return ( .DoCall("paintObjects", x, tgt, opac, col) )
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("matchObjects", signature(x="IndexedImage", ref="IndexedImage"),
   function (x, ref, ...) {
-    if ( colorMode(x) != Grayscale )
-      .stop( "'x' must be Grayscale" )
+    if ( colorMode(x) == TrueColor )  stop("this method doesn't support the \'TrueColor\' color mode")
+   
     if ( !assert(x, ref, strict=TRUE) )
       .stop( "dim(x) must equal dim(ref), 'ref' must be Grayscale" )
-    return ( .DoCall ("lib_matchFeatures", x, ref) )
+    return ( .DoCall ("matchObjects", x, ref) )
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("stackObjects", signature(x="IndexedImage", ref="Image", index="missing"),
   function (x, ref, index, combine, rotate, bg.col, ext, centerby, rotateby, ...) {
-    if ( colorMode(x) != Grayscale )
-      stop( "'x' must be Grayscale" )
+    if ( colorMode(x) == TrueColor )  stop("this method doesn't support the \'TrueColor\' color mode")
     dimx <- dim(x)
     if ( any(dimx != dim(ref)) )
       stop( "dim(x) must equal dim(ref)" )
@@ -182,7 +184,7 @@ setMethod ("stackObjects", signature(x="IndexedImage", ref="Image", index="missi
     if (missing(combine)) combine = TRUE
     
     # get centres
-    if (colorMode(ref)==Grayscale && (!missing(centerby)||!missing(rotateby)))
+    if (colorMode(ref)==TrueColor && (!missing(centerby)||!missing(rotateby)))
       warning("'centerby' and 'rotateby' are only meaningful for TrueColor images")
     if (missing(centerby)) centerby = "gray"
     if (missing(rotateby)) rotateby = "gray"
@@ -223,7 +225,7 @@ setMethod ("stackObjects", signature(x="IndexedImage", ref="Image", index="missi
     hdr <- header(ref)
     hdr@.Data <- array(col, c(1,1,1))
     if (dimx[3]==1) xyt = xyt[[1]]
-    res <- .Call ("lib_stack_objects", x, ref, hdr, xyt, as.numeric(ext), as.integer(rotate))
+    res <- .Call ("stackObjects", x, ref, hdr, xyt, as.numeric(ext), as.integer(rotate))
     if (!combine || !is.list(res)) return( res )
 #    ## if we are here, we have more than one frame and hf is a list
 #    ## index of frames with no objects, these are to remove
@@ -288,20 +290,18 @@ setMethod ("stackObjects", signature(x="IndexedImage", ref="Image", index="numer
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("rmObjects", signature(x="IndexedImage", index="list"),
   function (x, index, ...) {
-    if ( colorMode(x) != Grayscale )
-      .stop( "'x' must be Grayscale" )
+    if ( colorMode(x) == TrueColor )  stop("this method doesn't support the \'TrueColor\' color mode")
     index <- lapply (index, as.integer)
-    return ( .DoCall ("lib_deleteFeatures", x, index ) )
+    return ( .DoCall ("rmObjects", x, index ) )
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("rmObjects", signature(x="IndexedImage", index="numeric"),
   function (x, index, ...) {
-    if ( colorMode(x) != Grayscale )
-      .stop( "'x' must be Grayscale" )
+    if ( colorMode(x) == TrueColor )  stop("this method doesn't support the \'TrueColor\' color mode")
     index <- list( as.integer(index) )
-    return ( .DoCall ("lib_deleteFeatures", x, index ) )
+    return ( .DoCall ("rmObjects", x, index ) )
   }
 )
 

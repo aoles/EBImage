@@ -159,21 +159,11 @@ setClass( "Image",
 }
 
 \examples{
-
   ## New Grayscale image of a black-to-white vertical gradient
   w <- 120
   a <- Image((0:(w^2))/w^2, c(w,w))
   if ( interactive() ) display(a)
   print(a)
-
-  ## Converts image to TrueColor
-  b <- a
-  colorMode(b) <- TrueColor
-  print(b)
-
-  ## Fills values with intensities over 0.5 (50\%) with red
-  b[ a > 0.5 ] = as.integer(255)
-  if ( interactive() ) display(b)
 }
 
 \keyword{methods}

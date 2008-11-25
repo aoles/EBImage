@@ -125,9 +125,6 @@
   sx = exp(24i*pi*seq(-1, 1, length=300)^2)
   i2 = Image(outer(Im(sx), Re(sx)))
   if (interactive()) display(normalize(i2))
-  i3 <- copy(i2)
-  is.Image(i2)
-  
   ## see 'stackObjects' for example on combine
 }
 

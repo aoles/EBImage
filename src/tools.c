@@ -46,6 +46,75 @@ int
 isImage (SEXP x) {
     if ( strcmp( CHAR( asChar( GET_CLASS(x) ) ), "Image") != 0 && 
          strcmp( CHAR( asChar( GET_CLASS(x) ) ), "IndexedImage") != 0) return 0;
-    if ( LENGTH( GET_DIM(x) ) != 3 ) return 0;
+    if ( LENGTH( GET_DIM(x) ) < 2 ) return 0;
     return 1;
+}
+
+/*----------------------------------------------------------------------- */
+int
+getColorMode(SEXP x) {
+  int colorMode;
+  colorMode = INTEGER ( GET_SLOT(x, mkString("colormode") ) )[0];
+  return(colorMode);
+}
+
+/*----------------------------------------------------------------------- */
+// If type=0, returns the total number of frames
+// If type=1, returns the number of frames to be rendered, according to the colorMode
+int
+getNumberOfFrames(SEXP x, int type) {
+  int n,colorMode;
+  int k,p,kp;
+  colorMode=getColorMode(x);
+
+  if (type==1 && colorMode==MODE_COLOR) kp=3;
+  else kp=2;
+  
+  n=1;
+  p=GET_LENGTH(GET_DIM(x));
+  if (p>kp) {
+    for (k=kp;k<p;k++) n=n*INTEGER(GET_DIM(x))[k];
+  }
+
+  return(n);
+}
+
+/*----------------------------------------------------------------------- */
+int
+getNumberOfChannels(SEXP x) {
+  int colorMode;
+  int nbChannels;
+  colorMode=getColorMode(x);
+
+  if (colorMode!=MODE_COLOR) nbChannels=1;
+  else {
+    if (LENGTH(GET_DIM(x))<3) nbChannels=1;
+    else nbChannels=INTEGER(GET_DIM(x))[2];
+  }
+  return(nbChannels);
+}
+
+/*----------------------------------------------------------------------- */
+// colorMode must be MODE_GRAYSCALE or MODE_COLOR
+void getColorStrides(SEXP x,int index,int *redstride,int *greenstride,int *bluestride) {
+  int width,height,colorMode,nbChannels;
+
+  width=INTEGER(GET_DIM(x))[0];
+  height=INTEGER(GET_DIM(x))[1];
+  colorMode=getColorMode(x);
+  
+  *redstride=index*width*height;
+  *greenstride=index*width*height;
+  *bluestride=index*width*height;
+
+  if (colorMode==MODE_TRUECOLOR) warning("getColorStrides cannot be called if colorMode=TrueColor");
+
+  if (colorMode==MODE_COLOR) {
+    nbChannels=getNumberOfChannels(x);
+    *redstride=index*nbChannels*width*height;
+    *greenstride=-1;
+    *bluestride=-1;
+    if (nbChannels>1) *greenstride=index*nbChannels*width*height+width*height;
+    if (nbChannels>2) *bluestride=index*nbChannels*width*height+2*width*height;
+  }
 }

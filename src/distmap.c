@@ -90,8 +90,10 @@ SEXP distmap(SEXP _a, SEXP _metric) {
   // initialize width, height, dim
   width=INTEGER(GET_DIM(_a))[0];
   height=INTEGER(GET_DIM(_a))[1];
-  if (GET_LENGTH(GET_DIM(_a))>2) nz=INTEGER(GET_DIM(_a))[2];
-  else nz=1;
+  nz=getNumberOfFrames(_a,0);
+
+ // initialize vj, where (i,vj[i]) are the coordinates of the closest background pixel to a(i,j) with vj[i]>=j
+  vj=(int *)R_Calloc(height,int);
 
   // initialize a
   a=REAL(_a);
@@ -104,9 +106,6 @@ SEXP distmap(SEXP _a, SEXP _metric) {
   
   // initialize dist, the distance type
   metric=INTEGER(_metric)[0];
-  
-  // initialize vj, where (i,vj[i]) are the coordinates of the closest background pixel to a(i,j) with vj[i]>=j
-  vj=(int *)R_Calloc(height,int);
    
   // do the job
   for (i=0;i<nz;i++) {
@@ -116,7 +115,7 @@ SEXP distmap(SEXP _a, SEXP _metric) {
     d=d+height*width;
   }
 
-  // final square rootint for Euclidean distance
+  // final square root for Euclidean distance
   d=REAL(res);
   if (metric==0) for (i=0;i<height*width*nz;i++) d[i]=sqrt(d[i]);
 

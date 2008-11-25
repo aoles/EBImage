@@ -1,0 +1,21 @@
+2.7.5
+- functions copy, .isCorrectType, .correctType have been removed
+- multidimensional arrays are now handled
+- new color mode Color added
+- functions getNumberOfFrames, translate added
+- signature combine has been changed
+- validity method added
+- file filters.R renamed in magick.R
+- file spatial.R added
+- abind dependency added
+- new fast distmap algorithm, up to 1000 times faster
+- readImage now uses by default the native image color mode
+- C functions getColorMode, getNumberOfFrames, getNumberOfChannels, getColorStrides added
+- C function lib_paintFeatures renamed to paintObjects
+- C function lib_matchFeatures renamed to matchObjects
+- C function lib_deleteFeatures renamed to rmObjects
+- C function lib_stack_objects renamed to stackObjects
+- C function lib_tile_stack renamed to tile
+- C function lib_untile renamed to untile
+- display is faster since pixbuf are now directly built from SEXP
+- writeImage now uses a quality of 100 by default

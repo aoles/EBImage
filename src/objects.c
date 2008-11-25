@@ -19,25 +19,29 @@ See: ../LICENSE for license, LGPL
 /*----------------------------------------------------------------------- */
 /* will paint features on the target image with given colors and opacs    */
 SEXP
-lib_paintFeatures (SEXP x, SEXP tgt, SEXP _opac, SEXP _col) {
+paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col) {
     SEXP res;
     Image * image, * colors;
     PixelPacket * pixelPtr, * colorPtr;
     int nprotect, nx, ny, nz, im, i, j, tgtmode, index;
     double * data, * imdata, * opac;
 
+    double *dx,*dres,dp;
+    int redstride,greenstride,bluestride;
+
     if ( !isImage(x) || !isImage(tgt) ) return tgt;
 
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
-    nz = INTEGER ( GET_DIM(x) )[2];
+    nz = getNumberOfFrames(x,0);
     nprotect = 0;
 
     PROTECT ( res = Rf_duplicate(tgt) );
     nprotect++;
 
-    tgtmode = INTEGER ( GET_SLOT(tgt, mkString("colormode") ) )[0];
+    tgtmode = getColorMode(tgt);
     opac = REAL (_opac);
+
     /* will keep colors in a small image -- easier to access - 3 values */
     colors = vector2image1D (_col);
     colorPtr = SetImagePixels (colors, 0, 0, 3, 1);
@@ -47,47 +51,89 @@ lib_paintFeatures (SEXP x, SEXP tgt, SEXP _opac, SEXP _col) {
         colorPtr[i].blue *= opac[i];
     }
 
-    for ( im = 0; im < nz; im++ ) {
+    if (tgtmode==MODE_GRAYSCALE || tgtmode==MODE_COLOR) {
+       for ( im = 0; im < nz; im++ ) {
+	 dx   = &( REAL(x)[ im * nx * ny ] );
+	 dres = REAL(res);
+	 getColorStrides(tgt,im,&redstride,&greenstride,&bluestride);
+
+	 for ( j = 0; j < ny; j++ ) {
+	   for ( i = 0; i < nx; i++ ) {	    
+
+	     /* pixel is contact */
+	     index = 1;
+	     if ( dx[j*nx + i]<=0 ) continue;
+	     if ( dx[j*nx + i] < 1.0 || i < 1 || i > nx - 2 || j < 1 || j > ny - 2 ) index = 2;
+	     else {
+	       /* check if pixel is border, edge is same as contact */
+	       if ( dx[j*nx + i-1] != dx[j*nx + i] ||  dx[j*nx + i+1] != dx[j*nx + i] ||
+		    dx[(j-1)*nx + i] != dx[j*nx + i] || dx[(j+1)*nx + i] != dx[j*nx + i]) index = 0;
+	     }	  
+
+	     if (redstride!=-1) {
+	       dp=dres[redstride+j*nx + i]+((double)colorPtr[index].red)/QuantumRange;		
+	       if (dp<0.0) dp=0.0;
+	       if (dp>1.0) dp=1.0;
+	       dres[redstride+j*nx + i]=dp;
+	     }
+	     if (greenstride!=-1) {
+	       dp=dres[greenstride+j*nx + i]+((double)colorPtr[index].green)/QuantumRange;		
+	       if (dp<0.0) dp=0.0;
+	       if (dp>1.0) dp=1.0;
+	       dres[greenstride+j*nx + i]=dp;
+	     }
+	     if (bluestride!=-1) {
+	       dp=dres[bluestride+j*nx + i]+((double)colorPtr[index].blue)/QuantumRange;	
+	       if (dp<0.0) dp=0.0;
+	       if (dp>1.0) dp=1.0;
+	       dres[bluestride+j*nx + i]=dp;
+	     }
+	   }
+	 }
+       }
+    } else {
+      for ( im = 0; im < nz; im++ ) {
         imdata = &( REAL(x)[ im * nx * ny ] );
         for ( j = 0; j < ny; j++ ) {
-            data = &( REAL(x)[ im * nx * ny + j * nx ] );
-            image = NULL;
-            if ( tgtmode == MODE_RGB )
-                image = int2image1D ( &(INTEGER(res)[ im * nx * ny + j * nx ]), nx );
-            if ( tgtmode == MODE_GRAY )
-                image = double2image1D ( &(REAL(res)[ im * nx * ny + j * nx ]), nx );
-            if ( image == NULL ) continue;
-            for ( i = 0; i < nx; i++ ) {
-                if ( data[i] <= 0 ) continue;
-                pixelPtr = SetImagePixels (image, i, 0, 1, 1);
-                index = 1;
-                if ( data[i] < 1.0 || i < 1 || i > nx - 2 || j < 1 || j > ny - 2 )
-                    /* pixel is contact */
-                    index = 2;
-                else
-                    /* check if pixel is border, edge is same as contact */
-                if ( imdata[ i - 1 + j * nx ] != data[i] || imdata[ i + 1 + j * nx ] != data[i] ||
-                    imdata[ i + (j - 1) * nx ] != data[i] || imdata[ i + (j + 1) * nx ] != data[i] )
-                    index = 0;
-                if ( pixelPtr->red + colorPtr[index].red < QuantumRange )
-                    pixelPtr->red += colorPtr[index].red;
-                else
-                    pixelPtr->red = QuantumRange;
-                if ( pixelPtr->green + colorPtr[index].green < QuantumRange )
-                    pixelPtr->green += colorPtr[index].green;
-                else
-                    pixelPtr->green = QuantumRange;
-                if ( pixelPtr->blue + colorPtr[index].blue < QuantumRange )
-                    pixelPtr->blue += colorPtr[index].blue;
-                else
-                    pixelPtr->blue = QuantumRange;
-            }
-            if ( tgtmode == MODE_RGB )
-                image1D2int (image, &(INTEGER(res)[ im * nx * ny + j * nx ]), nx );
-            if ( tgtmode == MODE_GRAY )
-                image1D2double (image, &(REAL(res)[ im * nx * ny + j * nx ]), nx );
-            image = DestroyImage (image);
+	  data = &( REAL(x)[ im * nx * ny + j * nx ] );
+	  image = NULL;
+	  if ( tgtmode == MODE_TRUECOLOR )
+	    image = int2image1D ( &(INTEGER(res)[ im * nx * ny + j * nx ]), nx );
+	  if ( tgtmode == MODE_GRAYSCALE )
+	    image = double2image1D ( &(REAL(res)[ im * nx * ny + j * nx ]), nx );
+	  if ( image == NULL ) continue;
+	  for ( i = 0; i < nx; i++ ) {
+	    if ( data[i] <= 0 ) continue;
+	    pixelPtr = SetImagePixels (image, i, 0, 1, 1);
+	    index = 1;
+	    if ( data[i] < 1.0 || i < 1 || i > nx - 2 || j < 1 || j > ny - 2 )
+	      /* pixel is contact */
+	      index = 2;
+	    else
+	      /* check if pixel is border, edge is same as contact */
+	      if ( imdata[ i - 1 + j * nx ] != data[i] || imdata[ i + 1 + j * nx ] != data[i] ||
+		   imdata[ i + (j - 1) * nx ] != data[i] || imdata[ i + (j + 1) * nx ] != data[i] )
+		index = 0;
+	    if ( pixelPtr->red + colorPtr[index].red < QuantumRange )
+	      pixelPtr->red += colorPtr[index].red;
+	    else
+	      pixelPtr->red = QuantumRange;
+	    if ( pixelPtr->green + colorPtr[index].green < QuantumRange )
+	      pixelPtr->green += colorPtr[index].green;
+	    else
+	      pixelPtr->green = QuantumRange;
+	    if ( pixelPtr->blue + colorPtr[index].blue < QuantumRange )
+	      pixelPtr->blue += colorPtr[index].blue;
+	    else
+	      pixelPtr->blue = QuantumRange;
+	  }
+	  if ( tgtmode == MODE_TRUECOLOR )
+	    image1D2int (image, &(INTEGER(res)[ im * nx * ny + j * nx ]), nx );
+	  if ( tgtmode == MODE_GRAYSCALE )
+	    image1D2double (image, &(REAL(res)[ im * nx * ny + j * nx ]), nx );
+	  image = DestroyImage (image);
         }
+      }
     }
 
     colors = DestroyImage (colors);
@@ -98,7 +144,7 @@ lib_paintFeatures (SEXP x, SEXP tgt, SEXP _opac, SEXP _col) {
 
 /*----------------------------------------------------------------------- */
 SEXP
-lib_matchFeatures (SEXP x, SEXP ref) {
+matchObjects (SEXP x, SEXP ref) {
     SEXP res, xf, * indexes, ft;
     int nprotect, nx, ny, nz, i, ix, jy, im, nobj;
     double * data, * ftrs;
@@ -107,7 +153,7 @@ lib_matchFeatures (SEXP x, SEXP ref) {
 
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
-    nz = INTEGER ( GET_DIM(x) )[2];
+    nz = getNumberOfFrames(x,0);
     nprotect = 0;
 
     indexes = (SEXP *) R_alloc (nz, sizeof(SEXP) );
@@ -160,7 +206,7 @@ lib_matchFeatures (SEXP x, SEXP ref) {
 
 /*----------------------------------------------------------------------- */
 SEXP
-lib_deleteFeatures (SEXP x, SEXP _index) {
+rmObjects (SEXP x, SEXP _index) {
     SEXP res, index;
     int nprotect, nx, ny, nz, i, j, im, nobj, * indexes, found;
     double * data;
@@ -169,7 +215,7 @@ lib_deleteFeatures (SEXP x, SEXP _index) {
 
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
-    nz = INTEGER ( GET_DIM(x) )[2];
+    nz = getNumberOfFrames(x,0);
     nprotect = 0;
 
 
@@ -219,7 +265,7 @@ lib_deleteFeatures (SEXP x, SEXP _index) {
 
 /*----------------------------------------------------------------------- */
 SEXP
-lib_stack_objects ( SEXP obj, SEXP ref, SEXP hdr, SEXP xy_list, SEXP extension, SEXP rotate ) {
+stackObjects ( SEXP obj, SEXP ref, SEXP hdr, SEXP xy_list, SEXP extension, SEXP rotate ) {
   SEXP res, st, dm, xys;
   int nx, ny, nz, nprotect, im, x, y, i, pxi, nobj, index, dox, doy, ibg = 0, error=0;
   double * data, * xy, xx, yy, xxc, yyc, theta, dbg = 0.0;
@@ -231,7 +277,7 @@ lib_stack_objects ( SEXP obj, SEXP ref, SEXP hdr, SEXP xy_list, SEXP extension, 
   int mode = INTEGER ( GET_SLOT(ref, mkString("colormode") ) )[0];
   nx = INTEGER ( GET_DIM(obj) )[0];
   ny = INTEGER ( GET_DIM(obj) )[1];
-  nz = INTEGER ( GET_DIM(obj) )[2];
+  nz = getNumberOfFrames(obj,0);
   nprotect = 0;
 
   if ( nz == 1 ) {
@@ -244,7 +290,7 @@ lib_stack_objects ( SEXP obj, SEXP ref, SEXP hdr, SEXP xy_list, SEXP extension, 
     for ( im = 0; im < nz; im++ ) SET_VECTOR_ELT(res, im, Rf_duplicate(hdr) );
   }
 
-  if ( mode == MODE_RGB ) ibg = INTEGER(hdr)[0];
+  if ( mode == MODE_TRUECOLOR ) ibg = INTEGER(hdr)[0];
   else dbg = REAL(hdr)[0];
 
   for ( im = 0; im < nz; im++ ) {
@@ -259,7 +305,7 @@ lib_stack_objects ( SEXP obj, SEXP ref, SEXP hdr, SEXP xy_list, SEXP extension, 
       nobj = 1;
     } else error = 0;
     /* create stack */
-    if ( mode == MODE_RGB ) {
+    if ( mode == MODE_TRUECOLOR ) {
       PROTECT( st = allocVector(INTSXP, nobj * snx * sny) );
       nprotect++;
       ist = INTEGER( st );
@@ -295,7 +341,7 @@ lib_stack_objects ( SEXP obj, SEXP ref, SEXP hdr, SEXP xy_list, SEXP extension, 
     if ( xys == R_NilValue || INTEGER(GET_DIM(xys))[0] != nobj || INTEGER(GET_DIM(xys))[1] < 3 ) continue;
     xy = REAL(xys);
 
-    if ( mode == MODE_RGB ) {
+    if ( mode == MODE_TRUECOLOR ) {
       if ( nz == 1 )
         ist = INTEGER( res );
       else
@@ -334,17 +380,17 @@ lib_stack_objects ( SEXP obj, SEXP ref, SEXP hdr, SEXP xy_list, SEXP extension, 
         if ( xx < 0 || xx >= snx || yy < 0 || yy >= sny ) continue;
         /* put a pixel */
         pxi = xx + yy * snx + index * sny * snx;
-        if ( mode == MODE_RGB ) ist[ pxi ] = iref[x + y * nx];
+        if ( mode == MODE_TRUECOLOR ) ist[ pxi ] = iref[x + y * nx];
         else dst[ pxi ] = dref[x + y * nx];
         if ( !rot ) continue;
         if ( dox && xx + 1 < nx ) {
           pxi = xx + 1 + yy * snx + index * sny * snx;
-          if ( mode == MODE_RGB ) ist[ pxi ] = iref[x + y * nx];
+          if ( mode == MODE_TRUECOLOR ) ist[ pxi ] = iref[x + y * nx];
           else dst[ pxi ] = dref[x + y * nx];
         }
         if ( doy && yy + 1 < ny ) {
           pxi = xx + (yy + 1) * snx + index * sny * snx;
-          if ( mode == MODE_RGB ) ist[ pxi ] = iref[x + y * nx];
+          if ( mode == MODE_TRUECOLOR ) ist[ pxi ] = iref[x + y * nx];
           else dst[ pxi ] = dref[x + y * nx];
         }
       }
@@ -355,7 +401,7 @@ lib_stack_objects ( SEXP obj, SEXP ref, SEXP hdr, SEXP xy_list, SEXP extension, 
 
 /*----------------------------------------------------------------------- */
 SEXP
-lib_tile_stack (SEXP obj, SEXP hdr, SEXP params) {
+tile (SEXP obj, SEXP hdr, SEXP params) {
   SEXP res, dm, ims;
   int mode =  INTEGER ( GET_SLOT(obj, mkString("colormode") ) )[0];
   int ndy, ndx  = INTEGER(params)[0];
@@ -370,7 +416,7 @@ lib_tile_stack (SEXP obj, SEXP hdr, SEXP params) {
 
   if ( nz < 1 ) error("no images in stack to tile");
   /* get FG and BG colors from supplied header */
-  if ( mode == MODE_RGB ) {
+  if ( mode == MODE_TRUECOLOR ) {
     ifg = INTEGER(hdr)[0]; dfg = 0.0;
     ibg = INTEGER(hdr)[1]; dbg = 0.0;
   }
@@ -384,7 +430,7 @@ lib_tile_stack (SEXP obj, SEXP hdr, SEXP params) {
   nxr = lwd + (nx + lwd) * ndx;
   nyr = lwd + (ny + lwd) * ndy;
   /* allocate memory for the image, reset to BG */
-  if ( mode == MODE_RGB ) {
+  if ( mode == MODE_TRUECOLOR ) {
     PROTECT( ims = allocVector(INTSXP, nxr * nyr) );
     nprotect++;
     iim = INTEGER(ims); dim = NULL;
@@ -407,7 +453,7 @@ lib_tile_stack (SEXP obj, SEXP hdr, SEXP params) {
         warning("BAD THING HAPPEND -- WRONG INDEX CALCULATION");
         continue;
       }
-      if ( mode == MODE_RGB )
+      if ( mode == MODE_TRUECOLOR )
         memcpy( &(iim[i]), &(INTEGER(obj)[(j + index * ny) * nx]), nx * sizeof(int));
       else
         memcpy( &(dim[i]), &(REAL(obj)[(j + index * ny) * nx]), nx * sizeof(double));
@@ -418,7 +464,7 @@ lib_tile_stack (SEXP obj, SEXP hdr, SEXP params) {
     /* vertical stripes */
     for (i = 0; i <= ndx; i++ ) {
       for ( x = i * (nx + lwd); x < lwd + i * (nx + lwd); x++ ) {
-        if ( mode == MODE_RGB )
+        if ( mode == MODE_TRUECOLOR )
           for ( y = 0; y < nyr; y++ ) iim[x + y * nxr] = ifg;
         else
           for ( y = 0; y < nyr; y++ ) dim[x + y * nxr] = dfg;
@@ -427,7 +473,7 @@ lib_tile_stack (SEXP obj, SEXP hdr, SEXP params) {
     /* horizontal stripes */
     for (j = 0; j <= ndy; j++ ) {
       for ( y = j * (ny + lwd); y < lwd + j * (ny + lwd); y++ ) {
-        if ( mode == MODE_RGB )
+        if ( mode == MODE_TRUECOLOR )
           for ( x = 0; x < nxr; x++ ) iim[x + y * nxr] = ifg;
         else
           for ( x = 0; x < nxr; x++ ) dim[x + y * nxr] = dfg;
@@ -452,7 +498,7 @@ lib_tile_stack (SEXP obj, SEXP hdr, SEXP params) {
 
 /*----------------------------------------------------------------------- */
 SEXP
-lib_untile(SEXP img, SEXP hdr, SEXP nim, SEXP linewd) {
+untile(SEXP img, SEXP hdr, SEXP nim, SEXP linewd) {
   int mode = INTEGER(GET_SLOT(img, mkString("colormode")))[0];
   int nimx = INTEGER(nim)[0];
   int nimy = INTEGER(nim)[1];
@@ -465,7 +511,7 @@ lib_untile(SEXP img, SEXP hdr, SEXP nim, SEXP linewd) {
   SEXP res, dim, dat;
   void *src, *tgt; double *dd; int *id;
 
-  if (mode==MODE_RGB) {
+  if (mode==MODE_TRUECOLOR) {
     PROTECT(dat = allocVector(INTSXP, nx*ny*nz)); 
     nprotect++;
     id = INTEGER(dat);
@@ -487,7 +533,7 @@ lib_untile(SEXP img, SEXP hdr, SEXP nim, SEXP linewd) {
     i = im % nimx;
     j = (im-iim*nimx*nimy) / nimx;
     //Rprintf("%d %d %d\n", iim, i, j);
-    if (mode==MODE_RGB) {
+    if (mode==MODE_TRUECOLOR) {
       for (y=0; y<ny; y++) {
         src = &(INTEGER(img)[iim*sdim[0]*sdim[1] + (j*ny+lwd*(j+1) + y)*sdim[0] + (i*nx+lwd*(i+1))]);
         tgt = &(INTEGER(dat)[im*nx*ny + y*nx]);

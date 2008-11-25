@@ -8,13 +8,12 @@
 extern "C" {
 #endif
 
-SEXP lib_paintFeatures (SEXP, SEXP, SEXP, SEXP);
-SEXP lib_matchFeatures (SEXP, SEXP);
-SEXP lib_deleteFeatures (SEXP, SEXP);
-
-SEXP lib_stack_objects (SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP lib_tile_stack    (SEXP, SEXP, SEXP);
-SEXP lib_untile        (SEXP, SEXP, SEXP, SEXP);
+SEXP paintObjects (SEXP, SEXP, SEXP, SEXP);
+SEXP matchObjects (SEXP, SEXP);
+SEXP rmObjects (SEXP, SEXP);
+SEXP stackObjects (SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP tile (SEXP, SEXP, SEXP);
+SEXP untile (SEXP, SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus
 };

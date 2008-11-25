@@ -24,16 +24,15 @@ lib_drawText (SEXP obj, SEXP xylist, SEXP textlist, SEXP thefont, SEXP thecol) {
   Image * images, * image, * newimages;
   const char * str;
   
-  if ( !isImage(obj) )
-    error("'obj' must be an Image");
-
-  nz = INTEGER(GET_DIM(obj))[2];
-
-  if ( LENGTH(xylist) != LENGTH(textlist) || LENGTH(xylist) != nz )
-    error("lists of coordinates 'xy' labels 'labels' must be of the same length as the number of frames");
+  if ( !isImage(obj) ) error("'obj' must be an Image");
 
   mode = INTEGER( GET_SLOT(obj, mkString("colormode")) )[0];
   images = sexp2Magick(obj);
+  nz = GetImageListLength(images);
+  
+  if ( LENGTH(xylist) != LENGTH(textlist) || LENGTH(xylist) != nz )
+    error("lists of coordinates 'xy' labels 'labels' must be of the same length as the number of frames");
+
   newimages = NewImageList();
 
   /* create empty wand */

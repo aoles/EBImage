@@ -14,41 +14,9 @@
 # See the GNU Lesser General Public License for more details.
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("normalize", signature(x="Image"),
-  function (x, separate=TRUE, ft=c(0,1), ...) {
-    if (colorMode(x) != Grayscale)
-      stop("'x' must be Grayscale, use 'normalize2' for TrueColor images")
-    ft <- as.numeric (ft)
-    if ( diff(ft) == 0 )
-      stop("normalization range is 0")
-    separate <- as.integer(separate)
-    x = .DoCall("lib_normalize", x, separate, ft)
-    if (is(x, "IndexedImage")) x = as.Image(x)
-    return(x)
-  }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("flip", signature(x="Image"),
-  function (x, ...) {
-    Y <- 1:(dim(x)[2])
-    x@.Data <- x@.Data[ , rev(Y), , drop=FALSE]
-    return (x)
-  }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("flop", signature(x="Image"),
-  function (x, ...) {
-    X <- 1:(dim(x)[1])
-    x@.Data <- x@.Data[rev(X), , , drop=FALSE]
-    return (x)
-  }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # ImageMagick filters below
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 flt.blur      <- as.integer(0)
 flt.gaussblur <- as.integer(1)
 flt.contrast  <- as.integer(2)
