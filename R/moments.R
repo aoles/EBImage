@@ -17,16 +17,16 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("cmoments", signature(x="IndexedImage", ref="Image"),
   function (x, ref, ...) {
-    if ( colorMode(x) != Grayscale || !assert(x, ref, strict=TRUE) )
-      stop( "'x' and 'ref' must be gray scale images of equal size" )
+    if ( colorMode(x) == TrueColor || !assert(x, ref, strict=TRUE) )
+      stop( "'x' and 'ref' must images of equal size, same color mode and not in \'TrueColor\' color mode" )
     return( .DoCall("lib_cmoments", x, ref ) )
   }
 )
 
 setMethod ("cmoments", signature(x="IndexedImage", ref="missing"),
   function (x, ref, ...) {
-    if ( colorMode(x) != Grayscale )
-      stop( "'x' must be a gray scale image" )
+    if ( colorMode(x) == TrueColor )
+      stop("this method doesn't support the \'TrueColor\' color mode")
     return( .DoCall("lib_cmoments", x, NULL ) )
   }
 )
@@ -34,8 +34,8 @@ setMethod ("cmoments", signature(x="IndexedImage", ref="missing"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("smoments", signature(x="IndexedImage", ref="Image"),
   function (x, ref, pw=3, what="s", ...) {
-    if ( colorMode(x) != Grayscale || !assert(x, ref, strict=TRUE) )
-      stop( "'x' and 'ref' must be gray scale images of equal size" )
+    if ( colorMode(x) == TrueColor || !assert(x, ref, strict=TRUE) )
+      stop( "'x' and 'ref' must images of equal size, same color mode and not in \'TrueColor\' color mode" )
     alg <- as.integer( switch(tolower(substr(what, 1, 1)), n=0, c=1, s=2, r=3, 2) )
     pw <- as.integer (pw)
     if ( pw < 1 || pw > 9 )
@@ -46,8 +46,8 @@ setMethod ("smoments", signature(x="IndexedImage", ref="Image"),
 
 setMethod ("smoments", signature(x="IndexedImage", ref="missing"),
   function (x, ref, pw=3, what="s", ...) {
-    if ( colorMode(x) != Grayscale )
-      stop( "'x' must be a gray scale image" )
+    if ( colorMode(x) == TrueColor )
+      stop("this method doesn't support the \'TrueColor\' color mode")
     alg <- as.integer( switch(tolower(substr(what, 1, 1)), c=1, s=2, r=3, 2) )
     pw <- as.integer (pw)
     if ( pw < 1 || pw > 9 )
@@ -62,8 +62,8 @@ setMethod ("smoments", signature(x="IndexedImage", ref="missing"),
 setMethod ("rmoments", signature(x="IndexedImage", ref="Image"),
   # this is a convenience function for smoments with what='r', pw=3
   function (x, ref, ...) {
-    if ( colorMode(x) != Grayscale || !assert(x, ref, strict=TRUE) )
-      stop( "'x' and 'ref' must be gray scale images of equal size" )
+    if ( colorMode(x) == TrueColor || !assert(x, ref, strict=TRUE) )
+        stop( "'x' and 'ref' must images of equal size, same color mode and not in \'TrueColor\' color mode" )
     return( .DoCall("lib_moments", x, ref, as.integer(3), as.integer(3) ) )
   }
 )
@@ -71,8 +71,8 @@ setMethod ("rmoments", signature(x="IndexedImage", ref="Image"),
 setMethod ("rmoments", signature(x="IndexedImage", ref="missing"),
   # this is a convenience function for smoments with what='r', pw=3
   function (x, ref, ...) {
-    if ( colorMode(x) != Grayscale )
-      stop( "'x' must be a gray scale image" )
+    if ( colorMode(x) == TrueColor )
+      stop("this method doesn't support the \'TrueColor\' color mode")
     return( .DoCall("lib_moments", x, NULL, as.integer(3), as.integer(3) ) )
   }
 )
@@ -126,16 +126,16 @@ setMethod ("rmoments", signature(x="IndexedImage", ref="missing"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("moments", signature(x="IndexedImage", ref="Image"),
   function (x, ref, ...) {
-    if ( colorMode(x) != Grayscale || !assert(x, ref, strict=TRUE) )
-      stop( "'x' and 'ref' must be gray scale images of equal size" )
+    if ( colorMode(x) == TrueColor || !assert(x, ref, strict=TRUE) )
+       stop( "'x' and 'ref' must images of equal size, same color mode and not in \'TrueColor\' color mode" )
     return( .momentsSummary(x, ref) )
   }
 )
 
 setMethod ("moments", signature(x="IndexedImage", ref="missing"),
   function (x, ref, ...) {
-    if ( colorMode(x) != Grayscale )
-      stop( "'x' must be a gray scale image" )
+    if ( colorMode(x) == TrueColor )
+      stop("this method doesn't support the \'TrueColor\' color mode")
     return( .momentsSummary(x) )
   }
 )

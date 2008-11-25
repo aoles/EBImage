@@ -46,6 +46,7 @@ void * _animateInImageMagickWindow (void *);
 #ifdef USE_GTK
 void _showInGtkWindow (SEXP, SEXP);
 GdkPixbuf * newPixbufFromImages (Image *, int);
+GdkPixbuf *newPixbufFromSEXP (SEXP x, int index);
 #endif
 /*----------------------------------------------------------------------- */
 SEXP
@@ -155,11 +156,10 @@ typedef gpointer * ggpointer;
 
 /*----------------------------------------------------------------------- */
 void
-_showInGtkWindow (SEXP x, SEXP caption) {
+_showInGtkWindow (SEXP xx, SEXP caption) {
     int nx, ny, nz, width, height;
     dstats *stats;
     SEXP dim;
-    Image * images;
     GdkPixbuf * pxbuf;
     GtkWidget * imgWG, * evBox, * winWG, * vboxWG, * tbarWG, * stbarWG, * scrollWG,
               * btnZoomInWG, * btnZoomOutWG, * btnZoomOneWG,
@@ -171,22 +171,25 @@ _showInGtkWindow (SEXP x, SEXP caption) {
     if ( !GTK_OK )
         error ( "failed to initialize GTK+, use 'read.image' instead" );
 
-    /* get image in magick format and get image size */
-    images = sexp2Magick (x);
-    dim = GET_DIM (x);
+    dim = GET_DIM (xx);
     nx = INTEGER (dim)[0];
     ny = INTEGER (dim)[1];
-    nz = INTEGER (dim)[2];
+    nz = getNumberOfFrames(xx,1);
+
+    // xx is preserved from garbage collection til the windows is closed
+    R_PreserveObject(xx);
 
     /* create pixbuf from image data */
-    pxbuf = newPixbufFromImages (images, 0);
+    //pxbuf = newPixbufFromImages (images, 0);
+    pxbuf=newPixbufFromSEXP(xx,0);
+
     if ( pxbuf == NULL )
         error ( "cannot copy image data to display window" );
 
     /* create window structure */
     winStr = g_new ( ggpointer, 6 );
     winStr[3] = (gpointer *) g_new0 (int, 1);
-    winStr[2] = (gpointer *) images;
+    winStr[2] = (gpointer *) xx;
 
     /* create image display */
     imgWG = gtk_image_new_from_pixbuf (pxbuf);
@@ -282,13 +285,16 @@ _showInGtkWindow (SEXP x, SEXP caption) {
 gboolean
 onWinDestroy (GtkWidget * wnd, GdkEvent * event, gpointer ptr) {
     gpointer ** winStr;
-    Image * images;
+    SEXP xx;
+    //Image * images;
     winStr = (gpointer **) ptr;
     g_free (winStr[3]);
-    images = (Image *) winStr[2];
+    //images = (Image *) winStr[2];
+    xx=(SEXP)winStr[2];
+    R_ReleaseObject(xx);
     g_free (winStr[5]); /* stats */
     g_free (winStr);
-    images = DestroyImageList (images);
+    //images = DestroyImageList (images);
 /*    Rprintf ( _("R image display closed...\n") ); */
     return FALSE;
 }
@@ -301,18 +307,17 @@ onZoomInPress (GtkToolButton * btn, gpointer ptr) {
     dstats * stats;
     GdkPixbuf * pxbuf, * newPxbuf;
     GtkImage * imgWG;
-    Image * images;
+    SEXP xx;
 
     winStr = (gpointer **) ptr;
     imgWG = GTK_IMAGE (winStr[1]);
-    images = (Image *) winStr[2];
+    xx = (SEXP) winStr[2];
     index = *(int *)winStr[3];
-    pxbuf = newPixbufFromImages (images, index );
+    pxbuf = newPixbufFromSEXP (xx, index );
     stats = (dstats *)winStr[5];
 
     width = gdk_pixbuf_get_width ( gtk_image_get_pixbuf(imgWG) );
     height = gdk_pixbuf_get_height ( gtk_image_get_pixbuf(imgWG) );
-
     newPxbuf = gdk_pixbuf_scale_simple ( pxbuf, (int)(width *2), (int)(height * 2), INTERP_METHOD);
     stats->zoom *= 2;
     gtk_image_set_from_pixbuf (imgWG, newPxbuf);
@@ -331,18 +336,17 @@ onZoomOutPress (GtkToolButton * btn, gpointer ptr) {
     dstats * stats;
     GdkPixbuf * pxbuf, * newPxbuf;
     GtkImage * imgWG;
-    Image * images;
+    SEXP xx;
 
     winStr = (gpointer **) ptr;
     imgWG = GTK_IMAGE (winStr[1]);
-    images = (Image *) winStr[2];
+    xx = (SEXP ) winStr[2];
     index = *(int *)winStr[3];
-    pxbuf = newPixbufFromImages (images, index );
+    pxbuf = newPixbufFromSEXP (xx, index );
     stats = (dstats *)winStr[5];
 
     width = gdk_pixbuf_get_width ( gtk_image_get_pixbuf(imgWG) );
     height = gdk_pixbuf_get_height ( gtk_image_get_pixbuf(imgWG) );
-
     newPxbuf = gdk_pixbuf_scale_simple ( pxbuf, (int)(width/2), (int)(height/2), INTERP_METHOD);
     stats->zoom /= 2;
 
@@ -360,15 +364,15 @@ onZoomOnePress (GtkToolButton * btn, gpointer ptr) {
     gpointer ** winStr;
     GdkPixbuf * pxbuf;
     GtkImage * imgWG;
-    Image * images;
+    SEXP xx;
     int index;
     dstats * stats;
 
     winStr = (gpointer **) ptr;
     imgWG = GTK_IMAGE (winStr[1]);
-    images = (Image *) winStr[2];
+    xx = (SEXP) winStr[2];
     index = *(int *)winStr[3];
-    pxbuf = newPixbufFromImages (images, index );
+    pxbuf = newPixbufFromSEXP (xx, index );
     stats = (dstats *)winStr[5];
 
     gtk_image_set_from_pixbuf (imgWG, pxbuf);
@@ -392,22 +396,22 @@ onNextImPress (GtkToolButton * btn, gpointer ptr) {
     int width, height, nz, index;
     GdkPixbuf * pxbuf, * newPxbuf;
     GtkImage * imgWG;
-    Image * images;
+    SEXP xx;
     dstats * stats;
 
     winStr = (gpointer **) ptr;
     imgWG = GTK_IMAGE (winStr[1]);
-    images = (Image *) winStr[2];
+    xx = (SEXP) winStr[2];
     stats = (dstats *)winStr[5];
 
     width = gdk_pixbuf_get_width ( gtk_image_get_pixbuf(imgWG) );
     height = gdk_pixbuf_get_height ( gtk_image_get_pixbuf(imgWG) );
 
-    nz = GetImageListLength (images);
+    nz = getNumberOfFrames(xx,1);
     index = *(int *)winStr[3] + 1;
     if ( index == nz )
         return TRUE;
-    pxbuf = newPixbufFromImages (images, index);
+    pxbuf = newPixbufFromSEXP (xx, index);
     *(int *)winStr[3] = index;
     stats->index = index;
 
@@ -426,22 +430,22 @@ onPrevImPress (GtkToolButton * btn, gpointer ptr) {
     int width, height, nz, index;
     GdkPixbuf * pxbuf, * newPxbuf;
     GtkImage * imgWG;
-    Image * images;
+    SEXP xx;
     dstats * stats;
 
     winStr = (gpointer **) ptr;
     imgWG = GTK_IMAGE (winStr[1]);
-    images = (Image *) winStr[2];
+    xx = (SEXP) winStr[2];
     stats = (dstats *)winStr[5];
 
     width = gdk_pixbuf_get_width ( gtk_image_get_pixbuf(imgWG) );
     height = gdk_pixbuf_get_height ( gtk_image_get_pixbuf(imgWG) );
 
-    nz = GetImageListLength (images);
+    nz = getNumberOfFrames(xx,1);
     index = *(int *)winStr[3] - 1;
     if ( index < 0 )
         return TRUE;
-    pxbuf = newPixbufFromImages (images, index);
+    pxbuf = newPixbufFromSEXP (xx, index);
     *(int *)winStr[3] = index;
     stats->index = index;
 
@@ -512,6 +516,67 @@ newPixbufFromImages (Image * images, int index) {
 
     DestroyExceptionInfo(&exception);
     return res;
+}
+
+/*----------------------------------------------------------------------- */
+GdkPixbuf * 
+newPixbufFromSEXP (SEXP xx, int index) {
+  GdkPixbuf * pixbuf;
+  int width, height, rowstride, x, y;
+  numeric *dx,dr,dg,db;
+  unsigned char *dpixbuf,*data;
+  int colorMode;
+  int *ix,*idata;
+  int redstride=-1,greenstride=-1,bluestride=-1;
+
+  width=INTEGER(GET_DIM(xx))[0];
+  height=INTEGER(GET_DIM(xx))[1];
+   
+  colorMode=getColorMode(xx);
+
+  pixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8, width, height);
+  rowstride = gdk_pixbuf_get_rowstride (pixbuf);
+  dpixbuf=(unsigned char *)gdk_pixbuf_get_pixels(pixbuf);
+
+  // TrueColor
+  if (colorMode==MODE_TRUECOLOR) {
+    ix=INTEGER(xx);
+    for (y=0;y<height;y++) {
+      idata=(int *)(dpixbuf+y*rowstride);
+      for (x=0;x<width;x++) {
+	*idata=ix[x+y*width+index*width*height] | 0xff000000;
+	idata++;
+      }
+    }
+  } else {
+    dx=REAL(xx);
+    
+    getColorStrides(xx,index,&redstride,&greenstride,&bluestride);
+
+    for (y=0;y<height;y++) {
+      data=dpixbuf+y*rowstride;
+      for (x=0;x<width;x++) {
+	if (redstride!=-1) dr=256*dx[x+y*width+redstride];	
+	else dr=0;
+	if (greenstride!=-1) dg=256*dx[x+y*width+greenstride];	
+	else dg=0;
+	if (bluestride!=-1) db=256*dx[x+y*width+bluestride];
+	else db=0;
+	if (dr<0.0) dr=0.0;
+	if (dr>255.0) dr=255.0;
+	if (dg<0.0) dg=0.0;
+	if (dg>255.0) dg=255.0;
+	if (db<0.0) db=0.0;
+	if (db>255.0) db=255.0;
+	*data++=(unsigned char)dr;   // R
+	*data++=(unsigned char)dg;   // G
+	*data++=(unsigned char)db;   // B
+	*data++=255;                 // A
+      }
+    }
+  } 
+    
+  return pixbuf;
 }
 
 /*----------------------------------------------------------------------- */

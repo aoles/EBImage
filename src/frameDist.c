@@ -24,7 +24,7 @@ lib_frameDist(SEXP im1, SEXP im2, SEXP weights, SEXP method, SEXP verbose) {
 }
 
 /* -------------------------------------------------------------------------*/
-inline double d_cor(double *x, double *y, double nxny) {
+double d_cor(double *x, double *y, double nxny) {
   double mx, my, sdx, sdy, dx, dy, sum=0.0;
   int k;
   mx = 0.0;

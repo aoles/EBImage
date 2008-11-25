@@ -11,9 +11,10 @@ exportClasses(Image, IndexedImage)
 
 ## image class, copy, assertion, accessors
 export(Image, is.Image, stopIfNotImage, print.Image)
-export(print.IndexedImage,  TrueColor, Grayscale)
-exportMethods(header, copy, assert, Ops, "[", as.Image)
+export(print.IndexedImage, Grayscale, TrueColor, Color)
+exportMethods(header, assert, Ops, "[", as.Image)
 exportMethods(colorMode, "colorMode<-",imageData, "imageData<-")
+exportMethods(getNumberOfFrames)
 
 ## image IO, display
 export(readImage, display)
@@ -22,6 +23,7 @@ exportMethods(animate, writeImage, show, image)
 ## spatial transform
 exportMethods(resize,resample,rotate)
 exportMethods(affinet,flip,flop)
+exportMethods(translate)
 
 ## image analysis, segmentation
 exportMethods(edge,segment)

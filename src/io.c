@@ -24,6 +24,7 @@ See: ../LICENSE for license, LGPL
 #endif
 
 /*----------------------------------------------------------------------- */
+// GP: mode = -1 will be automatically guessed from the file
 SEXP
 lib_readImages (SEXP files, SEXP mode) {
     SEXP res;
@@ -32,11 +33,12 @@ lib_readImages (SEXP files, SEXP mode) {
     ImageInfo * image_info;
     ExceptionInfo exception;
     const char * file;
+    ImageType it;
 
     if ( LENGTH(files) < 1 )
         error ( "please supply at least one file name or URL" );
     _mode = INTEGER (mode)[0];
-    if ( _mode < 0 || _mode > MAX_MODE )
+    if ( _mode < -1 || _mode > MODE_MAX)
         error ( "requested mode is not supported" );
     image_info = (ImageInfo *) NULL;
     /* images loaded into image and moved into this list */
@@ -52,11 +54,20 @@ lib_readImages (SEXP files, SEXP mode) {
             file = CHAR ( asChar(files) );
         strcpy (image_info->filename, file);
         image = ReadImage (image_info, &exception);
+
         CatchException (&exception);
         if ( image == (Image *)NULL ) {
             warning ( "requested image not found or could not be loaded" );
             continue;
         }
+
+	// Automatic color mode guess
+	if (_mode==-1) {
+	  it = GetImageType(image,&exception);
+	  if (it==BilevelType || it==GrayscaleType || it==GrayscaleMatteType) _mode=MODE_GRAYSCALE;
+	  else _mode=MODE_COLOR;
+	}
+       
         /* do not destroy image here */
         AppendImageToList (&images, image);
         if ( nappends == 0 ) {
@@ -136,13 +147,14 @@ lib_writeImages (SEXP x, SEXP files, SEXP quality) {
     ExceptionInfo exception;
 
     /* basic checks */
-    if ( !isImage(x) )
-        error ( "argument must be of class 'Image'" );
-    nz = INTEGER ( GET_DIM(x) )[2];
+    if ( !isImage(x) ) error ( "argument must be of class 'Image'" );
+    images = sexp2Magick (x);
+    nz = GetImageListLength(images);
+ 
     nfiles = LENGTH (files);
     if ( nfiles != 1 && nfiles != nz)
         error ( "number of files must be 1, or equal to the size of the image stack" );
-    images = sexp2Magick (x);
+    
     if ( images == NULL || GetImageListLength (images) < 1 )
         error ( "cannot write an empty image" );
     GetExceptionInfo (&exception);

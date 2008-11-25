@@ -83,7 +83,7 @@
   xo = propagate(xi, io, mask, 1e-5, 1.5)
   
   ## create an RGB preview of a combination of ii and xi
-  rgb = channel(ii, "asred") + channel(xi, "asgreen")
+  rgb = rgbImage(red=ii,green=xi)
   ## paint cells on the preview
   rgb = paintObjects(xo, rgb)
   ## paint nuclei on the preview

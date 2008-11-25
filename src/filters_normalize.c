@@ -1,4 +1,5 @@
 #include "filters_normalize.h"
+#include "tools.h"
 
 /* -------------------------------------------------------------------------
 Frame-based image normalization
@@ -24,7 +25,7 @@ lib_normalize (SEXP x, SEXP separate, SEXP range) {
 
   nx = INTEGER (GET_DIM(x))[0];
   ny = INTEGER (GET_DIM(x))[1];
-  nz = INTEGER (GET_DIM(x))[2];
+  nz = getNumberOfFrames(x,0);
 
   PROTECT ( res = Rf_duplicate(x) );
   nprotect++;

@@ -18,15 +18,13 @@
 
 ## image class, copy, assertion, accessors
 setGeneric ("header",         function (x, ...)        standardGeneric("header") )
-setGeneric ("copy",           function (x, ...)        standardGeneric("copy") )
-setGeneric (".isCorrectType", function (x)             standardGeneric(".isCorrectType") )
-setGeneric (".correctType",   function (x)             standardGeneric(".correctType") )
 setGeneric ("assert",         function (x, y, strict=FALSE, ...) standardGeneric("assert") )
 setGeneric ("as.Image",       function (x, ...)        standardGeneric("as.Image") )
 setGeneric ("colorMode",      function (x, ...)        standardGeneric("colorMode") )
 setGeneric ("colorMode<-",    function (x, ..., value) standardGeneric("colorMode<-") )
 setGeneric ("imageData",      function (x, ...)        standardGeneric("imageData") )
 setGeneric ("imageData<-",    function (x, ..., value) standardGeneric("imageData<-") )
+setGeneric ("getNumberOfFrames",function (x,...)       standardGeneric("getNumberOfFrames") )
 
 ## image IO, display
 setGeneric ("animate",        function (x, ...)        standardGeneric("animate") )
@@ -40,6 +38,7 @@ setGeneric ("rotate",         function (x, ...)        standardGeneric("rotate")
 setGeneric ("affinet",        function (x, ...)        standardGeneric("affinet") )
 setGeneric ("flip",           function (x, ...)        standardGeneric("flip") )
 setGeneric ("flop",           function (x, ...)        standardGeneric("flop") )
+setGeneric ("translate",      function (x, ...)        standardGeneric("translate") )
 
 ## image analysis, segmentation
 setGeneric ("edge",           function (x, ...)        standardGeneric("edge") )
@@ -87,7 +86,7 @@ setGeneric ("fillHull",       function (x, ...)        standardGeneric("fillHull
 setGeneric ("channel",        function (x, mode, ...)  standardGeneric("channel") )
 
 ## image stacking, tiling
-setGeneric ("combine",        function (x, y, ...)     standardGeneric("combine") )
+setGeneric ("combine",        function (x, ...)     standardGeneric("combine") )
 setGeneric ("tile",           function (x, ...)        standardGeneric("tile") )
 setGeneric ("untile",         function (x, nim, ...)   standardGeneric("untile") )
 

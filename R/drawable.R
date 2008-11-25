@@ -40,8 +40,8 @@ setMethod ("drawtext", signature(img="Image", xy="matrix", labels="character"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("drawtext", signature(img="Image", xy="list", labels="list"),
   function(img, xy, labels, font, col, ...) {
-    if (length(xy) != length(labels) || length(xy) != dim(img)[3])
-      stop("lists of coordinates 'xy' labels 'labels' must be of the same length as the number of frames")
+    if (length(xy) != length(labels) || length(xy) != getNumberOfFrames(img,'render'))
+      stop("lists of coordinates 'xy' labels 'labels' must be of the same length as the number of render frames")
     xy <- lapply(xy, as.numeric)
     for ( i in seq_along(labels)) 
       if (!is.character(labels[[i]]))

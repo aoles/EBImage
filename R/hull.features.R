@@ -17,8 +17,8 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("hullFeatures", signature(x="IndexedImage"),
   function(x, ...) {
-    if ( colorMode(x) != Grayscale )
-      .stop( "'x' must be Grayscale" )
+    if ( colorMode(x) == TrueColor )
+      stop("this method doesn't support the \'TrueColor\' color mode")
     ## get basic hull features
     res <- .DoCall( "lib_basic_hull", x )
     if ( is.null(res) ) return( NULL )

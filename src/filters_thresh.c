@@ -1,4 +1,5 @@
 #include "filters_thresh.h"
+#include "tools.h"
 
 /* -------------------------------------------------------------------------
 Adaptive thresholding, magick-independent implementation
@@ -24,13 +25,14 @@ lib_filterThresh (SEXP x, SEXP param) {
     SEXP res;
 
 
-    dx = (int)( REAL(param)[0] );
-    dy = (int)( REAL(param)[1] );
-    offset = REAL(param)[2];
     dim = INTEGER ( GET_DIM(x) );
     nx = dim[0];
     ny = dim[1];
-    nz = dim[2];
+    nz = getNumberOfFrames(x,0);
+
+    dx = (int)( REAL(param)[0] );
+    dy = (int)( REAL(param)[1] );
+    offset = REAL(param)[2];
     nprotect = 0;
     nFramePix = (2 * dx + 1) * (2 * dx + 1);
 

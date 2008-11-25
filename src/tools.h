@@ -15,10 +15,11 @@ extern
     int GTK_OK;
 #endif
 
-#define MAX_MODE  1
-#define MODE_GRAY 0
-#define MODE_RGB  1
-  
+#define MODE_GRAYSCALE  0
+#define MODE_TRUECOLOR  1
+#define MODE_COLOR      2
+#define MODE_MAX        2
+
 typedef struct {
     int x, y;
 } PointXY;
@@ -30,8 +31,11 @@ double distancexy (int, int, int, int);
 PointXY pointFromIndex (const int, const int);
 int indexFromPoint (const PointXY, const int);
 int indexFromXY (const int, const int, const int);
-
 int isImage (SEXP);
+int getColorMode (SEXP x);
+int getNumberOfFrames (SEXP x, int type);
+int getNumberOfChannels (SEXP x);
+void getColorStrides(SEXP x,int index,int *redstride,int *greenstride,int *bluestride);
 
 #ifdef __cplusplus
 };

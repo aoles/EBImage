@@ -58,7 +58,7 @@ lib_filterMagick (SEXP x, SEXP filter, SEXP parameters) {
     char aStr[255];
 
     flt = INTEGER(filter)[0];
-    mode = INTEGER ( GET_SLOT(x, mkString("colormode") ) )[0];
+    mode = getColorMode(x);
     par = &( REAL (parameters)[0] );
     npar = LENGTH (parameters);
 
@@ -142,7 +142,7 @@ lib_filterMagick (SEXP x, SEXP filter, SEXP parameters) {
                 image = SampleImage (image, (unsigned long)par[0], (unsigned long)par[1], &exception);
                 break;
             case FLT_SEGMENT:
-                if ( mode == MODE_GRAY)
+                if ( mode == MODE_GRAYSCALE || mode == MODE_COLOR)
                     SegmentImage(image, GRAYColorspace, 0, par[0], par[1]);
                 else
                     SegmentImage(image, RGBColorspace, 0, par[0], par[1]);
@@ -218,81 +218,3 @@ lib_filterMagick (SEXP x, SEXP filter, SEXP parameters) {
     return res;
 }
 
-/* use own implementation of floodFill
-SEXP
-lib_filterFill (SEXP x, SEXP colStrSXP, SEXP coords, SEXP methodSXP, SEXP fuzzSXP) {
-    Image * images, * newimages, * image;
-    ExceptionInfo exception;
-    DrawInfo dinfo;
-    ImageInfo iinfo;
-    int mode, i, nz, nappended;
-    SEXP res;
-    PaintMethod pm;
-    PixelPacket pp, tgt;
-    int * xy, fuzz;
-    const char * str;
-
-    images = sexp2Magick (x);
-    mode = INTEGER ( GET_SLOT(x, mkString("colormode") ) )[0];
-    GetExceptionInfo(&exception);
-    nz = GetImageListLength (images);
-    res = R_NilValue;
-    nappended = 0;
-    fuzz = INTEGER (fuzzSXP)[0];
-    xy = INTEGER (coords);
-    str = CHAR ( asChar(colStrSXP) );
-    QueryColorDatabase (str, &pp, &exception);
-    if ( exception.severity != UndefinedException ) {
-        CatchException (&exception);
-        images = DestroyImageList (images);
-        DestroyExceptionInfo (&exception);
-        error ( "cannot identify color" );
-    }
-    str = CHAR ( asChar(methodSXP) );
-    if ( strcmp (str, "floodfill") == 0 )
-        pm =  FloodfillMethod;
-    else
-        pm = ReplaceMethod;
-    newimages = NewImageList ();
-    GetImageInfo (&iinfo);
-    GetDrawInfo (&iinfo, &dinfo);
-    dinfo.fill = pp;
-
-    // FIXME: fill() does not work in current implementation
-    warning("the 'fill' is not yet correctly implemented, expected result: black image");
-
-    for ( i = 0; i < nz; i++ ) {
-        image = GetFirstImageInList (images);
-        image->fuzz = fuzz;
-        tgt = GetOnePixel (image, xy[0], xy[1]);
-        ColorFloodfillImage (image, &dinfo, tgt, xy[0], xy[1], pm);
-        image = CloneImage (image, 0, 0, 1, &exception);
-        if (exception.severity != UndefinedException) {
-            CatchException (&exception);
-            continue;
-        }
-        AppendImageToList (&newimages, image);
-        if ( nappended == 0 ) {
-            // copy attributes once and only if image contains more than 1 element
-            nappended = 1;
-            newimages->compression = images->compression;
-            strcpy (newimages->filename, image->filename);
-            newimages->x_resolution = images->x_resolution;
-            newimages->y_resolution = images->y_resolution;
-        }
-        image = GetFirstImageInList (images);
-        RemoveFirstImageFromList (&images);
-        image = DestroyImage( image );
-    }
-
-    images = DestroyImageList (images);
-
-    PROTECT ( res = magick2SEXP(newimages, mode) );
-    newimages = DestroyImageList (newimages);
-
-    DestroyExceptionInfo(&exception);
-
-    UNPROTECT (1);
-    return res;
-}
-*/
