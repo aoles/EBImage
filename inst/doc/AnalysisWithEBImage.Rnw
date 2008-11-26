@@ -357,7 +357,7 @@ converted into one of the RGB channels if required, and channels can be
 added together as in the following example.
 %
 <<example.grayscaleToRGB>>=
-iRG = channel(iRn, "asred") + channel(iGn, "asgreen")
+iRG = rgbImage(red=iRn,green=iGn)
 @
 %
 <<example.displayConversions,eval=FALSE>>=
@@ -366,7 +366,7 @@ display(channel(iRG, "gray"))
 display(channel(iRG, "asred"))
 @ 
 <<write.iRG,echo=FALSE>>=
-writeImage(iRG[,,1], "iRG.png")
+writeImage(iRG[,,,1], "iRG.png")
 @
 %
 The image \Robject{iRG} is shown in Figure~\ref{figure:screenshot}.
@@ -442,7 +442,7 @@ b[ a < 0.1 ] = channel("#114D90", "rgb")
 display(b)
 @
 <<echo=FALSE,results=hide,eval=TRUE>>=
-writeImage(b[,,1], "06.png")
+writeImage(b[,,,1], "06.png")
 rm(a,b,x)
 gc()
 @
@@ -627,7 +627,7 @@ ct = tile(stackObjects(sR, iRn))
 nt = tile(stackObjects(sG, iGn))
 @
 <<echo=FALSE,results=hide,eval=TRUE>>=
-writeImage(rgb[,,1], "13.png")
+writeImage(rgb[,,,1], "13.png")
 @
 The result is shown in Figure~\ref{figure:done}.
 \begin{figure}[htbp]

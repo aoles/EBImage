@@ -32,11 +32,3 @@ setMethod ("zernikeMoments", signature(x="IndexedImage", ref="Image"),
       return( .DoCall("lib_pseudo_zernike", x, ref, xy, as.numeric(R), as.integer(N), as.integer(apply.Gaussian)) )
   }
 )
-
-setMethod ("zernike.moments", signature(x="IndexedImage", ref="Image"),
-  function(x, ref, ...) {
-    .Deprecated("zernikeMoments", "EBImage")
-    zernikeMoments(x, ref, ...)
-  }
-)
-

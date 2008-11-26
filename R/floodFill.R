@@ -18,8 +18,6 @@
 setMethod("floodFill", signature(x="array", pt="ANY"),
   function(x, pt, col, tolerance=1e-3, ...) {
     .dim = dim(x)
-    if (length(.dim)<2)
-      stop("'x' must have (at least) 2 dimensions")
     pt = as.integer(pt)
     if (length(pt)<2)
       stop("'pt' must contain at least 2 values for x and y coordinates")
@@ -32,7 +30,7 @@ setMethod("floodFill", signature(x="array", pt="ANY"),
       col <- if (is.integer(x)) channel(col,"rgb") else channel(col,"gray")
     else
       col <- if (is.integer(x)) as.integer(col) else col=as.double(col)
-    return( .DoCall("lib_floodFill", x, pt, col, tolerance))
+    return( .DoCall("floodFill", x, pt, col, tolerance))
   }
-)
+) 
 

@@ -45,7 +45,6 @@ void * _showInImageMagickWindow (void *);
 void * _animateInImageMagickWindow (void *);
 #ifdef USE_GTK
 void _showInGtkWindow (SEXP, SEXP);
-GdkPixbuf * newPixbufFromImages (Image *, int);
 GdkPixbuf *newPixbufFromSEXP (SEXP x, int index);
 #endif
 /*----------------------------------------------------------------------- */
@@ -180,7 +179,6 @@ _showInGtkWindow (SEXP xx, SEXP caption) {
     R_PreserveObject(xx);
 
     /* create pixbuf from image data */
-    //pxbuf = newPixbufFromImages (images, 0);
     pxbuf=newPixbufFromSEXP(xx,0);
 
     if ( pxbuf == NULL )
@@ -486,36 +484,6 @@ onMouseMove(GtkWidget * widget, GdkEventMotion * event, gpointer ptr) {
     updateStatusBar((GtkStatusbar *)winStr[4], stats);
     gdk_flush();
     return TRUE;
-}
-
-/*----------------------------------------------------------------------- */
-GdkPixbuf * 
-newPixbufFromImages (Image * images, int index) {
-    GdkPixbuf * res;
-    Image * image;
-    int nx, ny;
-    ExceptionInfo exception;
-
-    if ( images == NULL )
-        return NULL;
-    res = NULL;
-    image = GetImageFromList (images, index);
-    nx = image->columns;
-    ny = image->rows;
-    GetExceptionInfo(&exception);
-    res = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8, nx, ny);
-    if ( GetImageType(images, &exception) == GrayscaleType )
-        DispatchImage (image, 0, 0, nx, ny, "IIIA", CharPixel, gdk_pixbuf_get_pixels(res), &exception);
-    else
-        DispatchImage (image, 0, 0, nx, ny, "RGBA", CharPixel, gdk_pixbuf_get_pixels(res), &exception);
-    if (exception.severity != UndefinedException) {
-        CatchException (&exception);
-        g_object_unref (res);
-        res = NULL;
-    }
-
-    DestroyExceptionInfo(&exception);
-    return res;
 }
 
 /*----------------------------------------------------------------------- */

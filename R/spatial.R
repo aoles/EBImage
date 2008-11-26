@@ -49,11 +49,13 @@ setMethod ("flop", signature(x="Image"),
 )
 
 ## Translate a set of images according to a matrix of translation
-## A C function was needed for performance reasons
+## A C function is needed for performance reasons
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("translate", signature(x="Image"),
   function (x, v) {
-    cat('@GP TODO\n')
+    if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
+    if (length(v)!=2*getNumberOfFrames(x,'total')) stop("'v' must be a matrix of size (n,2), where \'n'\ is the total number of frames")
+    if (any(is.na(v))) stop("'v' shouldn't contain any NAs")
     return (.DoCall("translate", x, v))
   }
 )

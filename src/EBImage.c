@@ -17,8 +17,8 @@ See: ../LICENSE for license, LGPL
 #include "filters_propagate.h"
 #include "filters_normalize.h"
 #include "filters_watershed.h"
-#include "filters_thresh.h"
-#include "filters_floodfill.h"
+#include "thresh.h"
+#include "floodFill.h"
 
 #include "features_hull.h"
 #include "features_moments.h"
@@ -80,9 +80,9 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_filterMagick",   (DL_FUNC) &lib_filterMagick,   3},
     {"translate",          (DL_FUNC) &translate,          2},
     {"lib_erode_dilate",   (DL_FUNC) &lib_erode_dilate,   4},
-    {"lib_filterThresh",   (DL_FUNC) &lib_filterThresh,   2},
-    {"lib_floodFill",      (DL_FUNC) &lib_floodFill,      4},
-    {"lib_fillHull",       (DL_FUNC) &lib_fillHull,       1},
+    {"thresh",   (DL_FUNC) &thresh,   2},
+    {"floodFill",      (DL_FUNC) &floodFill,      4},
+    {"fillHull",       (DL_FUNC) &fillHull,       1},
     {"lib_normalize",      (DL_FUNC) &lib_normalize,      3},
     {"distmap",            (DL_FUNC) &distmap,            2},
     {"lib_filterInvWS",    (DL_FUNC) &lib_filterInvWS,    3},

@@ -1,4 +1,4 @@
-#include "filters_floodfill.h"
+#include "floodFill.h"
 
 /* -------------------------------------------------------------------------
 Flood fill for images and flood-fill-based hull filling for objects
@@ -17,13 +17,13 @@ struct XYPoint {
   int x, y;
 };
 
-template <class T> void floodFill(T*, XYPoint, XYPoint, T, double tol=1e-3);
+template <class T> void _floodFill(T*, XYPoint, XYPoint, T, double tol=1e-3);
 // void fillHull(int *, const XYPoint &);
-template <class T> void fillHullT(T *, const XYPoint &);
+template <class T> void _fillHullT(T *, const XYPoint &);
 
 /* -------------------------------------------------------------------------- */
 SEXP
-lib_floodFill(SEXP x, SEXP point, SEXP col, SEXP tol) {
+floodFill(SEXP x, SEXP point, SEXP col, SEXP tol) {
   int *dim = INTEGER(GET_DIM(x));
   XYPoint size(dim[0], dim[1]);
   if (LENGTH(GET_DIM(x))>2 && dim[2]>1)
@@ -41,10 +41,10 @@ lib_floodFill(SEXP x, SEXP point, SEXP col, SEXP tol) {
   nprotect++;
   /* do floodfil, templated version used depending on the storage mode */
   if (IS_INTEGER(m)) {
-    floodFill<int>(INTEGER(m), size, pt, INTEGER(col)[0], REAL(tol)[0]);
+    _floodFill<int>(INTEGER(m), size, pt, INTEGER(col)[0], REAL(tol)[0]);
   }
   else if (IS_NUMERIC(m)) {
-    floodFill<double>(REAL(m), size, pt, REAL(col)[0], REAL(tol)[0]);
+    _floodFill<double>(REAL(m), size, pt, REAL(col)[0], REAL(tol)[0]);
   }
   
   UNPROTECT (nprotect);
@@ -53,7 +53,7 @@ lib_floodFill(SEXP x, SEXP point, SEXP col, SEXP tol) {
 
 /* -------------------------------------------------------------------------- */
 SEXP
-lib_fillHull(SEXP x) {
+fillHull(SEXP x) {
 /*  if (!IS_INTEGER(x))
     error("'fillHull' is defined only for integer-based data");
 */
@@ -71,11 +71,11 @@ lib_fillHull(SEXP x) {
   nprotect++;
   if (IS_INTEGER(m)) {
     for (int i=0; i < nz; i++)
-      fillHullT<int>(&(INTEGER(m)[i*size.x*size.y]), size);
+      _fillHullT<int>(&(INTEGER(m)[i*size.x*size.y]), size);
   }
   else if (IS_NUMERIC(m)) {
     for (int i=0; i < nz; i++)
-      fillHullT<double>(&(REAL(m)[i*size.x*size.y]), size);
+      _fillHullT<double>(&(REAL(m)[i*size.x*size.y]), size);
   }
   
   UNPROTECT (nprotect);
@@ -116,7 +116,7 @@ typedef PopCheckStack<XYPoint> XYStack;
 */
 
 template <class T>void 
-floodFill(T *m, XYPoint size, XYPoint xy, T rc, double tol=1e-3) {
+_floodFill(T *m, XYPoint size, XYPoint xy, T rc, double tol=1e-3) {
   XYStack s, offsets;
   XYPoint pt = xy;
   bool spanLeft,spanRight,offset=false;
@@ -234,7 +234,7 @@ fillAroundObjectHull(int **m, int **canvas, const XYPoint &size, const Box &box,
 /* -------------------------------------------------------------------------- */
 /* Templated version by Oleg Sklyar */
 template <class T> void 
-fillAroundObjectHullT(T **m, T **canvas, const XYPoint &size, const Box &box, int &rc) {
+_fillAroundObjectHullT(T **m, T **canvas, const XYPoint &size, const Box &box, int &rc) {
   XYStack s;
   XYPoint pt;
   bool spanLeft,spanRight;
@@ -353,7 +353,7 @@ fillHull(int *_m, const XYPoint &srcsize) {
    dereferancible to those! */
 
 template <class T> void
-fillHullT(T *_m, const XYPoint &srcsize) {
+_fillHullT(T *_m, const XYPoint &srcsize) {
   int nobj = 0, i, x, y;
   XYPoint size = srcsize;
 
@@ -403,7 +403,7 @@ fillHullT(T *_m, const XYPoint &srcsize) {
   for (i=1; i <= nobj; i++) {
     Box box = bbox[i];
     box.expand(1);
-    fillAroundObjectHullT<T>(m, canvas, size, box, i);
+    _fillAroundObjectHullT<T>(m, canvas, size, box, i);
     // fill back the original matrix!
   	for (x=box.l+1; x <= box.r-1; x++)
       for (y=box.t+1; y <= box.b-1; y++) {

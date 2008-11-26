@@ -19,10 +19,10 @@
 setMethod ("thresh", signature(x="Image"),
     function (x, w=5, h=5, offset=0.01, ...) {
         if ( colorMode(x) == TrueColor )
-            stop ( .("'thresh' doesn't support the \'TrueColor\' color mode, use 'athresh' instead or 'channel' to convert") )
+            stop ( .("'thresh' doesn't support the \'TrueColor\' color mode, use the \'Color\' mode instead or 'athresh'") )
         if ( w < 2 || h < 2 )
             stop ( .("width 'w' and height 'h' must be larger than 1") )
-        return ( .DoCall("lib_filterThresh", x, as.numeric( c(w, h, offset) ) ) )
+        return ( .DoCall("thresh", x, as.numeric( c(w, h, offset) ) ) )
     }
 )
 
@@ -34,15 +34,6 @@ setMethod ("distmap", signature(x="Image"),
     metric=match.arg(metric)
     imetric=switch(metric,euclidean=0,manhattan=1)
     return (.DoCall("distmap", x, as.integer(imetric)))
-  }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("translate", signature(x="Image"),
-  function (x, v) {
-    cat('@GP TODO\n')
-    if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")    
-    return (.DoCall("translate", x, v))
   }
 )
 

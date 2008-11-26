@@ -3,16 +3,12 @@ md means multi-dimensional modes
 - watershed: hangs when used on distmap(lena>0.5)
 - floodFill: check md and Color
 - fillHull works only with IndexedImage
-- tile: doesn't work on Color
-- untile: doesn't work on Color
 - documentation: major update to be done
 - hullFeatures, edgeProfile, edgeFeatures: check md and Color
 - cmoments, smoments, rmoments, moments: check md and Color
 - drawtext: check md and Color (IM, should be OK)
 - haralickFeatures, haralickMatrix, zernikeMoments: check md and Color
 - zernikeMoments: check md and Color
-- thresh: check md and Color ([2])
-- translate: check param input
 - classUnion between Image, array and matrix
 - md: remove all INTEGER(GET_DIM())[2]
 - paintObjects, matchObjects, rmObjects, stackObjects, tile, untile: check md and Color
@@ -33,3 +29,6 @@ md means multi-dimensional modes
 - merge IndexedImage class within Image
 - assert is misnamed
 - image, hist: are they useful ?
+- tresh, athresh, cthresh: documentation
+- naiveSegment: to implement
+- check previous vignette
