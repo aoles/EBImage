@@ -30,12 +30,6 @@ setMethod ("haralickMatrix", signature(x="IndexedImage", ref="Image"),
   }
 )
 
-setMethod ("haralick.matrix", signature(x="IndexedImage", ref="Image"),
-  function(x, ref, ...) {
-    .Deprecated("haralickMatrix", "EBImage")
-    haralickMatrix(x, ref, ...)
-  }
-)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("haralickFeatures", signature(x="IndexedImage", ref="Image"),
   function(x, ref, nc=32, ...) {
@@ -53,11 +47,6 @@ setMethod ("haralickFeatures", signature(x="IndexedImage", ref="Image"),
   }   
 )
 
-setMethod ("haralick.features", signature(x="IndexedImage", ref="Image"),
-  function(x, ref, ...) {
-    .Deprecated("haralickFeatures", "EBImage")
-    haralickFeatures(x, ref, ...)
-  }
-)
+
 
 

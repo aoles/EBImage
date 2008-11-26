@@ -183,7 +183,8 @@ stopIfNotImage <- function (x) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("header", signature(x="Image"),
   function (x, ...) {
-    if (colorMode(x) == TrueColor) data=array(0L, c(1,1)) 
+    if (colorMode(x) == Grayscale) data=array(0,c(1,1))
+    else if (colorMode(x) == TrueColor) data=array(0L, c(1,1)) 
     else data=array(0,c(1,1))
     
     y = new(class(x),.Data=data,colormode=colorMode(x))
@@ -212,12 +213,13 @@ validImageObject=function(object) {
 setValidity("Image",validImageObject) 
 
 ## Overloading binary operators
-## Ensuring that the storage.mode of the data remains 'double', e.g. when comparing images
+## Ensuring that the storage.mode of the data remains 'double' in Grayscale and Color modes, e.g. when comparing images, and 'integer' for TrueColor images
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("Ops", signature(e1="Image", e2="Image"),
 	function(e1, e2) {
           e1@.Data=callGeneric(imageData(e1), imageData(e2))
           if (colorMode(e1)!=TrueColor & storage.mode(imageData(e1))!='double') storage.mode(e1@.Data)='double'
+          if (colorMode(e1)==TrueColor & storage.mode(imageData(e1))!='integer') storage.mode(e1@.Data)='integer'        
           validObject(e1)
           return(e1)
 	}
@@ -226,6 +228,7 @@ setMethod("Ops", signature(e1="Image", e2="numeric"),
 	function(e1, e2) {
           e1@.Data=callGeneric(imageData(e1), e2)
           if (colorMode(e1)!=TrueColor & storage.mode(imageData(e1))!='double') storage.mode(e1@.Data)='double'
+          if (colorMode(e1)==TrueColor & storage.mode(imageData(e1))!='integer') storage.mode(e1@.Data)='integer'          
           validObject(e1)
           return(e1)
 	}
@@ -234,6 +237,7 @@ setMethod("Ops", signature(e1="numeric", e2="Image"),
 	function(e1, e2) {
           e2@.Data=callGeneric(e1, imageData(e2))
           if (colorMode(e2)!=TrueColor & storage.mode(imageData(e2))!='double') storage.mode(e2@.Data)='double'
+          if (colorMode(e2)==TrueColor & storage.mode(imageData(e2))!='integer') storage.mode(e2@.Data)='integer'
           validObject(e2)
           return(e2)
 	}
@@ -372,7 +376,6 @@ selectChannel=function(x,i) {
   return(y)
 }
 
-## TODO
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("channel", signature(x="Image", mode="character"),
   function (x, mode, ...) { 
@@ -438,7 +441,7 @@ setMethod ("channel", signature(x="Image", mode="character"),
 setMethod ("hist", signature(x="Image"),
   function (x, breaks=64L, main=paste("Image histogram:", length(x), "pixels"), xlab="Intensity", ...) {
 
-    if ( colorMode(x) == TrueColor ) {
+    if ( colorMode(x) != Grayscale ) {
       colores = c("red", "green", "blue")
       y = lapply(colores, function(m) imageData(channel(x, m)))
       names(y) = colores
@@ -593,24 +596,4 @@ parseColorMode=function(colormode) {
   }
   
   as.integer(icolormode)
-}
-
-## DEPRECATED
-setMethod ("write.image", signature(x="Image"),
-  function (x, ...) {
-    .Deprecated("writeImage", "EBImage")
-    writeImage(x, ...)
-  }
-)
-
-## DEPRECATED
-read.image <- function(files, colormode=Grayscale, ...) {
-  .Deprecated("readImage", "EBImage")
-  readImage(files, colormode, ...)
-}
-
-## DEPRECATED
-choose.image <- function(colormode=Grayscale) {
-  .Deprecated("chooseImage", "EBImage")
-  chooseImage(colormode)
 }

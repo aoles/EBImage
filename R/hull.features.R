@@ -54,12 +54,6 @@ setMethod ("hullFeatures", signature(x="IndexedImage"),
   }
 )
 
-setMethod ("hull.features", signature(x="IndexedImage"),
-  function(x, ...) {
-    .Deprecated("hullFeatures", "EBImage")
-    hullFeatures(x, ...)
-  }
-)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 .edgeProfile <- function(x, ref=NULL, n=32, fft=FALSE, scale=TRUE, rotate=TRUE, ...) {
   if ( colorMode(x) != Grayscale ) .stop( "'x' must be Grayscale" )
@@ -144,13 +138,6 @@ setMethod ("edgeProfile", signature(x="IndexedImage"),
   }
 )
 
-setMethod ("edge.profile", signature(x="IndexedImage"),
-  function (x, ...) {
-    .Deprecated("edgeProfile", "EBImage")
-    edgeProfile(x, ...)
-  }
-)
-
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("edgeFeatures", signature(x="IndexedImage"),
   function (x, ref, ...) {
@@ -169,10 +156,5 @@ setMethod ("edgeFeatures", signature(x="IndexedImage"),
   }
 )
 
-setMethod ("edge.features", signature(x="IndexedImage"),
-  function (x, ...) {
-    .Deprecated("edgeFeatures", "EBImage")
-    edgeFeatures(x, ...)
-  }
-)
+
 

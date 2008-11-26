@@ -1,4 +1,4 @@
-#include "filters_thresh.h"
+#include "thresh.h"
 #include "tools.h"
 
 /* -------------------------------------------------------------------------
@@ -18,7 +18,7 @@ See: ../LICENSE for license, LGPL
 
 /*----------------------------------------------------------------------- */
 SEXP
-lib_filterThresh (SEXP x, SEXP param) {
+thresh (SEXP x, SEXP param) {
     int dx, dy, nx, ny, nz, nprotect, * dim, xi, yi, u, v, i;
     int sx, ex, sy, ey;
     double offset, * tgt, * src, sum, mean, nFramePix;
@@ -34,7 +34,7 @@ lib_filterThresh (SEXP x, SEXP param) {
     dy = (int)( REAL(param)[1] );
     offset = REAL(param)[2];
     nprotect = 0;
-    nFramePix = (2 * dx + 1) * (2 * dx + 1);
+    nFramePix = (2 * dx + 1) * (2 * dy + 1);
 
     PROTECT ( res = Rf_duplicate(x) );
     nprotect++;

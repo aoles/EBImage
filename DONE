@@ -1,3 +1,13 @@
+2.7.6
+- fixed dy instead of dx in lib_filterThresh L37 in nFramePix = (2 * dx + 1) * (2 * dx + 1); (bug submitted by Glenn Davis)
+- tile, untile, thresh: works fine on md, Color
+- vignettes build OK
+- translate: check param input OK
+- keeping correct storage.mode after binary operations on TrueColor images
+- deprecated functions moved to deprecated.R
+- vignette changes: (indexing a[,,,1] instead of a[,,1] and promote usage of rgbImage)
+- unit test inst/scripts/test.R added
+
 2.7.5
 - functions copy, .isCorrectType, .correctType have been removed
 - multidimensional arrays are now handled
@@ -19,3 +29,6 @@
 - C function lib_untile renamed to untile
 - display is faster since pixbuf are now directly built from SEXP
 - writeImage now uses a quality of 100 by default
+- keep correct storage.mode after binary operations 
+- the Image constructor is doing now the conversion between TrueColor and (Grayscale or Color) images
+- cleaner show, print methods

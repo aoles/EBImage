@@ -38,7 +38,7 @@ setMethod ("tile", signature(x="list"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("fillHull", signature(x="IndexedImage"),
   function(x, ...) {
-    return(.DoCall("lib_fillHull", x))
+    return(.DoCall("fillHull", x))
   }
 )
 

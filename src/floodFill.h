@@ -8,8 +8,8 @@
 extern "C" {
 #endif
 
-SEXP lib_floodFill(SEXP, SEXP, SEXP, SEXP);
-SEXP lib_fillHull(SEXP);
+SEXP floodFill(SEXP, SEXP, SEXP, SEXP);
+SEXP fillHull(SEXP);
 
 #ifdef __cplusplus
 };

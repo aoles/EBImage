@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-SEXP lib_filterThresh (SEXP, SEXP);
+SEXP thresh (SEXP, SEXP);
 
 #ifdef __cplusplus
 };
