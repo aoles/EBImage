@@ -17,14 +17,14 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 ## image class, copy, assertion, accessors
-setGeneric ("header",         function (x, ...)        standardGeneric("header") )
-setGeneric ("assert",         function (x, y, strict=FALSE, ...) standardGeneric("assert") )
-setGeneric ("as.Image",       function (x, ...)        standardGeneric("as.Image") )
-setGeneric ("colorMode",      function (x, ...)        standardGeneric("colorMode") )
-setGeneric ("colorMode<-",    function (x, ..., value) standardGeneric("colorMode<-") )
-setGeneric ("imageData",      function (x, ...)        standardGeneric("imageData") )
-setGeneric ("imageData<-",    function (x, ..., value) standardGeneric("imageData<-") )
-setGeneric ("getNumberOfFrames",function (x,...)       standardGeneric("getNumberOfFrames") )
+setGeneric ("header",         function (x)             standardGeneric("header") )
+setGeneric ("assert",         function (x, ...)        standardGeneric("assert") )
+setGeneric ("as.Image",       function (x)             standardGeneric("as.Image") )
+setGeneric ("colorMode",      function (x)             standardGeneric("colorMode") )
+setGeneric ("colorMode<-",    function (x, value)      standardGeneric("colorMode<-") )
+setGeneric ("imageData",      function (x)             standardGeneric("imageData") )
+setGeneric ("imageData<-",    function (x, value)      standardGeneric("imageData<-") )
+setGeneric ("getNumberOfFrames",function (x, ...)      standardGeneric("getNumberOfFrames") )
 
 ## image IO, display
 setGeneric ("animate",        function (x, ...)        standardGeneric("animate") )
@@ -97,8 +97,8 @@ setGeneric ("drawtext",       function (img, xy, labels, ...) standardGeneric("d
 setGeneric ("paintObjects",   function (x, tgt, ...)   standardGeneric("paintObjects") )
 setGeneric ("matchObjects",   function (x, ref, ...)   standardGeneric("matchObjects") )
 setGeneric ("stackObjects",   function (x, ref, index, ...) standardGeneric("stackObjects") )
-setGeneric ("rmObjects",      function (x, index, ...) standardGeneric("rmObjects") )
-setGeneric ("reenumerate",    function (x, ...)        standardGeneric("reenumerate"))
+setGeneric ("rmObjects",      function (x, index)      standardGeneric("rmObjects") )
+setGeneric ("reenumerate",    function (x)             standardGeneric("reenumerate"))
 
 ## features extraction
 setGeneric ("getFeatures",    function (x, ...)        standardGeneric("getFeatures") )
@@ -113,9 +113,6 @@ setGeneric ("zernikeMoments", function (x, ref, ...)   standardGeneric("zernikeM
 setGeneric ("haralickMatrix", function (x, ref, ...)   standardGeneric("haralickMatrix") )
 setGeneric ("haralickFeatures",function (x, ref,...)   standardGeneric("haralickFeatures") )
 
-## misc
-setGeneric ("frameDist",      function(x, y, ...)      standardGeneric("frameDist"))
-
 # deprecated
 setGeneric ("write.image",    function (x, ...)        standardGeneric("write.image") )
 setGeneric ("hull.features",  function (x, ...)        standardGeneric("hull.features") )
@@ -124,3 +121,4 @@ setGeneric ("edge.features",  function (x, ...)        standardGeneric("edge.fea
 setGeneric ("haralick.matrix",function (x, ref, ...)   standardGeneric("haralick.matrix") )
 setGeneric ("haralick.features",function (x, ref,...)  standardGeneric("haralick.features") )
 setGeneric ("zernike.moments",function (x, ref, ...)   standardGeneric("zernike.moments") )
+setGeneric ("frameDist",      function(x, y, ...)      standardGeneric("frameDist"))

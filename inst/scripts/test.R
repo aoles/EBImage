@@ -25,6 +25,7 @@ test=function(x) {
   ## imageData, imageData, colorMode, colorMode<-, print
   ## [, getNumberOfFrames
   cat('new test\n')
+  check('print',x)
   y=Image(x,colormode=Color)
   a=is.Image(y)
   y=check('>',x,0.5)
@@ -35,7 +36,6 @@ test=function(x) {
   z=as.Image(imageData(y))
   imageData(z)=y
   colorMode(z)=Grayscale
-  ##b=check('print',z)
   pat=as.list(rep(T,length(dim(x))))
   pat[[1]]=1:150
   pat[[2]]=1:100
@@ -77,13 +77,14 @@ test=function(x) {
   z[3,3]=-24
   y=check('filter2',x,z)
 
-  ## erode, dilate, opening, closing, distmap
+  ## erode, dilate, opening, closing, distmap, watershed
   w=x>0.5
   y=check('erode',w)
   y=check('dilate',w)
   y=check('opening',w)
   y=check('closing',w)
   y=check('distmap',w)
+  ws=check('watershed',y)
 
   ## rgbImage, channel
   if (colorMode(x)==Grayscale) {
@@ -95,10 +96,22 @@ test=function(x) {
   w=check('channel',y,'green')
   w=check('channelMix',y)
   
-  ## combine
+  ## combine, tile, untile
   y=check('combine',x,x,x)
   y=check('tile',x)
   y=check('untile',x,c(2,2))
+
+  ## hullFeatures, rmObjects, reenumerate, getFeatures (contains hullFeatures, edgeFeatures, haralickFeatures, zernikeMoments, moments)
+  w=ws
+  w[w@.Data==1]=2
+  w[w@.Data==3]=2117
+  y=check('reenumerate',w)
+  w=ws
+  hf=check('hullFeatures',w)
+  if (!is.list(hf)) hf=list(hf)
+  rmindex = lapply(hf, function(c) which(c[,'h.s']<10))
+  w=check('rmObjects',w,rmindex)
+  y=check('getFeatures',w,x)
   cat('\n')
 }
 
@@ -131,10 +144,29 @@ x=Image(x,colormode=TrueColor)
 test(x)
 
 ##
-library(EBImage)
-w=readImage('../lena-color.bmp')
-x=combine(w,flip(w))
-y=tile(x)
-z=untile(x,c(10,1))
+scratch=function() {
+  library(EBImage)
+  w=readImage('../lena-color.bmp')
+  x=combine(w,flip(w),flop(w))
+  ws=watershed(distmap(x>0.5))
+  y=edgeFeatures(ws,x)
 
+  ## bug 2
+  library(EBImage)
+  ref=readImage('../lena.gif')
+  x=watershed(distmap(ref>0.5))
+  y=edgeFeatures(x,ref)
 
+  ## bug 3
+  library(EBImage)
+  ref=readImage('../lena.gif')
+  ref=rgbImage(ref,flip(ref),flop(ref))
+  ref=combine(ref,ref)
+  x=watershed(distmap(ref>0.5))
+  y=edgeFeatures(x,ref)
+
+  hf=check('hullFeatures',x)
+  if (!is.list(hf)) hf=list(hf)
+  rmindex = lapply(hf, function(c) which(c[,'h.s']<10))
+  x2=check('rmObjects',x,rmindex)
+}

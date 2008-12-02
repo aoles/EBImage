@@ -1,4 +1,4 @@
-#include "filters_watershed.h"
+#include "watershed.h"
 
 /* -------------------------------------------------------------------------
 Watershed transform for Image
@@ -25,14 +25,14 @@ double check_multiple( double *, double *, int &, IntList &, SeedList &, double 
 
 /*----------------------------------------------------------------------- */
 SEXP
-lib_filterInvWS (SEXP x, SEXP _tolerance, SEXP _ext) {
+watershed (SEXP x, SEXP _tolerance, SEXP _ext) {
     SEXP res;
     int im, i, j, nx, ny, nz, ext, nprotect = 0;
     double tolerance;
 
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
-    nz = INTEGER ( GET_DIM(x) )[2];
+    nz = getNumberOfFrames(x,0);
     tolerance = REAL( _tolerance )[0];
     ext = INTEGER( _ext )[0];
 
@@ -49,8 +49,8 @@ lib_filterInvWS (SEXP x, SEXP _tolerance, SEXP _ext) {
 
         /* generate pixel index and negate the image -- filling wells */
         for ( i = 0; i < nx * ny; i++ ) {
-            tgt[ i ] = -src[ i ];
-            index[ i ] = i;
+	  tgt[ i ] = -src[ i ];
+	  index[ i ] = i;
         }
         /* from R includes R_ext/Utils.h */
         /* will resort tgt as well */
@@ -83,6 +83,7 @@ lib_filterInvWS (SEXP x, SEXP _tolerance, SEXP _ext) {
                  * existing objects, count checked and reset counter on each assigned
                  * -- exit when counter equals queue length */
                 for ( j = 0; j < (int) equals.size(); ) {
+		  if ((j%1000)==0) R_CheckUserInterrupt();
                     ind = equals.front();
                     equals.pop_front();
                     /* check neighbours:

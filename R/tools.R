@@ -29,89 +29,6 @@
 .warning <- function (string, ...) warning( .(string), ... )
 .cat <- function (string, ...) cat( .(string), ... )
 
-isNumeric=function(x) {
-  if (class(x)=='Image') {
-    if (storage.mode(x@.Data)=='double') return(TRUE)
-    else if ( storage.mode(x@.Data)=='integer') return(FALSE)
-    else if ( storage.mode(x@.Data)=='logical') return(FALSE)
-    else warning('unsupported Image storage mode')
-    return(FALSE)
-  }
-  else if (class(x)=='IndexedImage') {
-    if (storage.mode(x@.Data)=='numeric') {
-      warning('IndexedImage with a numeric storage mode ?')
-      return(TRUE)
-    }
-    else if ( storage.mode(x@.Data)=='integer') return(FALSE)
-    else if ( storage.mode(x@.Data)=='logical') return(FALSE)
-    else warning('unsupported IndexedImage storage mode')
-    return(FALSE)
-  }
-  else {
-     warning('unsupported class')
-    return(FALSE)
-  }
-}
-
-isInteger=function(x) {
-  if (class(x)=='Image') {
-    if (storage.mode(x@.Data)=='double') return(FALSE)
-    else if ( storage.mode(x@.Data)=='integer') return(TRUE)
-    else if ( storage.mode(x@.Data)=='logical') return(TRUE)
-    else warning('unsupported Image storage mode')
-    return(FALSE)
-  }
-  else if (class(x)=='IndexedImage') {
-    if (storage.mode(x@.Data)=='numeric') {
-      warning('IndexedImage with a numeric storage mode ?')
-      return(FALSE)
-    }
-    else if ( storage.mode(x@.Data)=='integer') return(TRUE)
-    else if ( storage.mode(x@.Data)=='logical') return(TRUE)
-    else warning('unsupported IndexedImage storage mode')
-    return(FALSE)
-  }
-  else {
-    warning('unsupported class')
-    return(FALSE)
-  }
-}
-
-## int -> num [0,1]
-castAsNumeric=function(x,scale,warnings=TRUE) {
-  if (!isNumeric(x)) {
-    if (missing(scale)) {
-      scale=attr(x,'scale')
-      if (is.null(scale)) {
-        scale=max(x)
-        if (warnings) warning(paste('implicit conversion from integer to numeric using linear scale with scale=',scale,'.',sep=''))
-      }
-    }
-    attr(x,'scale')=scale
-    if (scale!=0.0) x@.Data=x@.Data/scale
-    storage.mode(x@.Data)='numeric'
-  }
-  return(x)
-}
-
-## num -> int [a,b]
-castAsInteger=function(x,scale,warnings=TRUE) {
-  if (!isInteger(x)) {
-    if (missing(scale)) {
-      scale=attr(x,'scale')
-      if (is.null(scale)) {
-        minimum.step=setdiff(sort(unique(diff(sort(x@.Data)))),0)[1]
-        scale=1/minimum.step
-         if (warnings) warning(paste('implicit conversion from numeric to integer using linear scale with scale=',scale,'. Data loss may have occured.',sep=''))
-      }
-    }
-    attr(x,'scale')=scale
-    if (scale!=0.0) x@.Data=round(x@.Data*scale)
-    storage.mode(x@.Data)='integer'
-  }
-  return(x)
-}
-
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("channel", signature(x="ANY", mode="character"),
   function (x, mode, ...) {
@@ -153,3 +70,19 @@ setMethod("floodFill", signature(x="array", pt="ANY"),
   }
 )
 
+## check if x (indexing image) and ref (image) are compatible
+checkCompatibleImages=function(x,ref) {
+  if (missing(ref)) {
+    if (colorMode(x) == TrueColor)
+      stop( "'x' must be an Image object not in 'TrueColor' color mode" )
+  } else {
+    if (colorMode(x) == TrueColor || colorMode(ref) == TrueColor)
+      stop( "'x' and 'ref' must be Image objects not in 'TrueColor' color mode" )
+    
+    if (getNumberOfFrames(x,'total')!=getNumberOfFrames(ref,'total'))
+      stop( "'x' and 'ref' must have the same total number of frames" )
+    
+    if (any(dim(x)[1:2]!=dim(ref)[1:2])  )
+      stop( "'x' and 'ref' must have the same spatial 2D dimensions" )
+  }
+}

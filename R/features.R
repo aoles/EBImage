@@ -1,4 +1,4 @@
-# Extraction of hull and edge features from indexed images
+# Extraction of zernike features from indexed images
 
 # Copyright (c) 2007 Oleg Sklyar
 
@@ -15,8 +15,78 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("getFeatures", signature(x="IndexedImage"),
+  function (x, ref, N = 12, R = 30, apply.Gaussian=TRUE, nc = 256, pseudo=FALSE) {
+    if ( !missing(ref) && is.Image(ref) && (colorMode(ref) == TrueColor) )
+      .stop("\'ref\' must be an Image not in \'TrueColor\' color mode")
+    
+    .dim <- dim(x)
+    hf <- hullFeatures( x )
+    if ( !missing(ref) ) {
+      ef <- edgeFeatures( x=x, ref=ref )
+      tf <- haralickFeatures(x=x, ref=ref, nc=nc)
+      zf <- zernikeMoments(x=x, ref=ref, N=N, R=R, apply.Gaussian=apply.Gaussian, pseudo=pseudo)
+      ## mf calculation
+      mf <- moments(x=x, ref=ref)
+      ## distance from COM to geometric centre
+      if ( getNumberOfFrames(x,'total')== 1 )
+        mf <- cbind(mf, sqrt((mf[,3,drop=FALSE]-hf[,1])^2 +(mf[,4]-hf[,2])^2))
+      else {
+        for ( i in seq_along(hf) )
+          mf[[i]] <- cbind(mf[[i]], sqrt((mf[[i]][,3,drop=FALSE]-hf[[i]][,1])^2 +
+                                                     (mf[[i]][,4]-hf[[i]][,2])^2))
+      }
+      do.moms <- function(m) {
+        m <- cbind(m[,2,drop=FALSE], m[,2]/m[,1], m[,18], 2*sqrt(m[,9]),
+                   2*sqrt(m[,10]), sqrt((m[,9] - m[,10])/m[,9]), m[,11:17,drop=FALSE])
+        m[ which(is.na(m)) ] = 0.0
+        colnames(m) <- c("i.int", "i.dens", "i.d", "i.s2maj", "i.s2min", "i.ecc",
+                         "i.I1", "i.I2", "i.I3", "i.I4", "i.I5", "i.I6", "i.I7")
+        m
+      }
+      if ( getNumberOfFrames(x,'total') == 1 ) mf <- do.moms(mf)
+      else mf <- lapply(mf, do.moms)
+    }
+    else { # missing ref
+      ef <- edge.features( x=x )
+    }
+
+    if (  getNumberOfFrames(x,'total') == 1 ) {
+      if ( !missing(ref) )
+        features <- list( cbind(hf, ef, tf, mf, zf) )
+      else
+        features <- list( cbind(hf, ef) )
+    }
+    else {
+      features <- vector("list", length(hf))
+      if ( !missing(ref) )
+        for ( i in seq_along(hf) ) features[[i]] <- cbind(hf[[i]], ef[[i]], tf[[i]], mf[[i]], zf[[i]])
+      else
+        for ( i in seq_along(hf) ) features[[i]] <- cbind(hf[[i]], ef[[i]])
+    }
+    return(features)
+  }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("zernikeMoments", signature(x="IndexedImage", ref="Image"),
+  function(x, ref, N=12, R=30, apply.Gaussian=TRUE, pseudo=FALSE) {
+    checkCompatibleImages(x,ref)
+
+    if ( getNumberOfFrames(x,'total') == 1 )
+      xy <- moments(x=x, ref=ref)[, c(3,4), drop=FALSE]
+    else
+      xy <- lapply(moments(x=x, ref=ref), function(x) x[,c(3,4), drop=FALSE] )
+    if ( !pseudo )
+      return( .DoCall("lib_zernike", x, ref, xy, as.numeric(R), as.integer(N), as.integer(apply.Gaussian)) )
+    else
+      return( .DoCall("lib_pseudo_zernike", x, ref, xy, as.numeric(R), as.integer(N), as.integer(apply.Gaussian)) )
+  }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("hullFeatures", signature(x="IndexedImage"),
-  function(x, ...) {
+  function(x) {
     if ( colorMode(x) == TrueColor )
       stop("this method doesn't support the \'TrueColor\' color mode")
     ## get basic hull features
@@ -55,13 +125,14 @@ setMethod ("hullFeatures", signature(x="IndexedImage"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-.edgeProfile <- function(x, ref=NULL, n=32, fft=FALSE, scale=TRUE, rotate=TRUE, ...) {
-  if ( colorMode(x) != Grayscale ) .stop( "'x' must be Grayscale" )
+.edgeProfile <- function(x, ref=NULL, n=32, fft=FALSE, scale=TRUE, rotate=TRUE) {
+   checkCompatibleImages(x,ref)
+   
   .dim <- dim(x)
   ## get centres of objects xy, rotation angle theta and if required effective
   ## radius for scaling, s. If a reference image is provided, then xy and t are
   ## affected by the intensity distribution (as per moments)
-  if ( .dim[3] == 1 ) {
+  if ( getNumberOfFrames(x,'total')== 1 ) {
     if ( is.null(ref) ) xyt <- moments(x=x)[, c(3,4,8), drop=FALSE]
     else xyt <- moments(x=x, ref=ref)[, c(3,4,8), drop=FALSE]
     if ( scale ) s <- hullFeatures(x=x)[,7] else s <- NULL
@@ -110,8 +181,10 @@ setMethod ("hullFeatures", signature(x="IndexedImage"),
       }
     ## approximate the data sets for each object by approx at xout, apply fft, return
     do.approx <- function(x) {
-      y <- approx(x[,2], x[,1], xout=xout, n=n)$y
-      y[ which(is.na(y)) ] <- median(y, na.rm=TRUE)
+      if (nrow(x)!=1) {
+        y <- approx(x[,2], x[,1], xout=xout, n=n)$y
+        y[ which(is.na(y)) ] <- median(y, na.rm=TRUE)
+      } else y=rep(0,n)
       y
     }
     if ( fft )
@@ -121,26 +194,26 @@ setMethod ("hullFeatures", signature(x="IndexedImage"),
     matrix( unlist(res), ncol=n, nrow=length(m), byrow=TRUE)
   }
   ## run the above function for all images
-  if ( .dim[3] == 1 ) res <- do.profile(res, xyt, s)
+  if ( getNumberOfFrames(x,'total') == 1 ) res <- do.profile(res, xyt, s)
   else for (i in seq_along(res)) res[[i]] <- do.profile(res[[i]], xyt[[i]], s[[i]])
   res
 }
 
 setMethod ("edgeProfile", signature(x="IndexedImage"),
-  function (x, ref, n=32, fft=TRUE, scale=TRUE, rotate=TRUE, ...) {
+  function (x, ref, n=32, fft=TRUE, scale=TRUE, rotate=TRUE) {
     if ( missing(ref) ) 
       ref = NULL
     else {
       if ( !is.Image(ref) )
         .stop("'ref' must be of class Image or missing")
     }
-    .edgeProfile(x, ref, n, fft, scale, rotate, ...)
+    .edgeProfile(x, ref, n, fft, scale, rotate)
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("edgeFeatures", signature(x="IndexedImage"),
-  function (x, ref, ...) {
+  function (x, ref) {
     .dim <- dim(x)
     if ( missing(ref) ) ref <- NULL
     res <- edgeProfile(x=x, ref=ref, n=16, fft=FALSE, scale=TRUE, rotate=TRUE)
@@ -151,10 +224,43 @@ setMethod ("edgeFeatures", signature(x="IndexedImage"),
       m[,2:5] <- t(apply(e, 1, function(x) { x[which(is.na(x))]=median(x,na.rm=TRUE); abs(fft(x))[2:5] } ))
       return( m )
     }
-    if ( dim(x)[3] == 1 ) return( do.profile(res) )
+    if (getNumberOfFrames(x,'total')==1) return( do.profile(res) )
     return( lapply(res, do.profile) )
   }
 )
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("haralickMatrix", signature(x="IndexedImage", ref="Image"),
+  function(x, ref, nc=32) {
+    checkCompatibleImages(x,ref)
+    rref <- range(ref)
+    if ( rref[1] < 0 || rref[2] > 1 ) {
+      ref[ref<0] = 0
+      ref[ref>1] = 1
+      warning( "Values in 'ref' have been limited to the range [0,1]" )
+    }
+    res <- .DoCall( "lib_co_occurrence", x, ref, as.integer(nc) )
+    return( res )
+  }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("haralickFeatures", signature(x="IndexedImage", ref="Image"),
+  function(x, ref, nc=32) {
+    hm <- haralickMatrix(x=x, ref=ref, nc=nc)
+    if ( is.null(hm) || !(is.array(hm) || is.list(hm)) ) return( NULL )
+    do.features <- function(m) {
+      res <- .DoCall( "lib_haralick", m )
+      if ( is.matrix(res) )
+        colnames(res) <- c("t.asm", "t.con", "t.cor", "t.var", "t.idm", "t.sav", "t.sva", 
+                           "t.sen", "t.ent", "t.dva", "t.den", "t.f12", "t.f13")
+      res
+    }
+    if ( !is.list(hm) ) return( do.features(hm) )
+    lapply( hm, do.features )
+  }   
+)
+
 
 
 

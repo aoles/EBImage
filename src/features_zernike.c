@@ -51,7 +51,7 @@ lib_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP applyGaussi
   if ( !isImage(obj) ) return R_NilValue;
   nx = INTEGER ( GET_DIM(obj) )[0];
   ny = INTEGER ( GET_DIM(obj) )[1];
-  nz = INTEGER ( GET_DIM(obj) )[2];
+  nz = getNumberOfFrames(obj,0);
   nprotect = 0;
 
   doGauss = INTEGER(applyGaussian)[0];
@@ -206,7 +206,7 @@ lib_pseudo_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP appl
   if ( !isImage(obj) ) return R_NilValue;
   nx = INTEGER ( GET_DIM(obj) )[0];
   ny = INTEGER ( GET_DIM(obj) )[1];
-  nz = INTEGER ( GET_DIM(obj) )[2];
+  nz = getNumberOfFrames(obj,0);
   nprotect = 0;
 
   doGauss = INTEGER(applyGaussian)[0];

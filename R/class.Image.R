@@ -80,7 +80,7 @@ Image=function(data=array(0,dim=c(1,1)), dim=base::dim(data), colormode=NULL) {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("as.Image", signature(x="array"),
-  function (x, ...) {
+  function (x) {
     if (is.integer(x)) return(Image(x, colormode=TrueColor))
     
     x = Image(x, colormode=Grayscale)
@@ -121,13 +121,13 @@ setReplaceMethod ("colorMode", signature (x="Image", value="character"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("imageData", signature (x="Image"),
-  function (x, ...) x@.Data
+  function (x) x@.Data
 )
 setMethod ("imageData", signature (x="array"),
   function (x) x
 )
 setReplaceMethod ("imageData", signature (x="Image", value="matrix"),
-  function (x, ..., value) {
+  function (x, value) {
     x@.Data = value
      ## conversion here should not be possible ! kept for compatibility
     if (is.integer(value)) x@colormode = TrueColor
@@ -136,7 +136,7 @@ setReplaceMethod ("imageData", signature (x="Image", value="matrix"),
   }
 )
 setReplaceMethod ("imageData", signature (x="Image", value="array"),
-  function (x, ..., value) {
+  function (x, value) {
     x@.Data = value
     ## conversion here should not be possible ! kept for compatibility
     if (is.integer(value)) x@colormode = TrueColor
@@ -156,9 +156,10 @@ is.Image <- function (x) {
 ## If strict is FALSE, only the two first dimensions and colorMode are checked
 ## GP: Useful ?
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("assert", signature (x="Image", y="Image"),
-  function (x, y, strict=FALSE, ...) {
+setMethod ("assert", signature (x="Image"),
+  function (x, y, strict=FALSE) {
     n <- 2
+    if (missing(y)) return(is.Image(x))
     if (strict) {
       if (length(dim(x))!=length(dim(y))) return(FALSE)
       else n = length(dim(x))
@@ -167,10 +168,8 @@ setMethod ("assert", signature (x="Image", y="Image"),
       return( FALSE )
     return( TRUE )
   }
-           )
-setMethod ("assert", signature (x="Image", y="missing"),
-  function (x, y, strict=FALSE, ...) is.Image (x)
 )
+
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 stopIfNotImage <- function (x) {
@@ -182,7 +181,7 @@ stopIfNotImage <- function (x) {
 ## GP: Useful ?
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("header", signature(x="Image"),
-  function (x, ...) {
+  function (x) {
     if (colorMode(x) == Grayscale) data=array(0,c(1,1))
     else if (colorMode(x) == TrueColor) data=array(0L, c(1,1)) 
     else data=array(0,c(1,1))
@@ -191,7 +190,7 @@ setMethod ("header", signature(x="Image"),
     return(y)
   }
 )
-                  
+      
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 validImageObject=function(object) {
   ## testing colormode
@@ -294,7 +293,7 @@ setMethod ("[", signature(x="Image", i="ANY", j="ANY", drop="ANY"),
 ## If type='render', return the number of frames to be rendered after color channel merging
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod('getNumberOfFrames',signature(x="Image"),
-          function(x,type='total',...) {
+          function(x,type='total') {
             if (type=='render' & colorMode(x)==Color) {
               if (length(dim(x))< 3) return(1)
               else return(prod(dim(x)[-1:-3]))
@@ -307,8 +306,11 @@ setMethod ("show", signature(object="Image"),
   function (object) {
     cat('Image\n')
 
+    valid=validObject(object,test=TRUE)
+    if (!is.logical(valid)) valid=paste(FALSE,', ',valid,sep='')
+
     cat('  colormode:',c('Grayscale','TrueColor','Color')[1+colorMode(object)],'\n')
-    cat('  validity:',validObject(object,test=TRUE),'\n')
+    cat('  validity:',valid,'\n')
     cat('  storage.mode:',storage.mode(object),'\n')
     cat('  dim:',dim(object),'\n')
     cat('  nb.total.frames:',getNumberOfFrames(object,'total'),'\n')
@@ -597,3 +599,4 @@ parseColorMode=function(colormode) {
   
   as.integer(icolormode)
 }
+

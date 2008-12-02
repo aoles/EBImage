@@ -1,4 +1,5 @@
 #include "features_hull.h"
+#include "tools.h"
 
 /* -------------------------------------------------------------------------
 Calculating image moments from images and indexed images
@@ -26,7 +27,7 @@ lib_basic_hull (SEXP obj) {
 
   nx = INTEGER ( GET_DIM(obj) )[0];
   ny = INTEGER ( GET_DIM(obj) )[1];
-  nz = INTEGER ( GET_DIM(obj) )[2];
+  nz = getNumberOfFrames(obj,0);
   nprotect = 0;
 
   PROTECT ( res = allocVector(VECSXP, nz) );
@@ -153,7 +154,7 @@ lib_edge_profile (SEXP obj, SEXP xy_list) {
 
   nx = INTEGER ( GET_DIM(obj) )[0];
   ny = INTEGER ( GET_DIM(obj) )[1];
-  nz = INTEGER ( GET_DIM(obj) )[2];
+  nz = getNumberOfFrames(obj,0);
   nprotect = 0;
 
   PROTECT( edg = Rf_duplicate(obj) );
@@ -172,9 +173,11 @@ lib_edge_profile (SEXP obj, SEXP xy_list) {
       SET_VECTOR_ELT (res, im, R_NilValue ); // check in R code
       continue;
     }
+
     /* get xy */
     if ( nz == 1 ) xys = xy_list;
     else xys = VECTOR_ELT(xy_list, im);
+
     if ( xys == R_NilValue || INTEGER(GET_DIM(xys))[0] != nobj || INTEGER(GET_DIM(xys))[1] < 2 ) continue;
     xy = REAL(xys);
     /* get edge image data */
@@ -205,6 +208,7 @@ lib_edge_profile (SEXP obj, SEXP xy_list) {
     for ( x = 0; x < nx; x++ )
       for ( y = 0; y < ny; y++ ) {
         index = edata[x + y * nx]; /* index of the object, R-style = 1-based */
+	
         if ( index < 1 ) continue;
         /* all indexes were 1, 2, 3, but C has 0-based indexes!!! */
         index--;
@@ -219,6 +223,7 @@ lib_edge_profile (SEXP obj, SEXP xy_list) {
 
   UNPROTECT( nprotect );
   if ( nz == 1 ) return VECTOR_ELT( res, 0 );
+
   return res;
 }
 

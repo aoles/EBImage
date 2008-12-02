@@ -21,11 +21,11 @@ lib_co_occurrence (SEXP obj, SEXP ref, SEXP cgrades) {
   if ( !isImage(obj) || !isImage(ref) ) return R_NilValue;
   nx = INTEGER ( GET_DIM(obj) )[0];
   ny = INTEGER ( GET_DIM(obj) )[1];
-  nz = INTEGER ( GET_DIM(obj) )[2];
+  nz = getNumberOfFrames(obj,0);
   nprotect = 0;
 
   if ( INTEGER(GET_DIM(ref))[0] != nx || INTEGER(GET_DIM(ref))[1] != ny ||
-       INTEGER(GET_DIM(ref))[2] != nz )
+       getNumberOfFrames(ref,0) != nz )
     error( "'ref' image has different size than 'obj'" );
 
   nc = INTEGER(cgrades)[0];
@@ -141,6 +141,7 @@ lib_haralick ( SEXP cm ) {
     error( "Haralick matrix is not square or too small" );
   /* return NULL if no objects */
   nobj = INTEGER(GET_DIM(cm))[2];
+
   if ( nobj < 1 ) return R_NilValue;
   /* after all the checks we hope we can collect the results, alloc mem */
   PROTECT( res = allocVector(REALSXP, nobj * nf) );
