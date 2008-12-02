@@ -23,6 +23,10 @@ extern
 typedef struct {
     int x, y;
 } PointXY;
+
+typedef struct {
+  int x, y, z;
+} PointXYZ;
   
 typedef double numeric;
 

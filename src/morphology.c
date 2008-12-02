@@ -75,3 +75,4 @@ _match (numeric * kernel, PointXY * ksize, numeric * data, PointXY * dsize, Poin
         }
     return 1;
 }
+

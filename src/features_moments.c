@@ -21,12 +21,12 @@ lib_cmoments (SEXP obj, SEXP ref) {
   
   nx = INTEGER (GET_DIM(obj))[0];
   ny = INTEGER (GET_DIM(obj))[1];
-  nz = INTEGER (GET_DIM(obj))[2];
+  nz = getNumberOfFrames(obj,0);
   nprotect = 0;
 
   if ( isImage(ref) )
     if ( INTEGER(GET_DIM(ref))[0] != nx || INTEGER(GET_DIM(ref))[1] != ny ||
-         INTEGER(GET_DIM(ref))[2] != nz )
+         getNumberOfFrames(ref,0) != nz )
       error( "'ref' image is present, but has different size than 'obj'" );
 
   PROTECT( res = allocVector(VECSXP, nz) );
@@ -122,7 +122,7 @@ lib_moments (SEXP obj, SEXP ref, SEXP pw, SEXP what) {
 
   nx  = INTEGER (GET_DIM(obj))[0];
   ny  = INTEGER (GET_DIM(obj))[1];
-  nz  = INTEGER (GET_DIM(obj))[2];
+  nz  = getNumberOfFrames(obj,0);
   nprotect = 0;
   
   PROTECT( ctrlist = lib_cmoments(obj, ref) ); /* this also checks x and ref */

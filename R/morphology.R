@@ -112,13 +112,16 @@ setMethod ("dilate", signature(x="Image"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("opening", signature(x="Image"),
-    function (x, kern=morphKern(5), iter=1)
-        dilate ( erode(x, kern, iter), kern, iter)
+    function (x, kern=morphKern(5), iter=1) {
+      y=erode(x, kern, iter)
+      dilate (y, kern, iter)
+    }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("closing", signature(x="Image"),
-    function (x, kern=morphKern(5), iter=1)
-        erode ( dilate(x, kern, iter), kern, iter)
+    function (x, kern=morphKern(5), iter=1) {
+      y=dilate(x, kern, iter)
+      erode (y, kern, iter)
+    }
 )
-

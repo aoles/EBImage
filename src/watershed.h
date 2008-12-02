@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-SEXP lib_filterInvWS (SEXP, SEXP, SEXP);
+SEXP watershed(SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus
 };

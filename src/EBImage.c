@@ -16,7 +16,7 @@ See: ../LICENSE for license, LGPL
 #include "translate.h"
 #include "filters_propagate.h"
 #include "filters_normalize.h"
-#include "filters_watershed.h"
+#include "watershed.h"
 #include "thresh.h"
 #include "floodFill.h"
 
@@ -80,20 +80,20 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_filterMagick",   (DL_FUNC) &lib_filterMagick,   3},
     {"translate",          (DL_FUNC) &translate,          2},
     {"lib_erode_dilate",   (DL_FUNC) &lib_erode_dilate,   4},
-    {"thresh",   (DL_FUNC) &thresh,   2},
-    {"floodFill",      (DL_FUNC) &floodFill,      4},
-    {"fillHull",       (DL_FUNC) &fillHull,       1},
+    {"thresh",             (DL_FUNC) &thresh,   2},
+    {"floodFill",          (DL_FUNC) &floodFill,      4},
+    {"fillHull",           (DL_FUNC) &fillHull,       1},
     {"lib_normalize",      (DL_FUNC) &lib_normalize,      3},
     {"distmap",            (DL_FUNC) &distmap,            2},
-    {"lib_filterInvWS",    (DL_FUNC) &lib_filterInvWS,    3},
+    {"watershed",          (DL_FUNC) &watershed,    3},
     {"lib_propagate",      (DL_FUNC) &lib_propagate,      5},
 
-    {"paintObjects",  (DL_FUNC) &paintObjects,  4},
-    {"matchObjects",  (DL_FUNC) &matchObjects,  2},
-    {"rmObjects", (DL_FUNC) &rmObjects, 2},
-    {"tile",     (DL_FUNC) &tile,     3},
-    {"untile",         (DL_FUNC) &untile,         4},
-    {"stackObjects",  (DL_FUNC) &stackObjects,  6},
+    {"paintObjects",       (DL_FUNC) &paintObjects,  4},
+    {"matchObjects",       (DL_FUNC) &matchObjects,  2},
+    {"rmObjects",          (DL_FUNC) &rmObjects, 2},
+    {"tile",               (DL_FUNC) &tile,     3},
+    {"untile",             (DL_FUNC) &untile,         4},
+    {"stackObjects",       (DL_FUNC) &stackObjects,  6},
     {"lib_frameDist",      (DL_FUNC) &lib_frameDist,      5},
 
     {"lib_drawText",       (DL_FUNC) &lib_drawText,       5},

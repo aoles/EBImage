@@ -1,34 +1,30 @@
 md means multi-dimensional modes
 
-- watershed: hangs when used on distmap(lena>0.5)
 - floodFill: check md and Color
 - fillHull works only with IndexedImage
 - documentation: major update to be done
-- hullFeatures, edgeProfile, edgeFeatures: check md and Color
-- cmoments, smoments, rmoments, moments: check md and Color
 - drawtext: check md and Color (IM, should be OK)
-- haralickFeatures, haralickMatrix, zernikeMoments: check md and Color
-- zernikeMoments: check md and Color
 - classUnion between Image, array and matrix
-- md: remove all INTEGER(GET_DIM())[2]
-- paintObjects, matchObjects, rmObjects, stackObjects, tile, untile: check md and Color
+- paintObjects, matchObjects, stackObjects: check md and Color
 - remove lib_ things
-- toremove: frameDist (unclear, experimental function)
 - installation: ease the installation on MacOS
 - toremove: enhance (vague)
 - toremove: header (not useful anymore)
 - merge morphKern, mkball and mkbox
 - merge animate and display
-- make a deprecated file
 - change colormode/colorMode case
 - main doc EBImage
 - default arguments to be checked
 - overuse of '...'
 - clean display.c (winStr, newPixbufFromImages to remove)
-- class.IndexedImage.R : check stop message if given a TrueColor
 - merge IndexedImage class within Image
 - assert is misnamed
 - image, hist: are they useful ?
 - tresh, athresh, cthresh: documentation
 - naiveSegment: to implement
 - check previous vignette
+- features precise documentation
+- w[w==1]=2 doesn't work as w[w@.Data==1]=2 does, due to to the 'numeric' to 'logical' cast
+- check features values with current EBImage release
+- edgeFeatures hangs on md 
+- warnings and check edgeFeatures values with current EBImage release on edgeFeatures(watershed(distmap(lena>0.5)),x)

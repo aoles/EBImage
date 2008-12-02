@@ -1,3 +1,18 @@
+2.7.7
+- reenumerate, hullFeatures, rmObjects, watershed: work fine on md and Color
+- watershed: fixed bug when used on distmap(lena>0.5)
+- getFeatures, hullFeatures, edgeProfile, edgeFeatures: work fine on md and Color
+- cmoments, smoment, rmoments, moments: work fine on md and Color
+- haralickFeatures, haralickMatrix, zernikeMoments: work fine on md and Color
+- zernikeMoments: work fine on md and Color
+- frameDist deprecated
+- class.IndexedImage.R: stop message in case of TrueColor now OK
+- checked all INTEGER(GET_DIM())[2] OK
+- merged all features in features.R
+- renamed methods-display.R in display.R, filters_watershed.cpp in watershed.cpp
+- watershed is now interruptable
+- objects methods moved from class.IndexedImage.R to objects.R
+
 2.7.6
 - fixed dy instead of dx in lib_filterThresh L37 in nFramePix = (2 * dx + 1) * (2 * dx + 1); (bug submitted by Glenn Davis)
 - tile, untile, thresh: works fine on md, Color
@@ -7,6 +22,7 @@
 - deprecated functions moved to deprecated.R
 - vignette changes: (indexing a[,,,1] instead of a[,,1] and promote usage of rgbImage)
 - unit test inst/scripts/test.R added
+- new deprecated.R file
 
 2.7.5
 - functions copy, .isCorrectType, .correctType have been removed
