@@ -25,9 +25,14 @@ setClass ("Image",
   prototype (colormode=Grayscale),
   contains = "array"
 )
+setClassUnion("ImageX", c("Image", "array"))
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Image=function(data=array(0,dim=c(1,1)), dim=base::dim(data), colormode=NULL) {
+Image=function(data=array(0,dim=c(1,1)), dim, colormode=NULL) {
+  if (missing(dim)) {
+    if (is.array(data)) dim=base::dim(data)
+    else dim=c(1,length(data))
+  }
   ld = length(dim)
   if (ld<2) stop(sprintf("length(dim) must be at least 2 and is %d.", ld))
 
@@ -82,11 +87,7 @@ Image=function(data=array(0,dim=c(1,1)), dim=base::dim(data), colormode=NULL) {
 setMethod ("as.Image", signature(x="array"),
   function (x) {
     if (is.integer(x)) return(Image(x, colormode=TrueColor))
-    
-    x = Image(x, colormode=Grayscale)
-    r = range(x)
-    if (diff(r) > 1 || any(r<0) || any(r>2)) class(x) = "IndexedImage"
-
+    else x = Image(x, colormode=Grayscale)
     validObject(x)    
     return(x)
   }
@@ -118,6 +119,11 @@ setReplaceMethod ("colorMode", signature (x="Image", value="character"),
     return(x)
   }
 )
+setReplaceMethod ("colorMode", signature (x="array", value="ANY"),
+  function (x, value) {
+    return(x)
+  }
+)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("imageData", signature (x="Image"),
@@ -126,21 +132,18 @@ setMethod ("imageData", signature (x="Image"),
 setMethod ("imageData", signature (x="array"),
   function (x) x
 )
-setReplaceMethod ("imageData", signature (x="Image", value="matrix"),
-  function (x, value) {
-    x@.Data = value
-     ## conversion here should not be possible ! kept for compatibility
-    if (is.integer(value)) x@colormode = TrueColor
-    validObject(x)
-    return (x)
-  }
-)
 setReplaceMethod ("imageData", signature (x="Image", value="array"),
   function (x, value) {
     x@.Data = value
     ## conversion here should not be possible ! kept for compatibility
     if (is.integer(value)) x@colormode = TrueColor
     validObject(x)   
+    return (x)
+  }
+)
+setReplaceMethod ("imageData", signature (x="array", value="array"),
+  function (x, value) {
+    x = value
     return (x)
   }
 )
@@ -156,7 +159,7 @@ is.Image <- function (x) {
 ## If strict is FALSE, only the two first dimensions and colorMode are checked
 ## GP: Useful ?
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("assert", signature (x="Image"),
+setMethod ("assert", signature (x="ImageX"),
   function (x, y, strict=FALSE) {
     n <- 2
     if (missing(y)) return(is.Image(x))
@@ -170,17 +173,10 @@ setMethod ("assert", signature (x="Image"),
   }
 )
 
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-stopIfNotImage <- function (x) {
-  if ( !is.Image(x) ) stop( "argument must be of class 'Image'" )
-  invisible (NULL)
-}
-
 ## Shallow copy of the object: only the members (not the array) are copied
 ## GP: Useful ?
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("header", signature(x="Image"),
+setMethod ("header", signature(x="ImageX"),
   function (x) {
     if (colorMode(x) == Grayscale) data=array(0,c(1,1))
     else if (colorMode(x) == TrueColor) data=array(0L, c(1,1)) 
@@ -193,41 +189,35 @@ setMethod ("header", signature(x="Image"),
       
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 validImageObject=function(object) {
-  ## testing colormode
+  ## check colormode
   if (!is.integer(colorMode(object))) return('colormode must be an integer')
   if (colorMode(object)<0 | colorMode(object)>2) return('invalid colormode')
   if (colorMode(object)==TrueColor) warning('deprecated: the colormode \'TrueColor\' is deprecated, you should use the colormode \'Color\' instead')
-  if (colorMode(object)==TrueColor && storage.mode(object@.Data)!='integer') return('in color mode \'TrueColor\', storage.mode must be \'integer\'')
-    
-  ## testing array
-  if (colorMode(object)==Grayscale || colorMode(object)==Color) {
-    if (!is.array(object)) return('object must be an array')
-    if (storage.mode(object@.Data)!='double') return('array must have a \'double\' storage.mode')
-    d=dim(object)
-    if (length(d)<2) return('array must have at least two dimensions')
-    if (prod(d)==0) return('array must contain non-null dimensions')
-  }
+  
+  ## check array
+  if (!is.array(object)) return('object must be an array')
+
+  ## check dim
+  d=dim(object)
+  if (length(d)<2) return('object must have at least two dimensions')
+  if (getNumberOfFrames(object,'total')<1) return('Image must contain at least one frame')
+ 
   TRUE
 }
 setValidity("Image",validImageObject) 
 
 ## Overloading binary operators
-## Ensuring that the storage.mode of the data remains 'double' in Grayscale and Color modes, e.g. when comparing images, and 'integer' for TrueColor images
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("Ops", signature(e1="Image", e2="Image"),
 	function(e1, e2) {
           e1@.Data=callGeneric(imageData(e1), imageData(e2))
-          if (colorMode(e1)!=TrueColor & storage.mode(imageData(e1))!='double') storage.mode(e1@.Data)='double'
-          if (colorMode(e1)==TrueColor & storage.mode(imageData(e1))!='integer') storage.mode(e1@.Data)='integer'        
-          validObject(e1)
+           validObject(e1)
           return(e1)
 	}
 )
 setMethod("Ops", signature(e1="Image", e2="numeric"),
 	function(e1, e2) {
           e1@.Data=callGeneric(imageData(e1), e2)
-          if (colorMode(e1)!=TrueColor & storage.mode(imageData(e1))!='double') storage.mode(e1@.Data)='double'
-          if (colorMode(e1)==TrueColor & storage.mode(imageData(e1))!='integer') storage.mode(e1@.Data)='integer'          
           validObject(e1)
           return(e1)
 	}
@@ -235,28 +225,24 @@ setMethod("Ops", signature(e1="Image", e2="numeric"),
 setMethod("Ops", signature(e1="numeric", e2="Image"),
 	function(e1, e2) {
           e2@.Data=callGeneric(e1, imageData(e2))
-          if (colorMode(e2)!=TrueColor & storage.mode(imageData(e2))!='double') storage.mode(e2@.Data)='double'
-          if (colorMode(e2)==TrueColor & storage.mode(imageData(e2))!='integer') storage.mode(e2@.Data)='integer'
           validObject(e2)
           return(e2)
 	}
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("writeImage", signature(x="Image"),
-  function (x, files, quality=100, ...) {
+setMethod ("writeImage", signature(x="ImageX"),
+  function (x, files, quality=100) {
     validObject(x)
-    if (is(x, "IndexedImage"))
-      stop("cannot write images of class IndexedImage due to data range problems. Convert the object to Image and normalize it first, or save as an R object")
     if ( quality < 1 || quality > 100 )
       stop( "quality value is given in % between 1 and 100" )
     if ( missing(files) ) stop('\'files\' must be specified')
-    invisible ( .DoCall("lib_writeImages", x, as.character(files), as.integer(quality) ) )
+    invisible ( .ImageCall("lib_writeImages", x, as.character(files), as.integer(quality) ) )
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-readImage <- function(files, colormode, ...) {
+readImage <- function(files, colormode) {
   if ( missing(files) )
     stop("argument 'files' must be present in calls to 'readImage'")
   if (missing(colormode)) colormode=-1
@@ -278,21 +264,17 @@ setMethod ("[", signature(x="Image", i="ANY", j="ANY", drop="ANY"),
              sc=sys.call()
              sc[[2]]=call('slot',sc[[2]],'.Data')
              z=eval.parent(sc)
-             
-             ## if the result cannot be used to make an Image or is not an valid Image anymore, just return it as it is
-             if (!is.array(z)) return(z)
-             else {
-               x@.Data=z
-               if (validObject(x,test=TRUE)!=TRUE) return(x@.Data)
-               else return(x)
-             }            
+             if (!is.array(z)) z=array(z,dim=c(length(z),1))
+             x@.Data=z
+             validObject(x)
+             x
            })
 
 ## getNumberOfFrames
 ## If type='total', returns the total number of frames
 ## If type='render', return the number of frames to be rendered after color channel merging
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod('getNumberOfFrames',signature(x="Image"),
+setMethod('getNumberOfFrames',signature(x="ImageX"),
           function(x,type='total') {
             if (type=='render' & colorMode(x)==Color) {
               if (length(dim(x))< 3) return(1)
@@ -331,7 +313,7 @@ setMethod ("show", signature(object="Image"),
   }
 )
 
-print.Image <- function(x, ...) show(x)
+print.Image <- function(x) show(x)
 
 ## GP: Useful ?
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -379,14 +361,11 @@ selectChannel=function(x,i) {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("channel", signature(x="Image", mode="character"),
-  function (x, mode, ...) { 
+setMethod ("channel", signature(x="ImageX", mode="character"),
+  function (x, mode) { 
     mode=tolower(mode)
-    
-    if (is(x, "IndexedImage")) {
-      x = normalize(x)
-      warning("IndexedImage 'x' is normalized to [0,1] prior to applying the filter")
-    }
+
+    validObject(x)
     
     if (colorMode(x)==Grayscale) {
       return(switch(mode,
@@ -423,16 +402,15 @@ setMethod ("channel", signature(x="Image", mode="character"),
                                     green=3, b=, blue=4, asred=5, asgreen=6, asblue=7, x11=8, -1) )
       if (modeNo < 0) stop("wrong conversion mode")
       
-      resData <- .DoCall("lib_channel", x@.Data, modeNo)
+      resData <- .DoCall("lib_channel", imageData(x), modeNo)
       if (is.null(resData))
         stop("error converting colors, check if all supplied values majke sense for color representation")
       resData[which(is.na(x))] = NA
       resData = array (resData, dim(x) )
       if (mode == "x11") return(resData)
-      res <- header(x)
-      res@colormode <- switch (EXPR=mode, rgb=, asred=, asgreen=,
-                               asblue=TrueColor, Grayscale)
-      res@.Data <- resData
+      colormode=switch (EXPR=mode, rgb=, asred=, asgreen=,
+        asblue=TrueColor, Grayscale)
+      res=Image(data=resData,colormode=colormode)
       return(res)
     }
   }
@@ -466,7 +444,7 @@ setMethod ("hist", signature(x="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("combine", signature(x="Image"),
+setMethod ("combine", signature(x="ImageX"),
   function (x,...,along) {
     args=c(list(x),list(...))
     if (length(args)==1) return(x)
@@ -501,7 +479,7 @@ setMethod ("combine", signature(x="Image"),
     
     z=abind(args,along=along)
     dimnames(z)=NULL
-    x@.Data=z
+    imageData(x)=z
     
     validObject(x)
     return (x)
@@ -516,39 +494,14 @@ setMethod ("combine", signature(x="list"),
   }
 )
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("tile", signature(x="Image"),
-  function (x, nx=10, lwd=1, fg.col="#E4AF2B", bg.col="gray", ...) {
-    if ( nx < 1 || lwd < 0 || lwd > 100 )
-      stop( "wrong range of arguments, see help for range details" )
-    if ( colorMode(x) == TrueColor ) cols <- channel(c(fg.col,bg.col), "rgb")
-    else cols <- channel(c(fg.col,bg.col), "gray")
-    hdr <- header(x)
-    hdr@.Data <- array(cols, c(2,1,1))
-    x = .DoCall("tile", x, hdr, as.integer(c(nx, lwd)) )
-    if (is(x, "IndexedImage")) x = as.Image(x)
-    return(x)
-  }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("untile", signature(x="Image", nim="numeric"),
-  function (x, nim, lwd=1, ...) {
-    nim = as.integer(nim)
-    lwd = as.integer(lwd)
-    if (length(nim)<2)
-      stop("'nim' must contain two values for the number of images in x and y directions")
-    if (lwd<0)
-      stop("wrong line width")
-    return(.DoCall("untile", x, header(x), nim, lwd))
-  }
-)
-
-## Median redefinition
+## Median & quantile redefinition
 ## needed to overcome an isObject() test in median() which greatly slows down median()
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 median.Image <- function(x, na.rm = FALSE) {
   median(imageData(x), na.rm=na.rm)
+}
+quantile.Image <- function(x, ...) {
+  quantile(imageData(x), ...)
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

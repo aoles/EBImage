@@ -11,6 +11,9 @@ SEXP translate(SEXP _a,SEXP _v) {
   int tx,ty;
   double *a,*v,*b;
 
+  // check image validity
+  validImage(_a,0); 
+
   // initialize width, height, nz
   width=INTEGER(GET_DIM(_a))[0];
   height=INTEGER(GET_DIM(_a))[1];

@@ -7,11 +7,11 @@ importFrom("graphics", "hist")
 importFrom("stats", "median")
 
 ## classes
-exportClasses(Image, IndexedImage)
+exportClasses(Image, ImageX)
 
 ## image class, copy, assertion, accessors
 export(Image, is.Image, stopIfNotImage, print.Image)
-export(print.IndexedImage, Grayscale, TrueColor, Color)
+export(Grayscale, TrueColor, Color)
 exportMethods(header, assert, Ops, "[", as.Image)
 exportMethods(colorMode, "colorMode<-",imageData, "imageData<-")
 exportMethods(getNumberOfFrames)
@@ -30,7 +30,7 @@ exportMethods(edge,segment)
 exportMethods(thresh, athresh, cthresh)
 
 ## statistics
-export(median.Image)
+export(median.Image,quantile.Image)
 exportMethods(hist)
 
 ## image enhancement, restoration
@@ -72,6 +72,7 @@ export(chooseImage)
 
 ## misc
 exportMethods(frameDist)
+export(which)
 
 ## deprecated
 export(read.image, choose.image)

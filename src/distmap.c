@@ -87,6 +87,9 @@ SEXP distmap(SEXP _a, SEXP _metric) {
   SEXP res;
   int i,nprotect=0,nz;
 
+  // check validity
+  validImage(_a,0);
+
   // initialize width, height, dim
   width=INTEGER(GET_DIM(_a))[0];
   height=INTEGER(GET_DIM(_a))[1];

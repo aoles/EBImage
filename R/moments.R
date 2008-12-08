@@ -15,34 +15,36 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("cmoments", signature(x="IndexedImage", ref="Image"),
-  function (x, ref, ...) {
+setMethod ("cmoments", signature(x="ImageX", ref="ImageX"),
+  function (x, ref) {
     checkCompatibleImages(x,ref)
-    return( .DoCall("lib_cmoments", x, ref ) )
+    ref=ensureStorageMode(ref)
+    return( .ImageCall("lib_cmoments", x, ref ) )
   }
 )
 
-setMethod ("cmoments", signature(x="IndexedImage", ref="missing"),
-  function (x, ref, ...) {
+setMethod ("cmoments", signature(x="ImageX", ref="missing"),
+  function (x, ref) {
     checkCompatibleImages(x,ref)
-    return( .DoCall("lib_cmoments", x, NULL ) )
+    return( .ImageCall("lib_cmoments", x, NULL ) )
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("smoments", signature(x="IndexedImage", ref="Image"),
-  function (x, ref, pw=3, what="s", ...) {
+setMethod ("smoments", signature(x="ImageX", ref="ImageX"),
+  function (x, ref, pw=3, what="s") {
     checkCompatibleImages(x,ref)
+    ref=ensureStorageMode(ref)
     alg <- as.integer( switch(tolower(substr(what, 1, 1)), n=0, c=1, s=2, r=3, 2) )
     pw <- as.integer (pw)
     if ( pw < 1 || pw > 9 )
       stop("'pw' must be in the range [1,9]" )
-    return( .DoCall("lib_moments", x, ref, pw, alg ) )
+    return( .ImageCall("lib_moments", x, ref, pw, alg ) )
   }
 )
 
-setMethod ("smoments", signature(x="IndexedImage", ref="missing"),
-  function (x, ref, pw=3, what="s", ...) {
+setMethod ("smoments", signature(x="ImageX", ref="missing"),
+  function (x, ref, pw=3, what="s") {
     checkCompatibleImages(x,ref)
     alg <- as.integer( switch(tolower(substr(what, 1, 1)), c=1, s=2, r=3, 2) )
     pw <- as.integer (pw)
@@ -50,24 +52,25 @@ setMethod ("smoments", signature(x="IndexedImage", ref="missing"),
       stop("'pw' must be in the range [1,9]" )
     if ( alg == 3 && pw < 3 )
       stop( "'pw' must be at least 3 to calculate rotation invariant moments" )
-    return( .DoCall("lib_moments", x, NULL, pw, alg ) )
+    return( .ImageCall("lib_moments", x, NULL, pw, alg ) )
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("rmoments", signature(x="IndexedImage", ref="Image"),
+setMethod ("rmoments", signature(x="ImageX", ref="ImageX"),
   # this is a convenience function for smoments with what='r', pw=3
-  function (x, ref, ...) {
+  function (x, ref) {
     checkCompatibleImages(x,ref)
-    return( .DoCall("lib_moments", x, ref, as.integer(3), as.integer(3) ) )
+    ref=ensureStorageMode(ref)
+    return( .ImageCall("lib_moments", x, ref, as.integer(3), as.integer(3) ) )
   }
 )
 
-setMethod ("rmoments", signature(x="IndexedImage", ref="missing"),
+setMethod ("rmoments", signature(x="ImageX", ref="missing"),
   # this is a convenience function for smoments with what='r', pw=3
-  function (x, ref, ...) {
+  function (x, ref) {
     checkCompatibleImages(x,ref)
-    return( .DoCall("lib_moments", x, NULL, as.integer(3), as.integer(3) ) )
+    return( .ImageCall("lib_moments", x, NULL, as.integer(3), as.integer(3) ) )
   }
 )
 
@@ -118,28 +121,27 @@ setMethod ("rmoments", signature(x="IndexedImage", ref="missing"),
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("moments", signature(x="IndexedImage", ref="Image"),
-  function (x, ref, ...) {
+setMethod ("moments", signature(x="ImageX", ref="ImageX"),
+  function (x, ref) {
     checkCompatibleImages(x,ref)
     return( .momentsSummary(x, ref) )
   }
 )
 
-setMethod ("moments", signature(x="IndexedImage", ref="missing"),
-  function (x, ref, ...) {
+setMethod ("moments", signature(x="ImageX", ref="missing"),
+  function (x, ref) {
     checkCompatibleImages(x,ref)
     return( .momentsSummary(x) )
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("moments", signature(x="Image", ref="missing"),
+setMethod ("moments", signature(x="ImageX", ref="missing"),
   # in contrast to the above function, this considers one object per image
   # and processes the stack of images returning a summary of moments
-  function (x, ref, ...) {
+  function (x, ref) {
     ref <- x
     x[] <- 1
-    class(x) <- "IndexedImage"
     mom <- .momentsSummary(x=x, ref=ref)
     if ( getNumberOfFrames(x,'total') == 1 )
       return( mom )

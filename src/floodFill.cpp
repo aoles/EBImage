@@ -1,4 +1,5 @@
 #include "floodFill.h"
+#include "tools.h"
 
 /* -------------------------------------------------------------------------
 Flood fill for images and flood-fill-based hull filling for objects
@@ -24,8 +25,12 @@ template <class T> void _fillHullT(T *, const XYPoint &);
 /* -------------------------------------------------------------------------- */
 SEXP
 floodFill(SEXP x, SEXP point, SEXP col, SEXP tol) {
+  // check image validity
+  validImage(x,0);
+  
   int *dim = INTEGER(GET_DIM(x));
   XYPoint size(dim[0], dim[1]);
+  
   if (LENGTH(GET_DIM(x))>2 && dim[2]>1)
     warning("'floodFill' function is not defined for arrays or multi-frame images, the function will be applied to the first frame only");
   /* -1 as R has 1-based indexing */
@@ -54,11 +59,12 @@ floodFill(SEXP x, SEXP point, SEXP col, SEXP tol) {
 /* -------------------------------------------------------------------------- */
 SEXP
 fillHull(SEXP x) {
-/*  if (!IS_INTEGER(x))
-    error("'fillHull' is defined only for integer-based data");
-*/
-  int *dim = INTEGER(GET_DIM(x));
+  // check image validity
+  validImage(x,0);
+
+  int *dim=INTEGER(GET_DIM(x));
   XYPoint size(dim[0], dim[1]);
+
   /* check if array or multiple images */
   int nz = 1;
   if (LENGTH(GET_DIM(x))>2) nz = dim[2];

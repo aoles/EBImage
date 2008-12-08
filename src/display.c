@@ -54,8 +54,7 @@ lib_display(SEXP x, SEXP caption, SEXP nogtk) {
     pthread_t res;
 #endif
 
-    if ( !isImage(x) )
-        error ( "argument must be of class 'Image'" );
+    validImage(x,0);
 
 #ifdef USE_GTK
     if ( !LOGICAL(nogtk)[0] ) {
@@ -85,8 +84,7 @@ lib_animate (SEXP x) {
     pthread_t res;
 #endif
 
-    if ( !isImage(x) )
-        error ( "argument must be of class 'Image'" );
+    validImage(x,0);
 
 #ifdef WIN32
     error ( "animate function is not available on Windows because it uses ImageMagick interactive display" );

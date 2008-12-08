@@ -1,3 +1,12 @@
+2.7.8
+- validImage in C, removed isImage in C
+- merged IndexedImage class within Image, no IndexedImage class anymore !
+- removed spurious '...'
+- classUnion ImageX instead of Image !
+- now Image supports non-numeric storage.mode (e.g. logical) !
+- ImageCall instead of Call to check Image validity and storage.mode
+- deprecated: matchObject, stopIfNotImage
+
 2.7.7
 - reenumerate, hullFeatures, rmObjects, watershed: work fine on md and Color
 - watershed: fixed bug when used on distmap(lena>0.5)

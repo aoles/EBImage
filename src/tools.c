@@ -1,4 +1,6 @@
 #include "tools.h"
+#include <R.h>
+#include <Rdefines.h>
 
 /* -------------------------------------------------------------------------
 Package tools
@@ -42,19 +44,45 @@ indexFromXY (const int x, const int y, const int xsize) {
 }
 
 /*----------------------------------------------------------------------- */
+// test=0 will make validImage fail if x is not an image
+// test=1 will return 0 if x is not an Image
 int
-isImage (SEXP x) {
-    if ( strcmp( CHAR( asChar( GET_CLASS(x) ) ), "Image") != 0 && 
-         strcmp( CHAR( asChar( GET_CLASS(x) ) ), "IndexedImage") != 0) return 0;
-    if ( LENGTH( GET_DIM(x) ) < 2 ) return 0;
-    return 1;
+validImage (SEXP x,int test) {
+  int colorMode;
+  int *ip;
+  double *dp;
+  char *msg=NULL;
+
+  // check Nil
+  if (x==R_NilValue) msg="object is NULL";
+  else {
+    // check colormode
+    colorMode=getColorMode(x);
+    if (colorMode<0 || colorMode >2) msg="invalid colormode";
+    
+    // check dim
+    if (LENGTH(GET_DIM(x))<2) msg="object must contain at least two dimensions";
+    if (INTEGER(GET_DIM(x))[0]<1 || INTEGER(GET_DIM(x))[1]<1) msg="spatial dimensions of object must be higher than zero"; 
+    if (getNumberOfFrames(x,0)<1) msg="object must contain at least one frame";
+    
+    // check storage.mode
+    if (colorMode==MODE_TRUECOLOR) ip=INTEGER(x);
+    else dp=REAL(x);
+  }
+
+  if (test==0 && msg!=NULL) error(msg);
+  if (msg!=NULL) return(0);
+  else return(1);
 }
+
 
 /*----------------------------------------------------------------------- */
 int
 getColorMode(SEXP x) {
   int colorMode;
-  colorMode = INTEGER ( GET_SLOT(x, mkString("colormode") ) )[0];
+  if (strcmp( CHAR( asChar( GET_CLASS(x) ) ), "Image") == 0) colorMode=INTEGER(GET_SLOT(x, mkString("colormode")))[0];
+  else colorMode=0;
+
   return(colorMode);
 }
 

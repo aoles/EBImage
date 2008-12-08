@@ -22,6 +22,9 @@ lib_erode_dilate (SEXP x, SEXP kernel, SEXP iters, SEXP what) {
     PointXY size, ksize, pt;
     SEXP res;
 
+    validImage(x,0);
+    validImage(kernel,0);
+
     /* value to reset the checked part t */
     if ( INTEGER(what)[0] == DILATE )
         resetTo = 1.0; /* checking background, reseting to 1 */

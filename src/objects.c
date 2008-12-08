@@ -29,7 +29,8 @@ paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col) {
     double *dx,*dres,dp;
     int redstride,greenstride,bluestride;
 
-    if ( !isImage(x) || !isImage(tgt) ) return tgt;
+    validImage(x,0);
+    validImage(tgt,0);
 
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
@@ -97,10 +98,7 @@ paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col) {
         for ( j = 0; j < ny; j++ ) {
 	  data = &( REAL(x)[ im * nx * ny + j * nx ] );
 	  image = NULL;
-	  if ( tgtmode == MODE_TRUECOLOR )
-	    image = int2image1D ( &(INTEGER(res)[ im * nx * ny + j * nx ]), nx );
-	  if ( tgtmode == MODE_GRAYSCALE )
-	    image = double2image1D ( &(REAL(res)[ im * nx * ny + j * nx ]), nx );
+	  image = int2image1D ( &(INTEGER(res)[ im * nx * ny + j * nx ]), nx );
 	  if ( image == NULL ) continue;
 	  for ( i = 0; i < nx; i++ ) {
 	    if ( data[i] <= 0 ) continue;
@@ -127,10 +125,7 @@ paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col) {
 	    else
 	      pixelPtr->blue = QuantumRange;
 	  }
-	  if ( tgtmode == MODE_TRUECOLOR )
-	    image1D2int (image, &(INTEGER(res)[ im * nx * ny + j * nx ]), nx );
-	  if ( tgtmode == MODE_GRAYSCALE )
-	    image1D2double (image, &(REAL(res)[ im * nx * ny + j * nx ]), nx );
+	  image1D2int (image, &(INTEGER(res)[ im * nx * ny + j * nx ]), nx );
 	  image = DestroyImage (image);
         }
       }
@@ -149,7 +144,8 @@ matchObjects (SEXP x, SEXP ref) {
     int nprotect, nx, ny, nz, i, ix, jy, im, nobj;
     double * data, * ftrs;
 
-    if ( !isImage(x) || !isImage(ref) ) return x;
+    validImage(x,0);
+    validImage(ref,0);
 
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
@@ -211,7 +207,7 @@ rmObjects (SEXP x, SEXP _index) {
     int nprotect, nx, ny, nz, i, j, im, nobj, * indexes, found;
     double * data;
 
-    if ( !isImage(x) ) return x;
+    validImage(x,0);
 
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
@@ -221,8 +217,7 @@ rmObjects (SEXP x, SEXP _index) {
 
     PROTECT ( res = Rf_duplicate(x) );
     nprotect++;
-    SET_CLASS (res, mkString("IndexedImage") );
-
+   
     for ( im = 0; im < nz; im++ ) {
         /* get image data */
         data = &( REAL(res)[ im * nx * ny ] );

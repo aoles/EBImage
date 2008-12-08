@@ -43,7 +43,7 @@ lib_basic_hull (SEXP obj) {
     if ( nobj < 1 ) {
       no_objects = 1;
       nobj = 1; /* if no objects, create a matrix for 1 and fill all 0 */
-      warning("IndexedImage contains no objects");
+      warning("Image contains no objects");
     }
     else no_objects = 0;
     /* create features matrix */

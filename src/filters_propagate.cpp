@@ -75,8 +75,7 @@ lib_propagate (SEXP x, SEXP seeds_, SEXP mask_, SEXP ext_, SEXP lambda_) {
 
   PROTECT ( res = Rf_duplicate(x) );
   nprotect++;
-  SET_CLASS (res, mkString("IndexedImage") );
-
+ 
   /* we will keep distances here, reset for every new image */
   double * dists = new double[ nx * ny ];
 

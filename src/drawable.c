@@ -24,7 +24,7 @@ lib_drawText (SEXP obj, SEXP xylist, SEXP textlist, SEXP thefont, SEXP thecol) {
   Image * images, * image, * newimages;
   const char * str;
   
-  if ( !isImage(obj) ) error("'obj' must be an Image");
+  validImage(obj,0);
 
   mode = INTEGER( GET_SLOT(obj, mkString("colormode")) )[0];
   images = sexp2Magick(obj);

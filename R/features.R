@@ -15,7 +15,7 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("getFeatures", signature(x="IndexedImage"),
+setMethod ("getFeatures", signature(x="ImageX"),
   function (x, ref, N = 12, R = 30, apply.Gaussian=TRUE, nc = 256, pseudo=FALSE) {
     if ( !missing(ref) && is.Image(ref) && (colorMode(ref) == TrueColor) )
       .stop("\'ref\' must be an Image not in \'TrueColor\' color mode")
@@ -69,7 +69,7 @@ setMethod ("getFeatures", signature(x="IndexedImage"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("zernikeMoments", signature(x="IndexedImage", ref="Image"),
+setMethod ("zernikeMoments", signature(x="ImageX", ref="ImageX"),
   function(x, ref, N=12, R=30, apply.Gaussian=TRUE, pseudo=FALSE) {
     checkCompatibleImages(x,ref)
 
@@ -77,20 +77,23 @@ setMethod ("zernikeMoments", signature(x="IndexedImage", ref="Image"),
       xy <- moments(x=x, ref=ref)[, c(3,4), drop=FALSE]
     else
       xy <- lapply(moments(x=x, ref=ref), function(x) x[,c(3,4), drop=FALSE] )
+
+    ref=ensureStorageMode(ref)
+    
     if ( !pseudo )
-      return( .DoCall("lib_zernike", x, ref, xy, as.numeric(R), as.integer(N), as.integer(apply.Gaussian)) )
+      return( .ImageCall("lib_zernike", x, ref, xy, as.numeric(R), as.integer(N), as.integer(apply.Gaussian)) )
     else
-      return( .DoCall("lib_pseudo_zernike", x, ref, xy, as.numeric(R), as.integer(N), as.integer(apply.Gaussian)) )
+      return( .ImageCall("lib_pseudo_zernike", x, ref, xy, as.numeric(R), as.integer(N), as.integer(apply.Gaussian)) )
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("hullFeatures", signature(x="IndexedImage"),
+setMethod ("hullFeatures", signature(x="ImageX"),
   function(x) {
     if ( colorMode(x) == TrueColor )
       stop("this method doesn't support the \'TrueColor\' color mode")
     ## get basic hull features
-    res <- .DoCall( "lib_basic_hull", x )
+    res <- .ImageCall( "lib_basic_hull", x )
     if ( is.null(res) ) return( NULL )
     ## get central moments
     moms <- function(m) {
@@ -146,13 +149,13 @@ setMethod ("hullFeatures", signature(x="IndexedImage"),
   ## returns for each image a matrix of border points with for each
   ## object index in the first col, distance from the centre in the second
   ## and theta in third
-  res <- .DoCall("lib_edge_profile", x, xyt)
+  res <- .ImageCall("lib_edge_profile", x, xyt)
   ## profile will be calculated at these angle coordinates (-2Pi,+2Pi)
   xout <- (2*(0:(n-1))/(n-1) - 1) * pi
   ## this function will compose a profile matrix from the above matrix
   do.profile <- function(m, xyt, s) {
     if ( is.null(m) ) { # no objects return 1 line full of zeros
-      warning("IndexedImage contains no objects");
+      warning("Image contains no objects");
       return( matrix(0, ncol=n, nrow=1) )
     }
     ## object indexes for each record
@@ -199,7 +202,7 @@ setMethod ("hullFeatures", signature(x="IndexedImage"),
   res
 }
 
-setMethod ("edgeProfile", signature(x="IndexedImage"),
+setMethod ("edgeProfile", signature(x="ImageX"),
   function (x, ref, n=32, fft=TRUE, scale=TRUE, rotate=TRUE) {
     if ( missing(ref) ) 
       ref = NULL
@@ -212,7 +215,7 @@ setMethod ("edgeProfile", signature(x="IndexedImage"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("edgeFeatures", signature(x="IndexedImage"),
+setMethod ("edgeFeatures", signature(x="ImageX"),
   function (x, ref) {
     .dim <- dim(x)
     if ( missing(ref) ) ref <- NULL
@@ -230,7 +233,7 @@ setMethod ("edgeFeatures", signature(x="IndexedImage"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("haralickMatrix", signature(x="IndexedImage", ref="Image"),
+setMethod ("haralickMatrix", signature(x="ImageX", ref="ImageX"),
   function(x, ref, nc=32) {
     checkCompatibleImages(x,ref)
     rref <- range(ref)
@@ -239,13 +242,14 @@ setMethod ("haralickMatrix", signature(x="IndexedImage", ref="Image"),
       ref[ref>1] = 1
       warning( "Values in 'ref' have been limited to the range [0,1]" )
     }
-    res <- .DoCall( "lib_co_occurrence", x, ref, as.integer(nc) )
+    ref=ensureStorageMode(ref)
+    res <- .ImageCall( "lib_co_occurrence", x, ref, as.integer(nc) )
     return( res )
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("haralickFeatures", signature(x="IndexedImage", ref="Image"),
+setMethod ("haralickFeatures", signature(x="ImageX", ref="ImageX"),
   function(x, ref, nc=32) {
     hm <- haralickMatrix(x=x, ref=ref, nc=nc)
     if ( is.null(hm) || !(is.array(hm) || is.list(hm)) ) return( NULL )
