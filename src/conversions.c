@@ -20,17 +20,12 @@ sexp2Magick (SEXP x) {
     double *data2, *dp;
     int j,k,redstride,greenstride,bluestride;
 
-    /* basic checks */
-    if ( !isImage(x) )
-        error ( "argument must be of class 'Image'" );
+    validImage(x,0);
+
     dim = INTEGER ( GET_DIM(x) );
     nx = dim[0];
     ny = dim[1];
     nz = getNumberOfFrames(x,1);
-
-    if ( nx == 0 || ny == 0 || nz == 0 )
-      error("at least one dimension of the image is zero");
-
     colormode = getColorMode(x);
 
     /* conversion */

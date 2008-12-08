@@ -19,6 +19,21 @@
     .Call(name, ..., PACKAGE = "EBImage")
 }
 
+## .ImageCall valids an image and ensures that image storage.mode is the correct one
+## .ImageCall _must_ be called to call an EBImage image C function (since the validity of the image won't be check in the C code !)
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+.ImageCall <- function (name, x, ...) {
+  validObject(x)
+  x=ensureStorageMode(x)
+  .Call(name, x, ..., PACKAGE = "EBImage")
+}
+ensureStorageMode=function(x) {
+  validObject(x)
+  if (colorMode(x)!=TrueColor & storage.mode(imageData(x))!='double') storage.mode(imageData(x))='double'
+  if (colorMode(x)==TrueColor & storage.mode(imageData(x))!='integer') storage.mode(imageData(x))='integer'
+  x
+}
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 . <- function (string) {
   ##    .DoCall ("lib_", as.character(string) )
@@ -31,7 +46,7 @@
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("channel", signature(x="ANY", mode="character"),
-  function (x, mode, ...) {
+  function (x, mode) {
     mode <- tolower (mode)
     modeNo <- as.integer( switch (EXPR=mode, rgb=0, grey=, gray=1, r=, red=2, 
             g=, green=3, b=, blue=4, asred=5, asgreen=6, asblue=7, x11=8, -1) )
@@ -45,28 +60,6 @@ setMethod ("channel", signature(x="ANY", mode="character"),
     if ( is.null(res) || is.character(res) ) return (res)
     if ( is.array(x) ) dim (res) <- dim (x)
     return (res)
-  }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("floodFill", signature(x="array", pt="ANY"),
-  function(x, pt, col, tolerance=1e-3, ...) {
-    .dim = dim(x)
-    if (length(.dim)<2)
-      stop("'x' must have (at least) 2 dimensions")
-    pt = as.integer(pt)
-    if (length(pt)<2)
-      stop("'pt' must contain at least 2 values for x and y coordinates")
-    if (any(pt)<1 || any(pt[1:2]>.dim[1:2]))
-      stop("coordinates of the start point must be inside the image boundaries")
-    tolerance = as.numeric(tolerance)
-    if (missing(col)) col=x[pt[1]+pt[2]*.dim[1]]
-    # allows for conversion from X11 color string to its RGB or grayscale value
-    if (is.character(col))
-      col <- if (is.integer(x)) channel(col,"rgb") else channel(col,"gray")
-    else
-      col <- if (is.integer(x)) as.integer(col) else col=as.double(col)
-    return( .DoCall("lib_floodFill", x, pt, col, tolerance))
   }
 )
 

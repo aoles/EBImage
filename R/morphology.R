@@ -16,24 +16,24 @@
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## half width and height: moving frame will be 2 times + 1 px larger
-setMethod ("thresh", signature(x="Image"),
-    function (x, w=5, h=5, offset=0.01, ...) {
+setMethod ("thresh", signature(x="ImageX"),
+    function (x, w=5, h=5, offset=0.01) {
         if ( colorMode(x) == TrueColor )
             stop ( .("'thresh' doesn't support the \'TrueColor\' color mode, use the \'Color\' mode instead or 'athresh'") )
         if ( w < 2 || h < 2 )
             stop ( .("width 'w' and height 'h' must be larger than 1") )
-        return ( .DoCall("thresh", x, as.numeric( c(w, h, offset) ) ) )
+        return ( .ImageCall("thresh", x, as.numeric( c(w, h, offset) ) ) )
     }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("distmap", signature(x="Image"),
+setMethod ("distmap", signature(x="ImageX"),
   function (x, metric=c("euclidean",'manhattan')) {
     if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
     if (any(is.na(x))) stop("'x' shouldn't contain any NAs")
     metric=match.arg(metric)
     imetric=switch(metric,euclidean=0,manhattan=1)
-    return (.DoCall("distmap", x, as.integer(imetric)))
+    return (.ImageCall("distmap", x, as.integer(imetric)))
   }
 )
 
@@ -93,25 +93,25 @@ mkbox = function(n) {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("erode", signature(x="Image"),
+setMethod ("erode", signature(x="ImageX"),
     function (x, kern=morphKern(5), iter=1) {
       if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
       if ( iter < 1 ) stop ( .("'iter' must be a positive integer") )
-      return ( .DoCall("lib_erode_dilate", x, kern, as.integer(iter), as.integer(0) ) )
+      return ( .ImageCall("lib_erode_dilate", x, kern, as.integer(iter), as.integer(0) ) )
      }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("dilate", signature(x="Image"),
+setMethod ("dilate", signature(x="ImageX"),
     function (x, kern=morphKern(5), iter=1) {
       if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
       if ( iter < 1 ) stop ( .("'iter' is assumed to be a positive integer") )    
-      return ( .DoCall("lib_erode_dilate", x, kern, as.integer(iter), as.integer(1) ) )
+      return ( .ImageCall("lib_erode_dilate", x, kern, as.integer(iter), as.integer(1) ) )
     }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("opening", signature(x="Image"),
+setMethod ("opening", signature(x="ImageX"),
     function (x, kern=morphKern(5), iter=1) {
       y=erode(x, kern, iter)
       dilate (y, kern, iter)
@@ -119,7 +119,7 @@ setMethod ("opening", signature(x="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("closing", signature(x="Image"),
+setMethod ("closing", signature(x="ImageX"),
     function (x, kern=morphKern(5), iter=1) {
       y=dilate(x, kern, iter)
       erode (y, kern, iter)

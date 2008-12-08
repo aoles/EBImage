@@ -25,7 +25,7 @@ test=function(x) {
   ## imageData, imageData, colorMode, colorMode<-, print
   ## [, getNumberOfFrames
   cat('new test\n')
-  check('print',x)
+  if (class(x)=='Image') check('print',x)
   y=Image(x,colormode=Color)
   a=is.Image(y)
   y=check('>',x,0.5)
@@ -56,7 +56,7 @@ test=function(x) {
 
   ## edge, segment
   y=check('edge',x)
-  if (colorMode(y)!=TrueColor) y=check('segment',x) ## too slow in TrueColor
+  if (colorMode(x)!=TrueColor) y=check('segment',x) ## too slow in TrueColor
   y=check('thresh',x)
   y=check('athresh',x)
   y=check('cthresh',x)
@@ -102,6 +102,7 @@ test=function(x) {
   y=check('untile',x,c(2,2))
 
   ## hullFeatures, rmObjects, reenumerate, getFeatures (contains hullFeatures, edgeFeatures, haralickFeatures, zernikeMoments, moments)
+  ## paintObjects
   w=ws
   w[w@.Data==1]=2
   w[w@.Data==3]=2117
@@ -112,36 +113,44 @@ test=function(x) {
   rmindex = lapply(hf, function(c) which(c[,'h.s']<10))
   w=check('rmObjects',w,rmindex)
   y=check('getFeatures',w,x)
+  ##y=check('paintObjects',w,x)
   cat('\n')
 }
 
-## Gray - 1 image - 2 dim
-x=readImage('../lena.gif')
-test(x)
-
-## Gray - 1 image - 3 dim
-dim(x)=c(512,512,1) 
-test(x)
-
-## Gray - 3 images - 3 dim
-x=combine(x,flip(x),flop(x))
-test(x)
-
-## Color - 1 image - 3 dim
-colorMode(x)=Color
-test(x)
-
-## Color - 1 image - 4 dim
-dim(x)=c(dim(x),1)
-test(x)
-
-## Color - 3 images - 4 dim
-x=combine(x,x,x)
-test(x)
-
-## TrueColor - 3 images - 3 dim
-x=Image(x,colormode=TrueColor)
-test(x)
+if (!exists('x')) {
+  ## Gray - 1 image - 2 dim
+  x=readImage('../lena.gif')
+  test(x)
+  
+  ## Gray - 1 image - 3 dim
+  dim(x)=c(512,512,1) 
+  test(x)
+  
+  ## Gray - 2 images - 3 dim - logical
+  x=combine(x,flip(x))
+  y=x>0.5
+  test(y)
+  
+  ## Color - 1 image - 3 dim
+  colorMode(x)=Color
+  test(x)
+  
+  ## Color - 1 image - 4 dim
+  dim(x)=c(dim(x),1)
+  test(x)
+  
+  ## Color - 2 images - 4 dim
+  x=combine(x,x)
+  test(x)
+  
+  ## TrueColor - 3 images - 3 dim
+  x=Image(x,colormode=TrueColor)
+  test(x)
+  
+  ## matrix - 1 images - 2 dim
+  x=imageData(readImage('../lena.gif'))
+  test(x)
+}
 
 ##
 scratch=function() {
@@ -169,4 +178,10 @@ scratch=function() {
   if (!is.list(hf)) hf=list(hf)
   rmindex = lapply(hf, function(c) which(c[,'h.s']<10))
   x2=check('rmObjects',x,rmindex)
+
+  ## logical 
+  z=Image(0,dim=c(3,3))
+  x=z
+  x[2,2:3]=1
+  z[x]=2
 }

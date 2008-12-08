@@ -23,7 +23,8 @@ thresh (SEXP x, SEXP param) {
     int sx, ex, sy, ey;
     double offset, * tgt, * src, sum, mean, nFramePix;
     SEXP res;
-
+    
+    validImage(x,0);
 
     dim = INTEGER ( GET_DIM(x) );
     nx = dim[0];

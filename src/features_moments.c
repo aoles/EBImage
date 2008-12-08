@@ -12,7 +12,7 @@ See: ../LICENSE for license, LGPL
 # define  IND(I,X,Y) (X) + (Y)*(N+1) + (I)*(N+1)*(N+1)
 
 /* calculates size, M00, M10/M00, M01/M00 for all indexed objects */
-/* obj is an IndexedImage here and ref is a grayscale one */
+/* obj is an Image here and ref is a grayscale one */
 SEXP
 lib_cmoments (SEXP obj, SEXP ref) { 
   int nprotect, nx, ny, nz, im, i, x, y, nobj, no_objects;
@@ -24,11 +24,11 @@ lib_cmoments (SEXP obj, SEXP ref) {
   nz = getNumberOfFrames(obj,0);
   nprotect = 0;
 
-  if ( isImage(ref) )
+  if (validImage(ref,1) )
     if ( INTEGER(GET_DIM(ref))[0] != nx || INTEGER(GET_DIM(ref))[1] != ny ||
          getNumberOfFrames(ref,0) != nz )
       error( "'ref' image is present, but has different size than 'obj'" );
-
+  
   PROTECT( res = allocVector(VECSXP, nz) );
   nprotect++;
 
@@ -57,7 +57,7 @@ lib_cmoments (SEXP obj, SEXP ref) {
     if ( nobj < 1 ) {
       no_objects = 1;
       nobj = 1; /* if no objects, create a matrix for 1 and fill all 0 */
-      warning("IndexedImage contains no objects");
+      warning("Image contains no objects");
     }
     else no_objects = 0;
     /* create result storage */
@@ -108,7 +108,7 @@ lib_cmoments (SEXP obj, SEXP ref) {
 
 
 /* calculates all requested moments */
-/* obj is an IndexedImage here and ref is a grayscale one */
+/* obj is an Image here and ref is a grayscale one */
 SEXP
 lib_moments (SEXP obj, SEXP ref, SEXP pw, SEXP what) { 
   int nprotect, nx, ny, nz, im, i, x, y, ix, iy, nobj, N, alg;

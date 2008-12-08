@@ -21,25 +21,33 @@ drawfont <- function(family=switch(.Platform$OS.type, windows="Arial", "helvetic
   class(res) <- "DrawFont"
   res
 }
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("drawtext", signature(img="Image", xy="numeric", labels="character"),
-  function(img, xy, labels, font, col, ...) {
+setMethod ("drawtext", signature(img="ImageX", xy="numeric", labels="character"),
+  function(img, xy, labels, font, col) {
     if ( missing(font) ) font <- drawfont()
     if ( missing(col) ) col <- "white"
-    drawtext(img, list(as.numeric(xy)), list(labels), font, col, ...)
+    drawtext(img, list(as.numeric(xy)), list(labels), font, col)
   }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("drawtext", signature(img="Image", xy="matrix", labels="character"),
-  function(img, xy, labels, font, col, ...) {
+setMethod ("drawtext", signature(img="ImageX", xy="matrix", labels="character"),
+  function(img, xy, labels, font, col) {
     if ( missing(font) ) font <- drawfont()
     if ( missing(col) ) col <- "white"
-    drawtext(img, list(as.numeric(xy)), list(labels), font, col, ...)
+    drawtext(img, list(as.numeric(xy)), list(labels), font, col)
   }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("drawtext", signature(img="Image", xy="list", labels="list"),
-  function(img, xy, labels, font, col, ...) {
+setMethod ("drawtext", signature(img="ImageX", xy="list", labels="list"),
+  function(img, xy, labels, font, col) {
+
+    ## Mac stop: imageMagick/MagickWand/drawtext doesn't understand MacOS fonts
+    if ( length(grep("apple", Sys.getenv("R_PLATFORM")))>0) {
+      warning('drawtext doesn\'t work on Mac OS due to ImageMagick/Mac OS fonts incompatibility')
+      return(img)
+    }
+    
     if (length(xy) != length(labels) || length(xy) != getNumberOfFrames(img,'render'))
       stop("lists of coordinates 'xy' labels 'labels' must be of the same length as the number of render frames")
     xy <- lapply(xy, as.numeric)
@@ -54,11 +62,7 @@ setMethod ("drawtext", signature(img="Image", xy="list", labels="list"),
     font$size <- as.numeric(font$size)
     font$weight <- as.numeric(font$weight)
     font$antialias <- as.logical(font$antialias)
-    if (is(img, "IndexedImage")) {
-      img = normalize(img)
-      warning("IndexedImage 'img' is normalized to [0,1] prior to applying the filter")
-    }
-    return(.DoCall("lib_drawText", img, xy, labels, font, col))
+    return(.ImageCall("lib_drawText", img, xy, labels, font, col))
   }
 )
   

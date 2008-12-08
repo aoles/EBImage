@@ -16,9 +16,14 @@
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-setMethod("filter2", signature(x="array",filter="array"),
+setMethod("filter2", signature(x="ImageX",filter="ImageX"),
   function(x, filter) {
+    validObject(x)
+    validObject(filter)
+    if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
+    
     df = dim(filter)
+    
     if (any(df%%2==0) || df[1]!=df[2])
       stop("dimensions of 'filter' matrix must be equal and odd")
     dx = dim(x)
@@ -51,13 +56,5 @@ setMethod("filter2", signature(x="array",filter="array"),
   }
 )
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-setMethod("filter2", signature(x="Image",filter="array"),
-  function(x, filter) {
-    if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
-    imageData(x) = filter2(imageData(x),filter)
-    x
-  }
-)
 
 

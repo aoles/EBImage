@@ -15,8 +15,8 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("floodFill", signature(x="array", pt="ANY"),
-  function(x, pt, col, tolerance=1e-3, ...) {
+setMethod("floodFill", signature(x="ImageX", pt="ANY"),
+  function(x, pt, col, tolerance=1e-3) {
     .dim = dim(x)
     pt = as.integer(pt)
     if (length(pt)<2)
@@ -30,7 +30,13 @@ setMethod("floodFill", signature(x="array", pt="ANY"),
       col <- if (is.integer(x)) channel(col,"rgb") else channel(col,"gray")
     else
       col <- if (is.integer(x)) as.integer(col) else col=as.double(col)
-    return( .DoCall("floodFill", x, pt, col, tolerance))
+    return( .ImageCall("floodFill", x, pt, col, tolerance))
   }
 ) 
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod("fillHull", signature(x="ImageX"),
+  function(x) {
+    return(.ImageCall("fillHull", x))
+  }
+)

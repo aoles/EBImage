@@ -15,42 +15,42 @@ choose.image <- function(colormode=Grayscale) {
   chooseImage(colormode)
 }
 
-setMethod ("hull.features", signature(x="IndexedImage"),
+setMethod ("hull.features", signature(x="ImageX"),
   function(x, ...) {
     .Deprecated("hullFeatures", "EBImage")
     hullFeatures(x, ...)
   }
 )
 
-setMethod ("edge.profile", signature(x="IndexedImage"),
+setMethod ("edge.profile", signature(x="ImageX"),
   function (x, ...) {
     .Deprecated("edgeProfile", "EBImage")
     edgeProfile(x, ...)
   }
 )
 
-setMethod ("edge.features", signature(x="IndexedImage"),
+setMethod ("edge.features", signature(x="ImageX"),
   function (x, ...) {
     .Deprecated("edgeFeatures", "EBImage")
     edgeFeatures(x, ...)
   }
 )
 
-setMethod ("haralick.matrix", signature(x="IndexedImage", ref="Image"),
+setMethod ("haralick.matrix", signature(x="ImageX", ref="ImageX"),
   function(x, ref, ...) {
     .Deprecated("haralickMatrix", "EBImage")
     haralickMatrix(x, ref, ...)
   }
 )
 
-setMethod ("haralick.features", signature(x="IndexedImage", ref="Image"),
+setMethod ("haralick.features", signature(x="ImageX", ref="ImageX"),
   function(x, ref, ...) {
     .Deprecated("haralickFeatures", "EBImage")
     haralickFeatures(x, ref, ...)
   }
 )
 
-setMethod ("zernike.moments", signature(x="IndexedImage", ref="Image"),
+setMethod ("zernike.moments", signature(x="ImageX", ref="ImageX"),
   function(x, ref, ...) {
     .Deprecated("zernikeMoments", "EBImage")
     zernikeMoments(x, ref, ...)
@@ -58,7 +58,7 @@ setMethod ("zernike.moments", signature(x="IndexedImage", ref="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-setMethod("frameDist", signature(x="Image",y="Image"),
+setMethod("frameDist", signature(x="ImageX",y="ImageX"),
   function(x, y, r, g, b, blur=TRUE, method="dist", verbose, ...) {
     if (missing(verbose)) verbose = options()$verbose
     if (colorMode(x)!=colorMode(y))
@@ -104,3 +104,20 @@ setMethod("frameDist", signature(x="Image",y="missing"),
     return(.Call("lib_frameDist", x, x, weights, method, as.integer(verbose)))
   }
 )
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+setMethod ("matchObjects", signature(x="ImageX", ref="ImageX"),
+  function (x, ref, ...) {
+    if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")
+   
+    if ( !assert(x, ref, strict=TRUE) )
+      .stop( "dim(x) must equal dim(ref), 'ref' must be Grayscale" )
+    return ( .ImageCall ("matchObjects", x, ref) )
+  }
+)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+stopIfNotImage <- function (x) {
+  if ( !is.Image(x) ) stop( "argument must be of class 'Image'" )
+  invisible (NULL)
+}

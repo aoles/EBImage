@@ -38,8 +38,7 @@ watershed (SEXP x, SEXP _tolerance, SEXP _ext) {
 
     PROTECT ( res = Rf_duplicate(x) );
     nprotect++;
-    SET_CLASS (res, mkString("IndexedImage") );
-
+  
     int * index = new int[ nx * ny ];
 
     for ( im = 0; im < nz; im++ ) {

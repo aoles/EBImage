@@ -1,5 +1,3 @@
-# IndexedImage class definitions and methods
-
 # Copyright (c) 2005-2007 Oleg Sklyar
 
 # This library is free software; you can redistribute it and/or
@@ -15,8 +13,8 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("paintObjects", signature(x="IndexedImage", tgt="Image"),
-  function (x, tgt, opac=c(0.4, 0.05, 0.4), col=c("#FFC72C","#5BABF6","#FF372C"), ...) {
+setMethod ("paintObjects", signature(x="ImageX", tgt="ImageX"),
+  function (x, tgt, opac=c(0.4, 0.05, 0.4), col=c("#FFC72C","#5BABF6","#FF372C")) {
     if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")
     
     if ( any( dim(x)[1:2] != dim(tgt)[1:2] ) )
@@ -31,24 +29,13 @@ setMethod ("paintObjects", signature(x="IndexedImage", tgt="Image"),
     if ( any(opac < 0) || any(opac > 1) )
       .stop("all opacity values must be in the range [0,1]" )
     col <- as.character (col)
-    return ( .DoCall("paintObjects", x, tgt, opac, col) )
+    return ( .ImageCall("paintObjects", x, tgt, opac, col) )
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("matchObjects", signature(x="IndexedImage", ref="IndexedImage"),
-  function (x, ref, ...) {
-    if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")
-   
-    if ( !assert(x, ref, strict=TRUE) )
-      .stop( "dim(x) must equal dim(ref), 'ref' must be Grayscale" )
-    return ( .DoCall ("matchObjects", x, ref) )
-  }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("stackObjects", signature(x="IndexedImage", ref="Image", index="missing"),
-  function (x, ref, index, combine, rotate, bg.col, ext, centerby, rotateby, ...) {
+setMethod ("stackObjects", signature(x="ImageX", ref="ImageX", index="missing"),
+  function (x, ref, index, combine, rotate, bg.col, ext, centerby, rotateby) {
     if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")
     dimx <- dim(x)
     if ( any(dimx != dim(ref)) )
@@ -99,7 +86,7 @@ setMethod ("stackObjects", signature(x="IndexedImage", ref="Image", index="missi
     hdr <- header(ref)
     hdr@.Data <- array(col, c(1,1,1))
     if (dimx[3]==1) xyt = xyt[[1]]
-    res <- .Call ("stackObjects", x, ref, hdr, xyt, as.numeric(ext), as.integer(rotate))
+    res <- .ImageCall ("stackObjects", x, ref, hdr, xyt, as.numeric(ext), as.integer(rotate))
     if (!combine || !is.list(res)) return( res )
 #    ## if we are here, we have more than one frame and hf is a list
 #    ## index of frames with no objects, these are to remove
@@ -111,19 +98,19 @@ setMethod ("stackObjects", signature(x="IndexedImage", ref="Image", index="missi
   }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("stackObjects", signature(x="IndexedImage", ref="Image", index="character"),
-  function (x, ref, index, ...) {
+setMethod ("stackObjects", signature(x="ImageX", ref="ImageX", index="character"),
+  function (x, ref, index) {
     index <- strsplit(index, ".", fixed=TRUE)
     fct <- unlist(lapply(index, function(x) x[1]))
     index <- split( as.numeric(unlist(lapply(index, function(x) x[2]))), fct )
     if ( dim(x)[3] == 1 )
-      return( stackObjects(x, ref, index=as.numeric(index), ...) )
-    stackObjects(x, ref, index=index, ...)
+      return( stackObjects(x, ref, index=as.numeric(index)) )
+    stackObjects(x, ref, index=index)
   }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("stackObjects", signature(x="IndexedImage", ref="Image", index="list"),
-  function (x, ref, index, combine, ...) {
+setMethod ("stackObjects", signature(x="ImageX", ref="ImageX", index="list"),
+  function (x, ref, index, combine) {
     if ( missing(combine) )
       combine <- FALSE
     .dim <- dim(x)
@@ -136,7 +123,7 @@ setMethod ("stackObjects", signature(x="IndexedImage", ref="Image", index="list"
         stop("if 'index' is an unnamed list, its length must be equal to the number of frames")
       names(index) <- 1:(.dim[3])
     }
-    s <- stackObjects(x, ref, combine=FALSE, ...)
+    s <- stackObjects(x, ref, combine=FALSE)
     if ( .dim[3] == 1 ) s <- list(s)
     res <- list()
     for ( i in as.numeric(names(index)) ) {
@@ -150,37 +137,37 @@ setMethod ("stackObjects", signature(x="IndexedImage", ref="Image", index="list"
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("stackObjects", signature(x="IndexedImage", ref="Image", index="numeric"),
-  function (x, ref, index, ...) {
+setMethod ("stackObjects", signature(x="ImageX", ref="ImageX", index="numeric"),
+  function (x, ref, index) {
     .dim <- dim(x)
     if ( .dim[3] > 1 )
       stop("index cannot be numeric if there is more than 1 frame in 'x', consider character or list-type index")
-    s <- stackObjects(x, ref, ...)
+    s <- stackObjects(x, ref)
     if ( sum(index > dim(s)[3]) > 0 ) index <- index[ index <= dim(s)[3] ]
     return( s[,,index] )
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("rmObjects", signature(x="IndexedImage", index="list"),
+setMethod ("rmObjects", signature(x="ImageX", index="list"),
   function (x, index) {
     if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")
     index <- lapply (index, as.integer)
-    return ( .DoCall ("rmObjects", x, index ) )
+    return ( .ImageCall ("rmObjects", x, index ) )
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("rmObjects", signature(x="IndexedImage", index="numeric"),
+setMethod ("rmObjects", signature(x="ImageX", index="numeric"),
   function (x, index) {
     if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")
     index <- list( as.integer(index) )
-    return ( .DoCall ("rmObjects", x, index ) )
+    return ( .ImageCall ("rmObjects", x, index ) )
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("reenumerate", signature(x="IndexedImage"),
+setMethod("reenumerate", signature(x="ImageX"),
   function(x) {
     if (any(max(x)<0)) stop("'x' contains negative values and is incorrectly formed")
     validObject(x)
@@ -189,7 +176,7 @@ setMethod("reenumerate", signature(x="IndexedImage"),
     storage.mode(x)='integer'
     dim(x)=c(.dim[1:2],getNumberOfFrames(x,'total'))
 
-    x@.Data = apply(imageData(x), 3, function(im) {
+    imageData(x) = apply(imageData(x), 3, function(im) {
       from = as.integer(names(table(im)))
       to = seq_along(from)-1
       to[match(im, from)]

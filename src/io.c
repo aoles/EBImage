@@ -147,7 +147,8 @@ lib_writeImages (SEXP x, SEXP files, SEXP quality) {
     ExceptionInfo exception;
 
     /* basic checks */
-    if ( !isImage(x) ) error ( "argument must be of class 'Image'" );
+    validImage(x,0);
+
     images = sexp2Magick (x);
     nz = GetImageListLength(images);
  

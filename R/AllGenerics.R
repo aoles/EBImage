@@ -27,6 +27,7 @@ setGeneric ("imageData<-",    function (x, value)      standardGeneric("imageDat
 setGeneric ("getNumberOfFrames",function (x, ...)      standardGeneric("getNumberOfFrames") )
 
 ## image IO, display
+setGeneric ("display",        function (x, ...)        standardGeneric("display") )
 setGeneric ("animate",        function (x, ...)        standardGeneric("animate") )
 setGeneric ("writeImage",     function (x, ...)        standardGeneric("writeImage") )
 setGeneric ("image",          function (x, ...)        standardGeneric("image") )

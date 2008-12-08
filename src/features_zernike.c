@@ -48,7 +48,8 @@ lib_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP applyGaussi
   double * v; /* array of Vnl factors for n, l, m (everything but pow(d,...) and e^ilT) */
   int    * z; /* array of Z feature indexes from n, l */
 
-  if ( !isImage(obj) ) return R_NilValue;
+  validImage(obj,0);
+
   nx = INTEGER ( GET_DIM(obj) )[0];
   ny = INTEGER ( GET_DIM(obj) )[1];
   nz = getNumberOfFrames(obj,0);
@@ -112,7 +113,7 @@ lib_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP applyGaussi
     if ( nobj < 1 ) {
       no_objects = 1;
       nobj = 1; /* if no objects, create a matrix for 1 and fill all 0 */
-      warning("IndexedImage contains no objects");
+      warning("Image contains no objects");
     }
     else no_objects = 0;
     
@@ -203,7 +204,8 @@ lib_pseudo_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP appl
   double * v; /* array of Vnl factors for n, l, m (everything but pow(d,...) and e^ilT) */
   int    * z; /* array of Z feature indexes from n, l */
 
-  if ( !isImage(obj) ) return R_NilValue;
+  validImage(obj,0);
+
   nx = INTEGER ( GET_DIM(obj) )[0];
   ny = INTEGER ( GET_DIM(obj) )[1];
   nz = getNumberOfFrames(obj,0);
@@ -266,7 +268,7 @@ lib_pseudo_zernike ( SEXP obj, SEXP ref, SEXP xy_list, SEXP R, SEXP N, SEXP appl
     if ( nobj < 1 ) {
       no_objects = 1;
       nobj = 1; /* if no objects, create a matrix for 1 and fill all 0 */
-      warning("IndexedImage contains no objects");
+      warning("Image contains no objects");
     }
     else no_objects = 0;
     

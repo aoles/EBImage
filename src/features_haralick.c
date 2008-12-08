@@ -18,7 +18,8 @@ lib_co_occurrence (SEXP obj, SEXP ref, SEXP cgrades) {
   int nx, ny, nz, nprotect, im, x, y, nobj, index, i, nc, colthis, colthat, no_objects, * ncomp;
   double * data, * refdata, * cmdata;
 
-  if ( !isImage(obj) || !isImage(ref) ) return R_NilValue;
+  if ( !validImage(obj,1) || !validImage(ref,1) ) return R_NilValue;
+
   nx = INTEGER ( GET_DIM(obj) )[0];
   ny = INTEGER ( GET_DIM(obj) )[1];
   nz = getNumberOfFrames(obj,0);
@@ -45,7 +46,7 @@ lib_co_occurrence (SEXP obj, SEXP ref, SEXP cgrades) {
     if ( nobj < 1 ) {
       no_objects = 1;
       nobj = 1; /* if no objects, create a matrix for 1 and fill all 0 */
-      warning("IndexedImage contains no objects");
+      warning("Image contains no objects");
     }
     else no_objects = 0;
     /* create features matrix */

@@ -1,10 +1,9 @@
 md means multi-dimensional modes
-
 - floodFill: check md and Color
 - fillHull works only with IndexedImage
-- documentation: major update to be done
+- doc: major update to be done
 - drawtext: check md and Color (IM, should be OK)
-- classUnion between Image, array and matrix
+- propagate: check md and Color
 - paintObjects, matchObjects, stackObjects: check md and Color
 - remove lib_ things
 - installation: ease the installation on MacOS
@@ -13,18 +12,21 @@ md means multi-dimensional modes
 - merge morphKern, mkball and mkbox
 - merge animate and display
 - change colormode/colorMode case
-- main doc EBImage
+- doc: main doc EBImage
 - default arguments to be checked
-- overuse of '...'
 - clean display.c (winStr, newPixbufFromImages to remove)
-- merge IndexedImage class within Image
 - assert is misnamed
 - image, hist: are they useful ?
 - tresh, athresh, cthresh: documentation
 - naiveSegment: to implement
 - check previous vignette
-- features precise documentation
-- w[w==1]=2 doesn't work as w[w@.Data==1]=2 does, due to to the 'numeric' to 'logical' cast
+- doc: precise doc for features
 - check features values with current EBImage release
-- edgeFeatures hangs on md 
-- warnings and check edgeFeatures values with current EBImage release on edgeFeatures(watershed(distmap(lena>0.5)),x)
+- subset [1,1:10] or [1:10,1] doesn't have the good orientation
+- matrix: channel 4, untile, getFeatures FAILED
+- out of range [0:1] normalize for Magick
+- channel extra in tools.R
+- x11 channel
+- check display colorize and main
+- ref, checkCompatible should test for validity and storage.mode of ref
+
