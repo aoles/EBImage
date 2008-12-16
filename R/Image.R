@@ -251,8 +251,7 @@ setMethod ("writeImage", signature(x="ImageX"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 readImage <- function(files, colormode) {
-  if ( missing(files) )
-    stop("argument 'files' must be present in calls to 'readImage'")
+  if (missing(files)) stop("argument 'files' must be present in calls to 'readImage'")
   if (missing(colormode)) colormode=-1
   .DoCall ("lib_readImages", as.character(files), as.integer(colormode) )
 }

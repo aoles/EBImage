@@ -53,11 +53,16 @@ lib_readImages (SEXP files, SEXP mode) {
         else
             file = CHAR ( asChar(files) );
         strcpy (image_info->filename, file);
-        image = ReadImage (image_info, &exception);
 
-        CatchException (&exception);
+	// Prevent an ImageMagick bug when file is an empty string or NULL
+	if (file==NULL) image=NULL;
+	else if (strlen(file)==0) image=NULL;
+	else {
+	  image = ReadImage (image_info, &exception);
+	  CatchException (&exception);
+	}
         if ( image == (Image *)NULL ) {
-            warning ( "requested image not found or could not be loaded" );
+            warning ("requested image not found or could not be loaded" );
             continue;
         }
 
@@ -70,6 +75,7 @@ lib_readImages (SEXP files, SEXP mode) {
        
         /* do not destroy image here */
         AppendImageToList (&images, image);
+
         if ( nappends == 0 ) {
             /* set all attributes from the first image */
             strcpy (images->filename, image->filename);
@@ -82,6 +88,7 @@ lib_readImages (SEXP files, SEXP mode) {
     /* do not update image properties here because if no image was added to
     the list it will cause segfault, or use GetImageListLength first to check size */
     image_info = DestroyImageInfo (image_info);
+
     /* convert image list into R object */
     res = magick2SEXP (images, _mode);
     images = DestroyImageList (images);

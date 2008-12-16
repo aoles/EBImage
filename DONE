@@ -1,3 +1,6 @@
+2.7.10
+- fixed ReadImage bug when filename=''
+
 2.7.9
 - created tile.c, tile.h
 - out of range [0:1] normalize for Magick
