@@ -1,32 +1,31 @@
 md means multi-dimensional modes
+high:
 - floodFill: check md and Color
 - fillHull works only with IndexedImage
-- doc: major update to be done
+- doc: major update to be done (main + features + cthresh + athresh)
 - drawtext: check md and Color (IM, should be OK)
 - propagate: check md and Color
 - paintObjects, matchObjects, stackObjects: check md and Color
-- remove lib_ things
 - installation: ease the installation on MacOS
+- merge morphKern, mkball and mkbox
+- check previous vignette
+- check features values with current EBImage release
+- channel: two methods, rewrite vignette and usecases
+
+low:
+- remove lib_ things
 - toremove: enhance (vague)
 - toremove: header (not useful anymore)
-- merge morphKern, mkball and mkbox
 - merge animate and display
 - change colormode/colorMode case
-- doc: main doc EBImage
 - default arguments to be checked
 - clean display.c (winStr, newPixbufFromImages to remove)
 - assert is misnamed
 - image, hist: are they useful ?
-- tresh, athresh, cthresh: documentation
 - naiveSegment: to implement
-- check previous vignette
-- doc: precise doc for features
-- check features values with current EBImage release
 - subset [1,1:10] or [1:10,1] doesn't have the good orientation
-- matrix: channel 4, untile, getFeatures FAILED
-- out of range [0:1] normalize for Magick
-- channel extra in tools.R
-- x11 channel
 - check display colorize and main
 - ref, checkCompatible should test for validity and storage.mode of ref
+
+
 

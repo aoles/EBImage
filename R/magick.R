@@ -41,6 +41,23 @@ flt.modulate  <- as.integer(20)
 flt.negate    <- as.integer(21)
 flt.norm      <- as.integer(22)
 
+## Normalize to [0;1] if needed and go back to the original scale since ImageMagick assumes that image values are within [0;1]
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ImageMagickCall=function(x,flt,...) {
+  norm=FALSE
+  r=range(x)
+  min=r[1]
+  scale=r[2]-r[1]
+  if (scale==0.0) scale=1
+  if (min<0 | scale>1) {
+    norm=TRUE
+    x=(x-min)/scale
+  }
+  y=.ImageCall("lib_filterMagick",x,flt,...)
+  if (norm) y=y*scale+min
+  y
+}
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("blur", signature(x="ImageX"),
   function (x, r=0, s=0.5) {
@@ -48,7 +65,7 @@ setMethod ("blur", signature(x="ImageX"),
       stop("values of 'r' and 's' must be positive, set r=0 for automatic radius")
     if (r <= s && r != 0)
       warning("for reasonable results, 'r' should be larger than 's'")      
-    return(.ImageCall("lib_filterMagick", x, flt.blur, as.numeric(c(r, s))))
+    return(ImageMagickCall(x, flt.blur, as.numeric(c(r, s))))
   }
 )
 
@@ -59,14 +76,14 @@ setMethod ("gblur", signature(x="ImageX"),
       stop("values of 'r' and 's' must be positive, set r=0 for automatic radius")
     if (r <= s && r != 0)
       warning("for reasonable results, 'r' should be larger than 's'")    
-    return(.ImageCall("lib_filterMagick", x, flt.gaussblur, as.numeric(c(r, s))))
+    return(ImageMagickCall(x, flt.gaussblur, as.numeric(c(r, s))))
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("contrast", signature(x="ImageX"),
   function (x, sharpen=TRUE) {     
-    return(.ImageCall("lib_filterMagick", x, flt.contrast, as.numeric(sharpen)))
+    return(ImageMagickCall(x, flt.contrast, as.numeric(sharpen)))
   }
 )
 
@@ -75,35 +92,35 @@ setMethod ("denoise", signature(x="ImageX"),
   function (x, r=0) {
     if (r < 0)
       stop("'r' must be positive, set r=0 for automatic selection")    
-    return(.ImageCall("lib_filterMagick", x, flt.denoise, as.numeric(r)))
+    return(ImageMagickCall(x, flt.denoise, as.numeric(r)))
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("despeckle", signature(x="ImageX"),
   function (x) {     
-    return(.ImageCall ("lib_filterMagick", x, flt.despeckle, as.numeric(0)))
+    return(ImageMagickCall (x, flt.despeckle, as.numeric(0)))
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("edge", signature(x="ImageX"),
   function (x, r=0) {  
-    return(.ImageCall("lib_filterMagick", x, flt.edge, as.numeric(r)))
+    return(ImageMagickCall(x, flt.edge, as.numeric(r)))
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("enhance", signature(x="ImageX"),
   function (x) {     
-    return(.ImageCall("lib_filterMagick", x, flt.enhance, as.numeric(0)))
+    return(ImageMagickCall(x, flt.enhance, as.numeric(0)))
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("equalize", signature(x="ImageX"),
   function (x) {    
-    return(.ImageCall ("lib_filterMagick", x, flt.equalize, as.numeric(0)))
+    return(ImageMagickCall(x, flt.equalize, as.numeric(0)))
   }
 )
 
@@ -112,7 +129,7 @@ setMethod ("cgamma", signature(x="ImageX"),
   function (x, level=1) {
     if (level < 0.8 || level > 2.3)
       warning("reasonable 'level' is between 0.8 and 2.3")     
-    return(.ImageCall("lib_filterMagick", x, flt.gamma, as.numeric(level)))
+    return(ImageMagickCall(x, flt.gamma, as.numeric(level)))
   }
 )
 
@@ -121,7 +138,7 @@ setMethod ("mediansmooth", signature(x="ImageX"),
   function (x, r=2) {
     if (r <= 1)
       stop("value of 'r' must be larger than 1")      
-    return(.ImageCall("lib_filterMagick", x, flt.median, as.numeric(r)))
+    return(ImageMagickCall(x, flt.median, as.numeric(r)))
   }
 )
 
@@ -132,7 +149,7 @@ setMethod ("noise", signature(x="ImageX"),
     param = as.numeric(switch(type, u= 1, g= 2, m= 3, i= 4, l= 5, p= 6, 2))
     if (param == 2 && type != "g")
       warning("unsupported noise type, using 'gaussian' instead. Possible values: uniform, gaussian, multi, impulse, laplace and poisson")    
-    return(.ImageCall("lib_filterMagick", x, flt.noise, param))
+    return(ImageMagickCall(x, flt.noise, param))
   }
 )
 
@@ -150,7 +167,7 @@ setMethod ("resize", signature(x="ImageX"),
       poi=0, box=1, tri=2,  her=3,  han=4,  ham=5,  bla=6, gau=7, 
       qua=8, cub=9, cat=10, mit=11, lan=12, bes=13, sin=14, 12)
     param = as.numeric(c(w, h, blur, filter))
-    return(.ImageCall("lib_filterMagick", x, flt.resize, param))
+    return(ImageMagickCall(x, flt.resize, param))
   }
 )
 
@@ -165,7 +182,7 @@ setMethod ("resample", signature(x="ImageX"),
     if (w <= 0 || h <= 0)
       stop("width and height of a new image must be non zero positive")
     param = as.numeric(c(w, h))
-    return(.ImageCall("lib_filterMagick", x, flt.sample, param))
+    return(ImageMagickCall(x, flt.sample, param))
   }
 )
 
@@ -174,7 +191,7 @@ setMethod ("rotate", signature(x="ImageX"),
   function (x, angle=90, col) {
     if (!missing(col))
       warning("argument 'col' is ignored, not implemented yet, black is used as default")     
-    return(.ImageCall("lib_filterMagick", x, flt.rotate, as.numeric(angle) ))
+    return(ImageMagickCall(x, flt.rotate, as.numeric(angle) ))
   }
 )
 
@@ -186,7 +203,7 @@ setMethod ("segment", signature(x="ImageX"),
     if (s <= 0)
       stop("smoothness 's' must be positive")
     param = as.numeric(c(cl, s))
-    return(.ImageCall("lib_filterMagick", x, flt.segment, param))
+    return(ImageMagickCall(x, flt.segment, param))
   }
 )
 
@@ -198,7 +215,7 @@ setMethod ("sharpen", signature(x="ImageX"),
     if (r < 0 || s <= 0)
       stop("values of 'r' and 's' must be positive, alternatively r=0 selects radius automatically")
     param = as.numeric(c(r, s))
-    return(.ImageCall("lib_filterMagick", x, flt.sharpen, param))
+    return(ImageMagickCall( x, flt.sharpen, param))
   }
 )
 
@@ -210,7 +227,7 @@ setMethod ("umask", signature(x="ImageX"),
     if (r < 0 || s <= 0 || amount < 0 || t < 0)
       stop("all arguments must be positive, alternatively r=0 selects radius automatically")
     param = as.numeric(c(r, s, amount, t))
-    return(.ImageCall("lib_filterMagick", x, flt.unsharp, param))
+    return(ImageMagickCall( x, flt.unsharp, param))
   }
 )
 
@@ -220,14 +237,14 @@ setMethod ("athresh", signature(x="ImageX"),
     if (w < 2 || h < 2)
       stop("width 'w' and height 'h' must be larger than 1")
     param = as.numeric(c(w, h, offset))
-    return(.ImageCall("lib_filterMagick", x, flt.athresh, param))
+    return(ImageMagickCall(x, flt.athresh, param))
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("cthresh", signature(x="ImageX"),
   function (x, threshold=0) {
-    return(.ImageCall("lib_filterMagick", x, flt.cthresh, as.numeric(threshold)))
+    return(ImageMagickCall(x, flt.cthresh, as.numeric(threshold)))
   }
 )
 
@@ -235,28 +252,28 @@ setMethod ("cthresh", signature(x="ImageX"),
 setMethod ("affinet", signature(x="ImageX"),
   function (x, sx=0, rx=0, ry=0, sy=0, tx=0, ty=0) {
     param = as.numeric(c(sx, rx, ry, sy, tx, ty))
-    return(.ImageCall("lib_filterMagick", x, flt.affinet, param))
+    return(ImageMagickCall(x, flt.affinet, param))
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("modulate", signature(x="ImageX"),
   function (x, value=100) {
-    return(.ImageCall("lib_filterMagick", x, flt.modulate, as.numeric(value)))
+    return(ImageMagickCall(x, flt.modulate, as.numeric(value)))
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("negate", signature(x="ImageX"),
   function (x) {
-    return(.ImageCall("lib_filterMagick", x, flt.negate, as.numeric(0)))
+    return(ImageMagickCall(x, flt.negate, as.numeric(0)))
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("normalize2", signature(x="ImageX"),
   function (x) {
-    return(.ImageCall("lib_filterMagick", x, flt.norm, as.numeric(0)))
+    return(ImageMagickCall(x, flt.norm, as.numeric(0)))
   }
 )
 

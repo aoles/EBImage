@@ -204,12 +204,7 @@ setMethod ("hullFeatures", signature(x="ImageX"),
 
 setMethod ("edgeProfile", signature(x="ImageX"),
   function (x, ref, n=32, fft=TRUE, scale=TRUE, rotate=TRUE) {
-    if ( missing(ref) ) 
-      ref = NULL
-    else {
-      if ( !is.Image(ref) )
-        .stop("'ref' must be of class Image or missing")
-    }
+    if (missing(ref)) ref = NULL
     .edgeProfile(x, ref, n, fft, scale, rotate)
   }
 )
