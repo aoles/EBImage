@@ -60,6 +60,7 @@ setMethod ("zernike.moments", signature(x="ImageX", ref="ImageX"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 setMethod("frameDist", signature(x="ImageX",y="ImageX"),
   function(x, y, r, g, b, blur=TRUE, method="dist", verbose, ...) {
+    warning('\'frameDist\'\ is deprecated and shouldn\'t be used')
     if (missing(verbose)) verbose = options()$verbose
     if (colorMode(x)!=colorMode(y))
       stop("'x' and 'y' must be in the same color mode")
@@ -87,6 +88,7 @@ setMethod("frameDist", signature(x="ImageX",y="ImageX"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 setMethod("frameDist", signature(x="Image",y="missing"),
   function(x, y, r, g, b, blur=TRUE, method="dist", verbose, ...) {
+    warning('\'frameDist\'\ is deprecated and shouldn\'t be used')
     if (missing(verbose)) verbose = options()$verbose
     if (colorMode(x)==Grayscale && (!missing(r)||!missing(g)||!missing(b)))
       warning("r, g, b are used only for TrueColor images")
@@ -108,6 +110,7 @@ setMethod("frameDist", signature(x="Image",y="missing"),
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("matchObjects", signature(x="ImageX", ref="ImageX"),
   function (x, ref, ...) {
+    warning('\'matchObjects\'\ is deprecated and shouldn\'t be used')
     if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")
    
     if ( !assert(x, ref, strict=TRUE) )
@@ -118,6 +121,7 @@ setMethod ("matchObjects", signature(x="ImageX", ref="ImageX"),
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 stopIfNotImage <- function (x) {
+  warning('\'stopIfNotImage\'\ is deprecated and shouldn\'t be used')
   if ( !is.Image(x) ) stop( "argument must be of class 'Image'" )
   invisible (NULL)
 }

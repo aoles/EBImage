@@ -28,6 +28,7 @@ See: ../LICENSE for license, LGPL
 #include "drawable.h"
 
 #include "objects.h"
+#include "tile.h"
 #include "frameDist.h"
 
 #include <R.h>

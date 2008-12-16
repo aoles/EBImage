@@ -62,8 +62,8 @@ test=function(x) {
   y=check('cthresh',x)
   
   ## median, hist
-  b=check('median',x)
-  if (interactive()) check('hist',x) 
+  if (mode(x)!='logical') b=check('median',x)
+  if (mode(x)!='logical' & interactive()) check('hist',x) 
 
   ## blur, gblur, normalize, negate, normalize2
   y=check('blur',x,r=20,s=10)
@@ -94,6 +94,7 @@ test=function(x) {
   } else y=x
   w=check('channel',y,'gray')
   w=check('channel',y,'green')
+  w=check('channel',y,'x11')
   w=check('channelMix',y)
   
   ## combine, tile, untile
@@ -118,8 +119,11 @@ test=function(x) {
 }
 
 if (!exists('x')) {
+  lenaf= system.file("images","lena.gif",package="EBImage")
+  lenacolorf= system.file("images","lena-color.png",package="EBImage")
+    
   ## Gray - 1 image - 2 dim
-  x=readImage('../lena.gif')
+  x=readImage(lenaf)
   test(x)
   
   ## Gray - 1 image - 3 dim
@@ -148,40 +152,11 @@ if (!exists('x')) {
   test(x)
   
   ## matrix - 1 images - 2 dim
-  x=imageData(readImage('../lena.gif'))
+  x=imageData(readImage(lenaf))
+  test(x)
+
+  ## matrix - 2 images - 3 dim
+  x=combine(x,x)
   test(x)
 }
 
-##
-scratch=function() {
-  library(EBImage)
-  w=readImage('../lena-color.bmp')
-  x=combine(w,flip(w),flop(w))
-  ws=watershed(distmap(x>0.5))
-  y=edgeFeatures(ws,x)
-
-  ## bug 2
-  library(EBImage)
-  ref=readImage('../lena.gif')
-  x=watershed(distmap(ref>0.5))
-  y=edgeFeatures(x,ref)
-
-  ## bug 3
-  library(EBImage)
-  ref=readImage('../lena.gif')
-  ref=rgbImage(ref,flip(ref),flop(ref))
-  ref=combine(ref,ref)
-  x=watershed(distmap(ref>0.5))
-  y=edgeFeatures(x,ref)
-
-  hf=check('hullFeatures',x)
-  if (!is.list(hf)) hf=list(hf)
-  rmindex = lapply(hf, function(c) which(c[,'h.s']<10))
-  x2=check('rmObjects',x,rmindex)
-
-  ## logical 
-  z=Image(0,dim=c(3,3))
-  x=z
-  x[2,2:3]=1
-  z[x]=2
-}

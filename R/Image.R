@@ -121,6 +121,7 @@ setReplaceMethod ("colorMode", signature (x="Image", value="character"),
 )
 setReplaceMethod ("colorMode", signature (x="array", value="ANY"),
   function (x, value) {
+    warning('Color mode of an array cannot be changed, the array should be cast into an Image using \'Image\'')
     return(x)
   }
 )
@@ -176,14 +177,21 @@ setMethod ("assert", signature (x="ImageX"),
 ## Shallow copy of the object: only the members (not the array) are copied
 ## GP: Useful ?
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("header", signature(x="ImageX"),
+setMethod ("header", signature(x="Image"),
   function (x) {
-    if (colorMode(x) == Grayscale) data=array(0,c(1,1))
-    else if (colorMode(x) == TrueColor) data=array(0L, c(1,1)) 
-    else data=array(0,c(1,1))
+    dim=rep(1,length(dim(x)))
+    if (colorMode(x) == Grayscale) data=array(0,dim=dim)
+    else if (colorMode(x) == TrueColor) data=array(0L,dim=dim) 
+    else data=array(0,dim=dim)
     
     y = new(class(x),.Data=data,colormode=colorMode(x))
     return(y)
+  }
+)
+setMethod ("header", signature(x="array"),
+  function (x) {
+    dim=rep(1,length(dim(x)))
+    return(array(0,dim=dim))
   }
 )
       
@@ -313,7 +321,7 @@ setMethod ("show", signature(object="Image"),
   }
 )
 
-print.Image <- function(x) show(x)
+print.Image <- function(x,...) show(x)
 
 ## GP: Useful ?
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -377,7 +385,7 @@ setMethod ("channel", signature(x="ImageX", mode="character"),
                     asred=rgbImage(r=x),
                     asgreen=rgbImage(g=x),
                     asblue=rgbImage(b=x),
-                    x11=stop('\'x11\' color conversion mode is not supported'),
+                    x11=array(rgb(x,x,x),dim=dim(x)),
                     stop('invalid conversion mode')
                     ))
     }
@@ -392,7 +400,7 @@ setMethod ("channel", signature(x="ImageX", mode="character"),
                     asred=EBImage:::selectChannel(x,1),
                     asgreen=EBImage:::selectChannel(x,2),
                     asblue=EBImage:::selectChannel(x,3),
-                    x11=stop('\'x11\' color conversion mode is not supported'),
+                    x11=array(rgb(selectChannel(x,1),selectChannel(x,2),selectChannel(x,3)),dim=dim(x)),
                     stop('invalid conversion mode')
                     ))
     }
@@ -413,6 +421,23 @@ setMethod ("channel", signature(x="ImageX", mode="character"),
       res=Image(data=resData,colormode=colormode)
       return(res)
     }
+  }
+)
+setMethod ("channel", signature(x="ANY", mode="character"),
+  function (x, mode, ...) {
+    mode <- tolower (mode)
+    modeNo <- as.integer( switch (EXPR=mode, rgb=0, grey=, gray=1, r=, red=2, 
+            g=, green=3, b=, blue=4, asred=5, asgreen=6, asblue=7, x11=8, -1) )
+    if ( modeNo < 0 )
+      stop( "wrong conversion mode")
+    if ( !is.numeric(x) && !is.character(x) )
+      stop( "argument must be coercible to either numeric or character" )
+    res <- .DoCall("lib_channel", x, modeNo )
+    if ( !is.null(res) )
+      res [ which( is.na(x) ) ] = NA
+    if ( is.null(res) || is.character(res) ) return (res)
+    if ( is.array(x) ) dim (res) <- dim (x)
+    return (res)
   }
 )
 
@@ -519,6 +544,10 @@ rgbImage = function(red=NULL,green=NULL,blue=NULL) {
   if (colorMode(red)!=Grayscale | colorMode(green)!=Grayscale |colorMode(blue)!=Grayscale) stop('all Image objects must be in \'Grayscale\' color mode')
 
   x=combine(red,green,blue,along=2.5)
+  
+  ## Cast to Color Image if x is an array
+  if (class(x)=='array') x=Image(x)
+    
   colorMode(x)=Color
   x
 }

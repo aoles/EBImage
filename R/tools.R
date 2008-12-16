@@ -44,25 +44,6 @@ ensureStorageMode=function(x) {
 .warning <- function (string, ...) warning( .(string), ... )
 .cat <- function (string, ...) cat( .(string), ... )
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("channel", signature(x="ANY", mode="character"),
-  function (x, mode) {
-    mode <- tolower (mode)
-    modeNo <- as.integer( switch (EXPR=mode, rgb=0, grey=, gray=1, r=, red=2, 
-            g=, green=3, b=, blue=4, asred=5, asgreen=6, asblue=7, x11=8, -1) )
-    if ( modeNo < 0 )
-      stop( "wrong conversion mode")
-    if ( !is.numeric(x) && !is.character(x) )
-      stop( "argument must be coercible to either numeric or character" )
-    res <- .DoCall("lib_channel", x, modeNo )
-    if ( !is.null(res) )
-      res [ which( is.na(x) ) ] = NA
-    if ( is.null(res) || is.character(res) ) return (res)
-    if ( is.array(x) ) dim (res) <- dim (x)
-    return (res)
-  }
-)
-
 ## check if x (indexing image) and ref (image) are compatible
 checkCompatibleImages=function(x,ref) {
   if (missing(ref)) {

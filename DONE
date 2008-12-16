@@ -1,3 +1,9 @@
+2.7.9
+- created tile.c, tile.h
+- out of range [0:1] normalize for Magick
+- matrix: channel 4, untile, getFeatures fixed
+- x11 channel OK
+
 2.7.8
 - validImage in C, removed isImage in C
 - merged IndexedImage class within Image, no IndexedImage class anymore !
