@@ -514,7 +514,7 @@ setMethod ("combine", signature(x="ImageX"),
 setMethod ("combine", signature(x="list"),
   function (x) {
     names(x) <- NULL
-    do.call("combine", x)
+    do.call(combine, x)
   }
 )
 
