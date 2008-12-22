@@ -1,7 +1,12 @@
 library(EBImage)
 
 hash=function(x) {
- 
+  if (is.list(x)) hash(sapply(x,hash))
+  else {
+    xd=as.numeric(x)
+    xd=xd[!is.nan(xd)]
+    sum(xd*(1:length(xd)))
+  }
 }
 
 check=function(fun,x,...) {
@@ -15,8 +20,10 @@ check=function(fun,x,...) {
   }
   
   if (!passed) cat('FAILED\n')
-  else cat('OK\n')
- 
+  else {
+    cat('OK (hash=',hash(y),')\n',sep='')
+  }
+   
   y
 }
 
@@ -24,7 +31,7 @@ test=function(x) {
   ## Image, is.image, Ops, as.Image, assert, header
   ## imageData, imageData, colorMode, colorMode<-, print
   ## [, getNumberOfFrames
-  cat('new test\n')
+  cat('new test (hash=',hash(x),')\n',sep='')
   if (class(x)=='Image') check('print',x)
   y=Image(x,colormode=Color)
   a=is.Image(y)

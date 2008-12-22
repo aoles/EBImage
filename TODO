@@ -1,4 +1,3 @@
-md means multi-dimensional modes
 high:
 - floodFill: check md and Color
 - fillHull works only with IndexedImage
@@ -26,6 +25,8 @@ low:
 - subset [1,1:10] or [1:10,1] doesn't have the good orientation
 - check display colorize and main
 - ref, checkCompatible should test for validity and storage.mode of ref
+- R testing using hashing
+
 
 
 
