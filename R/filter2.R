@@ -16,7 +16,7 @@
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-setMethod("filter2", signature(x="ImageX",filter="ImageX"),
+setMethod("filter2", signature(x="array",filter="array"),
   function(x, filter) {
     validObject(x)
     validObject(filter)

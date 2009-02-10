@@ -13,7 +13,7 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("paintObjects", signature(x="ImageX", tgt="ImageX"),
+setMethod ("paintObjects", signature(x="array", tgt="array"),
   function (x, tgt, opac=c(0.4, 0.05, 0.4), col=c("#FFC72C","#5BABF6","#FF372C")) {
     if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")
     
@@ -34,7 +34,7 @@ setMethod ("paintObjects", signature(x="ImageX", tgt="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("stackObjects", signature(x="ImageX", ref="ImageX", index="missing"),
+setMethod ("stackObjects", signature(x="array", ref="array", index="missing"),
   function (x, ref, index, combine, rotate, bg.col, ext, centerby, rotateby) {
     if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")
     dimx <- dim(x)
@@ -98,7 +98,7 @@ setMethod ("stackObjects", signature(x="ImageX", ref="ImageX", index="missing"),
   }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("stackObjects", signature(x="ImageX", ref="ImageX", index="character"),
+setMethod ("stackObjects", signature(x="array", ref="array", index="character"),
   function (x, ref, index) {
     index <- strsplit(index, ".", fixed=TRUE)
     fct <- unlist(lapply(index, function(x) x[1]))
@@ -109,7 +109,7 @@ setMethod ("stackObjects", signature(x="ImageX", ref="ImageX", index="character"
   }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("stackObjects", signature(x="ImageX", ref="ImageX", index="list"),
+setMethod ("stackObjects", signature(x="array", ref="array", index="list"),
   function (x, ref, index, combine) {
     if ( missing(combine) )
       combine <- FALSE
@@ -137,7 +137,7 @@ setMethod ("stackObjects", signature(x="ImageX", ref="ImageX", index="list"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("stackObjects", signature(x="ImageX", ref="ImageX", index="numeric"),
+setMethod ("stackObjects", signature(x="array", ref="array", index="numeric"),
   function (x, ref, index) {
     .dim <- dim(x)
     if ( .dim[3] > 1 )
@@ -149,7 +149,7 @@ setMethod ("stackObjects", signature(x="ImageX", ref="ImageX", index="numeric"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("rmObjects", signature(x="ImageX", index="list"),
+setMethod ("rmObjects", signature(x="array", index="list"),
   function (x, index) {
     if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")
     index <- lapply (index, as.integer)
@@ -158,7 +158,7 @@ setMethod ("rmObjects", signature(x="ImageX", index="list"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("rmObjects", signature(x="ImageX", index="numeric"),
+setMethod ("rmObjects", signature(x="array", index="numeric"),
   function (x, index) {
     if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")
     index <- list( as.integer(index) )
@@ -167,7 +167,7 @@ setMethod ("rmObjects", signature(x="ImageX", index="numeric"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("reenumerate", signature(x="ImageX"),
+setMethod("reenumerate", signature(x="array"),
   function(x) {
     if (any(max(x)<0)) stop("'x' contains negative values and is incorrectly formed")
     validObject(x)

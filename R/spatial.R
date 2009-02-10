@@ -15,7 +15,7 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("normalize", signature(x="ImageX"),
+setMethod ("normalize", signature(x="array"),
   function (x, separate=TRUE, ft=c(0,1)) {
     if (colorMode(x) == TrueColor)
        stop("this method doesn't support the \'TrueColor\' color mode, use \'normalize2\' instead")
@@ -30,7 +30,7 @@ setMethod ("normalize", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("flip", signature(x="ImageX"),
+setMethod ("flip", signature(x="array"),
   function (x) {
     nd=as.list(rep(T,length(dim(x))))
     nd[[2]]=dim(x)[2]:1
@@ -39,7 +39,7 @@ setMethod ("flip", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("flop", signature(x="ImageX"),
+setMethod ("flop", signature(x="array"),
   function (x) {
     nd=as.list(rep(T,length(dim(x))))
     nd[[1]]=dim(x)[2]:1
@@ -50,7 +50,7 @@ setMethod ("flop", signature(x="ImageX"),
 ## Translate a set of images according to a matrix of translation
 ## A C function is needed for performance reasons
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("translate", signature(x="ImageX"),
+setMethod ("translate", signature(x="array"),
   function (x, v) {
     if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
     if (length(v)!=2*getNumberOfFrames(x,'total')) stop("'v' must be a matrix of size (n,2), where \'n'\ is the total number of frames")

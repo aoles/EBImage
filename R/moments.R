@@ -15,7 +15,7 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("cmoments", signature(x="ImageX", ref="ImageX"),
+setMethod ("cmoments", signature(x="array", ref="array"),
   function (x, ref) {
     checkCompatibleImages(x,ref)
     ref=ensureStorageMode(ref)
@@ -23,7 +23,7 @@ setMethod ("cmoments", signature(x="ImageX", ref="ImageX"),
   }
 )
 
-setMethod ("cmoments", signature(x="ImageX", ref="missing"),
+setMethod ("cmoments", signature(x="array", ref="missing"),
   function (x, ref) {
     checkCompatibleImages(x,ref)
     return( .ImageCall("lib_cmoments", x, NULL ) )
@@ -31,7 +31,7 @@ setMethod ("cmoments", signature(x="ImageX", ref="missing"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("smoments", signature(x="ImageX", ref="ImageX"),
+setMethod ("smoments", signature(x="array", ref="array"),
   function (x, ref, pw=3, what="s") {
     checkCompatibleImages(x,ref)
     ref=ensureStorageMode(ref)
@@ -43,7 +43,7 @@ setMethod ("smoments", signature(x="ImageX", ref="ImageX"),
   }
 )
 
-setMethod ("smoments", signature(x="ImageX", ref="missing"),
+setMethod ("smoments", signature(x="array", ref="missing"),
   function (x, ref, pw=3, what="s") {
     checkCompatibleImages(x,ref)
     alg <- as.integer( switch(tolower(substr(what, 1, 1)), c=1, s=2, r=3, 2) )
@@ -57,7 +57,7 @@ setMethod ("smoments", signature(x="ImageX", ref="missing"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("rmoments", signature(x="ImageX", ref="ImageX"),
+setMethod ("rmoments", signature(x="array", ref="array"),
   # this is a convenience function for smoments with what='r', pw=3
   function (x, ref) {
     checkCompatibleImages(x,ref)
@@ -66,7 +66,7 @@ setMethod ("rmoments", signature(x="ImageX", ref="ImageX"),
   }
 )
 
-setMethod ("rmoments", signature(x="ImageX", ref="missing"),
+setMethod ("rmoments", signature(x="array", ref="missing"),
   # this is a convenience function for smoments with what='r', pw=3
   function (x, ref) {
     checkCompatibleImages(x,ref)
@@ -121,14 +121,14 @@ setMethod ("rmoments", signature(x="ImageX", ref="missing"),
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("moments", signature(x="ImageX", ref="ImageX"),
+setMethod ("moments", signature(x="array", ref="array"),
   function (x, ref) {
     checkCompatibleImages(x,ref)
     return( .momentsSummary(x, ref) )
   }
 )
 
-setMethod ("moments", signature(x="ImageX", ref="missing"),
+setMethod ("moments", signature(x="array", ref="missing"),
   function (x, ref) {
     checkCompatibleImages(x,ref)
     return( .momentsSummary(x) )
@@ -136,7 +136,7 @@ setMethod ("moments", signature(x="ImageX", ref="missing"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("moments", signature(x="ImageX", ref="missing"),
+setMethod ("moments", signature(x="array", ref="missing"),
   # in contrast to the above function, this considers one object per image
   # and processes the stack of images returning a summary of moments
   function (x, ref) {

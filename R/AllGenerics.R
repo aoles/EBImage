@@ -24,7 +24,7 @@ setGeneric ("colorMode",      function (x)             standardGeneric("colorMod
 setGeneric ("colorMode<-",    function (x, value)      standardGeneric("colorMode<-") )
 setGeneric ("imageData",      function (x)             standardGeneric("imageData") )
 setGeneric ("imageData<-",    function (x, value)      standardGeneric("imageData<-") )
-setGeneric ("getNumberOfFrames",function (x, ...)      standardGeneric("getNumberOfFrames") )
+setGeneric ("getNumberOfFrames",function (x, type)      standardGeneric("getNumberOfFrames") )
 
 ## image IO, display
 setGeneric ("display",        function (x, ...)        standardGeneric("display") )

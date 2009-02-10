@@ -15,42 +15,42 @@ choose.image <- function(colormode=Grayscale) {
   chooseImage(colormode)
 }
 
-setMethod ("hull.features", signature(x="ImageX"),
+setMethod ("hull.features", signature(x="array"),
   function(x, ...) {
     .Deprecated("hullFeatures", "EBImage")
     hullFeatures(x, ...)
   }
 )
 
-setMethod ("edge.profile", signature(x="ImageX"),
+setMethod ("edge.profile", signature(x="array"),
   function (x, ...) {
     .Deprecated("edgeProfile", "EBImage")
     edgeProfile(x, ...)
   }
 )
 
-setMethod ("edge.features", signature(x="ImageX"),
+setMethod ("edge.features", signature(x="array"),
   function (x, ...) {
     .Deprecated("edgeFeatures", "EBImage")
     edgeFeatures(x, ...)
   }
 )
 
-setMethod ("haralick.matrix", signature(x="ImageX", ref="ImageX"),
+setMethod ("haralick.matrix", signature(x="array", ref="array"),
   function(x, ref, ...) {
     .Deprecated("haralickMatrix", "EBImage")
     haralickMatrix(x, ref, ...)
   }
 )
 
-setMethod ("haralick.features", signature(x="ImageX", ref="ImageX"),
+setMethod ("haralick.features", signature(x="array", ref="array"),
   function(x, ref, ...) {
     .Deprecated("haralickFeatures", "EBImage")
     haralickFeatures(x, ref, ...)
   }
 )
 
-setMethod ("zernike.moments", signature(x="ImageX", ref="ImageX"),
+setMethod ("zernike.moments", signature(x="array", ref="array"),
   function(x, ref, ...) {
     .Deprecated("zernikeMoments", "EBImage")
     zernikeMoments(x, ref, ...)
@@ -58,7 +58,7 @@ setMethod ("zernike.moments", signature(x="ImageX", ref="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-setMethod("frameDist", signature(x="ImageX",y="ImageX"),
+setMethod("frameDist", signature(x="array",y="array"),
   function(x, y, r, g, b, blur=TRUE, method="dist", verbose, ...) {
     warning('\'frameDist\'\ is deprecated and shouldn\'t be used')
     if (missing(verbose)) verbose = options()$verbose
@@ -108,7 +108,7 @@ setMethod("frameDist", signature(x="Image",y="missing"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("matchObjects", signature(x="ImageX", ref="ImageX"),
+setMethod ("matchObjects", signature(x="array", ref="array"),
   function (x, ref, ...) {
     warning('\'matchObjects\'\ is deprecated and shouldn\'t be used')
     if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")

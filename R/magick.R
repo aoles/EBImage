@@ -59,7 +59,7 @@ ImageMagickCall=function(x,flt,...) {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("blur", signature(x="ImageX"),
+setMethod ("blur", signature(x="array"),
   function (x, r=0, s=0.5) {
     if (r < 0 || s <= 0)
       stop("values of 'r' and 's' must be positive, set r=0 for automatic radius")
@@ -70,7 +70,7 @@ setMethod ("blur", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("gblur", signature(x="ImageX"),
+setMethod ("gblur", signature(x="array"),
   function (x, r=0, s=0.5) {
     if (r < 0 || s <= 0)
       stop("values of 'r' and 's' must be positive, set r=0 for automatic radius")
@@ -81,14 +81,14 @@ setMethod ("gblur", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("contrast", signature(x="ImageX"),
+setMethod ("contrast", signature(x="array"),
   function (x, sharpen=TRUE) {     
     return(ImageMagickCall(x, flt.contrast, as.numeric(sharpen)))
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("denoise", signature(x="ImageX"),
+setMethod ("denoise", signature(x="array"),
   function (x, r=0) {
     if (r < 0)
       stop("'r' must be positive, set r=0 for automatic selection")    
@@ -97,35 +97,35 @@ setMethod ("denoise", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("despeckle", signature(x="ImageX"),
+setMethod ("despeckle", signature(x="array"),
   function (x) {     
     return(ImageMagickCall (x, flt.despeckle, as.numeric(0)))
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("edge", signature(x="ImageX"),
+setMethod ("edge", signature(x="array"),
   function (x, r=0) {  
     return(ImageMagickCall(x, flt.edge, as.numeric(r)))
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("enhance", signature(x="ImageX"),
+setMethod ("enhance", signature(x="array"),
   function (x) {     
     return(ImageMagickCall(x, flt.enhance, as.numeric(0)))
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("equalize", signature(x="ImageX"),
+setMethod ("equalize", signature(x="array"),
   function (x) {    
     return(ImageMagickCall(x, flt.equalize, as.numeric(0)))
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("cgamma", signature(x="ImageX"),
+setMethod ("cgamma", signature(x="array"),
   function (x, level=1) {
     if (level < 0.8 || level > 2.3)
       warning("reasonable 'level' is between 0.8 and 2.3")     
@@ -134,7 +134,7 @@ setMethod ("cgamma", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("mediansmooth", signature(x="ImageX"),
+setMethod ("mediansmooth", signature(x="array"),
   function (x, r=2) {
     if (r <= 1)
       stop("value of 'r' must be larger than 1")      
@@ -143,7 +143,7 @@ setMethod ("mediansmooth", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("noise", signature(x="ImageX"),
+setMethod ("noise", signature(x="array"),
   function (x, type="G") {
     type = tolower(substr(type,1,1))
     param = as.numeric(switch(type, u= 1, g= 2, m= 3, i= 4, l= 5, p= 6, 2))
@@ -154,7 +154,7 @@ setMethod ("noise", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("resize", signature(x="ImageX"),
+setMethod ("resize", signature(x="array"),
   function (x, w, h, blur=1, filter="Lanczos") {
     if (missing(w) && missing(h))
       stop("either 'w' or 'h' must be specified")
@@ -163,6 +163,8 @@ setMethod ("resize", signature(x="ImageX"),
     else if (missing(h)) h = dimx[2]*w / dimx[1]
     if (w <= 0 || h <= 0)
       stop("width and height of a new image must be non zero positive")
+    if (length(w)>1 || length(h)>1)
+      stop("width and height must be scalar values")
     filter <- switch(tolower(substr(filter,1,3)), 
       poi=0, box=1, tri=2,  her=3,  han=4,  ham=5,  bla=6, gau=7, 
       qua=8, cub=9, cat=10, mit=11, lan=12, bes=13, sin=14, 12)
@@ -172,7 +174,7 @@ setMethod ("resize", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("resample", signature(x="ImageX"),
+setMethod ("resample", signature(x="array"),
   function (x, w, h) {
     if (missing(w) && missing(h))
       stop("either 'w' or 'h' must be specified")
@@ -187,7 +189,7 @@ setMethod ("resample", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("rotate", signature(x="ImageX"),
+setMethod ("rotate", signature(x="array"),
   function (x, angle=90, col) {
     if (!missing(col))
       warning("argument 'col' is ignored, not implemented yet, black is used as default")     
@@ -196,7 +198,7 @@ setMethod ("rotate", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("segment", signature(x="ImageX"),
+setMethod ("segment", signature(x="array"),
   function (x, cl=10, s=1.5) {
     if (cl < 1)
       stop("cluster size 'cl' must be larger than 1")
@@ -208,7 +210,7 @@ setMethod ("segment", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("sharpen", signature(x="ImageX"),
+setMethod ("sharpen", signature(x="array"),
   function (x, r=0, s=0.5) {
     if (r <= s && r != 0)
       warning("for reasonable results, 'r' should be larger than 's'")
@@ -220,7 +222,7 @@ setMethod ("sharpen", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("umask", signature(x="ImageX"),
+setMethod ("umask", signature(x="array"),
   function (x, r=0, s=0.5, amount=5, t=2) {
     if (r <= s && r != 0)
       warning("for reasonable results, 'r' should be larger than 's'")
@@ -232,7 +234,7 @@ setMethod ("umask", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("athresh", signature(x="ImageX"),
+setMethod ("athresh", signature(x="array"),
   function (x, w=10, h=10, offset=0) {
     if (w < 2 || h < 2)
       stop("width 'w' and height 'h' must be larger than 1")
@@ -242,14 +244,14 @@ setMethod ("athresh", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("cthresh", signature(x="ImageX"),
+setMethod ("cthresh", signature(x="array"),
   function (x, threshold=0) {
     return(ImageMagickCall(x, flt.cthresh, as.numeric(threshold)))
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("affinet", signature(x="ImageX"),
+setMethod ("affinet", signature(x="array"),
   function (x, sx=0, rx=0, ry=0, sy=0, tx=0, ty=0) {
     param = as.numeric(c(sx, rx, ry, sy, tx, ty))
     return(ImageMagickCall(x, flt.affinet, param))
@@ -257,21 +259,21 @@ setMethod ("affinet", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("modulate", signature(x="ImageX"),
+setMethod ("modulate", signature(x="array"),
   function (x, value=100) {
     return(ImageMagickCall(x, flt.modulate, as.numeric(value)))
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("negate", signature(x="ImageX"),
+setMethod ("negate", signature(x="array"),
   function (x) {
     return(ImageMagickCall(x, flt.negate, as.numeric(0)))
   }
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("normalize2", signature(x="ImageX"),
+setMethod ("normalize2", signature(x="array"),
   function (x) {
     return(ImageMagickCall(x, flt.norm, as.numeric(0)))
   }

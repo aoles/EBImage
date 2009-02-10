@@ -23,7 +23,7 @@ drawfont <- function(family=switch(.Platform$OS.type, windows="Arial", "helvetic
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("drawtext", signature(img="ImageX", xy="numeric", labels="character"),
+setMethod ("drawtext", signature(img="array", xy="numeric", labels="character"),
   function(img, xy, labels, font, col) {
     if ( missing(font) ) font <- drawfont()
     if ( missing(col) ) col <- "white"
@@ -31,7 +31,7 @@ setMethod ("drawtext", signature(img="ImageX", xy="numeric", labels="character")
   }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("drawtext", signature(img="ImageX", xy="matrix", labels="character"),
+setMethod ("drawtext", signature(img="array", xy="matrix", labels="character"),
   function(img, xy, labels, font, col) {
     if ( missing(font) ) font <- drawfont()
     if ( missing(col) ) col <- "white"
@@ -39,7 +39,7 @@ setMethod ("drawtext", signature(img="ImageX", xy="matrix", labels="character"),
   }
 )
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("drawtext", signature(img="ImageX", xy="list", labels="list"),
+setMethod ("drawtext", signature(img="array", xy="list", labels="list"),
   function(img, xy, labels, font, col) {
 
     ## Mac stop: imageMagick/MagickWand/drawtext doesn't understand MacOS fonts

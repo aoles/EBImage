@@ -15,7 +15,7 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("getFeatures", signature(x="ImageX"),
+setMethod ("getFeatures", signature(x="array"),
   function (x, ref, N = 12, R = 30, apply.Gaussian=TRUE, nc = 256, pseudo=FALSE) {
     if ( !missing(ref) && is.Image(ref) && (colorMode(ref) == TrueColor) )
       .stop("\'ref\' must be an Image not in \'TrueColor\' color mode")
@@ -69,7 +69,7 @@ setMethod ("getFeatures", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("zernikeMoments", signature(x="ImageX", ref="ImageX"),
+setMethod ("zernikeMoments", signature(x="array", ref="array"),
   function(x, ref, N=12, R=30, apply.Gaussian=TRUE, pseudo=FALSE) {
     checkCompatibleImages(x,ref)
 
@@ -88,7 +88,7 @@ setMethod ("zernikeMoments", signature(x="ImageX", ref="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("hullFeatures", signature(x="ImageX"),
+setMethod ("hullFeatures", signature(x="array"),
   function(x) {
     if ( colorMode(x) == TrueColor )
       stop("this method doesn't support the \'TrueColor\' color mode")
@@ -202,7 +202,7 @@ setMethod ("hullFeatures", signature(x="ImageX"),
   res
 }
 
-setMethod ("edgeProfile", signature(x="ImageX"),
+setMethod ("edgeProfile", signature(x="array"),
   function (x, ref, n=32, fft=TRUE, scale=TRUE, rotate=TRUE) {
     if (missing(ref)) ref = NULL
     .edgeProfile(x, ref, n, fft, scale, rotate)
@@ -210,7 +210,7 @@ setMethod ("edgeProfile", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("edgeFeatures", signature(x="ImageX"),
+setMethod ("edgeFeatures", signature(x="array"),
   function (x, ref) {
     .dim <- dim(x)
     if ( missing(ref) ) ref <- NULL
@@ -228,7 +228,7 @@ setMethod ("edgeFeatures", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("haralickMatrix", signature(x="ImageX", ref="ImageX"),
+setMethod ("haralickMatrix", signature(x="array", ref="array"),
   function(x, ref, nc=32) {
     checkCompatibleImages(x,ref)
     rref <- range(ref)
@@ -244,7 +244,7 @@ setMethod ("haralickMatrix", signature(x="ImageX", ref="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("haralickFeatures", signature(x="ImageX", ref="ImageX"),
+setMethod ("haralickFeatures", signature(x="array", ref="array"),
   function(x, ref, nc=32) {
     hm <- haralickMatrix(x=x, ref=ref, nc=nc)
     if ( is.null(hm) || !(is.array(hm) || is.list(hm)) ) return( NULL )
