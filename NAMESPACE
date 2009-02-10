@@ -7,13 +7,13 @@ importFrom("graphics", "hist")
 importFrom("stats", "median")
 
 ## classes
-exportClasses(Image, ImageX)
+exportClasses(Image)
 
 ## image class, copy, assertion, accessors
 export(Image, is.Image, print.Image)
 export(Grayscale, TrueColor, Color)
 exportMethods(header, assert, Ops, "[", as.Image)
-exportMethods(colorMode, "colorMode<-",imageData, "imageData<-")
+exportMethods(colorMode, "colorMode<-", imageData, "imageData<-")
 exportMethods(getNumberOfFrames)
 
 ## image IO, display

@@ -21,7 +21,7 @@ setMethod ("tile", signature(x="list"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("tile", signature(x="ImageX"),
+setMethod ("tile", signature(x="array"),
   function (x, nx=10, lwd=1, fg.col="#E4AF2B", bg.col="gray") {
     if ( nx < 1 || lwd < 0 || lwd > 100 )
       stop( "wrong range of arguments, see help for range details" )
@@ -34,7 +34,7 @@ setMethod ("tile", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("untile", signature(x="ImageX", nim="numeric"),
+setMethod ("untile", signature(x="array", nim="numeric"),
   function (x, nim, lwd=1) {
     nim = as.integer(nim)
     lwd = as.integer(lwd)

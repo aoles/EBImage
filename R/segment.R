@@ -1,5 +1,5 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("watershed", signature(x="ImageX"),
+setMethod ("watershed", signature(x="array"),
   function (x, tolerance=1, ext=1) {
     if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")
     tolerance <- as.numeric (tolerance)
@@ -13,7 +13,7 @@ setMethod ("watershed", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("propagate", signature(x="ImageX", seeds="ImageX"),
+setMethod ("propagate", signature(x="array", seeds="array"),
   function (x, seeds, mask=NULL, lambda=0.1, ext=1, seed.centers=FALSE) {
     if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")
     if ( !assert(x, seeds, strict=TRUE) || (!is.null(mask) && !assert(x, mask, strict=TRUE)) )

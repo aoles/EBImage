@@ -17,9 +17,9 @@
 
 \arguments{
 
-  \item{x}{A \code{\link{Grayscale}} object of \code{\linkS4class{Image}}.
+  \item{x}{An \code{Image} object or an array.
     \code{x} is considered as a binary image, whose pixels of value 0
-    are considered as background ones and the other pixels as
+    are considered as background ones and other pixels as
     foreground ones.}
 
   \item{metric}{A character indicating which metric to use, L2 distance
@@ -27,7 +27,7 @@
 }
 
 \value{
-  A \code{\link{Grayscale}} object of \code{\linkS4class{Image}} with pixels
+  An \code{Image} object or an array, with pixels
   containing the distances to the nearest background points. 
 }
 

@@ -1,3 +1,6 @@
+2.7.11
+- no ImageX object anymore: Image now extends array
+
 2.7.10
 - fixed ReadImage bug when filename=''
 

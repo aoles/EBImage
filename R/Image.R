@@ -25,7 +25,6 @@ setClass ("Image",
   prototype (colormode=Grayscale),
   contains = "array"
 )
-setClassUnion("ImageX", c("Image", "array"))
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Image=function(data=array(0,dim=c(1,1)), dim, colormode=NULL) {
@@ -100,7 +99,7 @@ setMethod ("colorMode", signature (x="Image"),
 setMethod ("colorMode", signature (x="array"),
   function (x) Grayscale
 )
-setReplaceMethod ("colorMode", signature (x="Image", value="numeric"),
+setReplaceMethod ("colorMode", signature (x="Image", value="ANY"),
   function (x, value) {
     ## conversion here should not be possible ! kept for compatibility
     if ((x@colormode==TrueColor & value!=TrueColor) |
@@ -110,12 +109,6 @@ setReplaceMethod ("colorMode", signature (x="Image", value="numeric"),
       x@colormode = EBImage:::parseColorMode(value)
       validObject(x)
     }
-    return(x)
-  }
-)
-setReplaceMethod ("colorMode", signature (x="Image", value="character"),
-  function (x, value) {
-    colorMode(x) = EBImage:::parseColorMode(value) 
     return(x)
   }
 )
@@ -160,7 +153,7 @@ is.Image <- function (x) {
 ## If strict is FALSE, only the two first dimensions and colorMode are checked
 ## GP: Useful ?
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("assert", signature (x="ImageX"),
+setMethod ("assert", signature (x="array"),
   function (x, y, strict=FALSE) {
     n <- 2
     if (missing(y)) return(is.Image(x))
@@ -239,7 +232,7 @@ setMethod("Ops", signature(e1="numeric", e2="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("writeImage", signature(x="ImageX"),
+setMethod ("writeImage", signature(x="array"),
   function (x, files, quality=100) {
     validObject(x)
     if ( quality < 1 || quality > 100 )
@@ -281,7 +274,7 @@ setMethod ("[", signature(x="Image", i="ANY", j="ANY", drop="ANY"),
 ## If type='total', returns the total number of frames
 ## If type='render', return the number of frames to be rendered after color channel merging
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod('getNumberOfFrames',signature(x="ImageX"),
+setMethod('getNumberOfFrames',signature(x="array"),
           function(x,type='total') {
             if (type=='render' & colorMode(x)==Color) {
               if (length(dim(x))< 3) return(1)
@@ -299,7 +292,6 @@ setMethod ("show", signature(object="Image"),
     if (!is.logical(valid)) valid=paste(FALSE,', ',valid,sep='')
 
     cat('  colormode:',c('Grayscale','TrueColor','Color')[1+colorMode(object)],'\n')
-    cat('  validity:',valid,'\n')
     cat('  storage.mode:',storage.mode(object),'\n')
     cat('  dim:',dim(object),'\n')
     cat('  nb.total.frames:',getNumberOfFrames(object,'total'),'\n')
@@ -368,7 +360,7 @@ selectChannel=function(x,i) {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("channel", signature(x="ImageX", mode="character"),
+setMethod ("channel", signature(x="array", mode="character"),
   function (x, mode) { 
     mode=tolower(mode)
 
@@ -468,7 +460,7 @@ setMethod ("hist", signature(x="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("combine", signature(x="ImageX"),
+setMethod ("combine", signature(x="array"),
   function (x,...,along) {
     args=c(list(x),list(...))
     if (length(args)==1) return(x)

@@ -15,7 +15,7 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("floodFill", signature(x="ImageX", pt="ANY"),
+setMethod("floodFill", signature(x="array", pt="ANY"),
   function(x, pt, col, tolerance=1e-3) {
     .dim = dim(x)
     pt = as.integer(pt)
@@ -35,7 +35,7 @@ setMethod("floodFill", signature(x="ImageX", pt="ANY"),
 ) 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("fillHull", signature(x="ImageX"),
+setMethod("fillHull", signature(x="array"),
   function(x) {
     return(.ImageCall("fillHull", x))
   }

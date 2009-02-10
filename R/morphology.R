@@ -16,7 +16,7 @@
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## half width and height: moving frame will be 2 times + 1 px larger
-setMethod ("thresh", signature(x="ImageX"),
+setMethod ("thresh", signature(x="array"),
     function (x, w=5, h=5, offset=0.01) {
         if ( colorMode(x) == TrueColor )
             stop ( .("'thresh' doesn't support the \'TrueColor\' color mode, use the \'Color\' mode instead or 'athresh'") )
@@ -27,7 +27,7 @@ setMethod ("thresh", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("distmap", signature(x="ImageX"),
+setMethod ("distmap", signature(x="array"),
   function (x, metric=c("euclidean",'manhattan')) {
     if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
     if (any(is.na(x))) stop("'x' shouldn't contain any NAs")
@@ -63,9 +63,7 @@ morphKern <- function (size=5, shape="round") {
     return(res)
 }
 
-##------------------------------
-## mkball
-##------------------------------
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 mkball = function(n, shape="step") {
   if(! (is.numeric(n) && (length(n)==1L) && (n>=1)) )
     stop("'n' must be a numeric of length 1 with value >=1.")
@@ -93,7 +91,7 @@ mkbox = function(n) {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("erode", signature(x="ImageX"),
+setMethod ("erode", signature(x="array"),
     function (x, kern=morphKern(5), iter=1) {
       if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
       if ( iter < 1 ) stop ( .("'iter' must be a positive integer") )
@@ -102,7 +100,7 @@ setMethod ("erode", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("dilate", signature(x="ImageX"),
+setMethod ("dilate", signature(x="array"),
     function (x, kern=morphKern(5), iter=1) {
       if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
       if ( iter < 1 ) stop ( .("'iter' is assumed to be a positive integer") )    
@@ -111,7 +109,7 @@ setMethod ("dilate", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("opening", signature(x="ImageX"),
+setMethod ("opening", signature(x="array"),
     function (x, kern=morphKern(5), iter=1) {
       y=erode(x, kern, iter)
       dilate (y, kern, iter)
@@ -119,7 +117,7 @@ setMethod ("opening", signature(x="ImageX"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("closing", signature(x="ImageX"),
+setMethod ("closing", signature(x="array"),
     function (x, kern=morphKern(5), iter=1) {
       y=dilate(x, kern, iter)
       erode (y, kern, iter)

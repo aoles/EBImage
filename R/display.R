@@ -17,7 +17,7 @@
 
 ## display uses GTK
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("display", signature(x="ImageX"),
+setMethod("display", signature(x="array"),
   function(x, no.GTK=FALSE, main=NULL, colorize=NULL) {
     validObject(x)
     if (is.null(main)) main=paste(deparse(substitute(x), 500), collapse="\n")
@@ -36,20 +36,13 @@ setMethod("display", signature(x="ImageX"),
 
 ## animate displays images using ImageMagick
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("animate", signature(x="ImageX"),
-  function (x, ...) {
+setMethod ("animate", signature(x="array"),
+  function (x) {
     validObject(x)
-    invisible ( .ImageCall("lib_animate", x ) )
+    invisible (.ImageCall("lib_animate", x ) )
   }
 )
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("animate", signature(x="array"),
-  function (x, ...) {
-    validObject(x)
-    animate(Image(x), ...)
-  }
-)
 
 
 

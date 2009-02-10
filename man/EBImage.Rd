@@ -7,17 +7,16 @@
 \title{Package overview}
 
 \description{
-  \code{EBImage} is the image processing and analysis package for R. Its primary 
+  \code{EBImage} is an image processing and analysis package for R. Its primary 
   goal is to enable automated analysis of large sets of images such as those
   obtained in high throughput automated microscopy.
 
-  The package uses \code{ImageMagick} library for image I/O operations and
-  for many image processing routines. Algorithms for image analysis are
-  implemented natively including algorithms for feature extraction.
+  The package uses the \code{ImageMagick} library for image I/O operations and 
+  some image processing methods. The \code{GTK} library is used for displaying images 
+  using \code{display}.
 
-  Image data are stored in objects of the class \code{\linkS4class{Image}}, which
-  is derived as an S4 class from \code{\link{array}} and inherits all of its 
-  properties and methods.
+  \code{EBImage} relies on the \code{Image} object to store and process images 
+  but also works on multi-dimensional arrays.
 }
 
 \section{Package content}{
@@ -79,7 +78,7 @@
   
   Colorspace manipulation
   \itemize{  
-    \item \code{rgbImage}, code{channel}
+    \item \code{rgbImage}, \code{channel}
     \item \code{channelMix}
   }
   
@@ -133,7 +132,7 @@
 
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}, Copyright 2005-2007
 
-  Gregoire Pau, \email{gpau@ebi.ac.uk},
+  Gregoire Pau, \email{gpau@ebi.ac.uk}
   
   Wolfgang Huber, \email{huber@ebi.ac.uk}
   
@@ -159,11 +158,7 @@
 
   \preformatted{
   This library is free software; you can redistribute it and/or modify it 
-  under the terms of the
-
-  GNU Lesser General Public License
-
-  as published by the Free Software Foundation; either version 2.1 of the 
+  under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the 
   License, or (at your option) any later version. This library is distributed
   in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even 
   the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
