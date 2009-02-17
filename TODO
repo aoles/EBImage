@@ -28,7 +28,11 @@ low:
 - R testing using hashing
 
 wolfgang:
-- the explanation of argument colormode should mention the other possible values besides "Grayscale"
+readImage man page:
+- the explanation of the argument colormode should mention the other possible values besides "Grayscale"
 - "Details" talks about choose.image even though that function name occurs nowhere else, and it is deprecated.
 - The "Examples" still use TrueColor even that is deprecated as well. 
-- wouldb't it make sense to document the argument "main" of the "display" method for ImageX? Also, the way the default value of this argument is currently handled does not work: the window title is always "x". 
+- wouldn't it make sense to document the argument "main" of the "display" method for ImageX? Also, the way the default value of this argument is currently handled does not work: the window title is always "x". This was discussed here: https://stat.ethz.ch/pipermail/r-help/2008-January/152287.html
+
+EBImage-deprecated.html man page: 
+- "The functions are likely to be defunct with the next Bioconductor release, 2.2." but the last release was already 2.3 ...
