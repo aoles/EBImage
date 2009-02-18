@@ -36,3 +36,6 @@ readImage man page:
 
 EBImage-deprecated.html man page: 
 - "The functions are likely to be defunct with the next Bioconductor release, 2.2." but the last release was already 2.3 ...
+
+drawtext man page:
+Clean up 'Value' section. Explain what drawtext and drawfont(?) function. Make the example less convoluted. In Description, describe what is there, not what someone thinks might sometime be there.
