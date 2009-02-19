@@ -16,32 +16,21 @@
 
 
 ## display uses GTK
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod("display", signature(x="array"),
-  function(x, no.GTK=FALSE, main=NULL, colorize=NULL) {
-    validObject(x)
-    if (is.null(main)) main=paste(deparse(substitute(x), 500), collapse="\n")
-
-    if (!is.null(colorize)) {
-      mx <- max(x)
-      ## cr <- colorRamp(c("#FF0000", "#FFAA00", "#FFFF00", "#00FF00", "#00FFFF", "#0000FF", "#FF00FF"))
-      ## cols <- channel(c("black", sample(rgb(cr(seq_len(mx)/mx)/255), mx)), "rgb")
-      index <- match(imageData(x), c(0,seq_len(mx)))
-      cols <- as.integer(c(0, runif(mx, 1, 0xFFFFFF)))
-      x <- Image(cols[index], dim(x), colormode=TrueColor)
-    }
-  invisible ( .ImageCall("lib_display", x, as.character(main), as.logical(no.GTK) ) )
-  }
-)
+display = function(x, title=paste(deparse(substitute(x))), useGTK=TRUE, ...) {
+  title = as.character(title)
+  useGTK = as.logical(useGTK)
+  stopifnot(length(useGTK)==1L, length(title)==1L, is(x, "Image"))
+  validObject(x)
+  invisible(.Call("lib_display", x, title, useGTK, PACKAGE="EBImage"))
+}
 
 ## animate displays images using ImageMagick
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("animate", signature(x="array"),
-  function (x) {
-    validObject(x)
-    invisible (.ImageCall("lib_animate", x ) )
-  }
-)
+animate = function (x, ...) {
+  stopifnot(is(x, "Image"))
+  validObject(x)
+  invisible(.Call("lib_animate", x, PACKAGE="EBImage"))
+}
+
 
 
 

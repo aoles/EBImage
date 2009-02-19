@@ -49,7 +49,7 @@ GdkPixbuf *newPixbufFromSEXP (SEXP x, int index);
 #endif
 /*----------------------------------------------------------------------- */
 SEXP
-lib_display(SEXP x, SEXP caption, SEXP nogtk) {
+lib_display(SEXP x, SEXP caption, SEXP useGTK) {
 #ifndef WIN32
     pthread_t res;
 #endif
@@ -57,7 +57,7 @@ lib_display(SEXP x, SEXP caption, SEXP nogtk) {
     validImage(x,0);
 
 #ifdef USE_GTK
-    if ( !LOGICAL(nogtk)[0] ) {
+    if ( LOGICAL(useGTK)[0] ) {
         if ( GTK_OK )
             _showInGtkWindow (x, caption);
         else
@@ -67,12 +67,12 @@ lib_display(SEXP x, SEXP caption, SEXP nogtk) {
 #endif
 
 #ifdef WIN32
-    error ( "only GTK+ display is awailable on Windows" );
+    error ( "ImageMagick 'display' is not available on Windows" );
 #else
     if ( THREAD_ON )
-        error ( "cannot display concurent windows. Close currently displayed window first." );
+        error ( "Cannot display multiple windows. Please close the currently displayed window first." );
     if ( pthread_create(&res, NULL, _showInImageMagickWindow, (void *)x ) != 0 )
-        error ( "cannot create display thread" );
+        error ( "Failed to create 'display' thread" );
 #endif
     return R_NilValue;
 }
@@ -87,12 +87,12 @@ lib_animate (SEXP x) {
     validImage(x,0);
 
 #ifdef WIN32
-    error ( "animate function is not available on Windows because it uses ImageMagick interactive display" );
+    error ( "ImageMagick 'animate' is not available on Windows." );
 #else
     if ( THREAD_ON )
-        error ( "cannot display concurent windows. Close currently displayed window first." );
+        error ( "Cannot display multiple windows. Please close the currently displayed window first." );
     if ( pthread_create(&res, NULL, _animateInImageMagickWindow, (void *)x ) != 0 )
-        error ( "cannot animate display thread" );
+        error ( "Failed to create 'animate' thread" );
 #endif
     return R_NilValue;
 }
