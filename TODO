@@ -45,3 +45,5 @@ Clean up 'Value' section. Explain what drawtext and drawfont(?)
 
 writeImage man page:
 refers to a 'fileName(x)' method - which thankfully no longer exists.
+
+Remove the weird functions 'ensureStorageMode' and '.ImageCall'

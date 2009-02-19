@@ -3,106 +3,64 @@
 \alias{display}
 \alias{animate}
 \alias{animate,Image-method}
-\alias{animate,IndexedImage-method}
-\alias{animate,array-method}
+\alias{display,Image-method}
 
 \concept{display}
 
-\title{ Interactive image display }
+\title{Interactive image display}
 
 \description{
-  Display images on the screen of a local or remote display. 
+  Display images.
 }
 
 \usage{
-  display(x, no.GTK=FALSE, ...)
+  display(x, ...)
+  animate(x, ...)
 
-  \S4method{animate}{Image}(x, ...)        ## not available on Windows
-  \S4method{animate}{IndexedImage}(x, ...) ## not available on Windows
-  \S4method{animate}{array}(x, ...)        ## not available on Windows
+  \S4method{display}{Image}(x, useGTK=TRUE, title=paste(deparse(substitute(x))), ...)
+  \S4method{animate}{Image}(x, ...)
 }
 
 \arguments{
-
-  \item{x}{An object of \code{\linkS4class{Image}}, \code{\linkS4class{IndexedImage}}
-    or \code{\link{array}}. }
-
-  \item{no.GTK}{ A logical value, if \code{TRUE} an \emph{ImageMagick}
-    display will be used instead of the GTK display (read details below). 
-    On Windows the \emph{ImageMagick} display is not available. } 
-
-  \item{...}{ Reserved. }
+  \item{x}{An object of \code{\linkS4class{Image}}.} 
+  \item{useGTK}{A logical of length 1. See details.} 
+  \item{title}{Window title.}
+  \item{...}{Currently not used.}
 }
 
 \value{
-
-  An invisible \code{NULL}.
+  The functions are called for their side effect.
+  Return value is invisible \code{NULL}.
 }
 
 \details{
-  The argument \code{main} can be used with the GTK display to substitute the
-  default window title. By default, the GTK display shows the expression used
-  in call to \code{display} for the window title.
+  By default (and if available), the \code{display} function uses GTK to
+  open a window and display the image. Multiple windows can be opened in
+  this way.
   
-  When used with \code{\linkS4class{IndexedImage}} \code{display} additionally 
-  accepts a \code{colorize} argument. If it is provided with any value of any 
-  class, then objects are mapped on the display using random RGB colors.
-
-  If available the \code{GTK} display will be used by default. This mode allows
-  display of multiple images simultaneously. If the \code{GTK} mode is not used,
-  an \code{ImageMagick}-internal display function, is used. This mode is
-  for compatibility purposes only and should not be used if \code{GTK} is
-  available. Because \code{ImageMagick} does not provide any programmatic ways to
-  control and close display windows, the display in this mode is limited to one
-  it time. The display window must be explicitly closed before a new image can
-  be displayed. If \code{EBImage} was installed without \code{GTK} support,
-  the function will fall back to the \code{ImageMagick} display automatically.
-  In this case there is no need to supply \code{no.GTK} argument.
+  If GTK is not available or if \code{useGTK} is \code{FALSE}, 
+  ImageMagick is used; only one window at a time can be open,
+  and it needs to be closed by the user interactively before
+  the next window can be opened. The ImageMagick display is not
+  available on MS-Windows.
   
-  So far \code{animate} uses the \code{AnimateImages} function from
-  \code{ImageMagick}, which behavior is analogous to that of the \code{ImageMagick} 
-  display. This function is not available on Windows due to the lack of support
-  in the \code{ImageMagick} API.
-  
-  \code{GTK} display does not use \code{GTK} widgets available from other \code{R}
-  packages, the functionality is coded in \code{EBImage}. Therefore, the package
-  must be compiled with \code{GTK} support in order to enable it.
+  The \code{animate} function uses \code{ImageMagick}. Similar limitations as for \code{display} apply
+  (only one window, not on MS-Windows.)
 }
 
-\seealso{ \code{
-    \linkS4class{Image}, \linkS4class{IndexedImage}, \link{Image}, 
-    \link{readImage}, \link{writeImage}
-}}
-
 \references{
-  \emph{ImageMagick}: \url{http://www.imagemagick.org}; \emph{GTK}: 
-  \url{http://www.gtk.org}; \emph{GTK on Windows}: \url{http://gladewin32.sf.net}
+  ImageMagick: \url{http://www.imagemagick.org}
+  GTK: \url{http://www.gtk.org}, on MS-Windows \url{http://gladewin32.sf.net}
 }
 
 \examples{
-
-  ## load images of nuclei (seed points later)
-  f <- paste( system.file(package="EBImage"), "images/Gene1_G.tif", sep="/" )
-  ii = readImage(f)
-  ## normalize images
-  ii = normalize(ii, separate=TRUE)
-  ## segment
-  mask = thresh(ii, 25, 25, 0.02)
-  ## refine segmentation with morphology filters
-  mk3 = morphKern(3)
-  mk5 = morphKern(5)
-  mask = dilate(erode(closing(mask, mk5), mk3), mk5)
-  ## index objects with 'watershed'
-  io = watershed( distmap(mask), 1.5, 1)
-  if (interactive()) {
-    display(io)
-    display(io, main="Watershed segmentation", colorize=T)
+  if(interactive()) {
+    Lena = readImage(system.file("images", "lena-color.png", package="EBImage"))
+    display(Lena)
   }
 }
 
 \author{
-  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2005-2007
+  Oleg Sklyar, \email{osklyar@ebi.ac.uk}
 }
-
-\keyword{file}
 

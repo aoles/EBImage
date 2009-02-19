@@ -232,15 +232,17 @@ setMethod("Ops", signature(e1="numeric", e2="Image"),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("writeImage", signature(x="array"),
-  function (x, files, quality=100) {
-    validObject(x)
-    if ( quality < 1 || quality > 100 )
-      stop( "quality value is given in % between 1 and 100" )
-    if ( missing(files) ) stop('\'files\' must be specified')
-    invisible ( .ImageCall("lib_writeImages", x, as.character(files), as.integer(quality) ) )
-  }
-)
+writeImage = function (x, files, quality=100) {
+  if (missing(files))
+    stop("Please specify a value for the argument 'files'.")
+  files = as.character(files)
+  quality = as.integer(quality)
+  stopifnot(is(x, "Image"), length(quality)==1L)
+  validObject(x)
+  if ((quality<1L) || (quality>100L))
+    stop(sprintf("'quality' must be a value between 1 and 100, but it is %8g.", quality))
+  invisible(.Call("lib_writeImages", x, files, quality))
+}
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 readImage <- function(files, colormode) {
