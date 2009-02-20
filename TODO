@@ -40,9 +40,13 @@ Clean up 'Value' section. Explain what drawtext and drawfont functions
 Remove the weird functions 'ensureStorageMode' and '.ImageCall'
 
 
-zernikeMoments function and man page: What is the 'apply.Gaussian =
-   TRUE' argument doing? It seems bizarre. Does it make sense?
-
+zernikeMoments function and man page: 
+   1.) What is the 'apply.Gaussian = TRUE' argument doing? It seems
+   bizarre. Does it make sense? Same question for 'pseudo'.
+   2.) The function used to compute the Zernike polynomials should be 
+   exposed (e.g. it could take the values of n and l, and a
+   parameterisation of a grid of points in R^2 on which the values 
+   should be computed; it could return the values on this grid.)
 
 Do we need "colormode" in readImage and as an attribute of the Image
    class? Wouldn't it be enough to have this as an argument of 'display'
