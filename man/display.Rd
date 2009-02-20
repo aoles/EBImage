@@ -2,8 +2,6 @@
 
 \alias{display}
 \alias{animate}
-\alias{animate,Image-method}
-\alias{display,Image-method}
 
 \concept{display}
 
@@ -14,17 +12,19 @@
 }
 
 \usage{
-  display(x, ...)
-  animate(x, ...)
-
-  \S4method{display}{Image}(x, useGTK=TRUE, title=paste(deparse(substitute(x))), ...)
-  \S4method{animate}{Image}(x, ...)
+display(x,
+        no.GTK, main, colorize,
+        title = paste(deparse(substitute(x))),
+        useGTK = TRUE, ...)
+animate(x,
+        ...)
 }
 
 \arguments{
   \item{x}{An object of \code{\linkS4class{Image}}.} 
   \item{useGTK}{A logical of length 1. See details.} 
   \item{title}{Window title.}
+  \item{no.GTK, main, colorize}{Defunct.}
   \item{...}{Currently not used.}
 }
 
