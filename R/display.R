@@ -16,7 +16,12 @@
 
 
 ## display uses GTK
-display = function(x, title=paste(deparse(substitute(x))), useGTK=TRUE, ...) {
+display = function(x, no.GTK, main, colorize,
+  title=paste(deparse(substitute(x))), useGTK=TRUE, ...) {
+  
+  if(!(missing(no.GTK)&&missing(main)&&missing(colorize)))
+    .Defunct("'no.GTK', 'main', 'colorize' are defunct in Bioconductor >= 2.4. Please use 'title' and 'useGTK' instead.")
+  
   title = as.character(title)
   useGTK = as.logical(useGTK)
   stopifnot(length(useGTK)==1L, length(title)==1L, is(x, "Image"))

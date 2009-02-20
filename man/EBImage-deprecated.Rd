@@ -1,7 +1,6 @@
 \name{EBImage-deprecated}
 
 \alias{EBImage-deprecated}
-\alias{choose.image}
 \alias{read.image}
 \alias{write.image}
 \alias{write.image,Image-method}
@@ -31,7 +30,6 @@
 
 \section{Substitutions for the deprecated functions}{
 
-\code{'choose.image' => \link{chooseImage}}
 
 \code{'edge.features' => \link{edgeFeatures}}
 

@@ -28,22 +28,23 @@ low:
 - R testing using hashing
 
 wolfgang:
-readImage man page:
-- the explanation of the argument colormode should mention the other possible values besides "Grayscale"
-- "Details" talks about choose.image even though that function name occurs nowhere else, and it is deprecated.
-- The "Examples" still use TrueColor even that is deprecated as well. 
-- wouldn't it make sense to document the argument "main" of the "display" method for ImageX? Also, the way the default value of this argument is currently handled does not work: the window title is always "x". This was discussed here: https://stat.ethz.ch/pipermail/r-help/2008-January/152287.html
+
 
 EBImage-deprecated.html man page: 
 - "The functions are likely to be defunct with the next Bioconductor release, 2.2." but the last release was already 2.3 ...
 
 drawtext man page:
-Clean up 'Value' section. Explain what drawtext and drawfont(?)
-   function. Make the example less convoluted. In Description,
-   describe what is there, not what someone thinks might sometime be
-   there.
-
-writeImage man page:
-refers to a 'fileName(x)' method - which thankfully no longer exists.
+Clean up 'Value' section. Explain what drawtext and drawfont functions
+   do.
 
 Remove the weird functions 'ensureStorageMode' and '.ImageCall'
+
+Do we need "colormode" in readImage and as an attribute of the Image
+   class? Wouldn't it be enough to have this as an argument of 'display'
+   and 'writeImage', to ask these functions to attempt to interpret
+   the third dimension of the Image object as three RGB color
+   channels? Everything else in the package should not really depend
+   on this (some functions might require the third dimesion to be of
+   size 1).
+ 
+How are we going to represent 3D 'images' (x,y,z), and time?

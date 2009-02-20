@@ -241,20 +241,16 @@ writeImage = function (x, files, quality=100) {
   validObject(x)
   if ((quality<1L) || (quality>100L))
     stop(sprintf("'quality' must be a value between 1 and 100, but it is %8g.", quality))
-  invisible(.Call("lib_writeImages", x, files, quality))
+  .Call("lib_writeImages", x, files, quality)
+  invisible(files)
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-readImage <- function(files, colormode) {
-  if (missing(files)) stop("argument 'files' must be present in calls to 'readImage'")
-  if (missing(colormode)) colormode=-1
-  .DoCall ("lib_readImages", as.character(files), as.integer(colormode) )
-}
-
-## GP: Useful ?
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-chooseImage <- function(colormode=Grayscale) {
-  .DoCall ("lib_chooseImages", as.integer(colormode))
+readImage = function(files, colormode = Grayscale) {
+  if (missing(files)) 
+    .DoCall ("lib_chooseImages", as.integer(colormode))
+  else 
+    .DoCall ("lib_readImages", as.character(files), as.integer(colormode))
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

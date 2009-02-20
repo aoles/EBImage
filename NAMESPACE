@@ -66,9 +66,6 @@ exportMethods(getFeatures, hullFeatures, edgeProfile, edgeFeatures)
 exportMethods(cmoments, smoments, rmoments, moments)
 exportMethods(haralickMatrix, haralickFeatures, zernikeMoments)
 
-## GUI interactive
-export(chooseImage)
-
 ## deprecated
 export(read.image, choose.image,stopIfNotImage)
 exportMethods(write.image, hull.features, edge.profile, edge.features)
