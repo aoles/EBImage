@@ -110,11 +110,6 @@
     \item \code{zernikeMoments}
   }
   
-  GUI interactive
-  \itemize{
-    \item \code{chooseImage}
-  }
-  
   Deprecated
   \itemize{
     \item \code{read.image}, \code{write.image}
