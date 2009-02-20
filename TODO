@@ -39,6 +39,11 @@ Clean up 'Value' section. Explain what drawtext and drawfont functions
 
 Remove the weird functions 'ensureStorageMode' and '.ImageCall'
 
+
+zernikeMoments function and man page: What is the 'apply.Gaussian =
+   TRUE' argument doing? It seems bizarre. Does it make sense?
+
+
 Do we need "colormode" in readImage and as an attribute of the Image
    class? Wouldn't it be enough to have this as an argument of 'display'
    and 'writeImage', to ask these functions to attempt to interpret
@@ -48,3 +53,4 @@ Do we need "colormode" in readImage and as an attribute of the Image
    size 1).
  
 How are we going to represent 3D 'images' (x,y,z), and time?
+
