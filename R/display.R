@@ -24,16 +24,16 @@ display = function(x, no.GTK, main, colorize,
   
   title = as.character(title)
   useGTK = as.logical(useGTK)
-  stopifnot(length(useGTK)==1L, length(title)==1L, is(x, "Image"))
+  stopifnot(length(useGTK)==1L, length(title)==1L, is(x, "array"))
   validObject(x)
-  invisible(.Call("lib_display", x, title, useGTK, PACKAGE="EBImage"))
+  invisible(.ImageCall("lib_display", x, title, useGTK))
 }
 
 ## animate displays images using ImageMagick
 animate = function (x, ...) {
-  stopifnot(is(x, "Image"))
+  stopifnot(is(x, "array"))
   validObject(x)
-  invisible(.Call("lib_animate", x, PACKAGE="EBImage"))
+  invisible(.ImageCall("lib_animate", x, PACKAGE="EBImage"))
 }
 
 
