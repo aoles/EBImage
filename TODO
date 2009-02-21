@@ -10,6 +10,7 @@ high:
 - check previous vignette
 - check features values with current EBImage release
 - channel: two methods, rewrite vignette and usecases
+- validObject must check image validity even if it is array (stopifnot to be removed)
 
 low:
 - remove lib_ things
@@ -57,4 +58,3 @@ Do we need "colormode" in readImage and as an attribute of the Image
    size 1).
  
 How are we going to represent 3D 'images' (x,y,z), and time?
-

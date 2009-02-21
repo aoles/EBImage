@@ -34,8 +34,12 @@ typedef struct {
   double nx,ny,nz;
   double x,y;
   double zoom;
-  double index;
-} dstats;
+  GtkWidget *hSlider;
+  GtkWidget *imgWG;
+  GtkWidget *stbarWG;
+  int index;
+  SEXP xx;
+} udata;
 
 #define INTERP_METHOD GDK_INTERP_NEAREST
 int THREAD_ON = 0;
@@ -147,24 +151,22 @@ gboolean onNextImPress  (GtkToolButton *, gpointer);         // "button-press-ev
 gboolean onPrevImPress  (GtkToolButton *, gpointer);         // "button-press-event"
 gboolean onScroll       (GtkAdjustment *adjustment, gpointer ptr) ;  // "value-changed"
 gboolean onMouseMove    (GtkWidget *, GdkEventMotion *, gpointer); // "motion-notify-event"
-void     updateStatusBar(GtkStatusbar * stbarWG, dstats * stats);
-
-typedef gpointer * ggpointer;
+gboolean onSlide(GtkRange *range, gpointer user_data);
+void updateStatusBar(gpointer user_data);
+void updateFrame(gpointer user_data,double factor);
 
 /*----------------------------------------------------------------------- */
 void
 _showInGtkWindow (SEXP xx, SEXP caption) {
     int nx, ny, nz, width, height;
-    dstats *stats;
+    udata *dat;
     SEXP dim;
     GdkPixbuf * pxbuf;
-    GtkWidget * imgWG, * evBox, * winWG, * vboxWG, * tbarWG, * stbarWG, * scrollWG,
-              * btnZoomInWG, * btnZoomOutWG, * btnZoomOneWG,
-              * btnNextWG, * btnPrevWG;
+    GtkWidget *evBox, *winWG, *vboxWG, *tbarWG, *scrollWG,
+      *btnZoomInWG, *btnZoomOutWG, *btnZoomOneWG,
+      *btnNextWG, *btnPrevWG;
+    GtkObject *hAdjustment;
     GtkIconSize iSize;
-    gpointer ** winStr; /* 6 pointers, 0 - window, 1 - imageWG, 2 - images, 3 - *int - index of current image on display,
-                                       4 - statusbar, 5 - pointer to dstats  */
-
     if ( !GTK_OK )
         error ( "failed to initialize GTK+, use 'read.image' instead" );
 
@@ -173,6 +175,17 @@ _showInGtkWindow (SEXP xx, SEXP caption) {
     ny = INTEGER (dim)[1];
     nz = getNumberOfFrames(xx,1);
 
+    dat=g_new(udata,1);
+    dat->nx=nx;
+    dat->ny=ny;
+    dat->nz=nz;
+    dat->x=0;
+    dat->y=0;
+    dat->zoom=1.0;
+    dat->index=0;
+    dat->hSlider=NULL;
+    dat->xx=xx;
+   
     // xx is preserved from garbage collection til the windows is closed
     R_PreserveObject(xx);
 
@@ -182,84 +195,76 @@ _showInGtkWindow (SEXP xx, SEXP caption) {
     if ( pxbuf == NULL )
         error ( "cannot copy image data to display window" );
 
-    /* create window structure */
-    winStr = g_new ( ggpointer, 6 );
-    winStr[3] = (gpointer *) g_new0 (int, 1);
-    winStr[2] = (gpointer *) xx;
-
-    /* create image display */
-    imgWG = gtk_image_new_from_pixbuf (pxbuf);
-//    gtk_misc_set_alignment(GTK_MISC(imgWG),0.0,0.0);
-    
-    winStr[1] = (gpointer *) imgWG;
+    /* create imae display */
+    dat->imgWG = gtk_image_new_from_pixbuf (pxbuf);
     g_object_unref (pxbuf);
+
     /* create main window */
     winWG =  gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    winStr[0] = (gpointer *) winWG;
     if ( caption != R_NilValue )
       gtk_window_set_title ( GTK_WINDOW(winWG), CHAR( asChar(caption) ) );
     else
       gtk_window_set_title ( GTK_WINDOW(winWG), "R image display" );
     /* set destroy event handler for the window */
-    g_signal_connect ( G_OBJECT(winWG), "delete-event", G_CALLBACK(onWinDestroy), winStr );
+    g_signal_connect ( G_OBJECT(winWG), "delete-event", G_CALLBACK(onWinDestroy), dat);
 
     /* create controls and set event handlers */
     /* create general horizontal lyout with a toolbar and add it to the window */
     vboxWG = gtk_vbox_new (FALSE, 0);
     gtk_container_add ( GTK_CONTAINER(winWG), vboxWG);
+
     /* create toolbar and push it to layout */
     tbarWG = gtk_toolbar_new ();
     gtk_box_pack_start ( GTK_BOX(vboxWG), tbarWG, FALSE, FALSE, 0);
+
+    // add a horizontal slider
+    if (nz>1) {
+      hAdjustment=gtk_adjustment_new(1,1,nz,1,1,0);
+      dat->hSlider=gtk_hscale_new(GTK_ADJUSTMENT(hAdjustment));
+      gtk_scale_set_digits(GTK_SCALE(dat->hSlider),0);
+      gtk_box_pack_start(GTK_BOX(vboxWG), dat->hSlider, FALSE,FALSE, 0);
+      gtk_signal_connect(GTK_OBJECT(dat->hSlider),"value-changed", GTK_SIGNAL_FUNC(onSlide), dat);
+    }
+
     /* create scrollbox that occupies and extends and push it to layout */
     scrollWG = gtk_scrolled_window_new (NULL, NULL);
     gtk_box_pack_start ( GTK_BOX(vboxWG), scrollWG, TRUE, TRUE, 5);
     gtk_scrolled_window_set_policy ( GTK_SCROLLED_WINDOW(scrollWG), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     /* add image to event box */
     evBox = gtk_event_box_new();
-    gtk_container_add(GTK_CONTAINER(evBox), imgWG);
+    gtk_container_add(GTK_CONTAINER(evBox), dat->imgWG);
     /* add image to scroll */
     gtk_scrolled_window_add_with_viewport ( GTK_SCROLLED_WINDOW(scrollWG), evBox);
-    gtk_signal_connect(GTK_OBJECT(gtk_scrolled_window_get_hadjustment(GTK_SCROLLED_WINDOW(scrollWG))),"value-changed", GTK_SIGNAL_FUNC(onScroll), winStr);
-    gtk_signal_connect(GTK_OBJECT(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrollWG))),"value-changed", GTK_SIGNAL_FUNC(onScroll), winStr);
+    gtk_signal_connect(GTK_OBJECT(gtk_scrolled_window_get_hadjustment(GTK_SCROLLED_WINDOW(scrollWG))),"value-changed", GTK_SIGNAL_FUNC(onScroll), dat);
+    gtk_signal_connect(GTK_OBJECT(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrollWG))),"value-changed", GTK_SIGNAL_FUNC(onScroll), dat);
 
     /* create status bar and push it to layout */
-    stbarWG = gtk_statusbar_new ();
-    gtk_box_pack_start ( GTK_BOX(vboxWG), stbarWG, FALSE, FALSE, 0);
+    dat->stbarWG = gtk_statusbar_new ();
+    gtk_box_pack_start ( GTK_BOX(vboxWG), dat->stbarWG, FALSE, FALSE, 0);
 
-    stats = g_new ( dstats, 1 );
-    stats->nx=nx;
-    stats->ny=ny;
-    stats->nz=nz;
-    stats->x=0;
-    stats->y=0;
-    stats->zoom=1.0;
-    stats->index=0;
-
-    winStr[4] = (gpointer *) stbarWG;
-    winStr[5] = (gpointer *) stats;
     /* add zoom buttons */
     iSize = gtk_toolbar_get_icon_size ( GTK_TOOLBAR(tbarWG) );
     btnZoomInWG = (GtkWidget *) gtk_tool_button_new ( gtk_image_new_from_stock("gtk-zoom-in", iSize), "Zoom in" );
     gtk_container_add ( GTK_CONTAINER(tbarWG), btnZoomInWG);
-    g_signal_connect ( G_OBJECT(btnZoomInWG), "clicked", G_CALLBACK(onZoomInPress), winStr);
+    g_signal_connect ( G_OBJECT(btnZoomInWG), "clicked", G_CALLBACK(onZoomInPress), dat);
     btnZoomOutWG = (GtkWidget *) gtk_tool_button_new ( gtk_image_new_from_stock("gtk-zoom-out", iSize), "Zoom out" );
     gtk_container_add ( GTK_CONTAINER(tbarWG), btnZoomOutWG);
-    g_signal_connect ( G_OBJECT(btnZoomOutWG), "clicked", G_CALLBACK(onZoomOutPress), winStr);
+    g_signal_connect ( G_OBJECT(btnZoomOutWG), "clicked", G_CALLBACK(onZoomOutPress), dat);
     btnZoomOneWG = (GtkWidget *) gtk_tool_button_new ( gtk_image_new_from_stock("gtk-yes", iSize), "1:1");
     gtk_container_add ( GTK_CONTAINER(tbarWG), btnZoomOneWG);
-    g_signal_connect ( G_OBJECT(btnZoomOneWG), "clicked", G_CALLBACK(onZoomOnePress), winStr);
+    g_signal_connect ( G_OBJECT(btnZoomOneWG), "clicked", G_CALLBACK(onZoomOnePress), dat);
 
     /* add browsing buttons */
     if ( nz > 1 ) {
         btnPrevWG = (GtkWidget *) gtk_tool_button_new ( gtk_image_new_from_stock("gtk-go-back", iSize), "Previous" );
         gtk_container_add ( GTK_CONTAINER(tbarWG), btnPrevWG);
-        g_signal_connect ( G_OBJECT(btnPrevWG), "clicked", G_CALLBACK(onPrevImPress), winStr);
+        g_signal_connect ( G_OBJECT(btnPrevWG), "clicked", G_CALLBACK(onPrevImPress), dat);
         btnNextWG = (GtkWidget *) gtk_tool_button_new ( gtk_image_new_from_stock("gtk-go-forward", iSize), "Next" );
         gtk_container_add ( GTK_CONTAINER(tbarWG), btnNextWG);
-        g_signal_connect ( G_OBJECT(btnNextWG), "clicked", G_CALLBACK(onNextImPress), winStr);
+        g_signal_connect ( G_OBJECT(btnNextWG), "clicked", G_CALLBACK(onNextImPress), dat);
     }
 
-    gtk_signal_connect( GTK_OBJECT(evBox), "motion-notify-event", GTK_SIGNAL_FUNC(onMouseMove), winStr);
+    gtk_signal_connect( GTK_OBJECT(evBox), "motion-notify-event", GTK_SIGNAL_FUNC(onMouseMove), dat);
     gtk_widget_set_events(evBox, GDK_POINTER_MOTION_MASK ); // GDK_BUTTON_PRESS_MASK | 
     
     /* resize to fit image */
@@ -273,165 +278,90 @@ _showInGtkWindow (SEXP xx, SEXP caption) {
 
     /* show window */
     gtk_widget_show_all (winWG);
-    updateStatusBar((GtkStatusbar *)stbarWG, stats);
+    updateStatusBar(dat);
     gdk_flush();
 }
 
 /*----------------------------------------------------------------------- */
 gboolean
-onWinDestroy (GtkWidget * wnd, GdkEvent * event, gpointer ptr) {
-    gpointer ** winStr;
-    SEXP xx;
-    //Image * images;
-    winStr = (gpointer **) ptr;
-    g_free (winStr[3]);
-    //images = (Image *) winStr[2];
-    xx=(SEXP)winStr[2];
-    R_ReleaseObject(xx);
-    g_free (winStr[5]); /* stats */
-    g_free (winStr);
-    //images = DestroyImageList (images);
-/*    Rprintf ( _("R image display closed...\n") ); */
-    return FALSE;
+onWinDestroy (GtkWidget * wnd, GdkEvent * event, gpointer user_data) {
+  udata *dat=(udata *)user_data;
+  R_ReleaseObject(dat->xx);
+  g_free (dat);
+  return FALSE;
 }
 
-/*----------------------------------------------------------------------- */
-gboolean
-onZoomInPress (GtkToolButton * btn, gpointer ptr) {
-    gpointer ** winStr;
-    int width, height, index;
-    dstats * stats;
-    GdkPixbuf * pxbuf, * newPxbuf;
-    GtkImage * imgWG;
-    SEXP xx;
-
-    winStr = (gpointer **) ptr;
-    imgWG = GTK_IMAGE (winStr[1]);
-    xx = (SEXP) winStr[2];
-    index = *(int *)winStr[3];
-    pxbuf = newPixbufFromSEXP (xx, index );
-    stats = (dstats *)winStr[5];
-
-    width = gdk_pixbuf_get_width ( gtk_image_get_pixbuf(imgWG) );
-    height = gdk_pixbuf_get_height ( gtk_image_get_pixbuf(imgWG) );
-    newPxbuf = gdk_pixbuf_scale_simple ( pxbuf, (int)(width *2), (int)(height * 2), INTERP_METHOD);
-    stats->zoom *= 2;
-    gtk_image_set_from_pixbuf (imgWG, newPxbuf);
-    g_object_unref (newPxbuf);
-    g_object_unref (pxbuf);
-    updateStatusBar((GtkStatusbar *)winStr[4], stats);
-    gdk_flush();
-    return TRUE;
+gboolean onSlide(GtkRange *range, gpointer user_data) {
+  udata *dat=(udata *)user_data;
+  dat->index=gtk_range_get_value (GTK_RANGE(dat->hSlider))-1;
+  updateFrame(user_data,1);
+  updateStatusBar(user_data);
+  return TRUE;
 }
 
-/*----------------------------------------------------------------------- */
-gboolean
-onZoomOutPress (GtkToolButton * btn, gpointer ptr) {
-    gpointer ** winStr;
-    int width, height, index;
-    dstats * stats;
-    GdkPixbuf * pxbuf, * newPxbuf;
-    GtkImage * imgWG;
-    SEXP xx;
-
-    winStr = (gpointer **) ptr;
-    imgWG = GTK_IMAGE (winStr[1]);
-    xx = (SEXP ) winStr[2];
-    index = *(int *)winStr[3];
-    pxbuf = newPixbufFromSEXP (xx, index );
-    stats = (dstats *)winStr[5];
-
-    width = gdk_pixbuf_get_width ( gtk_image_get_pixbuf(imgWG) );
-    height = gdk_pixbuf_get_height ( gtk_image_get_pixbuf(imgWG) );
-    newPxbuf = gdk_pixbuf_scale_simple ( pxbuf, (int)(width/2), (int)(height/2), INTERP_METHOD);
-    stats->zoom /= 2;
-
-    gtk_image_set_from_pixbuf (imgWG, newPxbuf);
-    g_object_unref (newPxbuf);
-    g_object_unref (pxbuf);
-    updateStatusBar((GtkStatusbar *)winStr[4], stats);
-    gdk_flush();
-    return TRUE;
-}
-
-/*----------------------------------------------------------------------- */
-gboolean
-onZoomOnePress (GtkToolButton * btn, gpointer ptr) {
-    gpointer ** winStr;
-    GdkPixbuf * pxbuf;
-    GtkImage * imgWG;
-    SEXP xx;
-    int index;
-    dstats * stats;
-
-    winStr = (gpointer **) ptr;
-    imgWG = GTK_IMAGE (winStr[1]);
-    xx = (SEXP) winStr[2];
-    index = *(int *)winStr[3];
-    pxbuf = newPixbufFromSEXP (xx, index );
-    stats = (dstats *)winStr[5];
-
+// factor = -1 resets the size
+void updateFrame(gpointer user_data,double factor) {
+  udata *dat=(udata *)user_data;
+  GtkImage *imgWG=GTK_IMAGE(dat->imgWG);
+  SEXP xx=dat->xx;
+  int width, height;
+  GdkPixbuf * pxbuf, * newPxbuf;    
+  
+  pxbuf = newPixbufFromSEXP (xx, dat->index);
+  if (factor==-1) {
     gtk_image_set_from_pixbuf (imgWG, pxbuf);
-    stats->zoom = 1.0;
-    g_object_unref (pxbuf);
-    updateStatusBar((GtkStatusbar *)winStr[4], stats);
-    gdk_flush();
-    return TRUE;
-}
-
-/*----------------------------------------------------------------------- */
-gboolean onScroll(GtkAdjustment *adjustment, gpointer ptr)
-{
-  return onMouseMove(NULL,NULL,ptr);
-}
-
-/*----------------------------------------------------------------------- */
-gboolean
-onNextImPress (GtkToolButton * btn, gpointer ptr) {
-    gpointer ** winStr;
-    int width, height, nz, index;
-    GdkPixbuf * pxbuf, * newPxbuf;
-    GtkImage * imgWG;
-    SEXP xx;
-    dstats * stats;
-
-    winStr = (gpointer **) ptr;
-    imgWG = GTK_IMAGE (winStr[1]);
-    xx = (SEXP) winStr[2];
-    stats = (dstats *)winStr[5];
-
+  } else { 
     width = gdk_pixbuf_get_width ( gtk_image_get_pixbuf(imgWG) );
     height = gdk_pixbuf_get_height ( gtk_image_get_pixbuf(imgWG) );
-
-    nz = getNumberOfFrames(xx,1);
-    index = *(int *)winStr[3] + 1;
-    if ( index == nz )
-        return TRUE;
-    pxbuf = newPixbufFromSEXP (xx, index);
-    *(int *)winStr[3] = index;
-    stats->index = index;
-
-    newPxbuf = gdk_pixbuf_scale_simple ( pxbuf, width, height, INTERP_METHOD);
+    newPxbuf = gdk_pixbuf_scale_simple ( pxbuf, (int)(width*factor), (int)(height*factor), INTERP_METHOD);
     gtk_image_set_from_pixbuf (imgWG, newPxbuf);
     g_object_unref (newPxbuf);
-    g_object_unref (pxbuf);
-    updateStatusBar((GtkStatusbar *)winStr[4], stats);
-    gdk_flush();
-    return TRUE;
+  }
+  
+  g_object_unref (pxbuf);
+  gdk_flush();
 }
-/*----------------------------------------------------------------------- */
-gboolean
-onPrevImPress (GtkToolButton * btn, gpointer ptr) {
-    gpointer ** winStr;
-    int width, height, nz, index;
-    GdkPixbuf * pxbuf, * newPxbuf;
-    GtkImage * imgWG;
-    SEXP xx;
-    dstats * stats;
 
-    winStr = (gpointer **) ptr;
-    imgWG = GTK_IMAGE (winStr[1]);
-    xx = (SEXP) winStr[2];
+gboolean onZoomInPress (GtkToolButton * btn, gpointer user_data) {
+  udata *dat=(udata *)user_data;
+  dat->zoom *= 2;
+  updateFrame(user_data,2);
+  updateStatusBar(user_data);
+  return TRUE;
+}
+
+gboolean onZoomOutPress (GtkToolButton * btn, gpointer user_data) {
+  udata *dat=(udata *)user_data;
+  dat->zoom *= 0.5;
+  updateFrame(user_data,0.5);
+  updateStatusBar(user_data);
+  return TRUE;
+}
+
+gboolean onZoomOnePress (GtkToolButton * btn, gpointer user_data) {
+  udata *dat=(udata *)user_data;
+  dat->zoom=1.0;
+  updateFrame(user_data,-1);
+  updateStatusBar(user_data);
+  return TRUE;
+}
+
+/*----------------------------------------------------------------------- */
+gboolean onScroll(GtkAdjustment *adjustment, gpointer user_data)
+{
+  return onMouseMove(NULL,NULL,user_data);
+}
+
+/*
+gboolean changeFrame(gpointer user_data) {
+  udata *dat=(udata *)user_data;
+  int width, height, nz, index;
+  GdkPixbuf * pxbuf, * newPxbuf;
+  GtkImage *imgWG=GTK_IMAGE(dat->imgWG);
+  SEXP xx=dat->xx;
+
+  winStr = (gpointer **) ptr;
+  xx = (SEXP) winStr[2];
     stats = (dstats *)winStr[5];
 
     width = gdk_pixbuf_get_width ( gtk_image_get_pixbuf(imgWG) );
@@ -453,40 +383,58 @@ onPrevImPress (GtkToolButton * btn, gpointer ptr) {
     gdk_flush();
     return TRUE;
 }
+*/
 
-/*----------------------------------------------------------------------- */
-gboolean 
-onMouseMove(GtkWidget * widget, GdkEventMotion * event, gpointer ptr) {
-    gpointer ** winStr;
-    dstats * stats;
+gboolean onNextImPress (GtkToolButton * btn, gpointer user_data) {
+  udata *dat=(udata *)user_data;
+  dat->index=dat->index+1;
+  if (dat->index>=dat->nz-1) dat->index=(dat->nz)-1;
+  if (dat->hSlider!=NULL) {
+    gtk_range_set_value (GTK_RANGE(dat->hSlider),(double)(dat->index+1));
+  }
+  updateFrame(user_data,1);
+  updateStatusBar(user_data);
+  return TRUE;
+}
 
-    winStr = (gpointer **) ptr;
-    GtkWidget * imgWG = GTK_WIDGET(winStr[1]);
-    stats = (dstats *)winStr[5];
-    gint x, y, x0=0, y0=0;
-
-    x0 = (imgWG->allocation.width - stats->nx*stats->zoom)/2;
-    if (x0 < 0) x0 = 0;
-    y0 = (imgWG->allocation.height - stats->ny*stats->zoom)/2;
-    if (y0 < 0) y0 = 0;
-
-    gtk_widget_get_pointer(imgWG, &x, &y);
-    stats->x = (x-x0) / stats->zoom + 1;
-    stats->y = (y-y0) / stats->zoom + 1;
-
-    if (stats->x<1) stats->x = 1;
-    if (stats->y<1) stats->y = 1;
-    if (stats->x>stats->nx) stats->x = stats->nx;
-    if (stats->y>stats->ny) stats->y = stats->ny;
-    
-    updateStatusBar((GtkStatusbar *)winStr[4], stats);
-    gdk_flush();
-    return TRUE;
+gboolean onPrevImPress (GtkToolButton * btn, gpointer user_data) {
+  udata *dat=(udata *)user_data;
+  dat->index=dat->index-1;
+  if (dat->index<0) dat->index=0;
+  if (dat->hSlider!=NULL) {
+    gtk_range_set_value (GTK_RANGE(dat->hSlider),(double)(dat->index+1));
+  }
+  updateFrame(user_data,1);
+  updateStatusBar(user_data);
+  return TRUE;
 }
 
 /*----------------------------------------------------------------------- */
-GdkPixbuf * 
-newPixbufFromSEXP (SEXP xx, int index) {
+gboolean 
+onMouseMove(GtkWidget * widget, GdkEventMotion * event, gpointer user_data) {
+  udata *dat=(udata *)user_data;
+  gint x, y, x0=0, y0=0;
+  
+  x0 = (dat->imgWG->allocation.width - dat->nx*dat->zoom)/2;
+  if (x0 < 0) x0 = 0;
+  y0 = (dat->imgWG->allocation.height - dat->ny*dat->zoom)/2;
+  if (y0 < 0) y0 = 0;
+
+  gtk_widget_get_pointer(dat->imgWG, &x, &y);
+  dat->x = (x-x0) / dat->zoom + 1;
+  dat->y = (y-y0) / dat->zoom + 1;
+
+  if (dat->x<1) dat->x = 1;
+  if (dat->y<1) dat->y = 1;
+  if (dat->x>dat->nx) dat->x = dat->nx;
+  if (dat->y>dat->ny) dat->y = dat->ny;
+  
+  updateStatusBar(user_data);
+  gdk_flush();
+  return TRUE;
+}
+
+GdkPixbuf * newPixbufFromSEXP (SEXP xx, int index) {
   GdkPixbuf * pixbuf;
   int width, height, rowstride, x, y;
   numeric *dx,dr,dg,db;
@@ -545,17 +493,14 @@ newPixbufFromSEXP (SEXP xx, int index) {
   return pixbuf;
 }
 
-/*----------------------------------------------------------------------- */
-void updateStatusBar(GtkStatusbar * stbarWG, dstats * stats) {
+void updateStatusBar(gpointer user_data) {
+  udata *dat=(udata *)user_data;
   gchar str[255];
-
-  /* 0: nx, 1: ny, 2: nz, 3: x, 4: y, 5: zoom, 6: index */
   sprintf(str, "Frame: %d/%d\tImage: %dx%dx%d\tZoom: %d%%\t Position: (%d,%d)", 
-	  (int)(stats->index+1), (int)stats->nz, (int)stats->nx, (int)stats->ny, (int)stats->nz, (int)(stats->zoom*100), (int)stats->x, (int)stats->y); 
-
-  gtk_statusbar_pop(stbarWG, 0);
-  gtk_statusbar_push(stbarWG, 0, str);
-}
+	  (int)(dat->index+1), (int)dat->nz, (int)dat->nx, (int)dat->ny, (int)dat->nz, (int)(dat->zoom*100), (int)dat->x, (int)dat->y); 
+  gtk_statusbar_pop(GTK_STATUSBAR(dat->stbarWG), 0);
+  gtk_statusbar_push(GTK_STATUSBAR(dat->stbarWG), 0, str);
+} 
 
 #endif
 

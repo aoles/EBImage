@@ -237,16 +237,17 @@ writeImage = function (x, files, quality=100) {
     stop("Please specify a value for the argument 'files'.")
   files = as.character(files)
   quality = as.integer(quality)
-  stopifnot(is(x, "Image"), length(quality)==1L)
+  stopifnot(is(x, "array"), length(quality)==1L)
   validObject(x)
   if ((quality<1L) || (quality>100L))
     stop(sprintf("'quality' must be a value between 1 and 100, but it is %8g.", quality))
-  .Call("lib_writeImages", x, files, quality)
+  .ImageCall("lib_writeImages", x, files, quality)
   invisible(files)
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-readImage = function(files, colormode = Grayscale) {
+readImage = function(files, colormode) {
+  if (missing(colormode)) colormode=-1
   if (missing(files)) 
     .DoCall ("lib_chooseImages", as.integer(colormode))
   else 
