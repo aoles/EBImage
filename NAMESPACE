@@ -17,7 +17,7 @@ export(colorMode, "colorMode<-", imageData, "imageData<-")
 export(getNumberOfFrames)
 
 ## image IO, display
-export(readImage, writeImage, display, animate)
+export(readImage, writeImage, display, show, animate)
 
 ## spatial transform
 export(resize,resample,rotate)
