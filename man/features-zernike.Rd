@@ -29,7 +29,7 @@
     for the 2D Gausian applied at the centre of an object. See details.
     Defaults to 30. }
 
-  \item{apply.Gaussian,pseudo}{Deprecated.}
+  \item{apply.Gaussian, pseudo}{Deprecated.}
 }
 
 \value{
