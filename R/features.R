@@ -20,9 +20,7 @@ getFeatures = function (x, ref, N = 12, R = 30, apply.Gaussian, nc = 256, pseudo
   if ( !missing(ref) && is.Image(ref) && (colorMode(ref) == TrueColor) )
     stop("\'ref\' must be an Image not in \'TrueColor\' color mode")
   if (!missing(apply.Gaussian)) warning("'apply.Gaussian' is deprecated.")
-  else apply.Gaussian=FALSE
   if (!missing(pseudo))  warning("'pseudo' is deprecated.")
-  else pseudo=FALSE
   
   .dim <- dim(x)
   hf <- hullFeatures( x )

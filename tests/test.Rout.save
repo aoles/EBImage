@@ -216,10 +216,6 @@ checking 'getFeatures' ... OK (hash=2557956903)
 Warning messages:
 1: In hash(y) : NAs introduced by coercion
 2: In hash(y) : NAs introduced by coercion
-3: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
-  'apply.Gaussian' is deprecated.
-4: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
-  'pseudo' is deprecated.
 > 
 > ## Image - Grayscale - 1 image  - 2 dim - logical
 > x=lena>0.5
@@ -288,10 +284,6 @@ Warning messages:
 2: In hash(y) : NAs introduced by coercion
 3: In approx(x[, 2], x[, 1], xout = xout, n = n) :
   collapsing to unique 'x' values
-4: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
-  'apply.Gaussian' is deprecated.
-5: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
-  'pseudo' is deprecated.
 > 
 > ## Image - Color - 1 image  - 3 dim - numeric
 > testEBImageFunctions(lenacolor)
@@ -356,10 +348,6 @@ checking 'getFeatures' ... OK (hash=12519420883)
 Warning messages:
 1: In hash(y) : NAs introduced by coercion
 2: In hash(y) : NAs introduced by coercion
-3: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
-  'apply.Gaussian' is deprecated.
-4: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
-  'pseudo' is deprecated.
 > 
 > ## Image - Color - 2 images - 4 dim - numeric
 > x=combine(lenacolor,lenacolor)
@@ -425,10 +413,6 @@ checking 'getFeatures' ... OK (hash=43511506219)
 Warning messages:
 1: In hash(y) : NAs introduced by coercion
 2: In hash(y) : NAs introduced by coercion
-3: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
-  'apply.Gaussian' is deprecated.
-4: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
-  'pseudo' is deprecated.
 > 
 > ## matrix - 2 images - 3 dim - numeric
 > x=imageData(lena)
@@ -481,8 +465,4 @@ checking 'getFeatures' ... OK (hash=7673870709)
 Warning messages:
 1: In hash(y) : NAs introduced by coercion
 2: In hash(y) : NAs introduced by coercion
-3: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
-  'apply.Gaussian' is deprecated.
-4: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
-  'pseudo' is deprecated.
 > 
