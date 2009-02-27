@@ -1,7 +1,6 @@
 \name{drawtext}
 
 \alias{drawtext}
-\alias{drawtext,Image,list,list-method}
 \alias{drawfont}
 
 \concept{drawing}
@@ -14,8 +13,7 @@
 }
 
 \usage{
-  drawtext(img, xy, labels, ...) 
-  \S4method{drawtext}{Image,list,list}(img, xy, labels, font, col, ...)
+  drawtext(img, xy, labels, font, col)
     
   drawfont(family=switch(.Platform$OS.type, windows="Arial", "helvetica"), 
            style="n", size=14, weight=200, antialias=TRUE)
@@ -40,8 +38,6 @@
 
   \item{col}{A character vector of font colors. One per frame, recycled
     between frames if required. }
-  
-  \item{...}{ Reserved. }
 
   \item{family}{A character value for the font family to use. On Linux/UNIX
     machines one can try to use \code{helvetica}, \code{times}, \code{courier} 

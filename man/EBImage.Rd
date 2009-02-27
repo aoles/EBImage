@@ -25,7 +25,6 @@
   \itemize{
     \item \code{Image}, the class constructor
     \item \code{as.Image}, \code{is.Image}
-    \item \code{header},  \code{assert}
     \item \code{colorMode}, \code{imageData}
     \item \code{getNumberOfFrames}
   }
@@ -68,7 +67,7 @@
   
   Morphological operations
   \itemize{
-    \item \code{morphKern}, \code{mkbox}, \code{mkball}
+    \item \code{makeBrush}
     \item \code{erode}, \code{dilate}, \code{opening}, \code{closing}
     \item \code{distmap}
     \item \code{watershed}
@@ -109,7 +108,7 @@
     \item \code{haralickFeatures}, \code{haralickMatrix}
     \item \code{zernikeMoments}
   }
-  
+
   Deprecated
   \itemize{
     \item \code{read.image}, \code{write.image}
@@ -119,7 +118,10 @@
   \code{haralick.features},  \code{zernike.moments}
     \item \code{stopIfNotImage}
     \item \code{frameDist}
+   \item \code{header},  \code{assert}
     \item \code{matchObjects}
+    \item \code{morphKern}, \code{mkbox}, \code{mkball}
+    \item \code{chooseImage}
   }
 }
 

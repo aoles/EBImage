@@ -12,20 +12,17 @@
 }
 
 \usage{
-display(x,
-        no.GTK, main, colorize,
+display(x, no.GTK, main, colorize,
         title = paste(deparse(substitute(x))),
-        useGTK = TRUE, ...)
-animate(x,
-        ...)
+        useGTK = TRUE)
+animate(x)
 }
 
 \arguments{
-  \item{x}{An object of \code{\linkS4class{Image}}.} 
+  \item{x}{An \code{\linkS4class{Image}} object or an array.} 
   \item{useGTK}{A logical of length 1. See details.} 
   \item{title}{Window title.}
-  \item{no.GTK, main, colorize}{Defunct.}
-  \item{...}{Currently not used.}
+  \item{no.GTK, main, colorize}{Deprecated.}
 }
 
 \value{
@@ -38,13 +35,13 @@ animate(x,
   open a window and display the image. Multiple windows can be opened in
   this way.
   
-  If GTK is not available or if \code{useGTK} is \code{FALSE}, 
+  If GTK is not available or if \code{useGTK} is \code{FALSE},
   ImageMagick is used; only one window at a time can be open,
   and it needs to be closed by the user interactively before
   the next window can be opened. The ImageMagick display is not
   available on MS-Windows.
   
-  The \code{animate} function uses \code{ImageMagick}. Similar limitations as for \code{display} apply
+  The \code{animate} function shows an animated sequence of images and uses \code{ImageMagick}. Similar limitations as for \code{display} apply
   (only one window, not on MS-Windows.)
 }
 
@@ -55,8 +52,8 @@ animate(x,
 
 \examples{
   if(interactive()) {
-    Lena = readImage(system.file("images", "lena-color.png", package="EBImage"))
-    display(Lena)
+    lena = readImage(system.file("images", "lena-color.png", package="EBImage"))
+    display(lena)
   }
 }
 

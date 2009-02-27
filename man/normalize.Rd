@@ -1,11 +1,8 @@
 \name{normalize}
 
 \alias{negate}
-\alias{negate,Image-method}
 \alias{normalize}
-\alias{normalize,Image-method}
 \alias{normalize2}
-\alias{normalize2,Image-method}
 
 \concept{normalization}
 
@@ -16,12 +13,10 @@
 }
 
 \usage{
+  normalize(x, separate=TRUE, ft=c(0,1))
 
-  \S4method{normalize}{Image}(x, separate=TRUE, ft=c(0,1), ...)
-
-  ## S4 methods for signature 'x=Image'
-  negate(x, ...)
-  normalize2(x, ...)
+  negate(x)
+  normalize2(x)
   
 }
 
@@ -33,9 +28,6 @@
 
   \item{ft}{ A numeric vector of 2 values, target minimum and maximum 
     intensity values after normalization for \code{\link{Grayscale}} images. }
-
-  \item{...}{ Reserved. }
-
 }
 
 \value{

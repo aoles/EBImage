@@ -1,10 +1,7 @@
 \name{rmObjects}
 
 \alias{rmObjects}
-\alias{rmObjects,IndexedImage,numeric-method}
-\alias{rmObjects,IndexedImage,list-method}
 \alias{reenumerate}
-\alias{reenumerate,IndexedImage-method}
 
 \concept{object detection}
 \concept{delete objects}
@@ -14,38 +11,33 @@
 \description{
   The \code{rmObjects} functions deletes objects indexed by a list of
   integer vectors (indexes) from an image with indexed objects. \code{reenumerate}
-  re-enumerates all objects in an \linkS4class{IndexedImage} from 0 - background
+  re-enumerates all objects in an \linkS4class{Image} from 0 - background
   to the actual number of objects.
 }
 
 \usage{
+  rmObjects(x, index)
 
-  ## S4 methods for signatures 'x=IndexedImage,index=numeric'
-  ## and 'x=IndexedImage,index=list'
-  rmObjects(x, index, ...)
-
-  \S4method{reenumerate}{IndexedImage}(x, ...)
+  reenumerate(x)
 }
 
 \arguments{
 
-  \item{x}{An object of \code{\linkS4class{IndexedImage}}. }
+  \item{x}{An object of \code{\linkS4class{Image}}. }
 
   \item{index}{ A numeric (integer) vector of indexes of objects to
     remove in the frame if \code{x} contains one frame only. For multiple
     frames, a list of such vectors.}
-
-  \item{...}{ Reserved. }
 }
 
 \value{
 
-  An image of \code{\linkS4class{IndexedImage}}.
+  An image of \code{\linkS4class{Image}}.
 
 }
 
 \seealso{ \code{
-  \linkS4class{IndexedImage}, \link{watershed}, \link{getFeatures}, \link{paintObjects}
+  \linkS4class{Image}, \link{watershed}, \link{getFeatures}, \link{paintObjects}
 }}
 
 \examples{

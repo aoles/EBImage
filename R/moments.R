@@ -14,71 +14,41 @@
 # See the GNU Lesser General Public License for more details.
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("cmoments", signature(x="array", ref="array"),
-  function (x, ref) {
-    checkCompatibleImages(x,ref)
-    ref=ensureStorageMode(ref)
-    return( .ImageCall("lib_cmoments", x, ref ) )
-  }
-)
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+cmoments = function (x, ref) {
+  checkCompatibleImages(x,ref)
+  if (missing(ref)) ref=NULL
+  else ref=castImage(ref)
+  return( .Call("lib_cmoments", castImage(x), ref, PACKAGE='EBImage') )
+}
 
-setMethod ("cmoments", signature(x="array", ref="missing"),
-  function (x, ref) {
-    checkCompatibleImages(x,ref)
-    return( .ImageCall("lib_cmoments", x, NULL ) )
-  }
-)
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+smoments = function (x, ref, pw=3, what="s") {
+  checkCompatibleImages(x,ref)
+  if (missing(ref)) ref=NULL
+  else ref=castImage(ref)
+  alg <- as.integer( switch(tolower(substr(what, 1, 1)), n=0, c=1, s=2, r=3, 2) )
+  pw <- as.integer (pw)
+  if ( pw < 1 || pw > 9 )
+    stop("'pw' must be in the range [1,9]" )
+  if ( alg == 3 && pw < 3 )
+    stop( "'pw' must be at least 3 to calculate rotation invariant moments" )
+  return( .Call("lib_moments", castImage(x), ref, pw, alg, PACKAGE='EBImage') )
+}
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("smoments", signature(x="array", ref="array"),
-  function (x, ref, pw=3, what="s") {
-    checkCompatibleImages(x,ref)
-    ref=ensureStorageMode(ref)
-    alg <- as.integer( switch(tolower(substr(what, 1, 1)), n=0, c=1, s=2, r=3, 2) )
-    pw <- as.integer (pw)
-    if ( pw < 1 || pw > 9 )
-      stop("'pw' must be in the range [1,9]" )
-    return( .ImageCall("lib_moments", x, ref, pw, alg ) )
-  }
-)
-
-setMethod ("smoments", signature(x="array", ref="missing"),
-  function (x, ref, pw=3, what="s") {
-    checkCompatibleImages(x,ref)
-    alg <- as.integer( switch(tolower(substr(what, 1, 1)), c=1, s=2, r=3, 2) )
-    pw <- as.integer (pw)
-    if ( pw < 1 || pw > 9 )
-      stop("'pw' must be in the range [1,9]" )
-    if ( alg == 3 && pw < 3 )
-      stop( "'pw' must be at least 3 to calculate rotation invariant moments" )
-    return( .ImageCall("lib_moments", x, NULL, pw, alg ) )
-  }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("rmoments", signature(x="array", ref="array"),
-  # this is a convenience function for smoments with what='r', pw=3
-  function (x, ref) {
-    checkCompatibleImages(x,ref)
-    ref=ensureStorageMode(ref)
-    return( .ImageCall("lib_moments", x, ref, as.integer(3), as.integer(3) ) )
-  }
-)
-
-setMethod ("rmoments", signature(x="array", ref="missing"),
-  # this is a convenience function for smoments with what='r', pw=3
-  function (x, ref) {
-    checkCompatibleImages(x,ref)
-    return( .ImageCall("lib_moments", x, NULL, as.integer(3), as.integer(3) ) )
-  }
-)
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+rmoments = function (x, ref) {
+  checkCompatibleImages(x,ref)
+  if (missing(ref)) ref=NULL
+  else ref=castImage(ref)
+  return( .Call("lib_moments", castImage(x), ref, as.integer(3), as.integer(3), PACKAGE='EBImage') )
+}
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # convenience function to call from moments and to write it only once
 # do not call directly
 .momentsSummary <- function(x, ref) {
-  if ( missing(ref) ) {
+  if ( missing(ref)) {
     ctr <- cmoments (x)
     rmo <- rmoments (x)
     mom <- smoments (x=x, pw=2, what="c")
@@ -120,34 +90,20 @@ setMethod ("rmoments", signature(x="array", ref="missing"),
   return( res )  
 }
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("moments", signature(x="array", ref="array"),
-  function (x, ref) {
-    checkCompatibleImages(x,ref)
-    return( .momentsSummary(x, ref) )
-  }
-)
-
-setMethod ("moments", signature(x="array", ref="missing"),
-  function (x, ref) {
-    checkCompatibleImages(x,ref)
-    return( .momentsSummary(x) )
-  }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("moments", signature(x="array", ref="missing"),
-  # in contrast to the above function, this considers one object per image
-  # and processes the stack of images returning a summary of moments
-  function (x, ref) {
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+moments = function (x, ref) {
+  if (missing(ref)) {
     ref <- x
     x[] <- 1
     mom <- .momentsSummary(x=x, ref=ref)
-    if ( getNumberOfFrames(x,'total') == 1 )
-      return( mom )
+    if ( getNumberOfFrames(x,'total') == 1) return( mom )
     res <- mom[[1]]
     for ( i in 2:length(mom) ) res <- rbind(res, mom[[i]])
-    res
+    return(res)
+  } else {
+    checkCompatibleImages(x,ref)
+    return( .momentsSummary(x, ref) )
   }
-)
+}
+
 

@@ -16,110 +16,79 @@
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## half width and height: moving frame will be 2 times + 1 px larger
-setMethod ("thresh", signature(x="array"),
-    function (x, w=5, h=5, offset=0.01) {
-        if ( colorMode(x) == TrueColor )
-            stop ( .("'thresh' doesn't support the \'TrueColor\' color mode, use the \'Color\' mode instead or 'athresh'") )
-        if ( w < 2 || h < 2 )
-            stop ( .("width 'w' and height 'h' must be larger than 1") )
-        return ( .ImageCall("thresh", x, as.numeric( c(w, h, offset) ) ) )
-    }
-)
+thresh = function (x, w=5, h=5, offset=0.01) {
+  validImage(x)
+  if ( colorMode(x) == TrueColor )
+    stop ("'thresh' doesn't support the \'TrueColor\' color mode, use the \'Color\' mode instead or 'athresh'")
+  if ( w < 2 || h < 2 )
+    stop ("width 'w' and height 'h' must be larger than 1")
+  return ( .Call("thresh", castImage(x), as.numeric( c(w, h, offset) ), PACKAGE='EBImage') )
+}
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("distmap", signature(x="array"),
-  function (x, metric=c("euclidean",'manhattan')) {
-    if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
-    if (any(is.na(x))) stop("'x' shouldn't contain any NAs")
-    metric=match.arg(metric)
-    imetric=switch(metric,euclidean=0,manhattan=1)
-    return (.ImageCall("distmap", x, as.integer(imetric)))
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+distmap = function (x, metric=c('euclidean', 'manhattan')) {
+  validImage(x)
+  if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
+  if (any(is.na(x))) stop("'x' shouldn't contain any NAs")
+  metric=match.arg(metric)
+  imetric=switch(metric,euclidean=0,manhattan=1)
+  return (.Call("distmap", castImage(x), as.integer(imetric), PACKAGE='EBImage'))
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+makeBrush = function(size, shape=c('box', 'disc', 'diamond'), step=TRUE) {
+  if(! (is.numeric(size) && (length(size)==1L) && (size>=1)) ) stop("'size' must be a numeric of length 1 with value >=1.")
+  shape=match.arg(shape)
+
+  if (shape=='box') z=array(1,dim=c(size,size))
+  else {
+    ## pixel center coordinates
+    x = 1:size -((size+1)/2)
+    
+    ## for each pixel, compute the distance from its center to the origin, using L1 norm ('diamond') or L2 norm ('disc')
+    if (shape=='disc') {
+      z = outer(x, x, FUN=function(X,Y) (X*X+Y*Y))
+      mz = (size/2)^2
+      z = (mz - z)/mz
+      z = sqrt(ifelse(z>0, z, 0))
+    } else {
+      z = outer(x, x, FUN=function(X,Y) (abs(X)+abs(Y)))
+      mz = (size/2)
+      z = (mz - z)/mz
+      z = ifelse(z>0, z, 0)
+    }
   }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-morphKern <- function (size=5, shape="round") {
-    if ( size < 3 || ( size / 2 == as.integer(size / 2) ) )
-        stop ( .("kernel size must be an odd number >= 3: [3, 5, 7, ...") )
-    if ( switch(shape, round=, square=FALSE, TRUE) )
-        stop("available shapes 'round' and 'square'")
-    res <- matrix (0, size, size, byrow = TRUE )
-    cx = as.integer(size / 2) + 1
-    if (shape == "round") {
-        res[cx,] = 1
-        res[,cx] = 1
-        for ( i in 1:(cx-1) )
-            for ( j in 1:(cx-1) )
-                if ( (cx - i)^2 + (cx - j)^2 <= (cx - 1)^2 ) {
-                    res[i, j] = 1
-                    res[size - i + 1, j] = 1
-                    res[i, size - j + 1] = 1
-                    res[size - i + 1, size - j + 1] =1
-                }
-        return (res)
-    }
-    # otherwise square
-    res[] = 1
-    return(res)
+ 
+  if (step) ifelse(z>0, 1, 0)
+  else z
 }
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-mkball = function(n, shape="step") {
-  if(! (is.numeric(n) && (length(n)==1L) && (n>=1)) )
-    stop("'n' must be a numeric of length 1 with value >=1.")
-
-  ## pixel center coordinates
-  x = 1:n -((n+1)/2)
-  
-  ## for each pixel, compute the distance from its center to the origin
-  d = outer(x, x, FUN=function(X,Y) (X*X+Y*Y))
-
-  ## radius and z^2
-  rsq = (n%/%2)^2
-  z2 = (rsq - d)
-  
-  switch(shape,
-         step = ifelse(z2>=0, 1, 0),
-         ball = sqrt(ifelse(z2>0, z2, 0)),
-         stop(sprintf("Invalid 'shape': %s", shape))
-  )
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+erode = function (x, kern=makeBrush(5, shape='diamond'), iter) {
+  validImage(x)
+  if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
+  if (!missing(iter)) warning("'iter' is a deprecated argument.")
+  return (.Call("lib_erode_dilate", castImage(x), kern, as.integer(0), PACKAGE='EBImage') )
 }
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-mkbox = function(n) {
-  matrix(1.0/(n*n),nc=n,nr=n)
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+dilate = function (x, kern=makeBrush(5, shape='diamond'), iter) {
+  validImage(x)
+  if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
+  if (!missing(iter)) warning("'iter' is a deprecated argument.")  
+  return (.Call("lib_erode_dilate", castImage(x), kern, as.integer(1), PACKAGE='EBImage') )
 }
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("erode", signature(x="array"),
-    function (x, kern=morphKern(5), iter=1) {
-      if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
-      if ( iter < 1 ) stop ( .("'iter' must be a positive integer") )
-      return ( .ImageCall("lib_erode_dilate", x, kern, as.integer(iter), as.integer(0) ) )
-     }
-)
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+opening = function (x, kern=makeBrush(5, shape='diamond'), iter) {
+  validImage(x)
+  if (!missing(iter)) warning("'iter' is a deprecated argument.")  
+  dilate(erode(x, kern), kern)
+}
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("dilate", signature(x="array"),
-    function (x, kern=morphKern(5), iter=1) {
-      if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
-      if ( iter < 1 ) stop ( .("'iter' is assumed to be a positive integer") )    
-      return ( .ImageCall("lib_erode_dilate", x, kern, as.integer(iter), as.integer(1) ) )
-    }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("opening", signature(x="array"),
-    function (x, kern=morphKern(5), iter=1) {
-      y=erode(x, kern, iter)
-      dilate (y, kern, iter)
-    }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("closing", signature(x="array"),
-    function (x, kern=morphKern(5), iter=1) {
-      y=dilate(x, kern, iter)
-      erode (y, kern, iter)
-    }
-)
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+closing = function (x, kern=makeBrush(5, shape='diamond'), iter) {
+  validImage(x)
+  if (!missing(iter)) warning("'iter' is a deprecated argument.")  
+  erode(dilate(x, kern), kern)
+}

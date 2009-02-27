@@ -484,15 +484,15 @@ writeImage(mask[,,1], "07.png")
 Some further smoothing of the mask is necessary. A useful set of instruments for this is provided by \emph{mathematical morphology} implemented in the morphological operators \Rfunction{dilate}, \Rfunction{erode}, \Rfunction{opening} and \Rfunction{closing}:
 
 <<example.dilate,echo=TRUE,results=verbatim,eval=TRUE>>=
-mk3 = morphKern(3)
-mk5 = morphKern(5)
+mk3 = makeBrush(3, shape='diamond')
+mk5 = makeBrush(5, shape='diamond')
 mask = dilate(erode(closing(mask, mk5), mk3), mk5)
 @
 <<echo=FALSE,results=hide,eval=TRUE>>=
 writeImage(mask[,,1], "08.png")
 @
 
-\noindent Here, several operators were used sequentially. You can observe the results of each of these operators separately by looking at the intermediate images. You can also try different kernels, i.\,e.\ different parameters for the function \Rfunction{morphKern}. The current result is shown in Figure~\ref{figure:nt2}.
+\noindent Here, several operators were used sequentially. You can observe the results of each of these operators separately by looking at the intermediate images. You can also try different kernels, i.\,e.\ different parameters for the function \Rfunction{makeBrush}. The current result is shown in Figure~\ref{figure:nt2}.
 
 \begin{figure}[htbp]
   \begin{center}

@@ -14,47 +14,46 @@
 # See the GNU Lesser General Public License for more details.
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-setMethod("filter2", signature(x="array",filter="array"),
-  function(x, filter) {
-    validObject(x)
-    validObject(filter)
-    if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+filter2 = function(x, filter) {
+  validObject(x)
+  validObject(filter)
+  if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
+  
+  df = dim(filter)
     
-    df = dim(filter)
-    
-    if (any(df%%2==0) || df[1]!=df[2])
-      stop("dimensions of 'filter' matrix must be equal and odd")
+  if (any(df%%2==0) || df[1]!=df[2])
+    stop("dimensions of 'filter' matrix must be equal and odd")
     dx = dim(x)
-    if (length(dx)<2) stop("'x' must have at least two dimensions")
-    
-    if (any(dx[1:2]<df[1]))
-      stop("first two dimensions of 'x' are too small")
-    # find centres of x and filter
-    cx = dx%/%2
-    cf = df%/%2
-    # create fft filter matrix
-    fltr = matrix(0.0,nr=dx[1],nc=dx[2])
-    fltr[(cx[1]-cf[1]):(cx[1]+cf[1]),(cx[2]-cf[2]):(cx[2]+cf[2])] = filter
-    fltr = fft(fltr)
-    
-    ## convert to a frame-based 3D array
-    dim(x) = c(dx[1:2],prod(dx)/prod(dx[1:2]))
+  if (length(dx)<2) stop("'x' must have at least two dimensions")
+  
+  if (any(dx[1:2]<df[1]))
+    stop("first two dimensions of 'x' are too small")
+  
+  ## find centres of x and filter
+  cx = dx%/%2
+  cf = df%/%2
+  
+  ## create fft filter matrix
+  fltr = matrix(0.0,nr=dx[1],nc=dx[2])
+  fltr[(cx[1]-cf[1]):(cx[1]+cf[1]),(cx[2]-cf[2]):(cx[2]+cf[2])] = filter
+  fltr = fft(fltr)
+  
+  ## convert to a frame-based 3D array
+  dim(x) = c(dx[1:2],prod(dx)/prod(dx[1:2]))
         
-    index1 = c(cx[1]:dx[1],1:(cx[1]-1))
-    index2 = c(cx[2]:dx[2],1:(cx[2]-1))
-    pdx = prod(dim(x)[1:2])
-    x = apply(x, 3, function(xx) {
-      dim(xx) = dx[1:2]
-      Re(fft(fft(xx)*fltr,inverse=T)/pdx)[index1,index2]
-    })
-
-    ## convert it back
-    dim(x) = dx
-    x
-  }
-)
+  index1 = c(cx[1]:dx[1],1:(cx[1]-1))
+  index2 = c(cx[2]:dx[2],1:(cx[2]-1))
+  pdx = prod(dim(x)[1:2])
+  x = apply(x, 3, function(xx) {
+    dim(xx) = dx[1:2]
+    Re(fft(fft(xx)*fltr,inverse=T)/pdx)[index1,index2]
+  })
+  
+  ## convert it back
+  dim(x) = dx
+  x
+}
 
 
 

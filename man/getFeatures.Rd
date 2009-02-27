@@ -1,9 +1,7 @@
 \name{getFeatures}
 
 \alias{getFeatures}
-\alias{getFeatures,IndexedImage-method}
 \alias{features}
-\alias{features,IndexedImage-method}
 
 \concept{object detection}
 
@@ -16,14 +14,13 @@
 }
 
 \usage{
-
-  \S4method{getFeatures}{IndexedImage}(x, ref, N=12, R=30, apply.Gaussian=TRUE, nc=256, ...)
+  getFeatures(x, ref, N=12, R=30, apply.Gaussian, nc=256, pseudo)
 
 }
 
 \arguments{
 
-  \item{x}{ An object of \code{\linkS4class{IndexedImage}} (like those
+  \item{x}{ An object of \code{\linkS4class{Image}} (like those
     obtained from \code{\link{propagate}} or \code{\link{watershed}}. }
 
   \item{ref}{ A reference image containing images of the objects in
@@ -37,16 +34,12 @@
     of the circle around an object centre from which the features are calculated. 
     It also defines the standard deviation for the 2D Gausian applied at the 
     centre of an object. See details. Defaults to 30. }
-    
-  \item{apply.Gaussian}{Passed to \code{\link{zernikeMoments}}. A logical 
-    value that specifies if a local 2D Gaussian modification should be applied 
-    to every object at its centre. Defaults to \code{TRUE}.}
-
+   
   \item{nc}{ Passed to \code{\link{haralickFeatures}}. A numeric value. 
     Specifies the number of gray levels to separate \code{ref} into when 
     calculating the co-occurrence matrix. Here defaults to 256.}
-  
-  \item{...}{ Reserved. }
+
+  \item{apply.Gaussian, pseudo}{Deprecated.}
 
 }
 
@@ -63,7 +56,7 @@
  
 
 \seealso{ \code{
-  \linkS4class{IndexedImage}, \link{propagate}, \link{paintObjects}, \link{stackObjects},
+  \linkS4class{Image}, \link{propagate}, \link{paintObjects}, \link{stackObjects},
   \link{hullFeatures}, \link{haralickFeatures}, \link{moments}, \link{edgeFeatures},
   \link{zernikeMoments}
 }}
@@ -82,8 +75,8 @@
   ## segment
   mask = thresh(ii, 25, 25, 0.02)
   ## refine segmentation with morphology filters
-  mk3 = morphKern(3)
-  mk5 = morphKern(5)
+  mk3 = makeBrush(3, shape='diamond')
+  mk5 = makeBrush(5, shape='diamond')
   mask = dilate(erode(closing(mask, mk5), mk3), mk5)
   ## index objects with 'watershed'
   io = watershed( distmap(mask), 1.5, 1)

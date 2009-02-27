@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-SEXP lib_erode_dilate (SEXP, SEXP, SEXP, SEXP);
+SEXP lib_erode_dilate (SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus
 };

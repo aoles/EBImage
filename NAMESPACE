@@ -9,65 +9,68 @@ importFrom("stats", "median")
 ## classes
 exportClasses(Image)
 
-## image class, copy, assertion, accessors
-export(Image, is.Image, print.Image)
+## image class, accessors
+export(Image, is.Image, as.Image, print.Image)
 export(Grayscale, TrueColor, Color)
-exportMethods(header, assert, Ops, "[", as.Image)
-exportMethods(colorMode, "colorMode<-", imageData, "imageData<-")
-exportMethods(getNumberOfFrames)
+exportMethods(Ops, "[")
+export(colorMode, "colorMode<-", imageData, "imageData<-")
+export(getNumberOfFrames)
 
 ## image IO, display
 export(readImage, writeImage, display, animate)
 
 ## spatial transform
-exportMethods(resize,resample,rotate)
-exportMethods(affinet,flip,flop)
-exportMethods(translate)
+export(resize,resample,rotate)
+export(affinet,flip,flop)
+export(translate)
 
 ## image analysis, segmentation
-exportMethods(edge,segment)
-exportMethods(thresh, athresh, cthresh)
+export(edge,segment)
+export(thresh, athresh, cthresh)
 
 ## statistics
 export(median.Image,quantile.Image)
 exportMethods(hist)
 
 ## image enhancement, restoration
-exportMethods(cgamma,contrast,enhance,equalize,modulate)
-exportMethods(denoise,mediansmooth,despeckle,sharpen,umask)
-exportMethods(blur,gblur,noise)
-exportMethods(normalize,negate,normalize2)
+export(cgamma,contrast,enhance,equalize,modulate)
+export(denoise,mediansmooth,despeckle,sharpen,umask)
+export(blur,gblur,noise)
+export(normalize,negate,normalize2)
 
 ## linear filtering
-exportMethods(filter2)
+export(filter2)
               
 ## morphological operations
-export(morphKern, mkbox, mkball)
-exportMethods(erode, dilate, opening, closing)
-exportMethods(distmap, watershed, propagate)
-exportMethods(floodFill, fillHull)
+export(makeBrush)
+export(erode, dilate, opening, closing)
+export(distmap)
+export(watershed, propagate)
+export(floodFill, fillHull)
 
 ## colorspace
-export(rgbImage, channelMix)
-exportMethods(channel)
+export(rgbImage, channelMix, channel)
 
 ## image stacking, tiling
-exportMethods(stackObjects, combine, tile, untile)
+export(stackObjects)
+export(combine, tile, untile)
 
 ## drawables
-export(drawfont)
-exportMethods(drawtext)
+export(drawfont,drawtext)
 
 ## object manipulation
-exportMethods(paintObjects, rmObjects, reenumerate)
+export(paintObjects,rmObjects,reenumerate)
 
 ## features extraction
-exportMethods(getFeatures, hullFeatures, edgeProfile, edgeFeatures)
-exportMethods(cmoments, smoments, rmoments, moments)
-exportMethods(haralickMatrix, haralickFeatures, zernikeMoments)
+export(getFeatures, hullFeatures, edgeProfile, edgeFeatures)
+export(cmoments, smoments, rmoments, moments)
+export(haralickMatrix, haralickFeatures, zernikeMoments)
 
 ## deprecated
 export(read.image, choose.image,stopIfNotImage)
-exportMethods(write.image, hull.features, edge.profile, edge.features)
-exportMethods(haralick.matrix, haralick.features, zernike.moments)
-exportMethods(matchObjects,frameDist)
+export(write.image, hull.features, edge.profile, edge.features)
+export(haralick.matrix, haralick.features, zernike.moments)
+export(matchObjects,frameDist)
+export(morphKern, mkbox, mkball)
+export(header, assert)
+export(chooseImage)

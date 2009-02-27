@@ -13,16 +13,16 @@
 }
 
 \usage{
-  readImage(files, colormode = Grayscale)
+  readImage(files, colormode)
   writeImage(x, files, quality = 100)
 }
 
 \arguments{
-  \item{x}{An object of \code{\linkS4class{Image}}. }
   \item{files}{A character vector of file names or URLs. If missing, an
   interactive file chooser is displayed.}
-  \item{colormode}{An integer value for the color mode of images after
-  they are read. Allowed values are \code{Grayscale}, \code{Color}.}
+  \item{x}{An \code{\linkS4class{Image}} object or an array.} 
+  \item{quality}{A numeric, ranging from 1 to 100. Default is 100.} 
+  \item{colormode}{Deprecated.}
 }
 
 \value{
@@ -33,7 +33,7 @@
 \details{
   When writing images in formats supporting lossy compression (like JPEG),
   the quality can be spcified used a \code{quality} value in the
-  range \code{[1,100]}. 
+  range \code{[1,100]}. The best quality is obtained with 100.
 
   The file format is deduced from the file name extension(s), there is neither
   a need nor a way to specify the format otherwise.
@@ -58,13 +58,19 @@
 }
 
 \examples{
+ ## Reads and display images
+ if(interactive()) {
+    lena = readImage(system.file("images", "lena-color.png", package="EBImage"))
+    display(lena)
+    im = readImage("http://www.google.com/intl/en/images/logo.gif")
+    display(im)
+ }
+
+ ## Converts a TIFF file into JPEG
  f1 = system.file("images", "Gene1_G.tif", package="EBImage")
  f2 = paste(tempfile(), "jpeg", sep=".")
  ii = readImage(f1, colormode=Color)
  writeImage(ii, f2)
-
- if(interactive())
-    im = readImage("http://www.google.com/intl/en/images/logo.gif")
 
 }
 

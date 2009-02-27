@@ -1,7 +1,6 @@
 \name{propagate}
 
 \alias{propagate}
-\alias{propagate,Image,IndexedImage-method}
 
 \concept{object detection}
 
@@ -14,8 +13,8 @@
 
 \usage{
 
-  \S4method{propagate}{Image,IndexedImage}(x, seeds, mask=NULL, lambda=0.1, 
-     ext=1, seed.centers=FALSE, ...)
+  propagate(x, seeds, mask=NULL, lambda=0.1, 
+     ext=1, seed.centers=FALSE)
 }
 
 \arguments{
@@ -23,7 +22,7 @@
   \item{x}{An object of \code{\linkS4class{Image}} to be segmented,
     in the \code{\link{Grayscale}} mode. }
 
-  \item{seeds}{An object of \code{\linkS4class{IndexedImage}} of the same
+  \item{seeds}{An object of \code{\linkS4class{Image}} of the same
     size as x in all three dimensions. This image provides seed points for object detection. }
 
   \item{mask}{An object of \code{\linkS4class{Image}} of the same
@@ -41,8 +40,6 @@
 
   \item{seed.centers}{ If \code{TRUE}, only centers of the seed points are left
     in the seeds image supplied to the propagate algorithm. }
-
-  \item{...}{ Reserved. }
 }
 
 \value{
@@ -87,7 +84,7 @@
 }
 
 \seealso{ \code{
-    \linkS4class{IndexedImage}, \linkS4class{Image}, \link{watershed}, \link{getFeatures}
+    \linkS4class{Image}, \link{watershed}, \link{getFeatures}
 }}
 
 \examples{
@@ -100,8 +97,8 @@
   ## segment
   mask = thresh(ii, 25, 25, 0.02)
   ## refine segmentation with morphology filters
-  mk3 = morphKern(3)
-  mk5 = morphKern(5)
+  mk3 = makeBrush(3, shape='diamond')
+  mk5 = makeBrush(5, shape='diamond')
   mask = dilate(erode(closing(mask, mk5), mk3), mk5)
   ## index objects with 'watershed'
   io = watershed( distmap(mask), 1.5, 1)
@@ -115,7 +112,7 @@
   ## segment
   mask = thresh(xi, 40, 40, 0.0)
   ## refine segmentation with morphology filters
-  mk7 = morphKern(7)
+  mk7 = makeBrush(7, shape='diamond')
   mask = dilate(erode(closing(mask, mk7), mk5), mk7)
   ## index objects of xi with 'propagate' using ii as seeds
   xo = propagate(xi, io, mask, 1e-2, 2)

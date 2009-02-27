@@ -1,7 +1,6 @@
 \name{paintObjects}
 
 \alias{paintObjects}
-\alias{paintObjects,IndexedImage,Image-method}
 
 \concept{object detection}
 
@@ -14,13 +13,13 @@
 
 \usage{
 
-  \S4method{paintObjects}{IndexedImage,Image}(x, tgt, opac=c(0.4, 0.05, 0.4), col=c("#FFC72C","#5BABF6","#FF372C"), ...)
+  paintObjects(x, tgt, opac=c(0.4, 0.05, 0.4), col=c("#FFC72C","#5BABF6","#FF372C"))
 
 }
 
 \arguments{
 
-  \item{x}{An object of \code{\linkS4class{IndexedImage}} in the
+  \item{x}{An object of \code{\linkS4class{Image}} in the
     \code{\link{Grayscale}} mode with integer-absed object encoding, as
     returned by \code{\link{watershed}}. }
 
@@ -37,9 +36,6 @@
     edges of object contacts. At least 3 values must be supplied. Default
     color scheme is yellow for edges, blue for background and red for object
     contacts and object on image edges. }
-
-  \item{...}{ Reserved. }
-  
 }
 
 \value{
@@ -50,7 +46,7 @@
 }
 
 \seealso{ \code{
-  \linkS4class{IndexedImage}, \linkS4class{Image}, \link{watershed}, \link{getFeatures}
+  \linkS4class{Image}, \link{watershed}, \link{getFeatures}
 }}
 
 \examples{
@@ -63,8 +59,8 @@
   ## segment
   mask = thresh(ii, 25, 25, 0.02)
   ## refine segmentation with morphology filters
-  mk3 = morphKern(3)
-  mk5 = morphKern(5)
+  mk3 = makeBrush(3, shape='diamond')
+  mk5 = makeBrush(5, shape='diamond')
   mask = dilate(erode(closing(mask, mk5), mk3), mk5)
   ## index objects with 'watershed'
   io = watershed( distmap(mask), 1.5, 1)
@@ -77,7 +73,7 @@
   ## segment
   mask = thresh(xi, 40, 40, 0.0)
   ## refine segmentation with morphology filters
-  mk7 = morphKern(7)
+  mk7 = makeBrush(7, shape='diamond')
   mask = dilate(erode(closing(mask, mk7), mk5), mk7)
   ## index objects of xi with 'propagate' using ii as seeds
   xo = propagate(xi, io, mask, 1e-5, 1.5)
