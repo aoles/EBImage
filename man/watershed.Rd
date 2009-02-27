@@ -1,7 +1,6 @@
 \name{watershed}
 
 \alias{watershed}
-\alias{watershed,Image-method}
 
 \concept{watershed transformation}
 \concept{watershed segmentation}
@@ -16,7 +15,7 @@
 
 \usage{
 
-  \S4method{watershed}{Image}(x, tolerance=1, ext=1, ...)
+  watershed(x, tolerance=1, ext=1)
 
 }
 
@@ -37,9 +36,6 @@
 
   \item{ext}{ Extension of the neighborhood for the detection
     of neighboring objects. Higher value smoothes out small objects. }
-
-  \item{...}{ Reserved. }
-
 }
 
 \value{
@@ -63,7 +59,6 @@
 
 \seealso{ \code{
   \linkS4class{Image}, \link{distmap}, \link{thresh}, \link{getFeatures},
-  \code{matchObjects}
 }}
 
 \examples{
@@ -76,8 +71,8 @@
   ## segment
   mask = thresh(ii, 25, 25, 0.02)
   ## refine segmentation with morphology filters
-  mk3 = morphKern(3)
-  mk5 = morphKern(5)
+  mk3 = makeBrush(3, shape='diamond')
+  mk5 = makeBrush(5, shape='diamond')
   mask = dilate(erode(closing(mask, mk5), mk3), mk5)
   ## index objects with 'watershed'
   io = watershed( distmap(mask), 1.5, 1)

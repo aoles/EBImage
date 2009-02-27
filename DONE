@@ -1,3 +1,17 @@
+2.7.15
+- no warnings anymore in R CMD check
+- S4 methods removed
+- header and assert deprecated
+- test framework added
+- documentation updated
+- morphKern, mkball and mkbox deprecated 
+- all '...' arguments removed
+- horizontal slider and clean display.c code added
+- zernikeMoments arguments 'pseudo' and 'apply.Gaussian' deprecated
+- display and readImage argument 'colormode' deprecated
+- display arguments: 'main', 'no.GTK' deprecated
+- .ImageCall and ensureStorageMode functions removed
+
 2.7.11
 - no ImageX object anymore: Image now extends array
 

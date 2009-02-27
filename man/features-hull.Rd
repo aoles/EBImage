@@ -1,7 +1,6 @@
 \name{hullFeatures}
 
 \alias{hullFeatures}
-\alias{hullFeatures,IndexedImage-method}
 
 \concept{feature extraction}
 
@@ -13,17 +12,14 @@
 }
 
 \usage{
-
-  \S4method{hullFeatures}{IndexedImage}(x, ...)
+  hullFeatures(x)
   
 }
 
 \arguments{
 
-  \item{x}{An object of \code{\linkS4class{IndexedImage}}.}
+  \item{x}{An object of \code{\linkS4class{Image}}.}
   
-  \item{...}{ Reserved. }
-
 }
 
 \value{
@@ -51,7 +47,7 @@
 }
 
 \seealso{\code{
-  \linkS4class{IndexedImage}, \link{watershed}, \link{getFeatures}, 
+  \linkS4class{Image}, \link{watershed}, \link{getFeatures}, 
   \link{edgeFeatures}, \link{moments}
 }}
 

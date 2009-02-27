@@ -15,9 +15,9 @@ int _match (numeric * kernel, PointXY * ksize, numeric * data, PointXY * dsize, 
 
 /*----------------------------------------------------------------------- */
 SEXP
-lib_erode_dilate (SEXP x, SEXP kernel, SEXP iters, SEXP what) {
+lib_erode_dilate (SEXP x, SEXP kernel, SEXP what) {
     numeric resetTo, * tgt, * src, *kern;
-    int nz, nt, i, j, it, nprotect;
+    int nz, i, j, nprotect;
     int * dim;
     PointXY size, ksize, pt;
     SEXP res;
@@ -38,7 +38,6 @@ lib_erode_dilate (SEXP x, SEXP kernel, SEXP iters, SEXP what) {
     kern = REAL (kernel);
     ksize.x = INTEGER ( GET_DIM(kernel) )[0];
     ksize.y = INTEGER ( GET_DIM(kernel) )[1];
-    nt = INTEGER (iters)[0];
     nprotect = 0;
 
     PROTECT ( res = Rf_duplicate(x) );
@@ -47,15 +46,14 @@ lib_erode_dilate (SEXP x, SEXP kernel, SEXP iters, SEXP what) {
     for ( i = 0; i < nz; i++ ) {
       tgt = &( REAL(res)[i * size.x * size.y] );
       src = &( REAL(x)[i * size.x * size.y] );
-      for ( it = 0; it < nt; it++ )
-	for ( j = 0; j < size.x * size.y; j++ ) {
-	  if ( tgt[j] == resetTo ) continue;
-	  pt = pointFromIndex (j, size.x);
-	  if ( !_match(kern, &ksize, src, &size, &pt, resetTo) )
-	    tgt[j] = resetTo;
-	}
+      for ( j = 0; j < size.x * size.y; j++ ) {
+	if ( tgt[j] == resetTo ) continue;
+	pt = pointFromIndex (j, size.x);
+	if ( !_match(kern, &ksize, src, &size, &pt, resetTo) )
+	  tgt[j] = resetTo;
+      }
     }
-
+    
     UNPROTECT (nprotect);
     return res;
 }

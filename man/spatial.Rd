@@ -1,17 +1,12 @@
 \name{resize}
 
 \alias{flip}
-\alias{flip,Image-method}
 \alias{flop}
-\alias{flop,Image-method}
 \alias{resample}
-\alias{resample,Image-method}
 \alias{resize}
-\alias{resize,Image-method}
 \alias{rotate}
-\alias{rotate,Image-method}
 \alias{affinet}
-\alias{affinet,Image-method}
+\alias{translate}
 
 \concept{image transformation}
 \concept{rotation}
@@ -25,12 +20,12 @@
 
 \usage{
 
-  \S4method{affinet}{Image}(x, sx=0, rx=0, ry=0, sy=0, tx=0, ty=0, ...)
-  \S4method{flip}{Image}(x, ...)
-  \S4method{flop}{Image}(x, ...)
-  \S4method{resample}{Image}(x, w, h, ...)
-  \S4method{resize}{Image}(x, w, h, blur=1, filter="Lanczos", ...)
-  \S4method{rotate}{Image}(x, angle=90, col, ...)
+  affinet(x, sx=0, rx=0, ry=0, sy=0, tx=0, ty=0)
+  flip(x)
+  flop(x)
+  resample(x, w, h)
+  resize(x, w, h, blur=1, filter="Lanczos")
+  rotate(x, angle=90, col)
 
 }
 
@@ -52,8 +47,6 @@
 
   \item{col}{ A numeric, integer or character specifying the background
     color of the rotated image. Not implemented yet, defaults to black. }
-
-  \item{...}{ Reserved. }
 }
 
 \value{
@@ -102,6 +95,4 @@
 \author{
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006-2007
 }
-
-\keyword{manip}
 

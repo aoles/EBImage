@@ -14,26 +14,32 @@
 # See the GNU Lesser General Public License for more details.
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
-
-## display uses GTK
+## display displays static images
 display = function(x, no.GTK, main, colorize,
-  title=paste(deparse(substitute(x))), useGTK=TRUE, ...) {
+  title=paste(deparse(substitute(x))), useGTK=TRUE) {
+  validImage(x)
   
-  if(!(missing(no.GTK)&&missing(main)&&missing(colorize)))
-    .Defunct("'no.GTK', 'main', 'colorize' are defunct in Bioconductor >= 2.4. Please use 'title' and 'useGTK' instead.")
-  
+  if (!missing(main)) {
+    warning("'main' is deprecated. Please use 'title' instead.")
+    title=main
+  }
+  if (!missing(no.GTK)) {
+    warning("'no.GTK' is deprecated. Please use 'useGTK' instead.")
+    no.GTK=!useGTK
+  }
+  if (!missing(colorize)) warning("'colorize' is deprecated.")
+ 
   title = as.character(title)
   useGTK = as.logical(useGTK)
-  stopifnot(length(useGTK)==1L, length(title)==1L, is(x, "array"))
-  validObject(x)
-  invisible(.ImageCall("lib_display", x, title, useGTK))
+  stopifnot(length(useGTK)==1L, length(title)==1L)
+  
+  invisible(.Call("lib_display", castImage(x), title, useGTK, PACKAGE="EBImage"))
 }
 
-## animate displays images using ImageMagick
-animate = function (x, ...) {
-  stopifnot(is(x, "array"))
-  validObject(x)
-  invisible(.ImageCall("lib_animate", x, PACKAGE="EBImage"))
+## animate displays animated sequences of images
+animate = function (x) {
+  validImage(x)
+  invisible(.Call("lib_animate", castImage(x), PACKAGE="EBImage"))
 }
 
 

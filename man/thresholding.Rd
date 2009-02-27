@@ -1,11 +1,8 @@
 \name{thresh}
 
 \alias{thresh}
-\alias{thresh,Image-method}
 \alias{athresh}
-\alias{athresh,Image-method}
 \alias{cthresh}
-\alias{cthresh,Image-method}
 
 \concept{image thresholding}
 
@@ -17,9 +14,9 @@
 
 \usage{
 
-  \S4method{thresh}{Image}(x, w=5, h=5, offset=0.01, ...)
-  \S4method{athresh}{Image}(x, w=10, h=10, offset=0, ...)
-  \S4method{cthresh}{Image}(x, threshold=0, ...)
+  thresh(x, w=5, h=5, offset=0.01)
+  athresh(x, w=10, h=10, offset=0)
+  cthresh(x, threshold=0)
   
 }
 
@@ -33,9 +30,6 @@
   \item{offset}{ Threshold offset from the mean value. }
 
   \item{threshold}{ Threshold value for channel thresholding (uniform). }
-
-  \item{...}{ Reserved. }
-
 }
 
 \value{
@@ -62,8 +56,7 @@
 }
 
 \seealso{ \code{
-  \linkS4class{Image}, \link{Image}, \link{distmap}, \link{segment}, 
-  \link{[,Image-method}
+  \linkS4class{Image}, \link{Image}, \link{distmap}, \link{segment}
 }}
 
 \references{

@@ -1,9 +1,7 @@
 \name{floodFill}
 
 \alias{floodFill}
-\alias{floodFill,array-method}
 \alias{fillHull}
-\alias{fillHull,IndexedImage-method}
 
 \title{Filling matrix data with flood fill algorithm}
 
@@ -13,14 +11,14 @@
 }
 
 \usage{
-  \S4method{floodFill}{array}(x, pt, col, tolerance=1e-3, ...)
-  \S4method{fillHull}{IndexedImage}(x, ...)
+  floodFill(x, pt, col, tolerance=1e-3)
+  fillHull(x)
 }
 
 \arguments{
 
   \item{x}{ An \code{\link{array}}-like object (e.g. \code{\linkS4class{Image}}) 
-    to be filled. For \code{fillHull} this must be an instance of \code{\linkS4class{IndexedImage}}.}
+    to be filled. For \code{fillHull} this must be an instance of \code{\linkS4class{Image}}.}
 
   \item{pt}{ An integer of 2 values for \code{x-y} coordinates of the point where
     fill starts. }
@@ -31,9 +29,6 @@
     can be a character value specifying the color in X11 mode.}
 
   \item{tolerance}{ Color tolerance used during the fill. }
-
-  \item{...}{ Reserved. }
-
 }
 
 \value{
@@ -47,12 +42,10 @@
   run either on matrices of single-framed images. If the latter is not the case,
   only the first frame will be modified!
   
-  \code{fillHull} files holes in objects of \code{\linkS4class{IndexedImage}}'s.
+  \code{fillHull} files holes in objects of \code{\linkS4class{Image}}'s.
 }
 
-\seealso{\code{
-  \linkS4class{Image}, \linkS4class{IndexedImage}
-}}
+\seealso{\code{\linkS4class{Image}}}
 
 
 \author{
@@ -72,7 +65,6 @@ if (interactive()) {
   mask[mask<=0.3]=0
 
   y = floodFill(mask,c(40,40),2)
-  class(y) = "IndexedImage"
   display(y, main="Indexed mask with holes")
   
   y = fillHull(y)

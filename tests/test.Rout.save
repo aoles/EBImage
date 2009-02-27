@@ -1,0 +1,488 @@
+
+R version 2.8.0 (2008-10-20)
+Copyright (C) 2008 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(EBImage)
+Loading required package: abind
+> 
+> ## returns a hashcode given an object
+> hash=function(x) {
++   if (is.list(x)) hash(sapply(x,hash))
++   else {
++     xd=as.numeric(x)
++     xd=xd[!is.nan(xd)]
++     sum(xd*(1:length(xd)))
++   }
++ }
+> 
+> ## try to evaluate fun(x,...) 
+> check=function(fun,x,...) {
++   passed=T
++   
++   cat('checking \'',fun,'\' ... ',sep='')
++   y=try(do.call(fun,c(list(x),list(...))),silent=T)
++   if (class(y)=='try-error' || ( is.Image(y) && !validObject(y)) ) {
++     y=NULL
++     passed=F
++   }
++   
++   if (passed) cat('OK (hash=',hash(y),')\n',sep='') 
++   else cat('FAILED\n')
++    
++   y
++ }
+> 
+> ## test a subset of EBImage functions on x
+> testEBImageFunctions=function(x) {  
++   ## Image, is.image, Ops, as.Image
++   ## imageData, imageData, colorMode, colorMode<-, print
++   ## [, getNumberOfFrames
++   cat('new test (hash=',hash(x),')\n',sep='')
++   if (class(x)=='Image') check('print',x)
++   y=Image(x,colormode=Color)
++   a=is.Image(y)
++   y=check('>',x,0.5)
++   y=check('+',x,y)
++   y=check('/',x,2)
++   z=as.Image(imageData(y))
++   imageData(z)=y
++   colorMode(z)=Grayscale
++   pat=as.list(rep(T,length(dim(x))))
++   pat[[1]]=1:100
++   pat[[2]]=1:100
++   b=check('getNumberOfFrames',y,type='render')
++   y=do.call('[',c(list(x),pat))
++ 
++   ## display
++   if (interactive()) check('display',x,main='x')
++   check('writeImage',x,'test.png')
++ 
++   ## resize, resample, rotate, flip, flop, translate
++   y=check('resize',x,277,139)
++   y=check('resample',x,277,139)
++   y=check('rotate',x,20)
++   y=check('flip',x)
++   y=check('flop',x)
++   y=check('translate',x,rep(1,2*getNumberOfFrames(x,'total')))
++ 
++   ## edge, segment
++   y=check('edge',x)
++   if (colorMode(x)!=TrueColor) y=check('segment',x) ## too slow in TrueColor
++   y=check('thresh',x)
++   y=check('athresh',x)
++   y=check('cthresh',x)
++   
++   ## median, hist
++   if (mode(x)!='logical') b=check('median',x)
++   if (mode(x)!='logical' & interactive()) check('hist',x) 
++ 
++   ## blur, gblur, normalize, negate, normalize2
++   y=check('blur',x,r=20,s=10)
++   y=check('gblur',x,r=10,s=5)
++   y=check('normalize',x)
++   y=check('negate',x)
++   y=check('normalize2',x)
++ 
++   ## filter2
++   z=matrix(1,nc=5,nr=5)
++   z[3,3]=-24
++   y=check('filter2',x,z)
++ 
++   ## erode, dilate, opening, closing, distmap, watershed
++   w=x>0.5
++   y=check('erode',w)
++   y=check('dilate',w)
++   y=check('opening',w)
++   y=check('closing',w)
++   y=check('distmap',w)
++   ws=check('watershed',y)
++ 
++   ## rgbImage, channel
++   if (colorMode(x)==Grayscale) {
++     y=rgbImage(x,flip(x),flop(x))
++     w=check('channel',x,'asblue')
++     w=check('channel',x,'rgb')
++   } else y=x
++   w=check('channel',y,'gray')
++   w=check('channel',y,'green')
++   w=check('channel',y,'x11')
++   w=check('channelMix',y)
++   
++   ## combine, tile, untile
++   y=check('combine',x,x,x)
++   y=check('tile',y,nx=2)
++   y=check('untile',y,c(2,2))
++ 
++   ## hullFeatures, rmObjects, reenumerate, getFeatures (contains hullFeatures, edgeFeatures, haralickFeatures, zernikeMoments, moments)
++   ## paintObjects
++   w=ws
++   w[w@.Data==1]=2
++   w[w@.Data==3]=2117
++   y=check('reenumerate',w)
++   w=ws
++   hf=check('hullFeatures',w)
++   if (!is.list(hf)) hf=list(hf)
++   rmindex = lapply(hf, function(c) which(c[,'h.s']<6))
++   w=check('rmObjects',w,rmindex)
++   y=check('getFeatures',w,x)
++   cat('\n')
++ }
+> 
+> ## Testing procedure
+> lena=readImage(system.file("images","lena.gif", package="EBImage"))
+> lenacolor=readImage(system.file("images","lena-color.png",package="EBImage"))
+> 
+> ## Resizing images, for speeding up testing
+> lena=resize(lena,128,128)
+> lenacolor=resize(lenacolor,128,128)
+> 
+> ## Image - Grayscale - 1 image  - 2 dim - numeric
+> testEBImageFunctions(lena)
+new test (hash=50433716)
+checking 'print' ... Image
+  colormode: Grayscale 
+  storage.mode: double 
+  dim: 128 128 
+  nb.total.frames: 1 
+  nb.render.frames: 1 
+
+imageData(object)[1:5,1:6]:
+          [,1]      [,2]      [,3]      [,4]      [,5]      [,6]
+[1,] 0.5368276 0.5287404 0.5157092 0.5158465 0.5123827 0.5070878
+[2,] 0.5313344 0.5241321 0.5073472 0.5099107 0.5100175 0.5072862
+[3,] 0.5328756 0.5251850 0.5156329 0.5115282 0.5106737 0.5141833
+[4,] 0.5238422 0.5081559 0.5074083 0.5092699 0.5147936 0.5199207
+[5,] 0.5266346 0.5117571 0.5087053 0.5103532 0.5145953 0.5207904
+
+OK (hash=0)
+checking '>' ... OK (hash=38666710)
+checking '+' ... OK (hash=89100426)
+checking '/' ... OK (hash=25216858)
+checking 'getNumberOfFrames' ... OK (hash=1)
+checking 'writeImage' ... OK (hash=NA)
+checking 'resize' ... OK (hash=278512432)
+checking 'resample' ... OK (hash=278639357)
+checking 'rotate' ... OK (hash=85150057)
+checking 'flip' ... OK (hash=53904438)
+checking 'flop' ... OK (hash=50377209)
+checking 'translate' ... OK (hash=50618330)
+checking 'edge' ... OK (hash=41314081)
+checking 'segment' ... OK (hash=21055046)
+checking 'thresh' ... OK (hash=58123331)
+checking 'athresh' ... OK (hash=68970518)
+checking 'cthresh' ... OK (hash=134123418)
+checking 'median' ... OK (hash=0.381033)
+checking 'blur' ... OK (hash=49934617)
+checking 'gblur' ... OK (hash=50328856)
+checking 'normalize' ... OK (hash=53225978)
+checking 'negate' ... OK (hash=83792204)
+checking 'normalize2' ... OK (hash=55074863)
+checking 'filter2' ... OK (hash=2084815)
+checking 'erode' ... OK (hash=19441755)
+checking 'dilate' ... OK (hash=64324775)
+checking 'opening' ... OK (hash=33218950)
+checking 'closing' ... OK (hash=42477507)
+checking 'distmap' ... OK (hash=113777193)
+checking 'watershed' ... OK (hash=331821330)
+checking 'channel' ... OK (hash=258984280)
+checking 'channel' ... OK (hash=464126994)
+checking 'channel' ... OK (hash=51571787)
+checking 'channel' ... OK (hash=53904438)
+checking 'channel' ... OK (hash=NA)
+checking 'channelMix' ... OK (hash=467541209)
+checking 'combine' ... OK (hash=464126994)
+checking 'tile' ... OK (hash=1165105121)
+checking 'untile' ... OK (hash=1161436114)
+checking 'reenumerate' ... OK (hash=524698803)
+checking 'hullFeatures' ... OK (hash=2315424)
+checking 'rmObjects' ... OK (hash=300487451)
+checking 'getFeatures' ... OK (hash=2557956903)
+
+Warning messages:
+1: In hash(y) : NAs introduced by coercion
+2: In hash(y) : NAs introduced by coercion
+3: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
+  'apply.Gaussian' is deprecated.
+4: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
+  'pseudo' is deprecated.
+> 
+> ## Image - Grayscale - 1 image  - 2 dim - logical
+> x=lena>0.5
+> testEBImageFunctions(x)
+new test (hash=38666710)
+checking 'print' ... Image
+  colormode: Grayscale 
+  storage.mode: logical 
+  dim: 128 128 
+  nb.total.frames: 1 
+  nb.render.frames: 1 
+
+imageData(object)[1:5,1:6]:
+     [,1] [,2] [,3] [,4] [,5] [,6]
+[1,] TRUE TRUE TRUE TRUE TRUE TRUE
+[2,] TRUE TRUE TRUE TRUE TRUE TRUE
+[3,] TRUE TRUE TRUE TRUE TRUE TRUE
+[4,] TRUE TRUE TRUE TRUE TRUE TRUE
+[5,] TRUE TRUE TRUE TRUE TRUE TRUE
+
+OK (hash=0)
+checking '>' ... OK (hash=38666710)
+checking '+' ... OK (hash=77333420)
+checking '/' ... OK (hash=19333355)
+checking 'getNumberOfFrames' ... OK (hash=1)
+checking 'writeImage' ... OK (hash=NA)
+checking 'resize' ... OK (hash=214938067)
+checking 'resample' ... OK (hash=213471021)
+checking 'rotate' ... OK (hash=67388563)
+checking 'flip' ... OK (hash=42760022)
+checking 'flop' ... OK (hash=38558733)
+checking 'translate' ... OK (hash=38893019)
+checking 'edge' ... OK (hash=23258690)
+checking 'segment' ... OK (hash=40530964)
+checking 'thresh' ... OK (hash=35024382)
+checking 'athresh' ... OK (hash=34577650)
+checking 'cthresh' ... OK (hash=38666710)
+checking 'blur' ... OK (hash=37689383)
+checking 'gblur' ... OK (hash=38533540)
+checking 'normalize' ... OK (hash=38666710)
+checking 'negate' ... OK (hash=95559210)
+checking 'normalize2' ... OK (hash=38666710)
+checking 'filter2' ... OK (hash=2288640)
+checking 'erode' ... OK (hash=19441755)
+checking 'dilate' ... OK (hash=64324775)
+checking 'opening' ... OK (hash=33218950)
+checking 'closing' ... OK (hash=42477507)
+checking 'distmap' ... OK (hash=113777193)
+checking 'watershed' ... OK (hash=331821330)
+checking 'channel' ... OK (hash=201294294)
+checking 'channel' ... OK (hash=359941506)
+checking 'channel' ... OK (hash=39995155)
+checking 'channel' ... OK (hash=42760022)
+checking 'channel' ... OK (hash=NA)
+checking 'channelMix' ... OK (hash=363926841)
+checking 'combine' ... OK (hash=359941506)
+checking 'tile' ... OK (hash=1045776199)
+checking 'untile' ... OK (hash=1057250626)
+checking 'reenumerate' ... OK (hash=524698803)
+checking 'hullFeatures' ... OK (hash=2315424)
+checking 'rmObjects' ... OK (hash=300487451)
+checking 'getFeatures' ... OK (hash=6575940781)
+
+Warning messages:
+1: In hash(y) : NAs introduced by coercion
+2: In hash(y) : NAs introduced by coercion
+3: In approx(x[, 2], x[, 1], xout = xout, n = n) :
+  collapsing to unique 'x' values
+4: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
+  'apply.Gaussian' is deprecated.
+5: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
+  'pseudo' is deprecated.
+> 
+> ## Image - Color - 1 image  - 3 dim - numeric
+> testEBImageFunctions(lenacolor)
+new test (hash=523333090)
+checking 'print' ... Image
+  colormode: Color 
+  storage.mode: double 
+  dim: 128 128 3 
+  nb.total.frames: 3 
+  nb.render.frames: 1 
+
+imageData(object)[1:5,1:6,1]:
+          [,1]      [,2]      [,3]      [,4]      [,5]      [,6]
+[1,] 0.8805829 0.8821698 0.8780652 0.8889448 0.8842298 0.8823377
+[2,] 0.8876631 0.8884565 0.8860609 0.8857404 0.8824598 0.8833143
+[3,] 0.8885939 0.8885786 0.8830549 0.8837720 0.8884565 0.8903487
+[4,] 0.8747387 0.8799420 0.8865949 0.8865034 0.8894636 0.8930037
+[5,] 0.8683909 0.8763256 0.8843061 0.8860151 0.8905776 0.8901808
+
+OK (hash=0)
+checking '>' ... OK (hash=360987695)
+checking '+' ... OK (hash=884320785)
+checking '/' ... OK (hash=261666545)
+checking 'getNumberOfFrames' ... OK (hash=1)
+checking 'writeImage' ... OK (hash=NA)
+checking 'resize' ... OK (hash=2890111652)
+checking 'resample' ... OK (hash=2890329436)
+checking 'rotate' ... OK (hash=864745347)
+checking 'flip' ... OK (hash=534169083)
+checking 'flop' ... OK (hash=523219064)
+checking 'translate' ... OK (hash=524410856)
+checking 'edge' ... OK (hash=316583258)
+checking 'segment' ... OK (hash=502142422)
+checking 'thresh' ... OK (hash=488499930)
+checking 'athresh' ... OK (hash=611345936)
+checking 'cthresh' ... OK (hash=1207701402)
+checking 'median' ... OK (hash=0.4649271)
+checking 'blur' ... OK (hash=521369852)
+checking 'gblur' ... OK (hash=523012960)
+checking 'normalize' ... OK (hash=491794301)
+checking 'negate' ... OK (hash=684651038)
+checking 'normalize2' ... OK (hash=479409941)
+checking 'filter2' ... OK (hash=6078833)
+checking 'erode' ... OK (hash=202763461)
+checking 'dilate' ... OK (hash=578653171)
+checking 'opening' ... OK (hash=298823356)
+checking 'closing' ... OK (hash=399769944)
+checking 'distmap' ... OK (hash=1559984795)
+checking 'watershed' ... OK (hash=2135276245)
+checking 'channel' ... OK (hash=65709782)
+checking 'channel' ... OK (hash=50433716)
+checking 'channel' ... OK (hash=NA)
+checking 'channelMix' ... OK (hash=523333090)
+checking 'combine' ... OK (hash=5214602765)
+checking 'tile' ... OK (hash=10682862135)
+checking 'untile' ... OK (hash=11490348365)
+checking 'reenumerate' ... OK (hash=4762468379)
+checking 'hullFeatures' ... OK (hash=13286617)
+checking 'rmObjects' ... OK (hash=1828471793)
+checking 'getFeatures' ... OK (hash=12519420883)
+
+Warning messages:
+1: In hash(y) : NAs introduced by coercion
+2: In hash(y) : NAs introduced by coercion
+3: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
+  'apply.Gaussian' is deprecated.
+4: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
+  'pseudo' is deprecated.
+> 
+> ## Image - Color - 2 images - 4 dim - numeric
+> x=combine(lenacolor,lenacolor)
+> testEBImageFunctions(x)
+new test (hash=2261534012)
+checking 'print' ... Image
+  colormode: Color 
+  storage.mode: double 
+  dim: 128 128 3 2 
+  nb.total.frames: 6 
+  nb.render.frames: 2 
+
+imageData(object)[1:5,1:6,1,1]:
+          [,1]      [,2]      [,3]      [,4]      [,5]      [,6]
+[1,] 0.8805829 0.8821698 0.8780652 0.8889448 0.8842298 0.8823377
+[2,] 0.8876631 0.8884565 0.8860609 0.8857404 0.8824598 0.8833143
+[3,] 0.8885939 0.8885786 0.8830549 0.8837720 0.8884565 0.8903487
+[4,] 0.8747387 0.8799420 0.8865949 0.8865034 0.8894636 0.8930037
+[5,] 0.8683909 0.8763256 0.8843061 0.8860151 0.8905776 0.8901808
+
+OK (hash=0)
+checking '>' ... OK (hash=1775106142)
+checking '+' ... OK (hash=4036640154)
+checking '/' ... OK (hash=1130767006)
+checking 'getNumberOfFrames' ... OK (hash=2)
+checking 'writeImage' ... OK (hash=NA)
+checking 'resize' ... OK (hash=12489520632)
+checking 'resample' ... OK (hash=12489591813)
+checking 'rotate' ... OK (hash=3723760783)
+checking 'flip' ... OK (hash=2283205998)
+checking 'flop' ... OK (hash=2261305960)
+checking 'translate' ... OK (hash=2264769850)
+checking 'edge' ... OK (hash=1274499119)
+checking 'segment' ... OK (hash=2008549256)
+checking 'thresh' ... OK (hash=1973802420)
+checking 'athresh' ... OK (hash=2474298400)
+checking 'cthresh' ... OK (hash=4830781236)
+checking 'median' ... OK (hash=0.4649271)
+checking 'blur' ... OK (hash=2254280360)
+checking 'gblur' ... OK (hash=2260575565)
+checking 'normalize' ... OK (hash=2118652724)
+checking 'negate' ... OK (hash=2570353348)
+checking 'normalize2' ... OK (hash=2152503882)
+checking 'filter2' ... OK (hash=12157666)
+checking 'erode' ... OK (hash=1143593354)
+checking 'dilate' ... OK (hash=2599376870)
+checking 'opening' ... OK (hash=1544166776)
+checking 'closing' ... OK (hash=1937261232)
+checking 'distmap' ... OK (hash=12716798521)
+checking 'watershed' ... OK (hash=8974349738)
+checking 'channel' ... OK (hash=266404879)
+checking 'channel' ... OK (hash=205142714)
+checking 'channel' ... OK (hash=NA)
+checking 'channelMix' ... OK (hash=2261534012)
+checking 'combine' ... OK (hash=21363016015)
+checking 'tile' ... OK (hash=20141471366)
+checking 'untile' ... OK (hash=21061237606)
+checking 'reenumerate' ... OK (hash=19465732150)
+checking 'hullFeatures' ... OK (hash=46640482)
+checking 'rmObjects' ... OK (hash=7905101794)
+checking 'getFeatures' ... OK (hash=43511506219)
+
+Warning messages:
+1: In hash(y) : NAs introduced by coercion
+2: In hash(y) : NAs introduced by coercion
+3: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
+  'apply.Gaussian' is deprecated.
+4: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
+  'pseudo' is deprecated.
+> 
+> ## matrix - 2 images - 3 dim - numeric
+> x=imageData(lena)
+> x=combine(x,x)
+> testEBImageFunctions(x)
+new test (hash=205142714)
+checking '>' ... OK (hash=158647212)
+checking '+' ... OK (hash=363789926)
+checking '/' ... OK (hash=102571357)
+checking 'getNumberOfFrames' ... OK (hash=2)
+checking 'writeImage' ... OK (hash=NA)
+checking 'resize' ... OK (hash=1132892630)
+checking 'resample' ... OK (hash=1133096274)
+checking 'rotate' ... OK (hash=341473234)
+checking 'flip' ... OK (hash=212084158)
+checking 'flop' ... OK (hash=205029699)
+checking 'translate' ... OK (hash=205724632)
+checking 'edge' ... OK (hash=159598219)
+checking 'segment' ... OK (hash=84217615)
+checking 'thresh' ... OK (hash=230279302)
+checking 'athresh' ... OK (hash=275419180)
+checking 'cthresh' ... OK (hash=536502068)
+checking 'median' ... OK (hash=0.381033)
+checking 'blur' ... OK (hash=203672584)
+checking 'gblur' ... OK (hash=204886454)
+checking 'normalize' ... OK (hash=216500439)
+checking 'negate' ... OK (hash=331744582)
+checking 'normalize2' ... OK (hash=224744344)
+checking 'filter2' ... OK (hash=4169629)
+checking 'erode' ... OK (hash=81678518)
+checking 'dilate' ... OK (hash=258722126)
+checking 'opening' ... OK (hash=138019596)
+checking 'closing' ... OK (hash=173526918)
+checking 'distmap' ... OK (hash=475551475)
+checking 'watershed' ... OK (hash=1307435556)
+checking 'channel' ... OK (hash=830794407)
+checking 'channel' ... OK (hash=1866731527)
+checking 'channel' ... OK (hash=207418857)
+checking 'channel' ... OK (hash=212084158)
+checking 'channel' ... OK (hash=NA)
+checking 'channelMix' ... OK (hash=1873559957)
+checking 'combine' ... OK (hash=1866731527)
+checking 'tile' ... OK (hash=1961696611)
+checking 'untile' ... OK (hash=1863237091)
+checking 'reenumerate' ... OK (hash=2598340966)
+checking 'hullFeatures' ... OK (hash=6946271)
+checking 'rmObjects' ... OK (hash=1189373494)
+checking 'getFeatures' ... OK (hash=7673870709)
+
+Warning messages:
+1: In hash(y) : NAs introduced by coercion
+2: In hash(y) : NAs introduced by coercion
+3: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
+  'apply.Gaussian' is deprecated.
+4: In zernikeMoments(x = x, ref = ref, N = N, R = R, apply.Gaussian = apply.Gaussian,  :
+  'pseudo' is deprecated.
+> 

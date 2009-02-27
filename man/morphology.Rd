@@ -1,85 +1,67 @@
-\name{closing}
+\name{morphology}
 
 \alias{dilate}
-\alias{dilate,Image-method}
 \alias{closing}
-\alias{closing,Image-method}
 \alias{erode}
-\alias{erode,Image-method}
 \alias{opening}
-\alias{opening,Image-method}
-\alias{morphKern}
+\alias{makeBrush}
 
-\concept{morphology}
-
-\title{ Morphological operations on images }
+\title{Perform morphological operations on images}
 
 \description{
   Functions to perform morphological operations on binary images.
 }
 
 \usage{
-  
-  \S4method{dilate}{Image}(x, kern=morphKern(5), iter=1, ...)
-  \S4method{erode}{Image}(x, kern=morphKern(5), iter=1, ...)
-  \S4method{opening}{Image}(x, kern=morphKern(5), iter=1, ...)
-  \S4method{closing}{Image}(x, kern=morphKern(5), iter=1, ...)
+  dilate(x, kern, iter)
+  erode(x, kern, iter)
+  opening(x, kern, iter)
+  closing(x, kern, iter)
 
-  morphKern(size=5, shape="round")
+  makeBrush(size, shape=c('box', 'disc', 'diamond'), step=TRUE)
 }
 
 \arguments{
+\item{x}{An \code{Image} object or an array.
+    \code{x} is considered as a binary image, whose pixels of value 0
+    are considered as background ones and other pixels as
+    foreground ones.}
 
-  \item{x}{ An object of \code{\linkS4class{Image}}. \code{x} should
-    be a binary image in the \code{\link{Grayscale}} mode. If image is
-    not binary, all non-zero pixels will be considered as 1 to turn the image
-    into a binary \code{\{0,1\}} image. }
+  \item{kern}{An \code{Image} object or an array, containing the
+structuring element. \code{kern} is considered as a binary image, whose
+pixels of value 0 are considered as background ones and other pixels as
+foreground ones.}
 
-  \item{kern}{ Kernel mask matrix. }
-
-  \item{iter}{ Number of iterations. }
-
-  \item{size, shape}{ Kernel matrix size and shape. }
-
-  \item{...}{ Reserved. }
-
+  \item{size}{A numeric containing the size of the brush, in pixels.}
+  \item{shape}{A character vector indicating the shape of the brush.
+     Can be \code{box}, \code{disc} or \code{diamond}. Default is \code{box}.
+  }
+  \item{step}{a logical indicating if the brush is binary. Default is \code{TRUE}.}
+ \item{iter}{Deprecated argument.}
 }
 
 \value{
-
-  A transformed image in an object of \code{\linkS4class{Image}}.
+  \code{dilate}, \code{erode}, \code{opening} and \code{closing} return the
+  transformed \code{Image} object or array,  after the corresponding
+  morphological operation.
     
-  \code{morphKern} returns a square matrix of 0 and 1 of a given size.
-  
+  \code{makeBrush} generates a 2D matrix containing the desired brush.
 }
 
 \details{
-
-  \code{morphKern} can be used to generate a kernel matrix for the use with any
-  of the morphological operators. The function can generate round and square 
-  kernels of odd size, e.g. 5, 7, 9 etc. Even sizes are not supported because
-  the location of the centre pixel is undefined. Kernels can be altered in any
-  desired way, this is just a convenience function.
-  
-  \code{erode} applies the mask positioning its centre over every background pixel 
+  \code{erode} applies the mask positioning its centre over every background pixel
   (0), every pixel which is not covered by the mask is reset to foreground (1).
   In this way image features grow in size.
   
   \code{dilate} applies the mask positioning its centre over every foreground pixel
-  (1), every pixel which is not covered by the mask is reset to background (0).
+  (!=0), every pixel which is not covered by the mask is reset to background (0).
   In this way image features seem shrink in size.
 
-  \code{opening} is erosion followed by dilation and \code{closing} is dilation
-  followed by erosion.
-  
-}
+  \code{opening} is an erosion followed by a dilation and \code{closing} is a dilation
+  followed by an erosion.
 
-\seealso{ \code{
-    \linkS4class{Image}, \link{thresh}, \link{segment}
-}}
-
-\references{
-  \emph{ImageMagick}: \url{http://www.imagemagick.org}.
+  \code{makeBrush} generates brushes of various sizes and shapes that can be used
+ as structuring elements.
 }
 
 \author{
@@ -87,8 +69,14 @@
 }
 
 \examples{
-  ## see example(propagate)
+  if(interactive()) {	
+    x = readImage(system.file("images", "shapes.png", package="EBImage"))
+    display(x)
+    kern=makeBrush(5, shape='diamond')
+    display(kern, title='Structuring element')
+    display(erode(x), title='Erosion of x')
+    display(dilate(x), title='Dilatation of x')
+  }
 }
 
-\keyword{manip}
 

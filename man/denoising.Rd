@@ -1,21 +1,13 @@
 \name{denoise}
 
 \alias{mediansmooth}
-\alias{mediansmooth,Image-method}
 \alias{blur}
-\alias{blur,Image-method}
 \alias{denoise}
-\alias{denoise,Image-method}
 \alias{despeckle}
-\alias{despeckle,Image-method}
 \alias{gblur}
-\alias{gblur,Image-method}
 \alias{noise}
-\alias{noise,Image-method}
 \alias{sharpen}
-\alias{sharpen,Image-method}
 \alias{umask}
-\alias{umask,Image-method}
 
 \concept{image color enhancement}
 
@@ -31,20 +23,20 @@
 \usage{
 
   # Noise removal:
-  \S4method{denoise}{Image}(x, r=0, ...)
-  \S4method{mediansmooth}{Image}(x, r=2, ...)
-  \S4method{despeckle}{Image}(x, ...)
+  denoise(x, r=0)
+  mediansmooth(x, r=2)
+  despeckle(x)
 
   # Sharpening images:
-  \S4method{sharpen}{Image}(x, r=0, s=0.5, ...)
-  \S4method{umask}{Image}(x, r=0, s=0.5, amount=5, t=2, ...)
+  sharpen(x, r=0, s=0.5)
+  umask(x, r=0, s=0.5, amount=5, t=2)
 
   # Blurring images:
-  \S4method{blur}{Image}(x, r=0, s=0.5, ...)
-  \S4method{gblur}{Image}(x, r=0, s=0.5, ...)
+  blur(x, r=0, s=0.5)
+  gblur(x, r=0, s=0.5)
 
   # Adding noise to images:
-  \S4method{noise}{Image}(x, type="G", ...)
+  noise(x, type="G")
 }
 
 \arguments{
@@ -69,8 +61,6 @@
     \code{Uniform, Gaussian} (default), \code{Multi, Impulse,
     Laplace} and \code{Poisson}. The value can be specified by one letter.
     Case insensitive. }
-
-  \item{...}{ Reserved. }
 }
 
 \value{

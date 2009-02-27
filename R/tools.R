@@ -14,49 +14,36 @@
 # See the GNU Lesser General Public License for more details.
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-.DoCall <- function (name, ...) {
-    .Call(name, ..., PACKAGE = "EBImage")
+## checks whether 'x' is a suitable image
+validImage=function(x) {
+  validObject(x)
 }
 
-## .ImageCall valids an image and ensures that image storage.mode is the correct one
-## .ImageCall _must_ be called to call an EBImage image C function (since the validity of the image won't be check in the C code !)
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-.ImageCall <- function (name, x, ...) {
-  validObject(x)
-  x=ensureStorageMode(x)
-  .Call(name, x, ..., PACKAGE = "EBImage")
-}
-ensureStorageMode=function(x) {
-  validObject(x)
+## changes the storage.mode of 'x' to 'double' if required
+castImage=function(x) {
   if (colorMode(x)!=TrueColor & storage.mode(imageData(x))!='double') storage.mode(imageData(x))='double'
   if (colorMode(x)==TrueColor & storage.mode(imageData(x))!='integer') storage.mode(imageData(x))='integer'
   x
 }
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-. <- function (string) {
-  ##    .DoCall ("lib_", as.character(string) )
-  return (string)
-}
-
-.stop <- function (string, ...) stop( .(string), ... )
-.warning <- function (string, ...) warning( .(string), ... )
-.cat <- function (string, ...) cat( .(string), ... )
-
 ## check if x (indexing image) and ref (image) are compatible
 checkCompatibleImages=function(x,ref) {
+  xn=paste(deparse(substitute(x)))
+  refn=paste(deparse(substitute(ref)))
+  validImage(x)
+  
   if (missing(ref)) {
     if (colorMode(x) == TrueColor)
-      stop( "'x' must be an Image object not in 'TrueColor' color mode" )
+      stop( "'",xn,"' must be an Image object not in 'TrueColor' color mode" )
   } else {
+    validImage(ref)
     if (colorMode(x) == TrueColor || colorMode(ref) == TrueColor)
-      stop( "'x' and 'ref' must be Image objects not in 'TrueColor' color mode" )
+      stop( "'",xn,"' and '",refn,"' must be Image objects not in 'TrueColor' color mode" )
     
     if (getNumberOfFrames(x,'total')!=getNumberOfFrames(ref,'total'))
-      stop( "'x' and 'ref' must have the same total number of frames" )
+      stop( "'",xn,"' and '",refn,"' must have the same total number of frames" )
     
     if (any(dim(x)[1:2]!=dim(ref)[1:2])  )
-      stop( "'x' and 'ref' must have the same spatial 2D dimensions" )
+      stop( "'",xn,"' and '",refn,"' must have the same spatial 2D dimensions" )
   }
 }

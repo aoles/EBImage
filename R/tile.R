@@ -12,36 +12,28 @@
 # See the GNU Lesser General Public License for more details.
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("tile", signature(x="list"),
-    function (x, nx=10, lwd=1, fg.col="#E4AF2B", bg.col="black") {
-        lapply(x, tile, nx=nx, lwd=lwd, fg.col=fg.col, bg.col=bg.col)
-    }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("tile", signature(x="array"),
-  function (x, nx=10, lwd=1, fg.col="#E4AF2B", bg.col="gray") {
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+tile = function (x, nx=10, lwd=1, fg.col="#E4AF2B", bg.col="gray") {
+  if (is.list(x)) lapply(x, tile, nx=nx, lwd=lwd, fg.col=fg.col, bg.col=bg.col)
+  else {
+    validImage(x)
     if ( nx < 1 || lwd < 0 || lwd > 100 )
       stop( "wrong range of arguments, see help for range details" )
+    
     hdr = Image(t(col2rgb(c(fg.col,bg.col)))/256,dim=c(2,1,3),col=Color)
     if (colorMode(x)==Grayscale) hdr=channel(hdr,'gray')
     else if (colorMode(x)==TrueColor) colorMode(hdr)=TrueColor
-    x = .ImageCall("tile", x, hdr, as.integer(c(nx, lwd)) )
+    x = .Call("tile", castImage(x), hdr, as.integer(c(nx, lwd)), PACKAGE='EBImage')
     return(x)
   }
-)
+}
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("untile", signature(x="array", nim="numeric"),
-  function (x, nim, lwd=1) {
-    nim = as.integer(nim)
-    lwd = as.integer(lwd)
-    if (length(nim)<2)
-      stop("'nim' must contain two values for the number of images in x and y directions")
-    if (lwd<0)
-      stop("wrong line width")
-    return(.ImageCall("untile", x, header(x), nim, lwd))
-  }
-)
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+untile = function (x, nim, lwd=1) {
+  validImage(x)
+  nim = as.integer(nim)
+  lwd = as.integer(lwd)
+  if (length(nim)<2) stop("'nim' must contain two values for the number of images in x and y directions")
+  if (lwd<0) stop("wrong line width")
+  return(.Call("untile", castImage(x), Image(x), nim, lwd, PACKAGE='EBImage'))
+}

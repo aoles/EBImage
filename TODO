@@ -1,60 +1,41 @@
-high:
+greg:
+- doc: resize, resample, rotate, translate, flip, flop, affinet
+- doc: edge, segment, thresh, cthresh, athresh
+- doc: cgamma, contrast, enhance, equalize, modulate, noise, denoise, despeckle, mediansmooth, blur, gblur, sharpen, normalize, normalize2, umask, filter2
+- doc: watershed, propagate, floodFill, fillHull
+- doc: rgbImage, channel, channelMix
+- doc: stackObjects, combine, tile, untile
+- doc: drawfont, drawtext
+- doc: paintObjects, rmObjects, reenumerate
+- doc: getFeatures, hullFeatures, edgeProfile, edgeFeatures
+- doc: moments, cmoments, smoments, rmoments
+- doc: haralickFeatures, haralickMatrix, zernikeMoments
 - floodFill: check md and Color
 - fillHull works only with IndexedImage
-- doc: major update to be done (main + features + cthresh + athresh)
 - drawtext: check md and Color (IM, should be OK)
 - propagate: check md and Color
 - paintObjects, matchObjects, stackObjects: check md and Color
 - installation: ease the installation on MacOS
-- merge morphKern, mkball and mkbox
 - check previous vignette
-- check features values with current EBImage release
 - channel: two methods, rewrite vignette and usecases
 - validObject must check image validity even if it is array (stopifnot to be removed)
-
-low:
-- remove lib_ things
+- readImage of IndexedImage in Grayscale
 - toremove: enhance (vague)
-- toremove: header (not useful anymore)
-- merge animate and display
 - change colormode/colorMode case
-- default arguments to be checked
-- clean display.c (winStr, newPixbufFromImages to remove)
-- assert is misnamed
 - image, hist: are they useful ?
 - naiveSegment: to implement
 - subset [1,1:10] or [1:10,1] doesn't have the good orientation
-- check display colorize and main
 - ref, checkCompatible should test for validity and storage.mode of ref
-- R testing using hashing
+- example for makeBrush
 
 wolfgang:
-
-
-EBImage-deprecated.html man page: 
-- "The functions are likely to be defunct with the next Bioconductor release, 2.2." but the last release was already 2.3 ...
 
 drawtext man page:
 Clean up 'Value' section. Explain what drawtext and drawfont functions
    do.
 
-Remove the weird functions 'ensureStorageMode' and '.ImageCall'
-
-
 zernikeMoments function and man page: 
-   1.) What is the 'apply.Gaussian = TRUE' argument doing? It seems
-   bizarre. Does it make sense? Same question for 'pseudo'.
    2.) The function used to compute the Zernike polynomials should be 
    exposed (e.g. it could take the values of n and l, and a
    parameterisation of a grid of points in R^2 on which the values 
    should be computed; it could return the values on this grid.)
-
-Do we need "colormode" in readImage and as an attribute of the Image
-   class? Wouldn't it be enough to have this as an argument of 'display'
-   and 'writeImage', to ask these functions to attempt to interpret
-   the third dimension of the Image object as three RGB color
-   channels? Everything else in the package should not really depend
-   on this (some functions might require the third dimesion to be of
-   size 1).
- 
-How are we going to represent 3D 'images' (x,y,z), and time?

@@ -282,9 +282,7 @@ _showInGtkWindow (SEXP xx, SEXP caption) {
     gdk_flush();
 }
 
-/*----------------------------------------------------------------------- */
-gboolean
-onWinDestroy (GtkWidget * wnd, GdkEvent * event, gpointer user_data) {
+gboolean onWinDestroy (GtkWidget * wnd, GdkEvent * event, gpointer user_data) {
   udata *dat=(udata *)user_data;
   R_ReleaseObject(dat->xx);
   g_free (dat);
@@ -346,44 +344,10 @@ gboolean onZoomOnePress (GtkToolButton * btn, gpointer user_data) {
   return TRUE;
 }
 
-/*----------------------------------------------------------------------- */
 gboolean onScroll(GtkAdjustment *adjustment, gpointer user_data)
 {
   return onMouseMove(NULL,NULL,user_data);
 }
-
-/*
-gboolean changeFrame(gpointer user_data) {
-  udata *dat=(udata *)user_data;
-  int width, height, nz, index;
-  GdkPixbuf * pxbuf, * newPxbuf;
-  GtkImage *imgWG=GTK_IMAGE(dat->imgWG);
-  SEXP xx=dat->xx;
-
-  winStr = (gpointer **) ptr;
-  xx = (SEXP) winStr[2];
-    stats = (dstats *)winStr[5];
-
-    width = gdk_pixbuf_get_width ( gtk_image_get_pixbuf(imgWG) );
-    height = gdk_pixbuf_get_height ( gtk_image_get_pixbuf(imgWG) );
-
-    nz = getNumberOfFrames(xx,1);
-    index = *(int *)winStr[3] - 1;
-    if ( index < 0 )
-        return TRUE;
-    pxbuf = newPixbufFromSEXP (xx, index);
-    *(int *)winStr[3] = index;
-    stats->index = index;
-
-    newPxbuf = gdk_pixbuf_scale_simple ( pxbuf, width, height, INTERP_METHOD);
-    gtk_image_set_from_pixbuf (imgWG, newPxbuf);
-    g_object_unref (newPxbuf);
-    g_object_unref (pxbuf);
-    updateStatusBar((GtkStatusbar *)winStr[4], stats);
-    gdk_flush();
-    return TRUE;
-}
-*/
 
 gboolean onNextImPress (GtkToolButton * btn, gpointer user_data) {
   udata *dat=(udata *)user_data;
@@ -409,9 +373,7 @@ gboolean onPrevImPress (GtkToolButton * btn, gpointer user_data) {
   return TRUE;
 }
 
-/*----------------------------------------------------------------------- */
-gboolean 
-onMouseMove(GtkWidget * widget, GdkEventMotion * event, gpointer user_data) {
+gboolean onMouseMove(GtkWidget * widget, GdkEventMotion * event, gpointer user_data) {
   udata *dat=(udata *)user_data;
   gint x, y, x0=0, y0=0;
   

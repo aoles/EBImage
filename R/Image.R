@@ -19,14 +19,14 @@ Grayscale = 0L
 TrueColor = 1L  ## deprecated mode
 Color     = 2L
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setClass ("Image",
   representation (colormode="integer"),
   prototype (colormode=Grayscale),
   contains = "array"
 )
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Image=function(data=array(0,dim=c(1,1)), dim, colormode=NULL) {
   if (missing(dim)) {
     if (is.array(data)) dim=base::dim(data)
@@ -82,113 +82,57 @@ Image=function(data=array(0,dim=c(1,1)), dim, colormode=NULL) {
   return(res)
 }
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("as.Image", signature(x="array"),
-  function (x) {
-    if (is.integer(x)) return(Image(x, colormode=TrueColor))
-    else x = Image(x, colormode=Grayscale)
-    validObject(x)    
-    return(x)
-  }
-)
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+as.Image = function(x) {
+  if (is.integer(x)) return(Image(x, colormode=TrueColor))
+  else x = Image(x, colormode=Grayscale)
+  validImage(x)    
+  return(x)
+}
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("colorMode", signature (x="Image"),
-  function (x) x@colormode
-)
-setMethod ("colorMode", signature (x="array"),
-  function (x) Grayscale
-)
-setReplaceMethod ("colorMode", signature (x="Image", value="ANY"),
-  function (x, value) {
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+colorMode = function (y) {
+  if (class(y)=='Image') y@colormode
+  else Grayscale
+}
+
+`colorMode<-` = function(y, value) {
+  if (class(y)=='Image') {
     ## conversion here should not be possible ! kept for compatibility
-    if ((x@colormode==TrueColor & value!=TrueColor) |
-        (x@colormode!=TrueColor & value==TrueColor)) {
-      x=Image(x,colormode=value)
+    if ((y@colormode==TrueColor & value!=TrueColor) |
+        (y@colormode!=TrueColor & value==TrueColor)) {
+      y=Image(y,colormode=value)
     } else {
-      x@colormode = EBImage:::parseColorMode(value)
-      validObject(x)
+      y@colormode = EBImage:::parseColorMode(value)
+      validObject(y)
     }
-    return(x)
-  }
-)
-setReplaceMethod ("colorMode", signature (x="array", value="ANY"),
-  function (x, value) {
-    warning('Color mode of an array cannot be changed, the array should be cast into an Image using \'Image\'')
-    return(x)
-  }
-)
+  } else warning('Color mode of an array cannot be changed, the array should be cast into an Image using \'Image\'')
+  return(y)
+}
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("imageData", signature (x="Image"),
-  function (x) x@.Data
-)
-setMethod ("imageData", signature (x="array"),
-  function (x) x
-)
-setReplaceMethod ("imageData", signature (x="Image", value="array"),
-  function (x, value) {
-    x@.Data = value
-    ## conversion here should not be possible ! kept for compatibility
-    if (is.integer(value)) x@colormode = TrueColor
-    validObject(x)   
-    return (x)
-  }
-)
-setReplaceMethod ("imageData", signature (x="array", value="array"),
-  function (x, value) {
-    x = value
-    return (x)
-  }
-)
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+imageData = function (y) {
+  if (class(y)=='Image') y@.Data
+  else y
+}
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+`imageData<-` = function (y, value) {
+  if (class(y)=='Image') {
+    y@.Data = value
+    ## conversion here should not be possible ! kept for compatibility !
+    if (is.integer(value)) y@colormode = TrueColor
+    validObject(y)
+  } else return(value)
+  return (y)
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 is.Image <- function (x) {
   if (!is(x, "Image")) return(FALSE)
   else return (TRUE)
 }
 
-## Assert (misnamed) checks Image dimension & color compatibility
-## If strict is TRUE,  all the dimensions and colorMode are checked
-## If strict is FALSE, only the two first dimensions and colorMode are checked
-## GP: Useful ?
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("assert", signature (x="array"),
-  function (x, y, strict=FALSE) {
-    n <- 2
-    if (missing(y)) return(is.Image(x))
-    if (strict) {
-      if (length(dim(x))!=length(dim(y))) return(FALSE)
-      else n = length(dim(x))
-    }
-    if ( any( dim(x)[1:n] != dim(y)[1:n] ) || colorMode(x) != colorMode(y) )
-      return( FALSE )
-    return( TRUE )
-  }
-)
-
-## Shallow copy of the object: only the members (not the array) are copied
-## GP: Useful ?
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("header", signature(x="Image"),
-  function (x) {
-    dim=rep(1,length(dim(x)))
-    if (colorMode(x) == Grayscale) data=array(0,dim=dim)
-    else if (colorMode(x) == TrueColor) data=array(0L,dim=dim) 
-    else data=array(0,dim=dim)
-    
-    y = new(class(x),.Data=data,colormode=colorMode(x))
-    return(y)
-  }
-)
-setMethod ("header", signature(x="array"),
-  function (x) {
-    dim=rep(1,length(dim(x)))
-    return(array(0,dim=dim))
-  }
-)
-      
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 validImageObject=function(object) {
   ## check colormode
   if (!is.integer(colorMode(object))) return('colormode must be an integer')
@@ -231,30 +175,29 @@ setMethod("Ops", signature(e1="numeric", e2="Image"),
 	}
 )
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 writeImage = function (x, files, quality=100) {
-  if (missing(files))
-    stop("Please specify a value for the argument 'files'.")
+  validImage(x)
+  if (missing(files)) stop("Please specify a value for the argument 'files'.")
   files = as.character(files)
   quality = as.integer(quality)
   stopifnot(is(x, "array"), length(quality)==1L)
-  validObject(x)
   if ((quality<1L) || (quality>100L))
     stop(sprintf("'quality' must be a value between 1 and 100, but it is %8g.", quality))
-  .ImageCall("lib_writeImages", x, files, quality)
+  
+  .Call("lib_writeImages", castImage(x), files, quality, PACKAGE='EBImage')
   invisible(files)
 }
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 readImage = function(files, colormode) {
-  if (missing(colormode)) colormode=-1
-  if (missing(files)) 
-    .DoCall ("lib_chooseImages", as.integer(colormode))
-  else 
-    .DoCall ("lib_readImages", as.character(files), as.integer(colormode))
+  if (!missing(colormode)) warning("'colormode' is deprecated")
+  else colormode=-1
+  if (missing(files)) .Call ("lib_chooseImages", as.integer(colormode), PACKAGE='EBImage')
+  else .Call ("lib_readImages", as.character(files), as.integer(colormode), PACKAGE='EBImage')
 }
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("[", signature(x="Image", i="ANY", j="ANY", drop="ANY"),
            function(x,i,j,...,drop) {
              ## list(...) doesn't work in this S4 method dispatch framework
@@ -272,17 +215,17 @@ setMethod ("[", signature(x="Image", i="ANY", j="ANY", drop="ANY"),
 ## getNumberOfFrames
 ## If type='total', returns the total number of frames
 ## If type='render', return the number of frames to be rendered after color channel merging
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod('getNumberOfFrames',signature(x="array"),
-          function(x,type='total') {
-            if (type=='render' & colorMode(x)==Color) {
-              if (length(dim(x))< 3) return(1)
-              else return(prod(dim(x)[-1:-3]))
-            }
-            else return(prod(dim(x)[-1:-2]))
-          })
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+getNumberOfFrames = function(y,type='total') {
+  if (missing(type)) type='total'
+  if (type=='render' & colorMode(y)==Color) {
+    if (length(dim(y))< 3) return(1)
+    else return(prod(dim(y)[-1:-3]))
+  }
+  else return(prod(dim(y)[-1:-2]))
+}
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("show", signature(object="Image"),
   function (object) {
     cat('Image\n')
@@ -336,7 +279,7 @@ setMethod ("image", signature(x="Image"),
 )
 
 ## private function to select a channel from a Color image
-## failsafe, will return a black image if the channel doesn't exist
+## failsafe, will return a black image if theser channel doesn't exist
 selectChannel=function(x,i) {
   if (colorMode(x)!=Color) stop('in \'selectChannel\', color mode must be Color')
   n=getNumberOfFrames(x,'render')
@@ -358,13 +301,11 @@ selectChannel=function(x,i) {
   return(y)
 }
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("channel", signature(x="array", mode="character"),
-  function (x, mode) { 
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+channel = function (x, mode) {
+  if (is.array(x)) {
     mode=tolower(mode)
-
     validObject(x)
-    
     if (colorMode(x)==Grayscale) {
       return(switch(mode,
                     rgb=rgbImage(r=x,g=x,b=x),
@@ -400,7 +341,7 @@ setMethod ("channel", signature(x="array", mode="character"),
                                     green=3, b=, blue=4, asred=5, asgreen=6, asblue=7, x11=8, -1) )
       if (modeNo < 0) stop("wrong conversion mode")
       
-      resData <- .DoCall("lib_channel", imageData(x), modeNo)
+      resData <- .Call("lib_channel", imageData(x), modeNo, PACKAGE='EBImage')
       if (is.null(resData))
         stop("error converting colors, check if all supplied values majke sense for color representation")
       resData[which(is.na(x))] = NA
@@ -412,27 +353,25 @@ setMethod ("channel", signature(x="array", mode="character"),
       return(res)
     }
   }
-)
-setMethod ("channel", signature(x="ANY", mode="character"),
-  function (x, mode, ...) {
+  else {
     mode <- tolower (mode)
     modeNo <- as.integer( switch (EXPR=mode, rgb=0, grey=, gray=1, r=, red=2, 
-            g=, green=3, b=, blue=4, asred=5, asgreen=6, asblue=7, x11=8, -1) )
+                                  g=, green=3, b=, blue=4, asred=5, asgreen=6, asblue=7, x11=8, -1) )
     if ( modeNo < 0 )
       stop( "wrong conversion mode")
     if ( !is.numeric(x) && !is.character(x) )
       stop( "argument must be coercible to either numeric or character" )
-    res <- .DoCall("lib_channel", x, modeNo )
+    res <- .Call("lib_channel", x, modeNo, PACKAGE='EBImage')
     if ( !is.null(res) )
       res [ which( is.na(x) ) ] = NA
     if ( is.null(res) || is.character(res) ) return (res)
     if ( is.array(x) ) dim (res) <- dim (x)
     return (res)
   }
-)
+}
 
 ## GP: Useful ?
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("hist", signature(x="Image"),
   function (x, breaks=64L, main=paste("Image histogram:", length(x), "pixels"), xlab="Intensity", ...) {
 
@@ -458,12 +397,16 @@ setMethod ("hist", signature(x="Image"),
   }
 )
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("combine", signature(x="array"),
-  function (x,...,along) {
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+combine = function (x,...,along) {
+  if (is.list(x)) {
+    names(x) <- NULL
+    do.call(combine, x)
+  }
+  else {
     args=c(list(x),list(...))
     if (length(args)==1) return(x)
-
+    
     ## check colorMode
     cm=sapply(args,colorMode)==TrueColor
     if (any(cm) && !all(cm)) stop("\'TrueColor\' images cannot be combined with non \'TrueColor\' ones")
@@ -499,19 +442,11 @@ setMethod ("combine", signature(x="array"),
     validObject(x)
     return (x)
   }
-)
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("combine", signature(x="list"),
-  function (x) {
-    names(x) <- NULL
-    do.call(combine, x)
-  }
-)
+}
 
 ## Median & quantile redefinition
 ## needed to overcome an isObject() test in median() which greatly slows down median()
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 median.Image <- function(x, na.rm = FALSE) {
   median(imageData(x), na.rm=na.rm)
 }
@@ -519,7 +454,7 @@ quantile.Image <- function(x, ...) {
   quantile(imageData(x), ...)
 }
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 rgbImage = function(red=NULL,green=NULL,blue=NULL) {
   d=NULL
   
@@ -543,13 +478,12 @@ rgbImage = function(red=NULL,green=NULL,blue=NULL) {
 }
 
 ## sqrt(r^2+g^2+b^2)
-## GP: Useful ?
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-channelMix = function(r,g,b) {
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+channelMix = function(red,green,blue) {
   mix = list()
-  if (!missing(r)) mix[["r"]] = r
-  if (!missing(g)) mix[["g"]] = g
-  if (!missing(b)) mix[["b"]] = b
+  if (!missing(red)) mix[["r"]] = red
+  if (!missing(green)) mix[["g"]] = green
+  if (!missing(blue)) mix[["b"]] = blue
   if (length(mix)==0)
     stop("at least one image must be provided")
   if (length(mix)==1) return(mix[[1]])
@@ -558,7 +492,7 @@ channelMix = function(r,g,b) {
   sqrt(res)
 }
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 parseColorMode=function(colormode) {
   icolormode=NA
   

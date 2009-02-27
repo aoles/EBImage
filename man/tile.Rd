@@ -2,9 +2,6 @@
 
 \alias{tile}
 \alias{untile}
-\alias{tile,Image-method}
-\alias{tile,list-method}
-\alias{untile,Image,numeric-method}
 
 \concept{image manipulation}
 
@@ -18,9 +15,8 @@
 
 \usage{
 
-  \S4method{tile}{Image}(x, nx=10, lwd=1, fg.col="#E4AF2B", bg.col="gray", ...)
-  \S4method{tile}{list}(x, nx=10, lwd=1, fg.col="#E4AF2B", bg.col="gray", ...)
-  \S4method{untile}{Image,numeric}(x, nim, lwd=1, ...)
+  tile(x, nx=10, lwd=1, fg.col="#E4AF2B", bg.col="gray")
+  untile(x, nim, lwd=1)
 
 }
 
@@ -40,8 +36,6 @@
     converted to Grayscale if the color mode of \code{x} is \code{Grayscale}. }
 
   \item{nim}{A numeric vector of 2 elements for the number of images in both directions.}
-
-  \item{...}{ Reserved. }
 }
 
 \value{

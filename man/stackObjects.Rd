@@ -1,10 +1,6 @@
 \name{stackObjects}
 
 \alias{stackObjects}
-\alias{stackObjects,IndexedImage,Image,missing-method}
-\alias{stackObjects,IndexedImage,Image,character-method}
-\alias{stackObjects,IndexedImage,Image,list-method}
-\alias{stackObjects,IndexedImage,Image,numeric-method}
 
 \concept{image manipulation}
 
@@ -17,15 +13,11 @@
 }
 
 \usage{
-  ## S4 methods for signatures 'x=IndexedImage,ref=Image,index=character'
-  ## and 'x=IndexedImage,ref=Image,index=list' and
-  \S4method{stackObjects}{IndexedImage,Image,numeric}(x, ref, index, ...)
-
-  \S4method{stackObjects}{IndexedImage,Image,missing}(x, ref, index, combine, rotate, bg.col, ext, centerby, rotateby, ...)
+  stackObjects(x, ref, index, combine, rotate, bg.col, ext, centerby, rotateby)
 }
 
 \arguments{
-  \item{x}{An object of \code{\linkS4class{IndexedImage}}.
+  \item{x}{An object of \code{\linkS4class{Image}}.
     Images must be Grayscale and carry object indexing information, like those
     returned by \code{\link{watershed}} or \code{\link{propagate}}. }
 
@@ -52,10 +44,7 @@
   \item{centerby,rotateby}{ If \code{ref} is a TrueColor image, these character 
     values specify which channel should be used to center and rotate objects. 
     By default the image is converted by \code{\link{channel}(ref,"gray")}. 
-    Other possible values are \code{"red", "green"} or \code{"blue"}. }
-
-  \item{...}{ Reserved. }
-  
+    Other possible values are \code{"red", "green"} or \code{"blue"}. }  
 }
 
 \value{
@@ -101,8 +90,8 @@
   ## segment
   mask = thresh(ii, 25, 25, 0.02)
   ## refine segmentation with morphology filters
-  mk3 = morphKern(3)
-  mk5 = morphKern(5)
+  mk3 = makeBrush(3, shape='diamond')
+  mk5 = makeBrush(5, shape='diamond')
   mask = dilate(erode(closing(mask, mk5), mk3), mk5)
   ## index objects with 'watershed'
   io = watershed( distmap(mask), 1.5, 1)

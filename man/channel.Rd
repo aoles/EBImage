@@ -1,8 +1,6 @@
 \name{channel}
 
 \alias{channel}
-\alias{channel,Image,character-method}
-\alias{channel,ANY,character-method}
 \alias{rgbImage}
 \alias{channelMix}
 
@@ -22,12 +20,10 @@
 
 
 \usage{ 
-  ## S4 methods for signatures 'x=Image,mode=character'
-  ## and 'x=ANY,mode=character'
-  channel(x, mode, ...)
+  channel(x, mode)
   
-  rgbImage(r, g, b)
-  channelMix(r, g, b)
+  rgbImage(red, green, blue)
+  channelMix(red, green, blue)
 }
 
 \arguments{
@@ -37,10 +33,8 @@
 
   \item{mode}{ A character value specifying the target mode for conversion. 
     See 'Conversion Modes' below. }
-
-  \item{...}{ Reserved. }
   
-  \item{r,g,b}{Objects of class \code{\linkS4class{Image}}. }
+  \item{red,green,blue}{Objects of class \code{\linkS4class{Image}}. }
 }
 
 \value{
