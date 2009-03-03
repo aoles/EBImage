@@ -66,16 +66,13 @@
 }
 
 \examples{
-## if ( length(grep("apple", Sys.getenv("R_PLATFORM"))) == 0 ) {
-  Lena = readImage(system.file("images", "lena-color.png", package="EBImage"))
-  Lena = drawtext(Lena,
+  lena = readImage(system.file("images", "lena-color.png", package="EBImage"))
+  lena = drawtext(lena,
      xy = c(250, 450),
      labels = "Lena",
      font = drawfont(weight=600, size=28),
-     col = "brown")
-  if (interactive())
-    display(Lena)
-## }
+     col = "white")
+  if (interactive()) display(lena)
 }
 
 \keyword{file}

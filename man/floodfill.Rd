@@ -53,10 +53,10 @@
 }
 
 \examples{
-if (interactive()) {
-  data(imageWithHoles)
+if (interactive()) { 
+  x = readImage(system.file("images", "holes.png", package="EBImage"))
 
-  display(x, main="Original image")
+  display(x, title="Original image")
   display(floodFill(x,c(5,5),tolerance=0.2))
   display(floodFill(x,c(40,40),tolerance=0.2))
 
@@ -65,16 +65,10 @@ if (interactive()) {
   mask[mask<=0.3]=0
 
   y = floodFill(mask,c(40,40),2)
-  display(y, main="Indexed mask with holes")
+  display(y, title="Indexed mask with holes")
   
   y = fillHull(y)
-  display(y, main="Indexed mask without holes")
-
-  rgb = channel(normalize(y), "rgb")
-  rgb = floodFill(rgb, c(1,1), "red")
-  rgb = floodFill(rgb, c(50,50), "blue")
-  rgb = floodFill(rgb, c(150,150), "green")
-  display(rgb)
+  display(y, title="Indexed mask without holes")
 }}
 
 \keyword{file}

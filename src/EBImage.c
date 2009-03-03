@@ -93,7 +93,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"matchObjects",       (DL_FUNC) &matchObjects,  2},
     {"rmObjects",          (DL_FUNC) &rmObjects, 2},
     {"tile",               (DL_FUNC) &tile,     3},
-    {"untile",             (DL_FUNC) &untile,         4},
+    {"untile",             (DL_FUNC) &untile,         3},
     {"stackObjects",       (DL_FUNC) &stackObjects,  6},
     {"lib_frameDist",      (DL_FUNC) &lib_frameDist,      5},
 

@@ -35,5 +35,5 @@ untile = function (x, nim, lwd=1) {
   lwd = as.integer(lwd)
   if (length(nim)<2) stop("'nim' must contain two values for the number of images in x and y directions")
   if (lwd<0) stop("wrong line width")
-  return(.Call("untile", castImage(x), Image(x), nim, lwd, PACKAGE='EBImage'))
+  return(.Call("untile", castImage(x), nim, lwd, PACKAGE='EBImage'))
 }

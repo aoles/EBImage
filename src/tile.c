@@ -140,7 +140,7 @@ tile (SEXP obj, SEXP hdr, SEXP params) {
 
 /*----------------------------------------------------------------------- */
 SEXP
-untile(SEXP img, SEXP hdr, SEXP nim, SEXP linewd) {
+untile(SEXP img, SEXP nim, SEXP linewd) {
   int mode = getColorMode(img);
   int nimx = INTEGER(nim)[0];
   int nimy = INTEGER(nim)[1];

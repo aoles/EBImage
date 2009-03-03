@@ -1,3 +1,8 @@
+2.7.16
+- fixed warnings due to unused variables in C code
+- fixed a drawtext bug which prevented EBImage to be checked on R 2.9.0
+- fixed floodFill example by restoring inst/images/holes.png
+
 2.7.15
 - no warnings anymore in R CMD check
 - S4 methods removed
