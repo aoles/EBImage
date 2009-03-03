@@ -25,9 +25,7 @@
     which in turn defines the number of features calculated. Defaults to 12.}
 
   \item{R}{ Defines the radius of the circle around an object centre
-    from which the features are calculated. It also defines the standard deviation
-    for the 2D Gausian applied at the centre of an object. See details.
-    Defaults to 30. }
+    from which the features are calculated.}
 
   \item{apply.Gaussian, pseudo}{Deprecated.}
 }
@@ -66,20 +64,6 @@
   the resulting number of features is 49. Columns in the results matrix are
   firstly ordered by increasing value of \code{n} and secondly by increasing
   value of \code{l}.
-
-  If \code{apply.Gaussian = TRUE} then prior to calculating the Zernike features,
-  a Gaussian is applied to the image centred at the co-ordinates of an objects
-  centre of mass, with the standard deviation defined by \code{sigma = 0.8 * R}.
-  The centres of mass are found by using \code{\link{moments}(x, ref)}.
-  The resulting image is then:
-
-  \code{i'(x,y) = i(x,y) * exp( -(x^2+y^2) / (2 * sigma^2) )}.
-
-  The expected effect: the default value of \code{R = 30} and
-  \code{sigma = 0.8 * R = 24} will penalize the edges of objects of
-  radii more than 20 and intensity is expected to be around 0 at distances from
-  the centre more than 40.
-
 }
 
 \references{
@@ -91,10 +75,8 @@
   \url{http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/SHUTLER3/node11.html}
 }
 
-\seealso{\code{
-  \linkS4class{Image}, \link{watershed}, \link{getFeatures},
-  \link{moments}
-}}
+\seealso{\code{\link{getFeatures}}
+}
 
 \author{
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}; Mike Smith, \email{msmith@ebi.ac.uk}, 2007

@@ -44,6 +44,9 @@ typedef struct {
 #define INTERP_METHOD GDK_INTERP_NEAREST
 int THREAD_ON = 0;
 
+// C preferred way to get rid of 'unused parameter' warnings
+#define UNUSED(expr) do { (void)(expr); } while (0)
+
 /*----------------------------------------------------------------------- */
 void * _showInImageMagickWindow (void *);
 void * _animateInImageMagickWindow (void *);
@@ -284,6 +287,9 @@ _showInGtkWindow (SEXP xx, SEXP caption) {
 
 gboolean onWinDestroy (GtkWidget * wnd, GdkEvent * event, gpointer user_data) {
   udata *dat=(udata *)user_data;
+  UNUSED(wnd);
+  UNUSED(event);
+
   R_ReleaseObject(dat->xx);
   g_free (dat);
   return FALSE;
@@ -291,6 +297,8 @@ gboolean onWinDestroy (GtkWidget * wnd, GdkEvent * event, gpointer user_data) {
 
 gboolean onSlide(GtkRange *range, gpointer user_data) {
   udata *dat=(udata *)user_data;
+  UNUSED(range);
+
   dat->index=gtk_range_get_value (GTK_RANGE(dat->hSlider))-1;
   updateFrame(user_data,1);
   updateStatusBar(user_data);
@@ -322,6 +330,8 @@ void updateFrame(gpointer user_data,double factor) {
 
 gboolean onZoomInPress (GtkToolButton * btn, gpointer user_data) {
   udata *dat=(udata *)user_data;
+  UNUSED(btn);
+
   dat->zoom *= 2;
   updateFrame(user_data,2);
   updateStatusBar(user_data);
@@ -330,6 +340,8 @@ gboolean onZoomInPress (GtkToolButton * btn, gpointer user_data) {
 
 gboolean onZoomOutPress (GtkToolButton * btn, gpointer user_data) {
   udata *dat=(udata *)user_data;
+  UNUSED(btn);
+
   dat->zoom *= 0.5;
   updateFrame(user_data,0.5);
   updateStatusBar(user_data);
@@ -338,6 +350,8 @@ gboolean onZoomOutPress (GtkToolButton * btn, gpointer user_data) {
 
 gboolean onZoomOnePress (GtkToolButton * btn, gpointer user_data) {
   udata *dat=(udata *)user_data;
+  UNUSED(btn);
+
   dat->zoom=1.0;
   updateFrame(user_data,-1);
   updateStatusBar(user_data);
@@ -346,11 +360,15 @@ gboolean onZoomOnePress (GtkToolButton * btn, gpointer user_data) {
 
 gboolean onScroll(GtkAdjustment *adjustment, gpointer user_data)
 {
+  UNUSED(adjustment);
+
   return onMouseMove(NULL,NULL,user_data);
 }
 
 gboolean onNextImPress (GtkToolButton * btn, gpointer user_data) {
   udata *dat=(udata *)user_data;
+  UNUSED(btn);
+
   dat->index=dat->index+1;
   if (dat->index>=dat->nz-1) dat->index=(dat->nz)-1;
   if (dat->hSlider!=NULL) {
@@ -363,6 +381,8 @@ gboolean onNextImPress (GtkToolButton * btn, gpointer user_data) {
 
 gboolean onPrevImPress (GtkToolButton * btn, gpointer user_data) {
   udata *dat=(udata *)user_data;
+  UNUSED(btn);
+
   dat->index=dat->index-1;
   if (dat->index<0) dat->index=0;
   if (dat->hSlider!=NULL) {
@@ -376,7 +396,9 @@ gboolean onPrevImPress (GtkToolButton * btn, gpointer user_data) {
 gboolean onMouseMove(GtkWidget * widget, GdkEventMotion * event, gpointer user_data) {
   udata *dat=(udata *)user_data;
   gint x, y, x0=0, y0=0;
-  
+  UNUSED(widget);
+  UNUSED(event);
+
   x0 = (dat->imgWG->allocation.width - dat->nx*dat->zoom)/2;
   if (x0 < 0) x0 = 0;
   y0 = (dat->imgWG->allocation.height - dat->ny*dat->zoom)/2;

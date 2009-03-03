@@ -25,7 +25,10 @@ drawfont = function(family=switch(.Platform$OS.type, windows="Arial", "helvetica
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 drawtext = function(img, xy, labels, font, col) {   
   validImage(img)
-  if (is.numeric(xy)) xy=list(as.numeric(xy))
+  if (is.numeric(xy)) {
+    xy=list(as.numeric(xy))
+    labels=list(labels)
+  }
   if ( missing(font) ) font=drawfont()
   if ( missing(col) ) col="white"
   

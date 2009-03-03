@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 SEXP tile (SEXP, SEXP, SEXP);
-SEXP untile (SEXP, SEXP, SEXP, SEXP);
+SEXP untile (SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus
 };

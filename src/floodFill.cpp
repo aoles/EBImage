@@ -240,11 +240,11 @@ fillAroundObjectHull(int **m, int **canvas, const XYPoint &size, const Box &box,
 /* -------------------------------------------------------------------------- */
 /* Templated version by Oleg Sklyar */
 template <class T> void 
-_fillAroundObjectHullT(T **m, T **canvas, const XYPoint &size, const Box &box, int &rc) {
+_fillAroundObjectHullT(T **m, T **canvas, const Box &box, int &rc) {
   XYStack s;
   XYPoint pt;
   bool spanLeft,spanRight;
-  
+
   pt.x = box.l;
   pt.y = box.t;
     
@@ -409,7 +409,7 @@ _fillHullT(T *_m, const XYPoint &srcsize) {
   for (i=1; i <= nobj; i++) {
     Box box = bbox[i];
     box.expand(1);
-    _fillAroundObjectHullT<T>(m, canvas, size, box, i);
+    _fillAroundObjectHullT<T>(m, canvas, box, i);
     // fill back the original matrix!
   	for (x=box.l+1; x <= box.r-1; x++)
       for (y=box.t+1; y <= box.b-1; y++) {
