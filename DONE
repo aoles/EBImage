@@ -1,3 +1,6 @@
+2.7.19
+- outline added
+
 2.7.16
 - fixed warnings due to unused variables in C code
 - fixed a drawtext bug which prevented EBImage to be checked on R 2.9.0

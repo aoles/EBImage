@@ -10,6 +10,7 @@ greg:
 - doc: getFeatures, hullFeatures, edgeProfile, edgeFeatures
 - doc: moments, cmoments, smoments, rmoments
 - doc: haralickFeatures, haralickMatrix, zernikeMoments
+- doc: outline
 - floodFill: check md and Color
 - fillHull works only with IndexedImage
 - drawtext: check md and Color (IM, should be OK)
