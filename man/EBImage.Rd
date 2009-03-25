@@ -47,6 +47,7 @@
   \itemize{
     \item \code{edge}, \code{segment}
     \item \code{thresh}, \code{athresh}, \code{cthresh}
+    \item \code{outline}
   }
   
   Image enhancement, restoration

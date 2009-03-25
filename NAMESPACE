@@ -25,8 +25,9 @@ export(affinet,flip,flop)
 export(translate)
 
 ## image analysis, segmentation
-export(edge,segment)
+export(edge, segment)
 export(thresh, athresh, cthresh)
+export(outline)
 
 ## statistics
 export(median.Image,quantile.Image)
@@ -59,7 +60,7 @@ export(combine, tile, untile)
 export(drawfont,drawtext)
 
 ## object manipulation
-export(paintObjects,rmObjects,reenumerate)
+export(paintObjects, rmObjects, reenumerate)
 
 ## features extraction
 export(getFeatures, hullFeatures, edgeProfile, edgeFeatures)

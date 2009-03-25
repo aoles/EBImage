@@ -28,6 +28,7 @@ See: ../LICENSE for license, LGPL
 #include "drawable.h"
 
 #include "objects.h"
+#include "outline.h"
 #include "tile.h"
 #include "frameDist.h"
 
@@ -95,6 +96,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"tile",               (DL_FUNC) &tile,     3},
     {"untile",             (DL_FUNC) &untile,         3},
     {"stackObjects",       (DL_FUNC) &stackObjects,  6},
+    {"outline",            (DL_FUNC) &outline,  1},
     {"lib_frameDist",      (DL_FUNC) &lib_frameDist,      5},
 
     {"lib_drawText",       (DL_FUNC) &lib_drawText,       5},
