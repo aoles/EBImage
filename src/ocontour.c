@@ -2,7 +2,7 @@
 #include <math.h>
 #include <R.h>
 #include <Rdefines.h>
-#include "outline.h"
+#include "ocontour.h"
 
 #define MAX_NB_POINTS 32768
 
@@ -10,7 +10,7 @@ static int rotr[8]={-1,-1,-1,0,1,1,1,0};
 static int rotc[8]={-1,0,1,1,1,0,-1,-1};
 static int dir [9]={5,4,3,6,-1,2,7,0,1};
 
-SEXP outline(SEXP _image) {
+SEXP ocontour(SEXP _image) {
   int *image, width, height;
   int i, j, k, direction, nbCells;
   int r, c, ocr, occ, ndirection, nr, nc;

@@ -11,6 +11,7 @@ greg:
 - doc: moments, cmoments, smoments, rmoments
 - doc: haralickFeatures, haralickMatrix, zernikeMoments
 - doc: outline
+- example EBImage, makebrush
 - floodFill: check md and Color
 - fillHull works only with IndexedImage
 - drawtext: check md and Color (IM, should be OK)
@@ -27,7 +28,6 @@ greg:
 - naiveSegment: to implement
 - subset [1,1:10] or [1:10,1] doesn't have the good orientation
 - ref, checkCompatible should test for validity and storage.mode of ref
-- example for makeBrush
 
 wolfgang:
 
