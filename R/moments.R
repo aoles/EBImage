@@ -14,50 +14,39 @@
 # See the GNU Lesser General Public License for more details.
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
+## centered moments
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 cmoments = function (x, ref) {
   checkCompatibleImages(x,ref)
-  if (missing(ref)) ref=NULL
-  else ref=castImage(ref)
-  return( .Call("lib_cmoments", castImage(x), ref, PACKAGE='EBImage') )
+  return( .Call("lib_cmoments", castImage(x), castImage(ref), PACKAGE='EBImage') )
 }
 
+## full moment matrix
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 smoments = function (x, ref, pw=3, what="s") {
   checkCompatibleImages(x,ref)
-  if (missing(ref)) ref=NULL
-  else ref=castImage(ref)
-  alg <- as.integer( switch(tolower(substr(what, 1, 1)), n=0, c=1, s=2, r=3, 2) )
+  alg <- as.integer(switch(tolower(substr(what, 1, 1)), n=0, c=1, s=2, r=3, 2) )
   pw <- as.integer (pw)
-  if ( pw < 1 || pw > 9 )
-    stop("'pw' must be in the range [1,9]" )
-  if ( alg == 3 && pw < 3 )
-    stop( "'pw' must be at least 3 to calculate rotation invariant moments" )
-  return( .Call("lib_moments", castImage(x), ref, pw, alg, PACKAGE='EBImage') )
+  if ( pw < 1 || pw > 9 ) stop("'pw' must be in the range [1,9]" )
+  if ( alg == 3 && pw < 3 ) stop( "'pw' must be at least 3 to calculate rotation invariant moments" )
+  return( .Call("lib_moments", castImage(x), castImage(ref), pw, alg, PACKAGE='EBImage') )
 }
 
+## Hu's set of invariant moments
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 rmoments = function (x, ref) {
   checkCompatibleImages(x,ref)
-  if (missing(ref)) ref=NULL
-  else ref=castImage(ref)
-  return( .Call("lib_moments", castImage(x), ref, as.integer(3), as.integer(3), PACKAGE='EBImage') )
+  return( .Call("lib_moments", castImage(x), castImage(ref), as.integer(3), as.integer(3), PACKAGE='EBImage') )
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# convenience function to call from moments and to write it only once
-# do not call directly
-.momentsSummary <- function(x, ref) {
-  if ( missing(ref)) {
-    ctr <- cmoments (x)
-    rmo <- rmoments (x)
-    mom <- smoments (x=x, pw=2, what="c")
-  }
-  else {
-    ctr <- cmoments (x=x, ref=ref)
-    rmo <- rmoments (x=x, ref=ref)
-    mom <- smoments (x=x, ref=ref, pw=2, what="c")
-  }
+moments <- function(x, ref) {
+  checkCompatibleImages(x,ref)
+  
+  ctr <- cmoments (x=x, ref=ref)
+  rmo <- rmoments (x=x, ref=ref)
+  mom <- smoments (x=x, ref=ref, pw=2, what="c")
+  
   summ <- function(u) {
     if ( length(u) < 6 ) return( numeric() )
     res <- matrix(0, nrow=dim(u)[3], ncol=6)
@@ -74,7 +63,7 @@ rmoments = function (x, ref) {
     res[,2] <- res[,2] / u[1,1,]
     res[,3] <- res[,3] / u[1,1,]
     res[ which(is.na(res)) ] = 0.0
-    colnames(res) <- c("n20","n11","n02","theta","l1","l2")
+    colnames(res) <- c("m.n20", "m.n11", "m.n02", "m.theta", "m.l1", "m.l2")
     res
   }
   if ( getNumberOfFrames(x,'total') == 1 ) {
@@ -90,20 +79,5 @@ rmoments = function (x, ref) {
   return( res )  
 }
 
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-moments = function (x, ref) {
-  if (missing(ref)) {
-    ref <- x
-    x[] <- 1
-    mom <- .momentsSummary(x=x, ref=ref)
-    if ( getNumberOfFrames(x,'total') == 1) return( mom )
-    res <- mom[[1]]
-    for ( i in 2:length(mom) ) res <- rbind(res, mom[[i]])
-    return(res)
-  } else {
-    checkCompatibleImages(x,ref)
-    return( .momentsSummary(x, ref) )
-  }
-}
 
 

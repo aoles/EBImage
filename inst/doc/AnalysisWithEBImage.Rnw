@@ -108,7 +108,7 @@ into a stack. Images and image stacks are stored in objects of class
 <<example.read.image>>=
 imgdir = file.path(system.file(package="EBImage"), "images")
 fG = dir(imgdir, pattern="_G.tif", full.names=TRUE)
-iG = readImage(fG[1], Grayscale)
+iG = readImage(fG[1])
 class(iG)
 dim(iG)
 
@@ -527,17 +527,17 @@ for ( i in seq_along(ft) ) ft[[i]] = cbind(ft[[i]], mf[[i]])
 sG = rmObjects(sG, 
         lapply(ft, 
           function(x) 
-            which(x[,"h.s"] < 150 | x[,"h.s"] > 10000 | x[,"int"] < 30 |
-                  0.4 * x[,"h.p"] < x[,"h.edge"] )
+            which(x[,"g.s"] < 150 | x[,"g.s"] > 10000 | x[,"m.int"] < 30 |
+                  0.4 * x[,"g.p"] < x[,"g.edge"] )
       ))
 @
 <<echo=FALSE,results=hide,eval=TRUE>>=
 writeImage(normalize(sG[,,1]), "10.png")
 @
 
-\noindent here \code{h.s} and \code{h.p} stand for the hull size and perimeter, \code{h.edge} for the number of pixels at the image edge and \code{int} for the intensity of the region (as returned by \Rfunction{hullFeatures} and \Rfunction{moments}). Investigate the structure of \code{ft} and \code{mf} and explain what kind of objects were removed.
+\noindent here \code{g.s} and \code{g.p} stand for the hull size and perimeter, \code{g.edge} for the number of pixels at the image edge and \code{m.int} for the intensity of the region (as returned by \Rfunction{hullFeatures} and \Rfunction{moments}). Investigate the structure of \code{ft} and \code{mf} and explain what kind of objects were removed.
 
-What we have finally obtained is an \code{IndexedImage} for the nuclei, where each nucleus is given an index from $1$ to \code{max(sG)}. One can now directly use functions like \Rfunction{getFeatures} or \Rfunction{moments} etc.\ to obtain numerical descriptors of each nucleus.
+What we have finally obtained is an \code{Image} for the nuclei, where each nucleus is given an index from $1$ to \code{max(sG)}. One can now directly use functions like \Rfunction{getFeatures} or \Rfunction{moments} etc.\ to obtain numerical descriptors of each nucleus.
  
 \begin{figure}[htbp]
   \begin{center}
@@ -547,7 +547,7 @@ What we have finally obtained is an \code{IndexedImage} for the nuclei, where ea
   \end{center}
 \end{figure}
 
-In principle, the same distance-map/watershed algorithm could be used to segment the cells, however we often find that neighbouring cells are touching and lead to segmentation errors. We can use the already identified nuclei as seed points to detect corresponding cells -- assuming that each cell has exactly one nucleus. This method falls short of detecting multi-nuclear cells, but it improves the quality of detection for all other cells tremendously. We start similarly to the nuclei segmentation, however instead of using \code{watershed}, we use \code{propagate}, supplying it with an \code{IndexedImage} of the seed points (nuclei). The function implements an elegant algorithm that produces a Voronoi segmentation using a metric that combines Euclidean distance and intensity differences between different pixels in the image:
+In principle, the same distance-map/watershed algorithm could be used to segment the cells, however we often find that neighbouring cells are touching and lead to segmentation errors. We can use the already identified nuclei as seed points to detect corresponding cells -- assuming that each cell has exactly one nucleus. This method falls short of detecting multi-nuclear cells, but it improves the quality of detection for all other cells tremendously. We start similarly to the nuclei segmentation, however instead of using \code{watershed}, we use \code{propagate}, supplying it with an \code{Image} of the seed points (nuclei). The function implements an elegant algorithm that produces a Voronoi segmentation using a metric that combines Euclidean distance and intensity differences between different pixels in the image:
 
 <<example.propagate,echo=TRUE,results=verbatim,eval=TRUE>>=
 mask = thresh(blur(iRn,4,1.5), 25, 25, 0.005)
@@ -586,9 +586,9 @@ mf = moments(sR, iRn)
 for ( i in seq_along(ft) ) ft[[i]] = cbind(ft[[i]], mf[[i]])
 index = lapply(ft, 
            function(x) 
-             which( x[,"h.s"] < 150 | x[,"h.s"] > 15000 | 
-                    x[,"int"]/x[,"h.s"] < 0.1 | 
-                    0.3 * x[,"h.p"] < x[,"h.edge"]
+             which( x[,"g.s"] < 150 | x[,"g.s"] > 15000 | 
+                    x[,"m.int"]/x[,"g.s"] < 0.1 | 
+                    0.3 * x[,"g.p"] < x[,"g.edge"]
          ))
 sR = rmObjects(sR, index)
 sG = rmObjects(sG, index)
