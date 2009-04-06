@@ -28,7 +28,7 @@ See: ../LICENSE for license, LGPL
 #include "drawable.h"
 
 #include "objects.h"
-#include "outline.h"
+#include "ocontour.h"
 #include "tile.h"
 #include "frameDist.h"
 
@@ -40,12 +40,16 @@ See: ../LICENSE for license, LGPL
 #include <magick/ImageMagick.h>
 #include <wand/magick-wand.h>
 
+// C preferred way to get rid of 'unused parameter' warnings
+#define UNUSED(expr) do { (void)(expr); } while (0)
+
 /* nan GTK+ includes */
 #ifdef USE_GTK
 	#include <gtk/gtk.h>
 	// GTK/Windows interface copied from the RGtk2 pacakge by Michael Lawrence (src/Rgtk.c)
 	void R_gtk_eventHandler(void *userData) {
-		while(gtk_events_pending()) gtk_main_iteration();
+	  UNUSED(userData);
+	  while(gtk_events_pending()) gtk_main_iteration();
 	}
 	#ifdef WIN32
         	typedef unsigned long ulong;
@@ -96,7 +100,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"tile",               (DL_FUNC) &tile,     3},
     {"untile",             (DL_FUNC) &untile,         3},
     {"stackObjects",       (DL_FUNC) &stackObjects,  6},
-    {"outline",            (DL_FUNC) &outline,  1},
+    {"ocontour",           (DL_FUNC) &ocontour,  1},
     {"lib_frameDist",      (DL_FUNC) &lib_frameDist,      5},
 
     {"lib_drawText",       (DL_FUNC) &lib_drawText,       5},
@@ -161,11 +165,13 @@ R_init_EBImage (DllInfo * winDll) {
 
 void
 R_unload_EBImage (DllInfo * winDll) {
+  UNUSED(winDll);
+  
   /* MagickWand must be terminated at the end of the process since MagickWandTerminus() closes all the Wand AND ALSO the MagickCore services ! */
   MagickWandTerminus();
-#   ifdef WIN32
+#ifdef WIN32
     if ( IsMagickInstantiated() )
         DestroyMagick();
-#   endif
+#endif
 }
 

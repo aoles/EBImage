@@ -1,5 +1,5 @@
-#ifndef EBIMAGE_OUTLINE_H
-#define EBIMAGE_OUTLINE_H
+#ifndef EBIMAGE_OCONTOUR_H
+#define EBIMAGE_OCONTOUR_H
 
 #include <R.h>
 #include <Rdefines.h>
@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-SEXP outline (SEXP);
+SEXP ocontour (SEXP);
 
 #ifdef __cplusplus
 };

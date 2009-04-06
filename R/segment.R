@@ -43,10 +43,10 @@ propagate = function (x, seeds, mask=NULL, lambda=0.1, ext=1, seed.centers=FALSE
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-outline = function(x) {
+ocontour = function(x) {
   validImage(x)
   storage.mode(x)='integer'
-  y = .Call('outline', x, PACKAGE='EBImage')[-1]
+  y = .Call('ocontour', x, PACKAGE='EBImage')[-1]
   y = lapply(y, function(z) matrix(z, nc=2, byrow=TRUE))
   y
 }
