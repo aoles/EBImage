@@ -1,3 +1,10 @@
+2.7.21
+- moment features renamed from '*' to 'm.*'
+- geometric hull features  from 'h.*' to 'g.*' to not to be confused with Haralick's features 'h.*'
+- moment features now need ref to be computed
+- getFeatures now just concatenate hull, moments, edge, haralick and zernike features
+- no more s2maj and s2min in hullFeatures: now only l1 and l2 (eigenvalues of the covariance matrix)(to be consistent with moments)
+
 2.7.20
 - outline renamed in ocontour, ocontour documentation added
 - build warnings should disappear

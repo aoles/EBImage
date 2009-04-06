@@ -117,7 +117,7 @@ testEBImageFunctions=function(x) {
   w=ws
   hf=check('hullFeatures',w)
   if (!is.list(hf)) hf=list(hf)
-  rmindex = lapply(hf, function(c) which(c[,'h.s']<6))
+  rmindex = lapply(hf, function(c) which(c[,'g.s']<6))
   w=check('rmObjects',w,rmindex)
   y=check('getFeatures',w,x)
   cat('\n')

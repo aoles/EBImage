@@ -84,7 +84,7 @@
   mf = moments(io, ii)   ## need these for intensity and size
   for ( i in seq_along(ft) ) ft[[i]] = cbind(ft[[i]], mf[[i]])
   io = rmObjects(io, lapply(ft, function(x) 
-         which(x[,"h.s"] < 150 | x[,"int"] < 50 | 0.3 * x[,"h.p"] < x[,"h.edge"] )
+         which(x[,"g.s"] < 150 | x[,"m.int"] < 50 | 0.3 * x[,"g.p"] < x[,"g.edge"] )
        ))
   ft = getFeatures(io, ii)
   str( ft )

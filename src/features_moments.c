@@ -37,10 +37,10 @@ lib_cmoments (SEXP obj, SEXP ref) {
   nprotect++;
   PROTECT( nm = allocVector(STRSXP, 4) );
   nprotect++;
-  SET_STRING_ELT( nm, 0, mkChar("pxs") );
-  SET_STRING_ELT( nm, 1, mkChar("int") );
-  SET_STRING_ELT( nm, 2, mkChar("x") );
-  SET_STRING_ELT( nm, 3, mkChar("y") );
+  SET_STRING_ELT( nm, 0, mkChar("m.pxs") );
+  SET_STRING_ELT( nm, 1, mkChar("m.int") );
+  SET_STRING_ELT( nm, 2, mkChar("m.x") );
+  SET_STRING_ELT( nm, 3, mkChar("m.y") );
   SET_VECTOR_ELT( dmnm, 1, nm );
   UNPROTECT( 1 ); nprotect--; // nm
 
@@ -115,7 +115,7 @@ lib_moments (SEXP obj, SEXP ref, SEXP pw, SEXP what) {
   double * data, * refd, * m, * rm,* cm, dx, dy, val, powx, powy, tmp, * fct = NULL;
   SEXP res, ctrlist, ctr;
   SEXP moments, rmoments, dm, dmnm, nmx, nmy;
-  char label[3] = "X0";
+  char label[32];
   
   N   = INTEGER (pw)[0];
   alg = INTEGER (what)[0];
@@ -128,6 +128,8 @@ lib_moments (SEXP obj, SEXP ref, SEXP pw, SEXP what) {
   PROTECT( ctrlist = lib_cmoments(obj, ref) ); /* this also checks x and ref */
   nprotect++;
 
+  strcpy(label, "X0");
+
   /* preset dim names, will be duplicate later */
   if ( alg < 3 ) {
     PROTECT( dmnm = allocVector(VECSXP, 3) );
@@ -137,8 +139,9 @@ lib_moments (SEXP obj, SEXP ref, SEXP pw, SEXP what) {
     PROTECT( nmy = allocVector(STRSXP, N+1) );
     nprotect++;
     for ( int i = 0; i <= N; i++ ) {
-      label[1] = (char)(i+48); /* 48 should 0 */
       label[0] = 'x';
+      label[1] = (char)(i+'0');
+      label[2] = 0;
       SET_STRING_ELT( nmx, i, Rf_duplicate(mkChar(label)) ); 
       label[0] = 'y';
       SET_STRING_ELT( nmy, i, Rf_duplicate(mkChar(label)) ); 
@@ -153,9 +156,12 @@ lib_moments (SEXP obj, SEXP ref, SEXP pw, SEXP what) {
     /* set dim colnames, all these vars unset and unused if !(alg < 3) */
     PROTECT( nmx = allocVector(STRSXP, 7) );
     nprotect++;
-    label[0] = 'I';
+    label[0] = 'm';
+    label[1] = '.';
+    label[2] = 'I';
+    label[4] = 0;
     for ( int i = 0; i < 7; i++ ) {
-      label[1] = (char)(i+49); /* 49 should 1 */
+      label[3] = (char)(i+'1');
       SET_STRING_ELT( nmx, i, mkChar(label) ); 
     }
     SET_VECTOR_ELT( dmnm, 1, nmx );

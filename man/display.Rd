@@ -51,10 +51,16 @@ animate(x)
 }
 
 \examples{
-  if(interactive()) {
-    lena = readImage(system.file("images", "lena-color.png", package="EBImage"))
-    display(lena)
-  }
+   ## single image
+   lena = readImage(system.file("images", "lena-color.png", package="EBImage"))
+   if(interactive()) display(lena)
+
+   ## animated threshold
+   lena = resize(lena, 256, 256)
+   lenat = list()
+   for (t in seq(0.8, 0.2, len=10)) lenat=c(lenat, list(lena>t))
+   lenat = combine(lenat)
+   if(interactive()) display(lenat)
 }
 
 \author{
