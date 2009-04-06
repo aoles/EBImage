@@ -27,7 +27,7 @@ export(translate)
 ## image analysis, segmentation
 export(edge, segment)
 export(thresh, athresh, cthresh)
-export(outline)
+export(ocontour)
 
 ## statistics
 export(median.Image,quantile.Image)
