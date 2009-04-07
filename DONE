@@ -1,3 +1,10 @@
+2.7.22
+- fixed a bug preventing from reading palette images in color
+- deprecated all ImageMagick functions except blur, gblur, equalize, resize and rotate
+- validImage now checks validity of arrays
+- new doc for ocontour, translate, resize, rotate , flip, flop
+- new examples for makeBrush
+
 2.7.21
 - moment features renamed from '*' to 'm.*'
 - geometric hull features  from 'h.*' to 'g.*' to not to be confused with Haralick's features 'h.*'

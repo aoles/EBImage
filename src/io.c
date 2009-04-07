@@ -69,7 +69,7 @@ lib_readImages (SEXP files, SEXP mode) {
 	// Automatic color mode guess
 	if (_mode==-1) {
 	  it = GetImageType(image,&exception);
-	  if (it==BilevelType || it==GrayscaleType || it==GrayscaleMatteType ||  it==PaletteType || it==PaletteMatteType ) _mode=MODE_GRAYSCALE;
+	  if (it==BilevelType || it==GrayscaleType || it==GrayscaleMatteType) _mode=MODE_GRAYSCALE;
 	  else _mode=MODE_COLOR;
 	}
        

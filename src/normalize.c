@@ -1,4 +1,4 @@
-#include "filters_normalize.h"
+#include "normalize.h"
 #include "tools.h"
 
 /* -------------------------------------------------------------------------
@@ -12,7 +12,7 @@ See: ../LICENSE for license, LGPL
 
 /*----------------------------------------------------------------------- */
 SEXP
-lib_normalize (SEXP x, SEXP separate, SEXP range) {
+normalize (SEXP x, SEXP separate, SEXP range) {
   int nprotect, nx, ny, nz, im, i, sep;
   double * data, from, to, min, max, diff;
   SEXP res;

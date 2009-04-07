@@ -21,32 +21,33 @@ normalize = function (x, separate=TRUE, ft=c(0,1)) {
   ft <- as.numeric (ft)
   if ( diff(ft) == 0 ) stop("normalization range is 0")
   separate <- as.integer(separate)
-  x = .Call("lib_normalize", castImage(x), separate, ft, PACKAGE='EBImage')
+  x = .Call("normalize", castImage(x), separate, ft, PACKAGE='EBImage')
   return(x)
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 flip = function (x) {
   validImage(x)
-  nd=as.list(rep(T,length(dim(x))))
+  nd=as.list(rep(T, length(dim(x))))
   nd[[2]]=dim(x)[2]:1
-  do.call('[',c(list(x),nd))
+  do.call('[', c(list(x),nd))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 flop = function (x) {
   validImage(x)
-  nd=as.list(rep(T,length(dim(x))))
+  nd=as.list(rep(T, length(dim(x))))
   nd[[1]]=dim(x)[2]:1
-  do.call('[',c(list(x),nd))
+  do.call('[', c(list(x),nd))
 }
 
 ## Translate a set of images according to a matrix of translation
-## A C function is needed for performance reasons
+## This C function is needed for performance reasons !
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-translate = function (x,v) {
+translate = function (x, v) {
   validImage(x)
   if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
+  v = matrix(v, nrow=getNumberOfFrames(x,'total'), ncol=2, byrow=TRUE)
   if (length(v)!=2*getNumberOfFrames(x,'total')) stop("'v' must be a matrix of size (n,2), where \'n'\ is the total number of frames")
   if (any(is.na(v))) stop("'v' shouldn't contain any NAs")
   

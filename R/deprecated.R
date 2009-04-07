@@ -1,50 +1,3 @@
-write.image = function (x, ...) {
-  .Deprecated("writeImage", "EBImage")
-  writeImage(x, ...)
-}
-
-read.image = function(files, colormode=Grayscale, ...) {
-  .Deprecated("readImage", "EBImage")
-  readImage(files, colormode, ...)
-}
-
-choose.image = function(colormode=Grayscale) {
-  .Deprecated("readImage", "EBImage")
-  if (!missing(colormode)) warning("'colormode' is deprecated")
-  else colormode=-1
-  readImage(colormode=colormode)
-}
-
-hull.features = function(x, ...) {
-  .Deprecated("hullFeatures", "EBImage")
-  hullFeatures(x, ...)
-}
-
-edge.profile = function (x, ...) {
-  .Deprecated("edgeProfile", "EBImage")
-  edgeProfile(x, ...)
-}
-
-edge.features = function (x, ...) {
-  .Deprecated("edgeFeatures", "EBImage")
-  edgeFeatures(x, ...)
-}
-
-haralick.matrix = function(x, ref, ...) {
-  .Deprecated("haralickMatrix", "EBImage")
-  haralickMatrix(x, ref, ...)
-}
-
-haralick.features = function(x, ref, ...) {
-  .Deprecated("haralickFeatures", "EBImage")
-  haralickFeatures(x, ref, ...)
-}
-
-zernike.moments = function(x, ref, ...) {
-  .Deprecated("zernikeMoments", "EBImage")
-  zernikeMoments(x, ref, ...)
-}
-
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 frameDist = function(x, y, r, g, b, blur=TRUE, method="dist", verbose, ...) {
   .Deprecated()
@@ -185,3 +138,144 @@ chooseImage = function(colormode) {
   else colormode=-1
   readImage(colormode=colormode)
 }
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+resample = function (x, w, h) {
+  .Deprecated("resize", "EBImage")
+  if (missing(w) && missing(h))
+    stop("either 'w' or 'h' must be specified")
+  dimx = dim(x)
+  if (missing(w)) w = dimx[1]*h / dimx[2]
+  else if (missing(h)) h = dimx[2]*w / dimx[1]
+  if (w <= 0 || h <= 0)
+    stop("width and height of a new image must be non zero positive")
+    param = as.numeric(c(w, h))
+  return(ImageMagickCall(x, flt.sample, param))
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+sharpen = function (x, r=0, s=0.5) {
+  .Deprecated("filter2", "EBImage")
+  if (r <= s && r != 0)
+    warning("for reasonable results, 'r' should be larger than 's'")
+  if (r < 0 || s <= 0)
+    stop("values of 'r' and 's' must be positive, alternatively r=0 selects radius automatically")
+  param = as.numeric(c(r, s))
+  return(ImageMagickCall( x, flt.sharpen, param))
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+umask = function (x, r=0, s=0.5, amount=5, t=2) {
+  .Deprecated("filter2", "EBImage")
+  if (r <= s && r != 0)
+    warning("for reasonable results, 'r' should be larger than 's'")
+  if (r < 0 || s <= 0 || amount < 0 || t < 0)
+    stop("all arguments must be positive, alternatively r=0 selects radius automatically")
+  param = as.numeric(c(r, s, amount, t))
+  return(ImageMagickCall( x, flt.unsharp, param))
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+modulate = function (x, value=100) {
+  .Deprecated()
+  return(ImageMagickCall(x, flt.modulate, as.numeric(value)))
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+negate = function (x) {
+  .Deprecated(paste("1-",paste(deparse(substitute(x))), sep=''))
+  return(ImageMagickCall(x, flt.negate, as.numeric(0)))
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+affinet = function (x, sx=0, rx=0, ry=0, sy=0, tx=0, ty=0) {
+  .Deprecated("resize", "EBImage")
+  param = as.numeric(c(sx, rx, ry, sy, tx, ty))
+  return(ImageMagickCall(x, flt.affinet, param))
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+normalize2 = function (x) {
+  .Deprecated("normalize", "EBImage")
+  return(ImageMagickCall(x, flt.norm, as.numeric(0)))
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+noise = function (x, type="G") {
+  .Deprecated("rnorm")
+  type = tolower(substr(type,1,1))
+  param = as.numeric(switch(type, u= 1, g= 2, m= 3, i= 4, l= 5, p= 6, 2))
+  if (param == 2 && type != "g")
+    warning("unsupported noise type, using 'gaussian' instead. Possible values: uniform, gaussian, multi, impulse, laplace and poisson")    
+  return(ImageMagickCall(x, flt.noise, param))
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+mediansmooth = function (x, r=2) {
+  .Deprecated("filter2", "EBImage")
+  if (r <= 1) stop("value of 'r' must be larger than 1")      
+  return(ImageMagickCall(x, flt.median, as.numeric(r)))
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+cgamma = function (x, level=1) {
+  .Deprecated(paste(paste(deparse(substitute(x))),"^level", sep=''))
+  if (level < 0.8 || level > 2.3)
+    warning("reasonable 'level' is between 0.8 and 2.3")     
+  return(ImageMagickCall(x, flt.gamma, as.numeric(level)))
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+enhance = function (x) {
+  .Deprecated()
+  return(ImageMagickCall(x, flt.enhance, as.numeric(0)))
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+denoise = function (x, r=0) {
+  .Deprecated("filter2", "EBImage")
+  if (r < 0) stop("'r' must be positive, set r=0 for automatic selection")    
+  return(ImageMagickCall(x, flt.denoise, as.numeric(r)))
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+contrast = function (x, sharpen=TRUE) {
+  .Deprecated(paste(paste(deparse(substitute(x))),"*2", sep=''))
+  return(ImageMagickCall(x, flt.contrast, as.numeric(sharpen)))
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+despeckle = function (x) {
+  .Deprecated("filter2", "EBImage")
+  return(ImageMagickCall (x, flt.despeckle, as.numeric(0)))
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+edge = function (x, r=0) {
+  .Deprecated("filter2", "EBImage")
+  return(ImageMagickCall(x, flt.edge, as.numeric(r)))
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+segment = function (x, cl=10, s=1.5) {
+  .Deprecated("filter2", "EBImage")
+  if (cl < 1) stop("cluster size 'cl' must be larger than 1")
+  if (s <= 0) stop("smoothness 's' must be positive")
+  param = as.numeric(c(cl, s))
+  return(ImageMagickCall(x, flt.segment, param))
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+cthresh = function (x, threshold=0) {
+  .Deprecated()
+  return(ImageMagickCall(x, flt.cthresh, as.numeric(threshold)))
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+athresh = function (x, w=10, h=10, offset=0) {
+  .Deprecated("thresh", "EBImage")
+  if (w < 2 || h < 2) stop("width 'w' and height 'h' must be larger than 1")
+  param = as.numeric(c(w, h, offset))
+  return(ImageMagickCall(x, flt.athresh, param))
+}
+

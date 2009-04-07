@@ -50,3 +50,7 @@ ocontour = function(x) {
   y = lapply(y, function(z) matrix(z, nc=2, byrow=TRUE))
   y
 }
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+bwlabel = function(x) {
+}

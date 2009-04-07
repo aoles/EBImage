@@ -19,6 +19,9 @@
 \alias{frameDist}
 \alias{stopIfNotImage}
 \alias{chooseImage}
+
+\alias{affinet}
+\alias{resample}
 \docType{package}
 
 \title{EBImage deprecated functions}

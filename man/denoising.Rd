@@ -96,17 +96,5 @@
     Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2005-2007
 }
 
-\examples{
-  w <- 120
-  a <- Image((0:(w^2))/w^2, c(w,w))
-  if ( interactive() ) display(a)
-  b <- normalize(noise(a) * 0.1)
-  if ( interactive() ) display(b)
-  dn <- despeckle(b)
-  if ( interactive() ) display(dn)
-  bl <- blur(dn, 4, 2)
-  if ( interactive() ) display(bl)
-}
-
 \keyword{file}
 

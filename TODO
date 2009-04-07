@@ -1,7 +1,6 @@
 greg:
-- doc: resize, resample, rotate, translate, flip, flop, affinet
-- doc: edge, segment, thresh, cthresh, athresh
-- doc: cgamma, contrast, enhance, equalize, modulate, noise, denoise, despeckle, mediansmooth, blur, gblur, sharpen, normalize, normalize2, umask, filter2
+- doc: thresh
+- doc: equalize, blur, gblur, normalize , filter2
 - doc: watershed, propagate, floodFill, fillHull
 - doc: rgbImage, channel, channelMix
 - doc: stackObjects, combine, tile, untile
@@ -10,24 +9,25 @@ greg:
 - doc: getFeatures, hullFeatures, edgeProfile, edgeFeatures
 - doc: moments, cmoments, smoments, rmoments
 - doc: haralickFeatures, haralickMatrix, zernikeMoments
-- doc: outline
-- example EBImage, makebrush
+- fix getFeatures example
+- fix EBImage.Rd
+- fix EBImage-deprecated.Rd
+- example EBImage
 - floodFill: check md and Color
 - fillHull works only with IndexedImage
 - drawtext: check md and Color (IM, should be OK)
 - propagate: check md and Color
 - paintObjects, matchObjects, stackObjects: check md and Color
 - installation: ease the installation on MacOS
-- check previous vignette
 - channel: two methods, rewrite vignette and usecases
-- validObject must check image validity even if it is array (stopifnot to be removed)
 - readImage of IndexedImage in Grayscale
 - toremove: enhance (vague)
 - change colormode/colorMode case
 - image, hist: are they useful ?
-- naiveSegment: to implement
+- bwlabel: to implement
 - subset [1,1:10] or [1:10,1] doesn't have the good orientation
-- ref, checkCompatible should test for validity and storage.mode of ref
+- defunct functions
+- deprecate functions in documentation
 
 wolfgang:
 

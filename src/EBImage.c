@@ -15,7 +15,7 @@ See: ../LICENSE for license, LGPL
 #include "morphology.h"
 #include "translate.h"
 #include "filters_propagate.h"
-#include "filters_normalize.h"
+#include "normalize.h"
 #include "watershed.h"
 #include "thresh.h"
 #include "floodFill.h"
@@ -89,7 +89,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"thresh",             (DL_FUNC) &thresh,   2},
     {"floodFill",          (DL_FUNC) &floodFill,      4},
     {"fillHull",           (DL_FUNC) &fillHull,       1},
-    {"lib_normalize",      (DL_FUNC) &lib_normalize,      3},
+    {"normalize",          (DL_FUNC) &normalize,      3},
     {"distmap",            (DL_FUNC) &distmap,            2},
     {"watershed",          (DL_FUNC) &watershed,    3},
     {"lib_propagate",      (DL_FUNC) &lib_propagate,      5},
