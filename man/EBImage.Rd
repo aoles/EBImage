@@ -53,7 +53,7 @@
   Image enhancement, restoration
   \itemize{
     \item \code{cgamma}, \code{contrast}, \code{enhance},
-  \code{equalize},  \code{modulate}
+    \code{equalize},  \code{modulate}
     \item \code{noise}, \code{denoise}, \code{despeckle}
     \item \code{mediansmooth}
     \item \code{blur}, \code{gblur}, \code{sharpen}

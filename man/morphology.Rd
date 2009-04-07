@@ -22,22 +22,22 @@
 }
 
 \arguments{
-\item{x}{An \code{Image} object or an array.
+  \item{x}{An \code{Image} object or an array.
     \code{x} is considered as a binary image, whose pixels of value 0
     are considered as background ones and other pixels as
     foreground ones.}
-
+  
   \item{kern}{An \code{Image} object or an array, containing the
-structuring element. \code{kern} is considered as a binary image, whose
-pixels of value 0 are considered as background ones and other pixels as
-foreground ones.}
-
+    structuring element. \code{kern} is considered as a binary image, whose
+    pixels of value 0 are considered as background ones and other pixels as
+    foreground ones.}
+  
   \item{size}{A numeric containing the size of the brush, in pixels.}
-  \item{shape}{A character vector indicating the shape of the brush.
-     Can be \code{box}, \code{disc} or \code{diamond}. Default is \code{box}.
-  }
+  \item{shape}{A character vector indicating the shape of the brush. Can
+    be \code{box}, \code{disc} or \code{diamond}. Default is \code{box}.}
   \item{step}{a logical indicating if the brush is binary. Default is \code{TRUE}.}
- \item{iter}{Deprecated argument.}
+  
+  \item{iter}{Deprecated argument.}
 }
 
 \value{
@@ -61,22 +61,26 @@ foreground ones.}
   followed by an erosion.
 
   \code{makeBrush} generates brushes of various sizes and shapes that can be used
- as structuring elements.
+  as structuring elements.
 }
 
 \author{
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006
 }
 
-\examples{
-  if(interactive()) {	
+\examples{	
     x = readImage(system.file("images", "shapes.png", package="EBImage"))
-    display(x)
+    if (interactive()) display(x)
     kern=makeBrush(5, shape='diamond')
-    display(kern, title='Structuring element')
-    display(erode(x), title='Erosion of x')
-    display(dilate(x), title='Dilatation of x')
-  }
+    if (interactive()) display(kern, title='Structuring element')
+    if (interactive()) display(erode(x), title='Erosion of x')
+    if (interactive()) display(dilate(x), title='Dilatation of x')
+
+    ## makeBrush 
+    x = makeBrush(100, shape='diamond')
+    if (interactive()) display(x, title="makeBrush(100, shape='diamond')")
+    x = makeBrush(100, shape='disc', step=FALSE)
+    if (interactive()) display(x, title="makeBrush(100, shape='disc', step=FALSE)")
 }
 
 

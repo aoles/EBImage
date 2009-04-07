@@ -79,58 +79,8 @@ gblur = function (x, r=0, s=0.5) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-contrast = function (x, sharpen=TRUE) {     
-  return(ImageMagickCall(x, flt.contrast, as.numeric(sharpen)))
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-denoise = function (x, r=0) {
-  if (r < 0)
-    stop("'r' must be positive, set r=0 for automatic selection")    
-  return(ImageMagickCall(x, flt.denoise, as.numeric(r)))
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-despeckle = function (x) {     
-  return(ImageMagickCall (x, flt.despeckle, as.numeric(0)))
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-edge = function (x, r=0) {  
-  return(ImageMagickCall(x, flt.edge, as.numeric(r)))
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-enhance = function (x) {     
-  return(ImageMagickCall(x, flt.enhance, as.numeric(0)))
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 equalize = function (x) {    
   return(ImageMagickCall(x, flt.equalize, as.numeric(0)))
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cgamma = function (x, level=1) {
-  if (level < 0.8 || level > 2.3)
-    warning("reasonable 'level' is between 0.8 and 2.3")     
-  return(ImageMagickCall(x, flt.gamma, as.numeric(level)))
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-mediansmooth = function (x, r=2) {
-  if (r <= 1)
-    stop("value of 'r' must be larger than 1")      
-  return(ImageMagickCall(x, flt.median, as.numeric(r)))
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-noise = function (x, type="G") {
-  type = tolower(substr(type,1,1))
-  param = as.numeric(switch(type, u= 1, g= 2, m= 3, i= 4, l= 5, p= 6, 2))
-  if (param == 2 && type != "g")
-    warning("unsupported noise type, using 'gaussian' instead. Possible values: uniform, gaussian, multi, impulse, laplace and poisson")    
-  return(ImageMagickCall(x, flt.noise, param))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -152,87 +102,8 @@ resize = function (x, w, h, blur=1, filter="Lanczos") {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-resample = function (x, w, h) {
-  if (missing(w) && missing(h))
-    stop("either 'w' or 'h' must be specified")
-  dimx = dim(x)
-  if (missing(w)) w = dimx[1]*h / dimx[2]
-  else if (missing(h)) h = dimx[2]*w / dimx[1]
-  if (w <= 0 || h <= 0)
-    stop("width and height of a new image must be non zero positive")
-    param = as.numeric(c(w, h))
-  return(ImageMagickCall(x, flt.sample, param))
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-rotate = function (x, angle=90, col) {
-  if (!missing(col))
-    warning("argument 'col' is ignored, not implemented yet, black is used as default")     
+rotate = function (x, angle=90) {  
   return(ImageMagickCall(x, flt.rotate, as.numeric(angle) ))
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-segment = function (x, cl=10, s=1.5) {
-  if (cl < 1)
-    stop("cluster size 'cl' must be larger than 1")
-  if (s <= 0)
-    stop("smoothness 's' must be positive")
-    param = as.numeric(c(cl, s))
-  return(ImageMagickCall(x, flt.segment, param))
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-sharpen = function (x, r=0, s=0.5) {
-  if (r <= s && r != 0)
-    warning("for reasonable results, 'r' should be larger than 's'")
-  if (r < 0 || s <= 0)
-    stop("values of 'r' and 's' must be positive, alternatively r=0 selects radius automatically")
-  param = as.numeric(c(r, s))
-  return(ImageMagickCall( x, flt.sharpen, param))
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-umask = function (x, r=0, s=0.5, amount=5, t=2) {
-  if (r <= s && r != 0)
-    warning("for reasonable results, 'r' should be larger than 's'")
-  if (r < 0 || s <= 0 || amount < 0 || t < 0)
-    stop("all arguments must be positive, alternatively r=0 selects radius automatically")
-  param = as.numeric(c(r, s, amount, t))
-  return(ImageMagickCall( x, flt.unsharp, param))
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-athresh = function (x, w=10, h=10, offset=0) {
-  if (w < 2 || h < 2)
-    stop("width 'w' and height 'h' must be larger than 1")
-  param = as.numeric(c(w, h, offset))
-  return(ImageMagickCall(x, flt.athresh, param))
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cthresh = function (x, threshold=0) {
-  return(ImageMagickCall(x, flt.cthresh, as.numeric(threshold)))
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-affinet = function (x, sx=0, rx=0, ry=0, sy=0, tx=0, ty=0) {
-  param = as.numeric(c(sx, rx, ry, sy, tx, ty))
-  return(ImageMagickCall(x, flt.affinet, param))
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-modulate = function (x, value=100) {
-  return(ImageMagickCall(x, flt.modulate, as.numeric(value)))
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-negate = function (x) {
-  return(ImageMagickCall(x, flt.negate, as.numeric(0)))
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-normalize2 = function (x) {
-  return(ImageMagickCall(x, flt.norm, as.numeric(0)))
 }
 
 

@@ -1,3 +1,4 @@
+## cat tests/test.R | R --vanilla &>tests/test.Rout.tmp
 library(EBImage)
 
 ## returns a hashcode given an object
@@ -54,18 +55,13 @@ testEBImageFunctions=function(x) {
 
   ## resize, resample, rotate, flip, flop, translate
   y=check('resize',x,277,139)
-  y=check('resample',x,277,139)
   y=check('rotate',x,20)
   y=check('flip',x)
   y=check('flop',x)
   y=check('translate',x,rep(1,2*getNumberOfFrames(x,'total')))
 
-  ## edge, segment
-  y=check('edge',x)
-  if (colorMode(x)!=TrueColor) y=check('segment',x) ## too slow in TrueColor
+  ## thresh
   y=check('thresh',x)
-  y=check('athresh',x)
-  y=check('cthresh',x)
   
   ## median, hist
   if (mode(x)!='logical') b=check('median',x)
@@ -75,8 +71,6 @@ testEBImageFunctions=function(x) {
   y=check('blur',x,r=20,s=10)
   y=check('gblur',x,r=10,s=5)
   y=check('normalize',x)
-  y=check('negate',x)
-  y=check('normalize2',x)
 
   ## filter2
   z=matrix(1,nc=5,nr=5)

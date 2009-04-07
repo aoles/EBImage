@@ -149,7 +149,7 @@ validImageObject=function(object) {
  
   TRUE
 }
-setValidity("Image",validImageObject) 
+setValidity("Image", validImageObject) 
 
 ## Overloading binary operators
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,7 +1,7 @@
 \name{ocontour}
 
 \alias{ocontour}
-
+\alias{bwlabel}
 \title{Oriented contours}
 
 \description{

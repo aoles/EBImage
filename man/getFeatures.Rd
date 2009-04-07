@@ -5,7 +5,7 @@
 
 \concept{object detection}
 
-\title{ Feature extraction for objects in indexed images }
+\title{Feature extraction for objects in indexed images}
 
 \description{
   Extract numerical descriptors for objects in indexed images.
@@ -66,17 +66,19 @@
 }
 
 \examples{
-
+if (FALSE) {
   ## load images
-  f <- paste( system.file(package="EBImage"), "images/Gene1_G.tif", sep="/" )
-  ii = readImage(f)
-  ## normalize images
-  ii = normalize(ii, separate=TRUE)
-  ## segment
-  mask = thresh(ii, 25, 25, 0.02)
+  f = system.file('images', 'Gene1_G.tif', package="EBImage")
+  x = readImage(f)
+
+  ## adaptative thresholding to find nuclei
+  fnuc = makeBrush(25, shape='disc', step=FALSE)
+  fnuc = fnuc/sum(fnuc)
+  mask = x > (filter2(x, fnuc)+0.005)
+
   ## refine segmentation with morphology filters
-  mk3 = makeBrush(3, shape='diamond')
-  mk5 = makeBrush(5, shape='diamond')
+  se = makeBrush(5, shape='diamond')
+
   mask = dilate(erode(closing(mask, mk5), mk3), mk5)
   ## index objects with 'watershed'
   io = watershed( distmap(mask), 1.5, 1)
@@ -88,6 +90,7 @@
        ))
   ft = getFeatures(io, ii)
   str( ft )
+}
   
 }
 

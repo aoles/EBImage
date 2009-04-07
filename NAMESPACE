@@ -20,28 +20,24 @@ export(getNumberOfFrames)
 export(readImage, writeImage, display, show, animate)
 
 ## spatial transform
-export(resize,resample,rotate)
-export(affinet,flip,flop)
+export(resize, rotate)
+export(flip, flop)
 export(translate)
 
 ## image analysis, segmentation
-export(edge, segment)
-export(thresh, athresh, cthresh)
-export(ocontour)
+export(bwlabel, ocontour)
+export(thresh)
 
 ## statistics
-export(median.Image,quantile.Image)
+export(median.Image, quantile.Image)
 exportMethods(hist)
 
-## image enhancement, restoration
-export(cgamma,contrast,enhance,equalize,modulate)
-export(denoise,mediansmooth,despeckle,sharpen,umask)
-export(blur,gblur,noise)
-export(normalize,negate,normalize2)
-
-## linear filtering
+## image filtering, enhancement
 export(filter2)
-              
+export(equalize)
+export(blur, gblur)
+export(normalize)
+        
 ## morphological operations
 export(makeBrush)
 export(erode, dilate, opening, closing)
@@ -57,7 +53,7 @@ export(stackObjects)
 export(combine, tile, untile)
 
 ## drawables
-export(drawfont,drawtext)
+export(drawfont, drawtext)
 
 ## object manipulation
 export(paintObjects, rmObjects, reenumerate)
@@ -68,10 +64,14 @@ export(cmoments, smoments, rmoments, moments)
 export(haralickMatrix, haralickFeatures, zernikeMoments)
 
 ## deprecated
-export(read.image, choose.image,stopIfNotImage)
-export(write.image, hull.features, edge.profile, edge.features)
-export(haralick.matrix, haralick.features, zernike.moments)
-export(matchObjects,frameDist)
+export(stopIfNotImage)
+export(matchObjects, frameDist)
 export(morphKern, mkbox, mkball)
 export(header, assert)
 export(chooseImage)
+export(cgamma, contrast, enhance, modulate)
+export(denoise, mediansmooth, despeckle, sharpen, umask, noise)
+export(negate, normalize2)
+export(athresh, cthresh)
+export(edge, segment)
+export(affinet, resample)

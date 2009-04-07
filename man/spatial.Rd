@@ -2,91 +2,74 @@
 
 \alias{flip}
 \alias{flop}
-\alias{resample}
 \alias{resize}
 \alias{rotate}
-\alias{affinet}
-\alias{translate}
 
-\concept{image transformation}
+\concept{transformation}
 \concept{rotation}
-\concept{affine transformation}
+\concept{resize}
+\concept{mirror}
 
-\title{ Image transformation: rotation, resize, etc. }
+\title{Spatial linear transformations}
 
 \description{
-  Functions to rotate, mirror and resize images.
+  Rotate, mirror and resize images. 
 }
 
 \usage{
-
-  affinet(x, sx=0, rx=0, ry=0, sy=0, tx=0, ty=0)
   flip(x)
   flop(x)
-  resample(x, w, h)
   resize(x, w, h, blur=1, filter="Lanczos")
-  rotate(x, angle=90, col)
-
+  rotate(x, angle=90)
 }
 
 \arguments{
+  \item{x}{An \code{Image} object or an array.}
 
-  \item{x}{An object of \code{\linkS4class{Image}}. }
+  \item{w, h}{Width and height of a new image. One of these arguments
+    can be missing to enable proportional resizing. }
 
-  \item{sx, rx, ry, sy, tx, ty}{Elements of the affine matrix. }
+  \item{blur}{The blur factor, where 1 (\code{TRUE}) is blurry,
+    0 (\code{FALSE}) is sharp.}
 
-  \item{w, h}{ Width and height of a new resized/resampled image.
-    One of these arguments can be missing to enable proportional resize. }
+  \item{filter}{Interpolating sampling filter.}
 
-  \item{blur}{ The blur factor, where 1 (\code{TRUE}) is blurry,
-    0 (\code{FALSE}) is sharp. }
-
-  \item{filter}{ Resize pixel sampling filter. }
-
-  \item{angle}{ Image rotation angle in degrees. }
-
-  \item{col}{ A numeric, integer or character specifying the background
-    color of the rotated image. Not implemented yet, defaults to black. }
+  \item{angle}{Image rotation angle in degrees.}
 }
 
 \value{
-
-  A transformed image in an object of \code{\linkS4class{Image}}.
-
+  An \code{Image} object or an array, containing the transformed version
+  of \code{x}.
 }
 
 \details{
+  \code{flip} transforms \code{x} in its vertical mirror image by
+  reflecting the pixels around the central x-axis.
+  
+  \code{flop} transforms \code{x} in its horizontal mirror image by
+  reflecting the pixels around the central y-axis.
 
-  \code{affinet} transforms an image as dictated by the affine matrix.
-
-  \code{flip} creates a vertical mirror image by reflecting the pixels
-    around the central x-axis.
-
-  \code{flop} creates a horizontal mirror image by reflecting the pixels
-    around the central y-axis.
-
-  \code{resample} scales an image to the desired dimensions with pixel
-    sampling. Unlike other scaling methods, this method does not introduce
-    any additional color into the scaled image.
-
-  \code{resize} scales an image to the desired dimensions using the supplied
-    filter algorithm. Available filters are: \code{Point, Box, Triangle, Hermite,
-    Hanning, Hamming, Blackman, Gaussian, Quadratic, Cubic, Catrom, Mitchell,
-    Lanczos, Bessel, Sinc}. Most of the filters are FIR (finite impulse response),
-    however, Bessel, Gaussian, and Sinc are IIR (infinite impulse response).
-    Bessel and Sinc are windowed (brought down to zero) with the Blackman filter.
-
-  \code{rotate} creates a new image that is a rotated copy of an existing one.
-    Positive angles rotate counter-clockwise (right-hand rule), while negative
-    angles rotate clockwise. Rotated images are usually larger than the
-    originals and have 'empty' triangular corners. X axis. Empty triangles left
-    over from shearing the image are filled with the background color.
-
+  \code{resize} scales the image to the desired dimensions using the supplied
+  interpolating filter. Available filters are: \code{Point}, \code{Box},
+  \code{Triangle}, \code{Hermite}, \code{Hanning}, \code{Hamming},
+  \code{Blackman}, \code{Gaussian}, \code{Quadratic}, \code{Cubic},
+  \code{Catrom}, \code{Mitchell}, \code{Lanczos}, \code{Bessel} and
+  \code{Sinc}. The filter \code{Box} performs a nearest-neighbor
+  interpolation and is fast but introduces considerable aliasing. The
+  filter \code{Triangle} performs a bilinear interpolation and is a
+  good trade-off between speed adn aliasing. Cubic interpolation with
+  the filter \code{Cubic} is also a good trade-off. High-quality and slower
+  interpolation is achieved with the \code{Lanczos} filter. The
+  algorithm used by this ImageMagick function is not well defined.
+  
+  \code{rotate} rotates the image counter-clockwise with the specified
+  angle. Rotated images are usually larger than the originals and have
+  empty triangular corners filled in black. The algorithm used by this
+  ImageMagick function is not well defined.
 }
 
-\seealso{ \code{
-    \linkS4class{Image}
-}}
+\seealso{ \code{translate} 
+}
 
 \references{
   \emph{ImageMagick}: \url{http://www.imagemagick.org}.
@@ -96,3 +79,19 @@
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006-2007
 }
 
+\examples{
+   x = readImage(system.file("images", "lena.gif", package="EBImage"))
+   if (interactive()) display(x)
+
+   y = flip(x)
+   if (interactive()) display(y, title='flip(x)')
+
+   y = flop(x) 
+   if (interactive()) display(y, title='flop(x)')
+
+   y = resize(x, 128) 
+   if (interactive()) display(y, title='resize(x, 128)')
+
+   y = rotate(x, 30) 
+   if (interactive()) display(y, title='rotate(x, 30)')
+}

@@ -32,7 +32,7 @@
 
 \details{
   When writing images in formats supporting lossy compression (like JPEG),
-  the quality can be spcified used a \code{quality} value in the
+  the quality can be specified used a \code{quality} value in the
   range \code{[1,100]}. The best quality is obtained with 100.
 
   The file format is deduced from the file name extension(s), there is neither
@@ -59,18 +59,21 @@
 
 \examples{
  ## Reads and display images
- if(interactive()) {
-    lena = readImage(system.file("images", "lena-color.png", package="EBImage"))
-    display(lena)
-    im = readImage("http://www.google.com/intl/en/images/logo.gif")
-    display(im)
- }
+   if(interactive()) {
+      f = system.file("images", "nuclei.tif", package="EBImage")
+      x = readImage(f)
+      display(x)
+      im = readImage("http://www.google.com/intl/en/images/logo.gif")
+      display(im)
+   }
 
- ## Converts a TIFF file into JPEG
- f1 = system.file("images", "Gene1_G.tif", package="EBImage")
- f2 = paste(tempfile(), "jpeg", sep=".")
- ii = readImage(f1, colormode=Color)
- writeImage(ii, f2)
+   ## Converts a TIFF file into JPEG
+   f1 = system.file("images", "lena-color.png", package="EBImage")
+   x1 = readImage(f1)
+   f2 = paste(tempfile(), "jpeg", sep=".")
+   cat("Converted '",f1,"' into '",f2,"'.\n",sep='')
+ 
+ writeImage(x1, f2)
 
 }
 
