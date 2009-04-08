@@ -23,7 +23,7 @@
 
   Image methods
   \itemize{
-    \item \code{Image}, the class constructor
+    \item \code{Image}
     \item \code{as.Image}, \code{is.Image}
     \item \code{colorMode}, \code{imageData}
     \item \code{getNumberOfFrames}
@@ -33,37 +33,28 @@
   \itemize{
     \item \code{readImage}, \code{writeImage}
     \item \code{display}, \code{animate}
-    \item \code{show}, \code{print.Image}
     \item \code{image}
   }
   
   Spatial transform
   \itemize{
-    \item \code{resize}, \code{resample}
-    \item \code{rotate}, \code{translate}, \code{flip}, \code{flop}, \code{affinet}
+    \item \code{resize}, \code{flip}, \code{flop}
+    \item \code{rotate}, \code{translate}
   }
   
-  Image analysis, segmentation
+  Image segmentation, objects manipulation
   \itemize{
-    \item \code{edge}, \code{segment}
-    \item \code{thresh}, \code{athresh}, \code{cthresh}
+    \item \code{thresh}, \code{bwlabel}
+    \item \code{watershed}, \code{propagate}
     \item \code{ocontour}
+    \item \code{paintObjects}, \code{rmObjects}, \code{reenumerate}
   }
   
-  Image enhancement, restoration
+  Image enhancement, filtering
   \itemize{
-    \item \code{cgamma}, \code{contrast}, \code{enhance},
-    \code{equalize},  \code{modulate}
-    \item \code{noise}, \code{denoise}, \code{despeckle}
-    \item \code{mediansmooth}
-    \item \code{blur}, \code{gblur}, \code{sharpen}
-    \item \code{normalize}, \code{normalize2}
-    \item \code{umask}
-  }
-  
-  Linear filtering
-  \itemize{
-    \item \code{filter2}
+    \item \code{normalize}
+    \item \code{filter2}, \code{blur}, \code{gblur}
+    \item \code{equalize}
   }
   
   Morphological operations
@@ -71,8 +62,6 @@
     \item \code{makeBrush}
     \item \code{erode}, \code{dilate}, \code{opening}, \code{closing}
     \item \code{distmap}
-    \item \code{watershed}
-    \item \code{propagate}
     \item \code{floodFill}, \code{fillHull}
   }
   
@@ -93,36 +82,29 @@
   \itemize{
     \item \code{drawfont}, \code{drawtext}
   }
-  
-  Objects manipulation
-  \itemize{
-    \item \code{paintObjects}
-    \item \code{rmObjects}, \code{reenumerate}
-  }
     
   Features extraction
   \itemize{
     \item \code{getFeatures}
     \item \code{hullFeatures}
     \item \code{edgeProfile}, \code{edgeFeatures}
-    \item \code{moments}, \code{cmoments}, \code{smoments},  \code{rmoments}
+    \item \code{moments}, \code{cmoments}, \code{smoments}, \code{rmoments}
     \item \code{haralickFeatures}, \code{haralickMatrix}
     \item \code{zernikeMoments}
   }
 
   Deprecated
   \itemize{
-    \item \code{read.image}, \code{write.image}
-    \item \code{choose.image}
-    \item \code{hull.features}, \code{edge.features},
-  \code{edge.profile},  \code{haralick.matrix},
-  \code{haralick.features},  \code{zernike.moments}
+    \item \code{frameDist}, \code{matchObjects}
     \item \code{stopIfNotImage}
-    \item \code{frameDist}
-   \item \code{header},  \code{assert}
-    \item \code{matchObjects}
     \item \code{morphKern}, \code{mkbox}, \code{mkball}
+    \item \code{header}, \code{assert}
     \item \code{chooseImage}
+    \item \code{resample}, \code{sharpen}, \code{umask}, \code{modulate}
+    \item \code{negate}, \code{affinet}, \code{normalize2}, \code{noise}
+    \item \code{mediansmooth}, \code{cgamma}, \code{enhance}, \code{denoise}
+    \item \code{contrast}, \code{despeckle}, \code{edge}, \code{segment} 
+    \item \code{cthresh}, \code{athresh}
   }
 }
 
@@ -164,6 +146,13 @@
 
   See the GNU Lesser General Public License for more details. For LGPL license 
   wording see \url{http://www.gnu.org/licenses/lgpl.html}
+}
+
+\examples{
+  example(display)
+  example(readImage)
+  example(erode)
+  example(getFeatures)
 }
 
 \keyword{package}

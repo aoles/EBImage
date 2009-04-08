@@ -17,32 +17,34 @@ export(colorMode, "colorMode<-", imageData, "imageData<-")
 export(getNumberOfFrames)
 
 ## image IO, display
-export(readImage, writeImage, display, show, animate)
+exportMethods('show')
+export(readImage, writeImage, display, animate)
 
 ## spatial transform
 export(resize, rotate)
 export(flip, flop)
 export(translate)
 
-## image analysis, segmentation
-export(bwlabel, ocontour)
-export(thresh)
+## image segmentation, objects manipulation
+export(thresh, bwlabel)
+export(watershed, propagate)
+export(ocontour)
+export(paintObjects, rmObjects, reenumerate)
 
 ## statistics
 export(median.Image, quantile.Image)
 exportMethods(hist)
 
-## image filtering, enhancement
-export(filter2)
-export(equalize)
-export(blur, gblur)
+## image enhancement, filtering
 export(normalize)
+export(filter2)
+export(blur, gblur)
+export(equalize)
         
 ## morphological operations
 export(makeBrush)
 export(erode, dilate, opening, closing)
 export(distmap)
-export(watershed, propagate)
 export(floodFill, fillHull)
 
 ## colorspace
@@ -55,23 +57,19 @@ export(combine, tile, untile)
 ## drawables
 export(drawfont, drawtext)
 
-## object manipulation
-export(paintObjects, rmObjects, reenumerate)
-
 ## features extraction
 export(getFeatures, hullFeatures, edgeProfile, edgeFeatures)
-export(cmoments, smoments, rmoments, moments)
+export(moments, cmoments, smoments, rmoments)
 export(haralickMatrix, haralickFeatures, zernikeMoments)
 
 ## deprecated
+export(frameDist, matchObjects)
 export(stopIfNotImage)
-export(matchObjects, frameDist)
 export(morphKern, mkbox, mkball)
 export(header, assert)
 export(chooseImage)
-export(cgamma, contrast, enhance, modulate)
-export(denoise, mediansmooth, despeckle, sharpen, umask, noise)
-export(negate, normalize2)
-export(athresh, cthresh)
-export(edge, segment)
-export(affinet, resample)
+export(resample, sharpen, umask, modulate)
+export(negate, affinet, normalize2, noise)
+export(mediansmooth, cgamma, enhance, denoise)
+export(contrast, despeckle, edge, segment)
+export(cthresh, athresh)

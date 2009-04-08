@@ -1,3 +1,7 @@
+2.99.1
+- starting the pre 3.0.0 release
+- doc: equalize, blur, gblur, normalize, EBImage, EBImage-deprecated
+
 2.7.22
 - fixed a bug preventing from reading palette images in color
 - deprecated all ImageMagick functions except blur, gblur, equalize, resize and rotate

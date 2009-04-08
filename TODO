@@ -1,6 +1,6 @@
 greg:
 - doc: thresh
-- doc: equalize, blur, gblur, normalize , filter2
+- doc: filter2
 - doc: watershed, propagate, floodFill, fillHull
 - doc: rgbImage, channel, channelMix
 - doc: stackObjects, combine, tile, untile
@@ -9,10 +9,7 @@ greg:
 - doc: getFeatures, hullFeatures, edgeProfile, edgeFeatures
 - doc: moments, cmoments, smoments, rmoments
 - doc: haralickFeatures, haralickMatrix, zernikeMoments
-- fix getFeatures example
-- fix EBImage.Rd
-- fix EBImage-deprecated.Rd
-- example EBImage
+- example: getFeatures, normalize example
 - floodFill: check md and Color
 - fillHull works only with IndexedImage
 - drawtext: check md and Color (IM, should be OK)
@@ -20,14 +17,10 @@ greg:
 - paintObjects, matchObjects, stackObjects: check md and Color
 - installation: ease the installation on MacOS
 - channel: two methods, rewrite vignette and usecases
-- readImage of IndexedImage in Grayscale
-- toremove: enhance (vague)
 - change colormode/colorMode case
 - image, hist: are they useful ?
 - bwlabel: to implement
 - subset [1,1:10] or [1:10,1] doesn't have the good orientation
-- defunct functions
-- deprecate functions in documentation
 
 wolfgang:
 
