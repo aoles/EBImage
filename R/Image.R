@@ -455,20 +455,30 @@ quantile.Image <- function(x, ...) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-rgbImage = function(red=NULL,green=NULL,blue=NULL) {
+rgbImage = function(red=NULL, green=NULL, blue=NULL) {
   d=NULL
   
-  if (!is.null(red)) d=dim(red)
-  if (!is.null(green)) d=dim(green)
-  if (!is.null(blue)) d=dim(blue)
-  if (is.null(red)) red=Image(0,dim=d)
-  if (is.null(green)) green=Image(0,dim=d)
-  if (is.null(blue)) blue=Image(0,dim=d)
+  if (!is.null(red)) {
+    red = Image(red, colormode=Grayscale)
+    d = dim(red)
+  }
+  if (!is.null(green)) {
+    green = Image(green, colormode=Grayscale)
+    d=dim(green)
+  } 
+  if (!is.null(blue)) {
+    blue = Image(blue, colormode=Grayscale)
+    d=dim(blue)
+  } 
+
+  if (is.null(red)) red=Image(0, dim=d)
+  if (is.null(green)) green=Image(0, dim=d)
+  if (is.null(blue)) blue=Image(0, dim=d)
+  
   
   if (is.null(d)) stop('at least one non-null Image object must be specified')
-  if (colorMode(red)!=Grayscale | colorMode(green)!=Grayscale |colorMode(blue)!=Grayscale) stop('all Image objects must be in \'Grayscale\' color mode')
-
-  x=combine(red,green,blue,along=2.5)
+  
+  x=combine(red, green, blue,along=2.5)
   
   ## Cast to Color Image if x is an array
   if (class(x)=='array') x=Image(x)

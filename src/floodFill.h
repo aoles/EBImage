@@ -10,6 +10,7 @@ extern "C" {
 
 SEXP floodFill(SEXP, SEXP, SEXP, SEXP);
 SEXP fillHull(SEXP);
+SEXP bwlabel(SEXP);
 
 #ifdef __cplusplus
 };

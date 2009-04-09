@@ -51,8 +51,8 @@ floodFill(SEXP x, SEXP point, SEXP col, SEXP tol) {
     if (pt.x < 0 || pt.x >= size.x || pt.y < 0 || pt.y >= size.y)
       error("coordinates of the starting point must be inside the image boundaries");
     
-    if (IS_NUMERIC(x)) _floodFill<double>(&(REAL(res)[i*size.x*size.y]), size, pt, REAL(col)[i], REAL(tol)[0]);
-    if (IS_INTEGER(x)) _floodFill<int>(&(INTEGER(res)[i*size.x*size.y]), size, pt, INTEGER(col)[i], REAL(tol)[0]);
+    if (IS_NUMERIC(res)) _floodFill<double>(&(REAL(res)[i*size.x*size.y]), size, pt, REAL(col)[i], REAL(tol)[0]);
+    if (IS_INTEGER(res)) _floodFill<int>(&(INTEGER(res)[i*size.x*size.y]), size, pt, INTEGER(col)[i], REAL(tol)[0]);
     
   }
 
@@ -63,36 +63,80 @@ floodFill(SEXP x, SEXP point, SEXP col, SEXP tol) {
 /* -------------------------------------------------------------------------- */
 SEXP
 fillHull(SEXP x) {
+  SEXP res;
+  int nprotect = 0;
+  int nz;
+
   // check image validity
   validImage(x,0);
+  nz = getNumberOfFrames(x, 0);
 
   int *dim=INTEGER(GET_DIM(x));
   XYPoint size(dim[0], dim[1]);
 
-  /* check if array or multiple images */
-  int nz;
-  nz = getNumberOfFrames(x, 0);
 
-  /* return itself if nothing to do */  
+  // return itself if nothing to do
   if (size.x <= 0 || size.y <= 0 || nz < 1) return x;
-  SEXP m;
-  int nprotect = 0;
-  /* do fillHull */  
-  PROTECT(m=Rf_duplicate(x));
+ 
+  // do fillHull
+  PROTECT(res = Rf_duplicate(x));
   nprotect++;
-  if (IS_INTEGER(m)) {
-    for (int i=0; i < nz; i++)
-      _fillHullT<int>(&(INTEGER(m)[i*size.x*size.y]), size);
+  if (IS_INTEGER(res)) {
+    for (int i=0; i < nz; i++) _fillHullT<int>(&(INTEGER(res)[i*size.x*size.y]), size);
   }
-  else if (IS_NUMERIC(m)) {
-    for (int i=0; i < nz; i++)
-      _fillHullT<double>(&(REAL(m)[i*size.x*size.y]), size);
+  else if (IS_NUMERIC(res)) {
+    for (int i=0; i < nz; i++) _fillHullT<double>(&(REAL(res)[i*size.x*size.y]), size);
   }
   
   UNPROTECT (nprotect);
-  return m;
+  return res;
 }
 
+/* -------------------------------------------------------------------------- */
+SEXP
+bwlabel(SEXP x) {
+  int i, kx, ky, nz, *dim;
+  int nprotect=0;
+  double index;
+  XYPoint pt;
+  SEXP res;
+
+  // check image validity
+  validImage(x,0);
+  nz = getNumberOfFrames(x, 0);
+  dim = INTEGER(GET_DIM(x));
+  XYPoint size(dim[0], dim[1]);
+  if (size.x <= 0 || size.y <= 0) error("image must have positive dimensions");
+  
+  // initialize result
+  PROTECT(res = Rf_duplicate(x));
+  nprotect++;  
+
+  // assuming binary images: 0 is background and everything else foreground
+  // foreground is converted here to -1.0
+  for (i=0; i<nz*size.x*size.y; i++) {
+    if (REAL(res)[i]!=0.0) REAL(res)[i]=-1.0;
+  }
+  
+  // do the job over images
+  // every pixel equals with R_PosInf is filled with an increasing index, starting from 1
+  for (i=0; i<nz; i++) {
+    index = 1.0;
+    for (ky=0; ky<size.y ; ky++) {
+      for (kx=0; kx<size.x ; kx++) {
+	if (REAL(res)[kx + ky*size.x + i*size.x*size.y]==-1.0) {
+	  pt.x = kx;
+	  pt.y = ky;
+	  _floodFill<double>(&(REAL(res)[i*size.x*size.y]), size, pt, index, 0.0);
+	  index = index + 1.0;
+	}
+      }
+    }
+  }
+
+  UNPROTECT (nprotect);
+  return res;
+}
 
 /* -------------------------------------------------------------------------- */
 /* stack that checks the size and returns a value on pop in one line */

@@ -89,6 +89,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"thresh",             (DL_FUNC) &thresh,   2},
     {"floodFill",          (DL_FUNC) &floodFill,      4},
     {"fillHull",           (DL_FUNC) &fillHull,       1},
+    {"bwlabel",            (DL_FUNC) &bwlabel,       1},
     {"normalize",          (DL_FUNC) &normalize,      3},
     {"distmap",            (DL_FUNC) &distmap,            2},
     {"watershed",          (DL_FUNC) &watershed,    3},
