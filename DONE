@@ -1,3 +1,7 @@
+2.99.3
+- bwlabel OK
+- safer rgbImage
+
 2.99.2
 - doc: tresh
 - floodFill and fillHull : doc + test + examples

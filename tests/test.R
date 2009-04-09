@@ -87,7 +87,8 @@ testEBImageFunctions=function(x) {
   ws=check('watershed',y)
   y=check('floodFill', w, c(10,10), 0.5)
   y=check('fillHull', w)
- 
+  y=check('bwlabel', w)
+  
   ## rgbImage, channel
   if (colorMode(x)==Grayscale) {
     y=rgbImage(x,flip(x),flop(x))

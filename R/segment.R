@@ -53,4 +53,6 @@ ocontour = function(x) {
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bwlabel = function(x) {
+  validImage(x)
+  return(.Call("bwlabel", castImage(x), PACKAGE='EBImage'))
 }
