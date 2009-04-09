@@ -1,12 +1,10 @@
 greg:
-- doc: filter2
 - doc: watershed, propagate
-- doc: rgbImage, channel, channelMix
+- doc: rgbImage, channel
 - doc: stackObjects, combine, tile, untile
 - doc: drawfont, drawtext
 - doc: paintObjects, rmObjects, reenumerate
 - doc: getFeatures, hullFeatures, edgeProfile, edgeFeatures
-- doc: moments, cmoments, smoments, rmoments
 - doc: haralickFeatures, haralickMatrix, zernikeMoments
 - example: getFeatures, normalize example
 - drawtext: check md and Color (IM, should be OK)
@@ -14,19 +12,6 @@ greg:
 - paintObjects, matchObjects, stackObjects: check md and Color
 - installation: ease the installation on MacOS
 - channel: two methods, rewrite vignette and usecases
-- change colormode/colorMode case
-- image, hist: are they useful ?
 - subset [1,1:10] or [1:10,1] doesn't have the good orientation
 - remove gene1.tif
-
-wolfgang:
-
-drawtext man page:
-Clean up 'Value' section. Explain what drawtext and drawfont functions
-   do.
-
-zernikeMoments function and man page: 
-   2.) The function used to compute the Zernike polynomials should be 
-   exposed (e.g. it could take the values of n and l, and a
-   parameterisation of a grid of points in R^2 on which the values 
-   should be computed; it could return the values on this grid.)
+- add cells.tif

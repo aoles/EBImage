@@ -279,3 +279,17 @@ athresh = function (x, w=10, h=10, offset=0) {
   return(ImageMagickCall(x, flt.athresh, param))
 }
 
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+channelMix = function(red, green, blue) {
+  .Deprecated("sqrt(red^2+green^2+blue^2)", "EBImage")
+  mix = list()
+  if (!missing(red)) mix[["r"]] = red
+  if (!missing(green)) mix[["g"]] = green
+  if (!missing(blue)) mix[["b"]] = blue
+  if (length(mix)==0)
+    stop("at least one image must be provided")
+  if (length(mix)==1) return(mix[[1]])
+  res = mix[[1]]^2 + mix[[2]]^2
+  if (length(mix)==3) res = res + mix[[3]]^2
+  sqrt(res)
+}

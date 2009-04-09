@@ -27,7 +27,7 @@ setClass ("Image",
 )
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Image=function(data=array(0,dim=c(1,1)), dim, colormode=NULL) {
+Image=function(data=array(0, dim=c(1,1)), dim, colormode=NULL) {
   if (missing(dim)) {
     if (is.array(data)) dim=base::dim(data)
     else dim=c(1,length(data))
@@ -279,9 +279,9 @@ setMethod ("image", signature(x="Image"),
 )
 
 ## private function to select a channel from a Color image
-## failsafe, will return a black image if theser channel doesn't exist
+## failsafe, will return a black image if the channel doesn't exist
 selectChannel=function(x,i) {
-  if (colorMode(x)!=Color) stop('in \'selectChannel\', color mode must be Color')
+  if (colorMode(x)==Grayscale) stop("in 'selectChannel', color mode must be 'Color'")
   n=getNumberOfFrames(x,'render')
   d=dim(x)[1:2]
   if (n>1) d=c(d,n)
@@ -485,21 +485,6 @@ rgbImage = function(red=NULL, green=NULL, blue=NULL) {
     
   colorMode(x)=Color
   x
-}
-
-## sqrt(r^2+g^2+b^2)
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-channelMix = function(red,green,blue) {
-  mix = list()
-  if (!missing(red)) mix[["r"]] = red
-  if (!missing(green)) mix[["g"]] = green
-  if (!missing(blue)) mix[["b"]] = blue
-  if (length(mix)==0)
-    stop("at least one image must be provided")
-  if (length(mix)==1) return(mix[[1]])
-  res = mix[[1]]^2 + mix[[2]]^2
-  if (length(mix)==3) res = res + mix[[3]]^2
-  sqrt(res)
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

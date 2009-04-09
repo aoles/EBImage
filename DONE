@@ -1,3 +1,8 @@
+2.99.4
+- deprecated channelMix
+- doc: filter2, moments, cmoments, smoments, rmoments
+- doc: paintObjects, getFeatures, rgbImage, channel
+
 2.99.3
 - bwlabel OK
 - safer rgbImage

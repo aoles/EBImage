@@ -29,6 +29,7 @@
 \alias{segment}
 \alias{cthresh}
 \alias{athresh}
+\alias{channelMix}
 
 \docType{package}
 
@@ -48,6 +49,7 @@
     \item \code{mediansmooth}, \code{cgamma}, \code{enhance}, \code{denoise}
     \item \code{contrast}, \code{despeckle}, \code{edge}, \code{segment} 
     \item \code{cthresh}, \code{athresh}
+    \item \code{channelMix}
   } 
 }
 

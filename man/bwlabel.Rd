@@ -5,7 +5,7 @@
 \title{Binary segmentation}
 
 \description{
-  Labels connected objects in a binary image.
+  Labels connected (connected sets) objects in a binary image.
 }
 
 \usage{
@@ -25,7 +25,8 @@
 
 \details{
   Each connected set of foreground (non-zero) pixels in \code{x} is set
-  to an unique integer.
+  to an unique increasing integer, starting from 1. Hence, \code{max(x)}
+  tells you the number of connected objects in \code{x}.
 }
 
 \author{

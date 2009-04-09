@@ -13,22 +13,24 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-paintObjects = function (x, tgt, opac=c(0.4, 0.05, 0.4), col=c("#FFC72C","#5BABF6","#FF372C")) {
+paintObjects = function (x, tgt, opac=c(1, 1), col=c('red', NA)) {
   validImage(x)
   if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")
   
-  if ( any( dim(x)[1:2] != dim(tgt)[1:2] ))
-    stop( "'x' and 'tgt' must have the same size" )
+  if ( any( dim(x)[1:2] != dim(tgt)[1:2] )) stop( "'x' and 'tgt' must have the same size" )
   
-  if (getNumberOfFrames(x,'render') != getNumberOfFrames(tgt,'render'))
-    stop( "'x' and 'tgt' must have the same number of render frames" )                           
+  if (getNumberOfFrames(x,'render') != getNumberOfFrames(tgt,'render')) stop( "'x' and 'tgt' must have the same number of render frames" )                           
+
+  col = c(col, rep(NA, 3-length(col)))
+  opac = c(opac, rep(1, 3-length(opac)))
+  zcol = which(is.na(col))
+  col[zcol] = 'white'
+  opac[zcol] = 0
   
-    if ( length(opac) < 3 || length(col) < 3 )
-      stop( "'opac' and 'col' must have at least 3 elements each: opacity and color of the edge, of the background, of the object contact" )
-  opac <- as.numeric (opac)
-  if ( any(opac < 0) || any(opac > 1) )
-    stop("all opacity values must be in the range [0,1]" )
-    col <- as.character (col)
+  opac = as.numeric(opac)
+  if (any(opac < 0) || any(opac > 1)) stop("all opacity values must be in the range [0,1]" )
+  col <- as.character (col)
+  
   return (.Call("paintObjects", castImage(x), tgt, opac, col, PACKAGE='EBImage'))
 }
 

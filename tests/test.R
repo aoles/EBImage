@@ -98,7 +98,6 @@ testEBImageFunctions=function(x) {
   w=check('channel',y,'gray')
   w=check('channel',y,'green')
   w=check('channel',y,'x11')
-  w=check('channelMix',y)
   
   ## combine, tile, untile
   y=check('combine',x,x,x)
@@ -125,8 +124,8 @@ lena=readImage(system.file("images","lena.gif", package="EBImage"))
 lenacolor=readImage(system.file("images","lena-color.png",package="EBImage"))
 
 ## Resizing images, for speeding up testing
-lena=resize(lena,128,128)
-lenacolor=resize(lenacolor,128,128)
+lena=resize(lena, 128, 128)
+lenacolor=resize(lenacolor, 128, 128)
 
 ## Image - Grayscale - 1 image  - 2 dim - numeric
 testEBImageFunctions(lena)
@@ -139,10 +138,10 @@ testEBImageFunctions(x)
 testEBImageFunctions(lenacolor)
 
 ## Image - Color - 2 images - 4 dim - numeric
-x=combine(lenacolor,lenacolor)
+x=combine(lenacolor, lenacolor)
 testEBImageFunctions(x)
 
 ## matrix - 2 images - 3 dim - numeric
 x=imageData(lena)
-x=combine(x,x)
+x=combine(x, x)
 testEBImageFunctions(x)
