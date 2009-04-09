@@ -92,7 +92,7 @@
 }
 
 \seealso{
-  \link{\code{bwlabel}}, \link{\code{watershed}},  \link{\code{propagate}}
+  \code{\link{bwlabel}}, \code{\link{watershed}}, \code{\link{propagate}}
 }
 
 \author{
