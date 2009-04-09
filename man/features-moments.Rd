@@ -7,35 +7,28 @@
 
 \concept{feature extraction}
 
-\title{ Image moments and moment invariants, feature extraction }
+\title{Image moments and moment invariants}
 
 \description{
-  A set of functions to compute central, scale and rotation invariant moments
-  as well as to estimate object rotation angles and elongations based on 
-  central moments.
+  Computes moments and invariant moments from image objects.
 }
 
 \usage{
-  cmoments(x, ref)
-
-  smoments(x, ref, pw=3, what="s")
-
-  rmoments(x, ref)
-
   moments(x, ref)
-  
+  cmoments(x, ref)
+  rmoments(x, ref)
+  smoments(x, ref, pw=3, what="s")
 }
 
 \arguments{
-
-  \item{x}{An object of \code{\linkS4class{Image}}; a \code{\link{Grayscale}}
-    object of \code{\linkS4class{Image}} in the last case.}
-
-  \item{ref}{A \code{\link{Grayscale}} object of \code{\linkS4class{Image}}.}
-
-  \item{pw}{ A numeric value. When calculating central os scale invariant 
-    moments using \code{smoments} \code{pw} specifies the order of the 
-    matrix of moments to calculate. }
+  \item{x}{An \code{Image} object or an array containing object masks.
+    Object masks are sets of pixels with the same unique integer value.}
+    
+  \item{ref}{An \code{Image} object or an array, containing the
+    intensity values of the objects.}
+  
+  \item{pw}{A numeric value specifying the maximum moment order to
+    compute. Default is 3.}
 
   \item{what}{ A character string, or the first case insensitive letter, 
     for the type of the moments to calculate: \code{C}entral, \code{S}cale invariants,
@@ -98,9 +91,9 @@
   \emph{Image moments}: \url{http://en.wikipedia.org/wiki/Image_moments}
 }
 
-\seealso{\code{
-  \linkS4class{Image}, \link{watershed}, \link{getFeatures}
-}}
+\seealso{
+  \link{\code{bwlabel}}, \link{\code{watershed}},  \link{\code{propagate}}
+}
 
 \author{
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2007

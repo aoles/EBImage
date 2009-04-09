@@ -1,7 +1,6 @@
 greg:
-- doc: thresh
 - doc: filter2
-- doc: watershed, propagate, floodFill, fillHull
+- doc: watershed, propagate
 - doc: rgbImage, channel, channelMix
 - doc: stackObjects, combine, tile, untile
 - doc: drawfont, drawtext
@@ -10,8 +9,6 @@ greg:
 - doc: moments, cmoments, smoments, rmoments
 - doc: haralickFeatures, haralickMatrix, zernikeMoments
 - example: getFeatures, normalize example
-- floodFill: check md and Color
-- fillHull works only with IndexedImage
 - drawtext: check md and Color (IM, should be OK)
 - propagate: check md and Color
 - paintObjects, matchObjects, stackObjects: check md and Color
@@ -21,6 +18,7 @@ greg:
 - image, hist: are they useful ?
 - bwlabel: to implement
 - subset [1,1:10] or [1:10,1] doesn't have the good orientation
+- remove gene1.tif
 
 wolfgang:
 

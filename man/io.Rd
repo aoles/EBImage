@@ -58,24 +58,20 @@
 }
 
 \examples{
- ## Reads and display images
-   if(interactive()) {
-      f = system.file("images", "nuclei.tif", package="EBImage")
-      x = readImage(f)
-      display(x)
-      im = readImage("http://www.google.com/intl/en/images/logo.gif")
-      display(im)
-   }
+   ## Reads and display images
+   f = system.file("images", "nuclei.tif", package="EBImage")
+   x = readImage(f)
+   if(interactive()) display(x)
+   im = readImage("http://www.google.com/intl/en/images/logo.gif")
+   if(interactive()) display(im)
 
    ## Converts a TIFF file into JPEG
    f1 = system.file("images", "lena-color.png", package="EBImage")
    x1 = readImage(f1)
+   if (interactive()) display(x1)
    f2 = paste(tempfile(), "jpeg", sep=".")
+   writeImage(x1, f2)
    cat("Converted '",f1,"' into '",f2,"'.\n",sep='')
- 
- writeImage(x1, f2)
-
 }
 
-\keyword{file}
 
