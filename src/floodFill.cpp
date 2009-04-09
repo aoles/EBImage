@@ -25,35 +25,39 @@ template <class T> void _fillHullT(T *, const XYPoint &);
 /* -------------------------------------------------------------------------- */
 SEXP
 floodFill(SEXP x, SEXP point, SEXP col, SEXP tol) {
+  int i, nz, *dim;
+  int nprotect=0;
+  XYPoint pt;
+  SEXP res;
+
   // check image validity
   validImage(x,0);
-  
-  int *dim = INTEGER(GET_DIM(x));
+  nz = getNumberOfFrames(x, 0);
+  dim = INTEGER(GET_DIM(x));
   XYPoint size(dim[0], dim[1]);
+  if (size.x <= 0 || size.y <= 0) error("image must have positive dimensions");
+  if (LENGTH(point) != 2*nz) error("point must have a size of two times the number of frames");
+  if (LENGTH(col) != nz) error("color must have the same size as the number of frames");
   
-  if (LENGTH(GET_DIM(x))>2 && dim[2]>1)
-    warning("'floodFill' function is not defined for arrays or multi-frame images, the function will be applied to the first frame only");
-  /* -1 as R has 1-based indexing */
-  XYPoint pt(INTEGER(point)[0]-1, INTEGER(point)[1]-1);
-  /* if nothing to fill: this check is also done in R, but here to be fool-proof */
-  if (size.x <= 0 || pt.x < 0 || pt.x >= size.x || 
-      size.y <= 0 || pt.y < 0 || pt.y >= size.y)
-    error("coordinates of the start point must be inside the image boundaries");
-  SEXP m;
-  int nprotect=0;
-  /* copy existing image/matrix to result */
-  PROTECT(m = Rf_duplicate(x));
-  nprotect++;
-  /* do floodfil, templated version used depending on the storage mode */
-  if (IS_INTEGER(m)) {
-    _floodFill<int>(INTEGER(m), size, pt, INTEGER(col)[0], REAL(tol)[0]);
-  }
-  else if (IS_NUMERIC(m)) {
-    _floodFill<double>(REAL(m), size, pt, REAL(col)[0], REAL(tol)[0]);
-  }
+  // initialize result
+  PROTECT(res = Rf_duplicate(x));
+  nprotect++;  
   
+  // do the job over images
+ for (i=0; i<nz; i++) {
+    pt.x = INTEGER(point)[i]-1;
+    pt.y = INTEGER(point)[nz+i]-1;
+    
+    if (pt.x < 0 || pt.x >= size.x || pt.y < 0 || pt.y >= size.y)
+      error("coordinates of the starting point must be inside the image boundaries");
+    
+    if (IS_NUMERIC(x)) _floodFill<double>(&(REAL(res)[i*size.x*size.y]), size, pt, REAL(col)[i], REAL(tol)[0]);
+    if (IS_INTEGER(x)) _floodFill<int>(&(INTEGER(res)[i*size.x*size.y]), size, pt, INTEGER(col)[i], REAL(tol)[0]);
+    
+  }
+
   UNPROTECT (nprotect);
-  return m;
+  return res;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -66,8 +70,9 @@ fillHull(SEXP x) {
   XYPoint size(dim[0], dim[1]);
 
   /* check if array or multiple images */
-  int nz = 1;
-  if (LENGTH(GET_DIM(x))>2) nz = dim[2];
+  int nz;
+  nz = getNumberOfFrames(x, 0);
+
   /* return itself if nothing to do */  
   if (size.x <= 0 || size.y <= 0 || nz < 1) return x;
   SEXP m;
@@ -151,11 +156,11 @@ _floodFill(T *m, XYPoint size, XYPoint xy, T rc, double tol=1e-3) {
     pt.y++;
     spanLeft=false;
     spanRight=false;
+    /* to enable users to terminate this function */
+    R_CheckUserInterrupt();
 
     // processes the column x
     while(pt.y<size.y && fabs(m[pt.x+pt.y*size.x]-tc) <= tol) {
-      /* to enable users to terminate this function */
-      R_CheckUserInterrupt();
       m[pt.x+pt.y*size.x]=resetc;
       if (offset) offsets.push(pt);
       if(!spanLeft && pt.x>0 && fabs(m[pt.x-1+pt.y*size.x]-tc) <= tol) {

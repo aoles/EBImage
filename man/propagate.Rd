@@ -92,6 +92,8 @@
   ## load images of nuclei (seed points later)
   f <- paste( system.file(package="EBImage"), "images/Gene1_G.tif", sep="/" )
   ii = readImage(f)
+  ii = channel(ii, 'gray')
+
   ## normalize images
   ii = normalize(ii, separate=TRUE)
   ## segment
@@ -107,6 +109,8 @@
   ## load images of cells (the ones to segment with propagate)
   f <- paste( system.file(package="EBImage"), "images/Gene1_R.tif", sep="/" )
   xi = readImage(f)
+  xi = channel(xi, 'gray')
+
   ## normalize images
   xi = normalize(xi, separate=TRUE)
   ## segment

@@ -6,7 +6,7 @@
 \title{Blurring images}
 
 \description{
-  Blur images with ImageMagick functions.
+  Blurs an image with ImageMagick functions.
 }
 
 \usage{
@@ -33,7 +33,8 @@
 \details{
   \code{blur} uses an unspecified separable kernel. \code{gblur} uses
   a Gaussian kernel. The algorithms used by these ImageMagick functions
-  are not well defined.
+  are not well defined and hence, the usage of \code{filter2} is preferable
+  to \code{blur} or \code{gblur}.
 }
 
 \seealso{

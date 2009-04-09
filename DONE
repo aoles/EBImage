@@ -1,3 +1,7 @@
+2.99.2
+- doc: tresh
+- floodFill and fillHull : doc + test + examples
+
 2.99.1
 - starting the pre 3.0.0 release
 - doc: equalize, blur, gblur, normalize, EBImage, EBImage-deprecated

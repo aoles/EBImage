@@ -66,6 +66,8 @@
   ## load images
   f <- paste( system.file(package="EBImage"), "images/Gene1_G.tif", sep="/" )
   ii = readImage(f)
+  ii = channel(ii, 'gray')
+
   ## normalize images
   ii = normalize(ii, separate=TRUE)
   ## segment

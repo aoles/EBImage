@@ -109,11 +109,13 @@ into a stack. Images and image stacks are stored in objects of class
 imgdir = file.path(system.file(package="EBImage"), "images")
 fG = dir(imgdir, pattern="_G.tif", full.names=TRUE)
 iG = readImage(fG[1])
+iG = channel(iG, 'gray')
 class(iG)
 dim(iG)
 
 fR = dir(imgdir, pattern="_R.tif", full.names=TRUE)
 iR = readImage(fR[1])
+iR = channel(iR, 'gray')
 @
 %
 The images are 16-bit grayscale TIFFs and were measured at two

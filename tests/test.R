@@ -67,7 +67,7 @@ testEBImageFunctions=function(x) {
   if (mode(x)!='logical') b=check('median',x)
   if (mode(x)!='logical' & interactive()) check('hist',x) 
 
-  ## blur, gblur, normalize, negate, normalize2
+  ## blur, gblur, normalize
   y=check('blur',x,r=20,s=10)
   y=check('gblur',x,r=10,s=5)
   y=check('normalize',x)
@@ -85,7 +85,9 @@ testEBImageFunctions=function(x) {
   y=check('closing',w)
   y=check('distmap',w)
   ws=check('watershed',y)
-
+  y=check('floodFill', w, c(10,10), 0.5)
+  y=check('fillHull', w)
+ 
   ## rgbImage, channel
   if (colorMode(x)==Grayscale) {
     y=rgbImage(x,flip(x),flop(x))

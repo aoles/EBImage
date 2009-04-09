@@ -15,22 +15,17 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-floodFill = function(x, pt, col, tolerance=1e-3) {
+floodFill = function(x, pt, col, tolerance=0) {
   validImage(x)
-  .dim = dim(x)
-  pt = as.integer(pt)
-  if (length(pt)<2)
-    stop("'pt' must contain at least 2 values for x and y coordinates")
-  if (any(pt)<1 || any(pt[1:2]>.dim[1:2]))
-    stop("coordinates of the start point must be inside the image boundaries")
-  tolerance = as.numeric(tolerance)
-  if (missing(col)) col=x[pt[1]+pt[2]*.dim[1]]
-  ## allows for conversion from X11 color string to its RGB or grayscale value
-  if (is.character(col))
-    col <- if (is.integer(x)) channel(col,"rgb") else channel(col,"gray")
-  else
-    col <- if (is.integer(x)) as.integer(col) else col=as.double(col)
-  return( .Call("floodFill", castImage(x), pt, col, tolerance, PACKAGE='EBImage'))
+
+  n = getNumberOfFrames(x, 'total')
+  pt = matrix(as.integer(pt), nr=n, nc=2, byrow=TRUE)
+  if (is.character(col)) col = as.numeric(col2rgb(col)/255)
+  col = as.numeric(matrix(col, nr=n, nc=1))
+  if (any(pt[,1]<1) || any(pt[,1]>dim(x)[1]) ||
+      any(pt[,2]<1) || any(pt[,2]>dim(x)[2])) stop("coordinates 'pt' of the starting point(s) must be inside the image boundaries")
+ 
+  return( .Call("floodFill", castImage(x), pt, col, as.numeric(tolerance), PACKAGE='EBImage'))
 } 
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

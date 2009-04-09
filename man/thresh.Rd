@@ -5,7 +5,7 @@
 \title{Adaptive thresholding}
 
 \description{
-  Threshold an image using a moving rectangular window.
+  Thresholds an image using a moving rectangular window.
 }
 
 \usage{
@@ -17,7 +17,7 @@
   
   \item{w, h}{Width and height of the moving rectangular window.} 
   
-  \item{offset}{Thresholding offset from the mean value.}
+  \item{offset}{Thresholding offset from the averaged value.}
 }
 
 \value{
@@ -26,7 +26,11 @@
 }
 
 \details{
-  
+  This function returns the binary image resulting from the comparison
+  between an image and its filtered version with a rectangular window.
+  It is equivalent of doing \code{f = matrix(1, nc=2*w+1, nr=2*h+1) ; f=f/sum(f) ; x>(filter2(x, f)+offset)} 
+  but slightly faster. The function \code{filter2} provides more 
+  flexbility and is preferable to \code{thresh}.
 }
 
 \seealso{
@@ -38,7 +42,10 @@
 }
 
 \examples{
- 
+  x = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
+  if (interactive()) display(x)
+  y = thresh(x, 10, 10, 0.05)
+  if (interactive()) display(y)
 }
 
 \keyword{manip}

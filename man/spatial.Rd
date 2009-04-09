@@ -13,7 +13,7 @@
 \title{Spatial linear transformations}
 
 \description{
-  Rotate, mirror and resize images. 
+  Rotates, mirrors and resizes images. 
 }
 
 \usage{
