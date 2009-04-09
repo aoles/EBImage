@@ -1,10 +1,9 @@
 greg:
 - doc: watershed, propagate
-- doc: rgbImage, channel
 - doc: stackObjects, combine, tile, untile
 - doc: drawfont, drawtext
-- doc: paintObjects, rmObjects, reenumerate
-- doc: getFeatures, hullFeatures, edgeProfile, edgeFeatures
+- doc: rmObjects, reenumerate
+- doc: hullFeatures, edgeProfile, edgeFeatures
 - doc: haralickFeatures, haralickMatrix, zernikeMoments
 - example: getFeatures, normalize example
 - drawtext: check md and Color (IM, should be OK)
@@ -14,4 +13,3 @@ greg:
 - channel: two methods, rewrite vignette and usecases
 - subset [1,1:10] or [1:10,1] doesn't have the good orientation
 - remove gene1.tif
-- add cells.tif
