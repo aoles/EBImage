@@ -48,7 +48,7 @@ export(distmap)
 export(floodFill, fillHull)
 
 ## colorspace
-export(rgbImage, channelMix, channel)
+export(rgbImage, channel)
 
 ## image stacking, tiling
 export(stackObjects)
@@ -73,3 +73,4 @@ export(negate, affinet, normalize2, noise)
 export(mediansmooth, cgamma, enhance, denoise)
 export(contrast, despeckle, edge, segment)
 export(cthresh, athresh)
+export(channelMix)

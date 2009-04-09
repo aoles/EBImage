@@ -119,7 +119,14 @@
   w = matrix(seq(0, 1, len=300), nc=300, nr=300)
   m = abind(w, t(w), along=3)
   z = Image(m, colormode='Color')
-  if (interactive()) display(normalize(z))		
+  if (interactive()) display(normalize(z))
+
+  ## colorMode example
+  x = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
+  x = x[,,1:3]
+  if (interactive()) display(x, title='Cell nuclei')
+  colorMode(x)=Color
+  if (interactive()) display(x, title='Cell nuclei in RGB')
 }
 
 

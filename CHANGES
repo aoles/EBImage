@@ -1,0 +1,47 @@
+Major changes since EBImage 2.6.0
+
+1) Slots
+The slots 'filename', 'compression', 'resolution', and 'features' have been removed 
+since they are not intrisic properties of images. Only the slot 'colormode' has been
+kept to help EBImage functions to know how to render Image objects.
+
+2) Truecolor mode
+This color mode 'Truecolor' is now deprecated and will be defunct for the next 
+Bioconductor release. In this color mode, color pixels were stored as integers and 
+resulting matrices didn't constitute a mathematical field anymore, breaking all
+the compatibility with basic mathematical operators and R commands.Please use 
+the color mode 'Color' instead. In this mode, color RGB channels are stored in 
+the third dimension and are more natural to process with R.
+
+3) Image object, arrays and dimensions
+All EBImage functions now work with Image objects and arrays having more than
+2 dimensions. Extra dimensions are used to store image stacks and image color 
+channels. Storage mode can be 'integer', 'numeric' or 'logical'.
+
+4) All S4 methods removed
+All EBImage functions are now R functions, not S4 methods anymore.
+
+5) Testing procedure
+All EBImage functions are now tested during 'R CMD check' with several types of
+multi-dimensional matrices/arrays/Image objects, with several storage modes.
+
+6) Deprecation
+28 EBImage functions have been deprecated, mostly functions coming from ImageMagick 
+because they were poorely documented (even in the ImageMagick documentation !) and/or 
+useless in the R environement. We want EBImage to be a quantitative, precise image 
+processing toolbox.
+
+7) Attribute deprecation
+Many attributes have been deprecated since they were poorly documented, useless in 
+the new framework or too vague to be kept. Many useless '...' arguments have been 
+removed.
+
+8) Many bug and speeding issue fixes
+distmap, readImage, watershed, display and many more. See the DONE file.
+
+9) New features/functions added
+display, ocontour, bwlabel, makeBrush
+
+10) IndexedImage class
+This class doesn't exist aynmore. All EBImage functions are now able to work
+on arrays.

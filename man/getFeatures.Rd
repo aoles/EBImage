@@ -1,97 +1,83 @@
 \name{getFeatures}
 
 \alias{getFeatures}
-\alias{features}
 
-\concept{object detection}
+\concept{features extraction}
 
-\title{Feature extraction for objects in indexed images}
+\title{Extract feature extraction from image objects}
 
 \description{
-  Extract numerical descriptors for objects in indexed images.
-  The functions here call a set of individual feature extraction routines for
-  every feature set like hull, texture (Haralick), edge, moment features etc.
+  Extracts numerical features from image objects.
 }
 
 \usage{
-  getFeatures(x, ref, N=12, R=30, apply.Gaussian, nc=256, pseudo)
-
+  getFeatures(x, ref, N=12, R=30, apply.Gaussian, nc=32, pseudo)
 }
 
 \arguments{
-
-  \item{x}{ An object of \code{\linkS4class{Image}} (like those
-    obtained from \code{\link{propagate}} or \code{\link{watershed}}. }
-
-  \item{ref}{ A reference image containing images of the objects in
-    Grayscale mode (intensity values)! }
-
+  \item{x}{An \code{Image} object or an array containing object masks.
+    Object masks are sets of pixels with the same unique integer value.}
+  
+  \item{ref}{An \code{Image} object or an array, containing the
+    intensity values of the objects.}
+  
   \item{N}{ Passed to \code{\link{zernikeMoments}}. Integer value 
-    defining the degree of the Zernike polynomials, which in turn defines the 
-    number of features calculated. Defaults to 12.}
+    defining the degree of the Zernike polynomials, which in turn
+    defines the number of features calculated. Defaults to 12.}
 
   \item{R}{ Passed to \code{\link{zernikeMoments}}. Defines the radius 
     of the circle around an object centre from which the features are calculated. 
-    It also defines the standard deviation for the 2D Gausian applied at the 
-    centre of an object. See details. Defaults to 30. }
+    See details. Defaults to 30.}
    
   \item{nc}{ Passed to \code{\link{haralickFeatures}}. A numeric value. 
-    Specifies the number of gray levels to separate \code{ref} into when 
-    calculating the co-occurrence matrix. Here defaults to 256.}
+    Specifies the number of gray levels to bin \code{ref} into when 
+    computing the co-occurrence matrix. Defaults to 32.}
 
   \item{apply.Gaussian, pseudo}{Deprecated.}
-
 }
 
 \value{
-
   \code{getFeatures} returns feature matrices.
 }
-
       
 \details{
-  \code{ref} can be missing in calls to \code{getFeatures}. In this case texture
-  and other intensity-dependent features will be omitted.
+  Combines and returns the features returned by \code{hullFeatures},
+  \code{moments}, \code{edgeFeatures}, \code{haralickFeatures} and
+  \code{zernikeMoments}.
 }
  
 
-\seealso{ \code{
-  \linkS4class{Image}, \link{propagate}, \link{paintObjects}, \link{stackObjects},
-  \link{hullFeatures}, \link{haralickFeatures}, \link{moments}, \link{edgeFeatures},
-  \link{zernikeMoments}
-}}
+\seealso{
+  \code{\link{hullFeatures}}, \code{\link{moments}}, \code{\link{edgeFeatures}}
+  \code{\link{haralickFeatures}}, \code{\link{zernikeMoments}} 
+  }
 
 \author{
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2007
 }
 
 \examples{
-if (FALSE) {
-  ## load images
-  f = system.file('images', 'Gene1_G.tif', package="EBImage")
-  x = readImage(f)
+  x = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
+  x = x[,,1]
+  if (interactive()) display(x)
 
-  ## adaptative thresholding to find nuclei
-  fnuc = makeBrush(25, shape='disc', step=FALSE)
-  fnuc = fnuc/sum(fnuc)
-  mask = x > (filter2(x, fnuc)+0.005)
+  ## computes object mask
+  y = thresh(x, 10, 10, 0.05)
+  y = opening(y, makeBrush(5, shape='disc'))
+  mask = bwlabel(y)
+  if (interactive()) display(mask, title='Cell nuclei')
 
-  ## refine segmentation with morphology filters
-  se = makeBrush(5, shape='diamond')
+  ## features
+  ftrs = getFeatures(mask, x)[[1]]
+  print(ftrs[1:5,])
 
-  mask = dilate(erode(closing(mask, mk5), mk3), mk5)
-  ## index objects with 'watershed'
-  io = watershed( distmap(mask), 1.5, 1)
-  ft = hullFeatures(io)
-  mf = moments(io, ii)   ## need these for intensity and size
-  for ( i in seq_along(ft) ) ft[[i]] = cbind(ft[[i]], mf[[i]])
-  io = rmObjects(io, lapply(ft, function(x) 
-         which(x[,"g.s"] < 150 | x[,"m.int"] < 50 | 0.3 * x[,"g.p"] < x[,"g.edge"] )
-       ))
-  ft = getFeatures(io, ii)
-  str( ft )
-}
-  
+  ## paint nuclei with an eccentricity higher than 0.85
+  maskb = mask
+  id = which(ftrs[,'m.ecc']<0.85)
+  maskb[!is.na(match(maskb, id))] = 0
+
+  img = paintObjects(maskb, channel(x, 'rgb'), col='red')
+  if (interactive()) display(img, title='Nuclei with high eccentricity')
 }
 
 \keyword{manip}

@@ -5,7 +5,7 @@
 \title{2D Convolution Filter}
 
 \description{
-  2D convolution-based linear filter for images and matrix data.
+  Filters an image using the fast 2D FFT convolution product.
 }
 
 \usage{
@@ -13,30 +13,49 @@
 }
 
 \arguments{
+  \item{x}{An \code{Image} object or an array.}
 
-  \item{x}{An object of \code{\linkS4class{Image}} in Grayscale mode, a numeric 
-    \code{array} or a \code{matrix}. }
-
-  \item{filter}{A square \code{matrix} with odd dimensions.}
+  \item{filter}{An \code{Image} object or an array, with odd spatial
+    dimensions. Must contain only one frame.}
 }
 
 \value{
-  \code{filter2} returns a transformed object of the same class as 
-  \code{x}.
+  An \code{Image} object or an array, containing the filtered version
+  of \code{x}.
 }
 
 \details{
+  Linear filtering is useful to perform low-pass filtering (to blur
+  images, remove noise...) and high-pass filtering (to detect
+  edges, sharpen images). The function \code{makeBrush} is useful to
+  generate filters.
 
-  The convolution filter is based on \code{fft} transforms.
-  If \code{x} is an \code{array}, the filter is applied per frame (as to images).
+  Data is reflected around borders.
+  
+  If \code{x} contains multiple franes, the filter will be applied one each frame.
   
 }
 
 \seealso{
-  \code{
-    \linkS4class{Image}, \link{fft}
-  }
+  \code{\link{makeBrush}}, \code{\link{convolve}}, \code{\link{fft}}, \code{\link{blur}}
 }
 
 \author{Gregoire Pau, \email{gpau@ebi.ac.uk}}
 
+\examples{
+  x = readImage(system.file("images", "lena-color.png", package="EBImage"))
+  if (interactive()) display(x, title='Lena')
+
+  ## Low-pass disc-shaped filter
+  f = makeBrush(21, shape='disc', step=FALSE)
+  if (interactive()) display(f, title='Disc filter')
+  f = f/sum(f)
+  y = filter2(x, f)
+  if (interactive()) display(y, title='Filtered lena')
+
+  ## High-pass Laplacian filter
+  la = matrix(1, nc=3, nr=3)
+  la[2,2] = -8
+  y = filter2(x, la)
+  if (interactive()) display(y, title='Filtered lena')
+}

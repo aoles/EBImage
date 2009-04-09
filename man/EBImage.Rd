@@ -68,7 +68,6 @@
   Colorspace manipulation
   \itemize{  
     \item \code{rgbImage}, \code{channel}
-    \item \code{channelMix}
   }
   
   Image stacking, combining, tiling
@@ -105,6 +104,7 @@
     \item \code{mediansmooth}, \code{cgamma}, \code{enhance}, \code{denoise}
     \item \code{contrast}, \code{despeckle}, \code{edge}, \code{segment} 
     \item \code{cthresh}, \code{athresh}
+    \item \code{channelMix}
   }
 }
 

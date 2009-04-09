@@ -1,5 +1,5 @@
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-getFeatures = function (x, ref, N = 12, R = 30, apply.Gaussian, nc = 256, pseudo) {
+getFeatures = function (x, ref, N = 12, R = 30, apply.Gaussian, nc = 32, pseudo) {
   validImage(x)
   if (colorMode(ref) == TrueColor) stop("\'ref\' must not be in \'TrueColor\' color mode")
   if (!missing(apply.Gaussian)) warning("'apply.Gaussian' is deprecated.")
