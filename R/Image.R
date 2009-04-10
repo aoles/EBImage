@@ -75,8 +75,14 @@ Image=function(data=array(0, dim=c(1,1)), dim, colormode=NULL) {
     }
   }
 
-  if (colormode==TrueColor) data=as.integer(data)
-  res = new("Image", .Data=array(data,dim=dim),colormode=colormode)
+  if (is.character(data)) {
+    colormode=Color
+    datac = col2rgb(data)/255
+    res = rgbImage(Image(datac[1,,drop=FALSE], dim=dim),  Image(datac[2,,drop=FALSE], dim=dim),  Image(datac[3,,drop=FALSE], dim=dim))
+  } else {
+    if (colormode==TrueColor) data=as.integer(data)
+    res = new("Image", .Data=array(data,dim=dim), colormode=colormode)
+  }
   
   validObject(res)
   return(res)
@@ -303,70 +309,38 @@ selectChannel=function(x,i) {
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 channel = function (x, mode) {
-  if (is.array(x)) {
-    mode=tolower(mode)
-    validObject(x)
-    if (colorMode(x)==Grayscale) {
-      return(switch(mode,
-                    rgb=rgbImage(r=x,g=x,b=x),
-                    grey=,gray=x,
-                    r=,red=stop('invalid conversion mode, can\'t extract the red channel from a \'Grayscale\' image'),
-                    g=,green=stop('invalid conversion mode, can\'t extract the green channel from a \'Grayscale\' image'),
-                    b=,blue=stop('invalid conversion mode, can\'t extract the blue channel from a \'Grayscale\' image'),
-                    asred=rgbImage(r=x),
-                    asgreen=rgbImage(g=x),
-                    asblue=rgbImage(b=x),
-                    x11=array(rgb(x,x,x),dim=dim(x)),
-                    stop('invalid conversion mode')
-                    ))
-    }
-    else if (colorMode(x)==Color) {
-      return(switch(mode,
-                    rgb=x,
-                    ## Color->Grayscale conversion is done using 1/3 uniform RGB weights
-                    grey=,gray=(EBImage:::selectChannel(x,1)+EBImage:::selectChannel(x,2)+EBImage:::selectChannel(x,3))/3,
-                    r=,red=EBImage:::selectChannel(x,1),
-                    g=,green=EBImage:::selectChannel(x,2),
-                    b=,blue=EBImage:::selectChannel(x,3),
-                    asred=EBImage:::selectChannel(x,1),
-                    asgreen=EBImage:::selectChannel(x,2),
-                    asblue=EBImage:::selectChannel(x,3),
-                    x11=array(rgb(selectChannel(x,1),selectChannel(x,2),selectChannel(x,3)),dim=dim(x)),
-                    stop('invalid conversion mode')
-                    ))
-    }
-    else {
-      ## TrueColor deprecated mode
-      modeNo <- as.integer( switch (EXPR=mode, rgb=0, grey=, gray=1, r=, red=2, g=,
-                                    green=3, b=, blue=4, asred=5, asgreen=6, asblue=7, x11=8, -1) )
-      if (modeNo < 0) stop("wrong conversion mode")
-      
-      resData <- .Call("lib_channel", imageData(x), modeNo, PACKAGE='EBImage')
-      if (is.null(resData))
-        stop("error converting colors, check if all supplied values majke sense for color representation")
-      resData[which(is.na(x))] = NA
-      resData = array (resData, dim(x) )
-      if (mode == "x11") return(resData)
-      colormode=switch (EXPR=mode, rgb=, asred=, asgreen=,
-        asblue=TrueColor, Grayscale)
-      res=Image(data=resData,colormode=colormode)
-      return(res)
-    }
-  }
-  else {
-    mode <- tolower (mode)
-    modeNo <- as.integer( switch (EXPR=mode, rgb=0, grey=, gray=1, r=, red=2, 
-                                  g=, green=3, b=, blue=4, asred=5, asgreen=6, asblue=7, x11=8, -1) )
-    if ( modeNo < 0 )
-      stop( "wrong conversion mode")
-    if ( !is.numeric(x) && !is.character(x) )
-      stop( "argument must be coercible to either numeric or character" )
-    res <- .Call("lib_channel", x, modeNo, PACKAGE='EBImage')
-    if ( !is.null(res) )
-      res [ which( is.na(x) ) ] = NA
-    if ( is.null(res) || is.character(res) ) return (res)
-    if ( is.array(x) ) dim (res) <- dim (x)
-    return (res)
+  if (!is.array(x)) x=Image(x)
+  if (is.character(x)) x=Image(x)
+  mode=tolower(mode)
+  validObject(x)
+  if (colorMode(x)==TrueColor) x=Image(x, colormode=Color)
+  if (colorMode(x)==Grayscale) {
+    return(switch(mode,
+                  rgb=rgbImage(r=x,g=x,b=x),
+                  grey=,gray=x,
+                  r=,red=stop('invalid conversion mode, can\'t extract the red channel from a \'Grayscale\' image'),
+                  g=,green=stop('invalid conversion mode, can\'t extract the green channel from a \'Grayscale\' image'),
+                  b=,blue=stop('invalid conversion mode, can\'t extract the blue channel from a \'Grayscale\' image'),
+                  asred=rgbImage(r=x),
+                  asgreen=rgbImage(g=x),
+                  asblue=rgbImage(b=x),
+                  x11=array(rgb(x,x,x),dim=dim(x)),
+                  stop('invalid conversion mode')
+                  ))
+  } else {
+    return(switch(mode,
+                  rgb=x,
+                  ## Color->Grayscale conversion is done using 1/3 uniform RGB weights
+                  grey=,gray=(EBImage:::selectChannel(x,1)+EBImage:::selectChannel(x,2)+EBImage:::selectChannel(x,3))/3,
+                  r=,red=EBImage:::selectChannel(x,1),
+                  g=,green=EBImage:::selectChannel(x,2),
+                  b=,blue=EBImage:::selectChannel(x,3),
+                  asred=EBImage:::selectChannel(x,1),
+                  asgreen=EBImage:::selectChannel(x,2),
+                  asblue=EBImage:::selectChannel(x,3),
+                  x11=array(rgb(selectChannel(x,1),selectChannel(x,2),selectChannel(x,3)),dim=dim(selectChannel(x,1))),
+                  stop('invalid conversion mode')
+                  ))
   }
 }
 
@@ -416,14 +390,6 @@ combine = function (x,...,along) {
     dmx=dm[1,]==dm[1,1]
     dmy=dm[2,]==dm[2,1]
     if (!all(dmx) || !all(dmy)) stop("images must have the same 2D frame size to be combined")
-
-    ## check nb dim and removes final dimension 1, if any (needed by abind)
-    nd=sapply(args,function(z) length(dim(z)))
-    ndf=mapply(function(a,n) dim(a)[n],args,nd)
-    df1=which(ndf==1)
-    for (k in df1) dim(args[[k]])=dim(args[[k]])[1:(nd[k]-1)]
-    nd[df1]=nd[df1]-1
-    if (all(nd[1]!=nd)) stop("images must have the same 2D frame size to be combined")
 
     ## merging along position guided by colorMode
     ## if along is rationnal, a new dimension is created
@@ -475,10 +441,9 @@ rgbImage = function(red=NULL, green=NULL, blue=NULL) {
   if (is.null(green)) green=Image(0, dim=d)
   if (is.null(blue)) blue=Image(0, dim=d)
   
-  
   if (is.null(d)) stop('at least one non-null Image object must be specified')
   
-  x=combine(red, green, blue,along=2.5)
+  x=combine(red, green, blue, along=2.5)
   
   ## Cast to Color Image if x is an array
   if (class(x)=='array') x=Image(x)

@@ -1,5 +1,5 @@
 
-R version 2.7.0 (2008-04-22)
+R version 2.8.0 (2008-10-20)
 Copyright (C) 2008 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -17,7 +17,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
-> ## cat tests/test.R | R --vanilla &>tests/test.Rout.tmp
+> ## cat tests/test.R | R --vanilla &>tests/test.Rout.save
 > library(EBImage)
 Loading required package: abind
 > 
@@ -104,7 +104,7 @@ Loading required package: abind
 +   y=check('opening',w)
 +   y=check('closing',w)
 +   y=check('distmap',w)
-+   ws=check('watershed',y)
++   ws=check('watershed', y)
 +   y=check('floodFill', w, c(10,10), 0.5)
 +   y=check('fillHull', w)
 +   y=check('bwlabel', w)
@@ -131,11 +131,13 @@ Loading required package: abind
 +   w[w@.Data==3]=2117
 +   y=check('reenumerate',w)
 +   w=ws
-+   hf=check('hullFeatures',w)
++   hf=check('hullFeatures', w)
 +   if (!is.list(hf)) hf=list(hf)
 +   rmindex = lapply(hf, function(c) which(c[,'g.s']<6))
-+   w=check('rmObjects',w,rmindex)
-+   y=check('getFeatures',w,x)
++   w=check('rmObjects', w, rmindex)
++   y=check('getFeatures', w, x)
++   if (colorMode(w)==Color) w = channel(w, 'red')
++   y=check('paintObjects', w, x)
 +   cat('\n')
 + }
 > 
@@ -203,6 +205,7 @@ checking 'reenumerate' ... OK (hash=524698803)
 checking 'hullFeatures' ... OK (hash=3425915)
 checking 'rmObjects' ... OK (hash=300487451)
 checking 'getFeatures' ... OK (hash=112458679)
+checking 'paintObjects' ... OK (hash=55130488)
 
 Warning messages:
 1: In hash(y) : NAs introduced by coercion
@@ -233,7 +236,7 @@ checking '+' ... OK (hash=77333420)
 checking '/' ... OK (hash=19333355)
 checking 'getNumberOfFrames' ... OK (hash=1)
 checking 'writeImage' ... OK (hash=NA)
-checking 'resize' ... OK (hash=214938068)
+checking 'resize' ... OK (hash=214938067)
 checking 'rotate' ... OK (hash=67388563)
 checking 'flip' ... OK (hash=42760022)
 checking 'flop' ... OK (hash=38558733)
@@ -264,6 +267,7 @@ checking 'reenumerate' ... OK (hash=524698803)
 checking 'hullFeatures' ... OK (hash=3425915)
 checking 'rmObjects' ... OK (hash=300487451)
 checking 'getFeatures' ... OK (hash=243259173)
+checking 'paintObjects' ... OK (hash=38666710)
 
 Warning messages:
 1: In hash(y) : NAs introduced by coercion
@@ -325,6 +329,7 @@ checking 'reenumerate' ... OK (hash=4762468379)
 checking 'hullFeatures' ... OK (hash=18493133)
 checking 'rmObjects' ... OK (hash=1828471793)
 checking 'getFeatures' ... OK (hash=535955461)
+checking 'paintObjects' ... OK (hash=529056647)
 
 Warning messages:
 1: In hash(y) : NAs introduced by coercion
@@ -385,6 +390,7 @@ checking 'reenumerate' ... OK (hash=19465732150)
 checking 'hullFeatures' ... OK (hash=66098474)
 checking 'rmObjects' ... OK (hash=7905101794)
 checking 'getFeatures' ... OK (hash=1888295204)
+checking 'paintObjects' ... OK (hash=2299205033)
 
 Warning messages:
 1: In hash(y) : NAs introduced by coercion
@@ -432,6 +438,7 @@ checking 'reenumerate' ... OK (hash=2598340966)
 checking 'hullFeatures' ... OK (hash=10277746)
 checking 'rmObjects' ... OK (hash=1189373494)
 checking 'getFeatures' ... OK (hash=337376036)
+checking 'paintObjects' ... OK (hash=224055747)
 
 Warning messages:
 1: In hash(y) : NAs introduced by coercion

@@ -6,7 +6,6 @@ See: ../LICENSE for license, LGPL
 
 #include "tools.h"
 #include "conversions.h"
-#include "colors.h"
 #include "display.h"
 #include "io.h"
 
@@ -81,8 +80,6 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_writeImages",    (DL_FUNC) &lib_writeImages,    3},
     {"lib_display",        (DL_FUNC) &lib_display,        3},
     {"lib_animate",        (DL_FUNC) &lib_animate,        1},
-    {"lib_channel",        (DL_FUNC) &lib_channel,        2},
-
     {"lib_filterMagick",   (DL_FUNC) &lib_filterMagick,   3},
     {"translate",          (DL_FUNC) &translate,          2},
     {"lib_erode_dilate",   (DL_FUNC) &lib_erode_dilate,   3},
@@ -94,7 +91,6 @@ static R_CallMethodDef libraryRCalls[] = {
     {"distmap",            (DL_FUNC) &distmap,            2},
     {"watershed",          (DL_FUNC) &watershed,    3},
     {"lib_propagate",      (DL_FUNC) &lib_propagate,      5},
-
     {"paintObjects",       (DL_FUNC) &paintObjects,  4},
     {"matchObjects",       (DL_FUNC) &matchObjects,  2},
     {"rmObjects",          (DL_FUNC) &rmObjects, 2},
@@ -103,9 +99,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"stackObjects",       (DL_FUNC) &stackObjects,  6},
     {"ocontour",           (DL_FUNC) &ocontour,  1},
     {"lib_frameDist",      (DL_FUNC) &lib_frameDist,      5},
-
     {"lib_drawText",       (DL_FUNC) &lib_drawText,       5},
-
     {"lib_basic_hull",     (DL_FUNC) &lib_basic_hull,     1},
     {"lib_cmoments",       (DL_FUNC) &lib_cmoments,       2},
     {"lib_moments",        (DL_FUNC) &lib_moments,        4},

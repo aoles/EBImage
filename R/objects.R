@@ -15,10 +15,9 @@
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 paintObjects = function (x, tgt, opac=c(1, 1), col=c('red', NA)) {
   validImage(x)
-  if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")
-  
-  if ( any( dim(x)[1:2] != dim(tgt)[1:2] )) stop( "'x' and 'tgt' must have the same size" )
-  
+  if (colorMode(x) != Grayscale)  stop("'",paste(deparse(substitute(x))), "' must be in 'Grayscale' color mode")
+  if (colorMode(tgt) == TrueColor) tgt = Image(tgt, Color)
+  if (any(dim(x)[1:2] != dim(tgt)[1:2])) stop( "'x' and 'tgt' must have the same size" )
   if (getNumberOfFrames(x,'render') != getNumberOfFrames(tgt,'render')) stop( "'x' and 'tgt' must have the same number of render frames" )                           
 
   col = c(col, rep(NA, 3-length(col)))
@@ -29,9 +28,8 @@ paintObjects = function (x, tgt, opac=c(1, 1), col=c('red', NA)) {
   
   opac = as.numeric(opac)
   if (any(opac < 0) || any(opac > 1)) stop("all opacity values must be in the range [0,1]" )
-  col <- as.character (col)
-  
-  return (.Call("paintObjects", castImage(x), tgt, opac, col, PACKAGE='EBImage'))
+
+  .Call("paintObjects", castImage(x), castImage(tgt), opac, Image(col), PACKAGE='EBImage')
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

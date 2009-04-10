@@ -19,8 +19,8 @@
 }
 
 \value{
-  An \code{Image} object or an array, containing the labelled version
-  of \code{x}.
+  An \code{Grayscale} \code{Image} object or an array, containing the
+  labelled version of \code{x}.
 }
 
 \details{
@@ -34,6 +34,14 @@
 }
 
 \examples{
+  ## simple example
+  x = readImage(system.file('images', 'shapes.png', package='EBImage'))
+  x = x[110:512,1:130]
+  if (interactive()) display(x, title='Binary')
+  y = bwlabel(x)
+  if (interactive()) display(normalize(y), title='Segmented')
+
+  ## read nuclei images
   x = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
   if (interactive()) display(x)
 
@@ -46,14 +54,10 @@
   z = bwlabel(y)
   if (interactive()) display(normalize(z), title='Cell nuclei')
   nbnuclei = apply(z, 3, max)
-  cat('There are', paste(nbnuclei, collapse=','),'nuclei in the
-  images.\n')
+  cat('Number of nuclei=', paste(nbnuclei, collapse=','),'\n')
 
   ## recolor nuclei in colors
-  col = matrix(as.numeric(col2rgb(c('black', sample(rainbow(max(z)))))),  nr=3)/255
-  red = Image(col[1, 1+z], dim=dim(z))
-  green = Image(col[2, 1+z], dim=dim(z))
-  blue = Image(col[3, 1+z], dim=dim(z))
-  zrainbow = rgbImage(red, green, blue)
+  cols = c('black', sample(rainbow(max(z))))
+  zrainbow = Image(cols[1+z], dim=dim(z))
   if (interactive()) display(zrainbow, title='Cell nuclei (recolored)')
 }

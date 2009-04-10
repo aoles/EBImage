@@ -1,14 +1,12 @@
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 watershed = function (x, tolerance=1, ext=1) {
   validImage(x)
-  if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")
-  tolerance <- as.numeric (tolerance)
-  if ( tolerance < 0 )
-      stop( "'tolerance' must be non-negative" )
-  ext <- as.integer (ext)
-  if ( ext < 1 )
-    stop( "'ext' must be a positive integer" )
-  return( .Call("watershed", castImage(x), tolerance, ext, PACKAGE='EBImage') )
+  if (colorMode(x)==TrueColor) stop("'x' must be an Image not in \'TrueColor\' color mode")
+  tolerance = as.numeric(tolerance)
+  if (tolerance < 0) stop( "'tolerance' must be non-negative" )
+  ext = as.integer(ext)
+  if (ext<1) stop( "'ext' must be a positive integer" )
+  .Call("watershed", castImage(x), tolerance, ext, PACKAGE='EBImage')
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -39,7 +37,7 @@ propagate = function (x, seeds, mask=NULL, lambda=0.1, ext=1, seed.centers=FALSE
     s[index] = seeds[index]
     seeds = s
   }
-  return( .Call( "lib_propagate", castImage(x), seeds, mask, ext, lambda, PACKAGE='EBImage') )
+  return(.Call( "lib_propagate", castImage(x), seeds, mask, ext, lambda, PACKAGE='EBImage'))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -54,5 +52,5 @@ ocontour = function(x) {
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bwlabel = function(x) {
   validImage(x)
-  return(.Call("bwlabel", castImage(x), PACKAGE='EBImage'))
+  .Call("bwlabel", castImage(x), PACKAGE='EBImage')
 }

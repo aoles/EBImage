@@ -1,3 +1,10 @@
+2.99.5
+- channel OK
+- paintObjects, drawtext OK
+- colors.c removed
+- doc: watershed
+- simpler combine
+
 2.99.4
 - deprecated channelMix
 - doc: filter2, moments, cmoments, smoments, rmoments
