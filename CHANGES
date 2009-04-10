@@ -45,4 +45,3 @@ display, ocontour, bwlabel, makeBrush
 10) IndexedImage class
 This class doesn't exist aynmore. All EBImage functions are now able to work
 on arrays.
-
