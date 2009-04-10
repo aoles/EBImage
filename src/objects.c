@@ -8,130 +8,75 @@ See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
 
 #include "tools.h"
-#include "colors.h"
 #include <R_ext/Error.h>
 #include <magick/ImageMagick.h>
 #include <stdio.h>
 
 /*----------------------------------------------------------------------- */
-#define BG 0.0
-
-/*----------------------------------------------------------------------- */
-/* will paint features on the target image with given colors and opacs    */
+/* paints features on the target image with given colors and opacs    */
 SEXP
 paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col) {
     SEXP res;
-    Image * image, * colors;
-    PixelPacket * pixelPtr, * colorPtr;
-    int nprotect, nx, ny, nz, im, i, j, tgtmode, index;
-    double * data, * imdata, * opac;
-
-    double *dx,*dres,dp;
-    int redstride,greenstride,bluestride;
+    int nprotect, nx, ny, nz, im, i, j, index;
+    double *opac, *col;
+    double *dx, *dres, dp;
+    int redstride, greenstride, bluestride;
+    int xcolormode;
 
     validImage(x,0);
     validImage(tgt,0);
 
-    nx = INTEGER ( GET_DIM(x) )[0];
-    ny = INTEGER ( GET_DIM(x) )[1];
-    nz = getNumberOfFrames(x,0);
+    nx = INTEGER(GET_DIM(x))[0];
+    ny = INTEGER(GET_DIM(x))[1];
+    nz = getNumberOfFrames(x, 0);
     nprotect = 0;
+    xcolormode = getColorMode(x);
+    if (xcolormode != MODE_GRAYSCALE) error("'x' must be in 'Grayscale' color mode");
 
     PROTECT ( res = Rf_duplicate(tgt) );
     nprotect++;
 
-    tgtmode = getColorMode(tgt);
     opac = REAL (_opac);
+    col = REAL(_col);
 
-    /* will keep colors in a small image -- easier to access - 3 values */
-    colors = vector2image1D (_col);
-    colorPtr = SetImagePixels (colors, 0, 0, 3, 1);
-    for ( i = 0; i < 3; i++ ) {
-        colorPtr[i].red *= opac[i];
-        colorPtr[i].green *= opac[i];
-        colorPtr[i].blue *= opac[i];
-    }
+    for (im = 0; im < nz; im++) {
+      dx = &( REAL(x)[ im * nx * ny ] );
+      dres = REAL(res);
+      getColorStrides(tgt, im, &redstride, &greenstride, &bluestride);
+      
+      for ( j = 0; j < ny; j++ ) {
+	for ( i = 0; i < nx; i++ ) {	    
+	  /* pixel is contact */
+	  index = 1;
+	  if ( dx[j*nx + i]<=0 ) continue;
+	  if ( dx[j*nx + i] < 1.0 || i < 1 || i > nx - 2 || j < 1 || j > ny - 2 ) index = 2;
+	  else {
+	    /* check if pixel is border, edge is same as contact */
+	    if ( dx[j*nx + i-1] != dx[j*nx + i] ||  dx[j*nx + i+1] != dx[j*nx + i] ||
+		 dx[(j-1)*nx + i] != dx[j*nx + i] || dx[(j+1)*nx + i] != dx[j*nx + i]) index = 0;
+	  }	  
 
-    if (tgtmode==MODE_GRAYSCALE || tgtmode==MODE_COLOR) {
-       for ( im = 0; im < nz; im++ ) {
-	 dx   = &( REAL(x)[ im * nx * ny ] );
-	 dres = REAL(res);
-	 getColorStrides(tgt,im,&redstride,&greenstride,&bluestride);
-
-	 for ( j = 0; j < ny; j++ ) {
-	   for ( i = 0; i < nx; i++ ) {	    
-
-	     /* pixel is contact */
-	     index = 1;
-	     if ( dx[j*nx + i]<=0 ) continue;
-	     if ( dx[j*nx + i] < 1.0 || i < 1 || i > nx - 2 || j < 1 || j > ny - 2 ) index = 2;
-	     else {
-	       /* check if pixel is border, edge is same as contact */
-	       if ( dx[j*nx + i-1] != dx[j*nx + i] ||  dx[j*nx + i+1] != dx[j*nx + i] ||
-		    dx[(j-1)*nx + i] != dx[j*nx + i] || dx[(j+1)*nx + i] != dx[j*nx + i]) index = 0;
-	     }	  
-
-	     if (redstride!=-1) {
-	       dp=dres[redstride+j*nx + i]+((double)colorPtr[index].red)/QuantumRange;		
-	       if (dp<0.0) dp=0.0;
-	       if (dp>1.0) dp=1.0;
-	       dres[redstride+j*nx + i]=dp;
-	     }
-	     if (greenstride!=-1) {
-	       dp=dres[greenstride+j*nx + i]+((double)colorPtr[index].green)/QuantumRange;		
-	       if (dp<0.0) dp=0.0;
-	       if (dp>1.0) dp=1.0;
-	       dres[greenstride+j*nx + i]=dp;
-	     }
-	     if (bluestride!=-1) {
-	       dp=dres[bluestride+j*nx + i]+((double)colorPtr[index].blue)/QuantumRange;	
-	       if (dp<0.0) dp=0.0;
-	       if (dp>1.0) dp=1.0;
-	       dres[bluestride+j*nx + i]=dp;
-	     }
-	   }
-	 }
-       }
-    } else {
-      for ( im = 0; im < nz; im++ ) {
-        imdata = &( REAL(x)[ im * nx * ny ] );
-        for ( j = 0; j < ny; j++ ) {
-	  data = &( REAL(x)[ im * nx * ny + j * nx ] );
-	  image = NULL;
-	  image = int2image1D ( &(INTEGER(res)[ im * nx * ny + j * nx ]), nx );
-	  if ( image == NULL ) continue;
-	  for ( i = 0; i < nx; i++ ) {
-	    if ( data[i] <= 0 ) continue;
-	    pixelPtr = SetImagePixels (image, i, 0, 1, 1);
-	    index = 1;
-	    if ( data[i] < 1.0 || i < 1 || i > nx - 2 || j < 1 || j > ny - 2 )
-	      /* pixel is contact */
-	      index = 2;
-	    else
-	      /* check if pixel is border, edge is same as contact */
-	      if ( imdata[ i - 1 + j * nx ] != data[i] || imdata[ i + 1 + j * nx ] != data[i] ||
-		   imdata[ i + (j - 1) * nx ] != data[i] || imdata[ i + (j + 1) * nx ] != data[i] )
-		index = 0;
-	    if ( pixelPtr->red + colorPtr[index].red < QuantumRange )
-	      pixelPtr->red += colorPtr[index].red;
-	    else
-	      pixelPtr->red = QuantumRange;
-	    if ( pixelPtr->green + colorPtr[index].green < QuantumRange )
-	      pixelPtr->green += colorPtr[index].green;
-	    else
-	      pixelPtr->green = QuantumRange;
-	    if ( pixelPtr->blue + colorPtr[index].blue < QuantumRange )
-	      pixelPtr->blue += colorPtr[index].blue;
-	    else
-	      pixelPtr->blue = QuantumRange;
+	  if (redstride!=-1) {
+	    dp=dres[redstride+j*nx + i] + col[index]*opac[index];		
+	    if (dp<0.0) dp=0.0;
+	    if (dp>1.0) dp=1.0;
+	    dres[redstride+j*nx + i]=dp;
 	  }
-	  image1D2int (image, &(INTEGER(res)[ im * nx * ny + j * nx ]), nx );
-	  image = DestroyImage (image);
-        }
+	  if (greenstride!=-1) {
+	    dp=dres[greenstride+j*nx + i] + col[index+3]*opac[index];
+	    if (dp<0.0) dp=0.0;
+	    if (dp>1.0) dp=1.0;
+	    dres[greenstride+j*nx + i]=dp;
+	  }
+	  if (bluestride!=-1) {
+	    dp=dres[bluestride+j*nx + i] + col[index+3*2]*opac[index];	
+	    if (dp<0.0) dp=0.0;
+	    if (dp>1.0) dp=1.0;
+	    dres[bluestride+j*nx + i]=dp;
+	  }
+	}
       }
     }
-
-    colors = DestroyImage (colors);
 
     UNPROTECT (nprotect);
     return res;

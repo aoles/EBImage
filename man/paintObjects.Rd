@@ -13,8 +13,9 @@
 }
 
 \arguments{
-   \item{x}{An \code{Image} object or an array containing object masks.
-    Object masks are sets of pixels with the same unique integer value.}
+   \item{x}{An \code{Image} object in \code{Grayscale} color mode or an
+    array containing object masks. Object masks are sets of pixels
+    with the same unique integer value.}
     
   \item{tgt}{An \code{Image} object or an array, containing the
     intensity values of the objects.}
@@ -30,11 +31,11 @@
 
 \value{
   An \code{Image} object or an array, containing the painted version
-  of \code{x}.
+  of \code{tgt}.
 }
 
 \seealso{
-  \code{\link{bwlabel}}, \code{\link{watershed}}, \link{getFeatures}
+  \code{\link{bwlabel}}, \code{\link{watershed}}, \code{link{getFeatures}}
 }
 
 \examples{
@@ -68,5 +69,4 @@
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006-2007
 }
 
-\keyword{manip}
 

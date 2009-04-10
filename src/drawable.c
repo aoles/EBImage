@@ -26,7 +26,7 @@ lib_drawText (SEXP obj, SEXP xylist, SEXP textlist, SEXP thefont, SEXP thecol) {
   
   validImage(obj,0);
 
-  mode = INTEGER( GET_SLOT(obj, mkString("colormode")) )[0];
+  mode = getColorMode(obj);
   images = sexp2Magick(obj);
   nz = GetImageListLength(images);
   

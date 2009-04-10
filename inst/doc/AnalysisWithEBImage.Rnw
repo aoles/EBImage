@@ -381,28 +381,6 @@ The image \Robject{iRG} is shown in Figure~\ref{figure:screenshot}.
 the data in the two channels \Robject{iRG} and \Robject{iG}.}
 \end{center}
 \end{figure}
-%
-The \Rfunction{channel} function can also be used to convert vectors
-containing colour data from one format to another. Grayscale to RGB
-integers:
-%
-<<example.channel1>>=
-ch = channel(c(0.2, 0.5), "rgb") 
-ch
-sprintf("%X", ch)
-@ 
-\noindent Grayscale to X11 hexadecimal color strings:
-<<example.channel2>>=
-channel(c(0.2, 0.5), "x11") 
-@ 
-\noindent Color strings to RGB:
-<<example.channel3>>=
-channel(c("red","green","#0000FF"), "rgb") 
-@ 
-\noindent 24-bit RGB integers to grayscale:
-<<example.channel4>>=
-channel(as.integer(c(0x0000f0, 0x00f000, 0xf0000, 0x808080)), "gray") 
-@
 
 %%-------------------------------------------------------
 \section{Creating images and further data manipulation}

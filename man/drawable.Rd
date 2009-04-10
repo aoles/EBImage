@@ -3,13 +3,10 @@
 \alias{drawtext}
 \alias{drawfont}
 
-\concept{drawing}
-\concept{text}
-
 \title{Draw text on images.}
 
 \description{
-  Draw text on images.
+  Draws text on images.
 }
 
 \usage{
@@ -20,45 +17,40 @@
 }
 
 \arguments{
+  \item{img}{An \code{Image} object or an array.}
 
-  \item{img}{ An object of \code{\linkS4class{Image}}. With indexed images,
-    please ensure that the color range is in \code{[0,1]}.}
+  \item{xy}{Matrix (or a list of matrices if \code{img} contains multiple frames) 
+    of coordinates of labels.}
 
-  \item{xy}{ (x,y) coordinates of labels. For single frames a matrix with 
-    the first column being \code{x} and second \code{y} or a corresponding numeric 
-    vector as it would be used to construct such a matrix. For multiple frames,
-    a list of corresponding matrices/vectors. }
+  \item{labels}{A character vector (or a list of vectors if \code{img} contains multiple frames) 
+    containing the labels to be output.}
 
-  \item{labels}{ A character vector of labels to be output. For multiple frames
-    a list of such characters. }
+  \item{font}{A font object, returned by \code{drawfont}. If missing, a default OS-dependent
+   font will be chosen.}
 
-  \item{font}{ An S3 object of class \code{DrawFont} as returned by 
-    \code{drawfont}. If omitted, the \code{drawfont} functions is called internally
-    to obtain the default values. }
+  \item{col}{A character vector of font colors.}
 
-  \item{col}{A character vector of font colors. One per frame, recycled
-    between frames if required. }
-
-  \item{family}{A character value for the font family to use. On Linux/UNIX
-    machines one can try to use \code{helvetica}, \code{times}, \code{courier} 
-    and \code{symbol}. On Windows machines, one can specify installed TrueType
-    fonts, like \code{Arial}.}
+  \item{family}{A character value indicating the font family to use. Valid
+    examples on Linux/UNIX systems include \code{helvetica}, \code{times},
+    \code{courier} and \code{symbol}. Valid examples on Windows machines 
+    include TrueType like \code{Arial} and \code{Verdana}.}
   
-  \item{style}{A character value for the font style to use. Can be
-    specified by providing the first letter only. Supported are: \code{normal} 
-    (default), \code{italic}, \code{oblique}. }
+  \item{style}{A character value specifying the font style to use. 
+    Supported styles are: \code{normal} (default), \code{italic}, 
+    and \code{oblique}. }
   
-  \item{size}{A numeric value for the font size.}
+  \item{size}{Font size in points.}
 
-  \item{weight}{A numeric value for the font weight (bold font). Supported
-    values between 100 and 900.}
+  \item{weight}{A numeric value indicating the font weight (bold font). Supported
+    values range between 100 and 900.}
 
-  \item{antialias}{A logical value for whether the font should be 
-    anti-aliased. }
+  \item{antialias}{A logical value indicating whether the font should be 
+    anti-aliased.}
 }
 
 \value{
-  An object of \code{\linkS4class{Image}}.
+  An \code{Image} object or an array, containing the transformed version
+  of \code{img}.
 }
 
 \author{
@@ -75,5 +67,4 @@
   if (interactive()) display(lena)
 }
 
-\keyword{file}
 

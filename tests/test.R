@@ -1,4 +1,4 @@
-## cat tests/test.R | R --vanilla &>tests/test.Rout.tmp
+## cat tests/test.R | R --vanilla &>tests/test.Rout.save
 library(EBImage)
 
 ## returns a hashcode given an object
@@ -84,7 +84,7 @@ testEBImageFunctions=function(x) {
   y=check('opening',w)
   y=check('closing',w)
   y=check('distmap',w)
-  ws=check('watershed',y)
+  ws=check('watershed', y)
   y=check('floodFill', w, c(10,10), 0.5)
   y=check('fillHull', w)
   y=check('bwlabel', w)
@@ -111,11 +111,13 @@ testEBImageFunctions=function(x) {
   w[w@.Data==3]=2117
   y=check('reenumerate',w)
   w=ws
-  hf=check('hullFeatures',w)
+  hf=check('hullFeatures', w)
   if (!is.list(hf)) hf=list(hf)
   rmindex = lapply(hf, function(c) which(c[,'g.s']<6))
-  w=check('rmObjects',w,rmindex)
-  y=check('getFeatures',w,x)
+  w=check('rmObjects', w, rmindex)
+  y=check('getFeatures', w, x)
+  if (colorMode(w)==Color) w = channel(w, 'red')
+  y=check('paintObjects', w, x)
   cat('\n')
 }
 

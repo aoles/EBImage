@@ -29,11 +29,11 @@ drawtext = function(img, xy, labels, font, col) {
     xy=list(as.numeric(xy))
     labels=list(labels)
   }
-  if ( missing(font) ) font=drawfont()
-  if ( missing(col) ) col="white"
+  if (missing(font)) font=drawfont()
+  if (missing(col)) col="white"
   
   ## Mac stop: imageMagick/MagickWand/drawtext doesn't understand MacOS fonts
-  if ( length(grep("apple", Sys.getenv("R_PLATFORM")))>0) {
+  if (length(grep("apple", Sys.getenv("R_PLATFORM")))>0) {
     warning('drawtext doesn\'t work on Mac OS due to ImageMagick/Mac OS fonts incompatibility')
     return(img)
   }
