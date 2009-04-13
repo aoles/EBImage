@@ -102,8 +102,8 @@
    \item \code{m.n20}, \code{m.n11} and \code{m.n02} are translation/scale
    invariant moments.
    \item \code{m.theta} characterizes the orientation of an object in radians.
-   \item 2*sqrt(\code{m.l1}) and 2*sqrt(\code{m.l2}) are the major and minor axes
-   of the object and have the dimension of a length.
+   \item 2*sqrt(\code{m.l1}) and 2*sqrt(\code{m.l2}) are the semi-major
+   and semi-minor axes of the object and have the dimension of a length.
    \item \code{m.Ik} is the translation/scale/rotation invariant k-th Hu's moment.
  }
 }
@@ -124,6 +124,7 @@
 }
 
 \examples{
+  ## load cell nucleus images
   x = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
   if (interactive()) display(x)
 

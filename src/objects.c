@@ -205,136 +205,139 @@ rmObjects (SEXP x, SEXP _index) {
 
 /*----------------------------------------------------------------------- */
 SEXP
-stackObjects ( SEXP obj, SEXP ref, SEXP hdr, SEXP xy_list, SEXP extension, SEXP rotate ) {
-  SEXP res, st, dm, xys;
-  int nx, ny, nz, nprotect, im, x, y, i, pxi, nobj, index, dox, doy, ibg = 0, error=0;
-  double * data, * xy, xx, yy, xxc, yyc, theta, dbg = 0.0;
-  double * dst, * dref; int * ist, * iref; // double or integer reference and stack
-  int ext = floor( REAL(extension)[0] );
+stackObjects (SEXP obj, SEXP ref, SEXP _bgcol, SEXP xy_list, SEXP extension) {
+  SEXP res, st=NULL, dim, xys;
+  int nx, ny, nz, nprotect, im, x, y, i, j, pxi, nobj, index;
+  double *dobj, *dref, *xy, xx, yy,  *bgcol;
+  double * dst;
+  int ext = floor(REAL(extension)[0]);
   int snx = 2 * ext + 1;
   int sny = 2 * ext + 1;
-  int rot = INTEGER(rotate)[0];
-  int mode = INTEGER ( GET_SLOT(ref, mkString("colormode") ) )[0];
+  int mode = getColorMode(ref);
+  int redstride, greenstride, bluestride;
+  int redstridet, greenstridet, bluestridet;
+ 
   nx = INTEGER ( GET_DIM(obj) )[0];
   ny = INTEGER ( GET_DIM(obj) )[1];
   nz = getNumberOfFrames(obj,0);
+  bgcol = REAL(_bgcol);
   nprotect = 0;
 
-  if ( nz == 1 ) {
-    PROTECT( res = Rf_duplicate(hdr) );
+  if (nz == 1) {
+    PROTECT(res = Rf_duplicate(_bgcol));
     nprotect++;
   }
   else {
-    PROTECT( res = allocVector(VECSXP, nz) );
+    PROTECT(res = allocVector(VECSXP, nz));
     nprotect++;
-    for ( im = 0; im < nz; im++ ) SET_VECTOR_ELT(res, im, Rf_duplicate(hdr) );
+    for (im = 0; im < nz; im++) SET_VECTOR_ELT(res, im, Rf_duplicate(_bgcol) );
   }
+ 
+  for (im = 0; im < nz; im++) {
+    // set dobj, dref and strides
+    dobj = &(REAL(obj)[im * nx * ny]);
+    dref = REAL(ref);
+    getColorStrides(ref, im, &redstridet, &greenstridet, &bluestridet);
 
-  if ( mode == MODE_TRUECOLOR ) ibg = INTEGER(hdr)[0];
-  else dbg = REAL(hdr)[0];
-
-  for ( im = 0; im < nz; im++ ) {
-    /* get image data */
-    data = &( REAL(obj)[ im * nx * ny ] );
-    /* get number of objects -- max index */
+    // get number of objects = max index
     nobj = 0;
-    for ( index = 0; index < nx * ny; index++ )
-      if ( data[index] > nobj ) nobj = data[index];
-    if ( nobj < 1 ) {
-      error = 1;
-      nobj = 1;
-    } else error = 0;
-    /* create stack */
-    if ( mode == MODE_TRUECOLOR ) {
-      PROTECT( st = allocVector(INTSXP, nobj * snx * sny) );
-      nprotect++;
-      ist = INTEGER( st );
-      dst = NULL;
-      for ( i = 0; i < nobj * snx * sny; i++ ) ist[i] = ibg;
-      iref = &( INTEGER(ref)[im * nx * ny] );
-      dref = NULL;
-    }
-    else {
-      PROTECT( st = allocVector(REALSXP, nobj * snx * sny) );
-      nprotect++;
-      dst = REAL( st );
-      ist = NULL;
-      for ( i = 0; i < nobj * snx * sny; i++ ) dst[i] = dbg;
-      dref = &( REAL(ref)[im * nx * ny] );
-      iref = NULL;
-    }
-    /* set dims on array */
-    PROTECT ( dm = allocVector( INTSXP, 3 ) );
-    nprotect++;
-    INTEGER (dm)[0] = snx;
-    INTEGER (dm)[1] = sny;
-    INTEGER (dm)[2] = nobj;
-    SET_DIM ( st, dm );
-    UNPROTECT( 1 ); nprotect--; // dm
-    if ( nz == 1 ) res = SET_SLOT(res, install(".Data"), st);
-    else SET_VECTOR_ELT(res, im, SET_SLOT(VECTOR_ELT(res, im), install(".Data"), st) );
-    UNPROTECT( 1 ); nprotect--; // st
-    if ( error == 1 ) continue;
-    /* get xy */
-    if ( nz == 1 ) xys = xy_list;
-    else xys = VECTOR_ELT(xy_list, im);
-    if ( xys == R_NilValue || INTEGER(GET_DIM(xys))[0] != nobj || INTEGER(GET_DIM(xys))[1] < 3 ) continue;
-    xy = REAL(xys);
+    for (i = 0; i < nx * ny; i++) if (dobj[i] > nobj) nobj = dobj[i];
 
-    if ( mode == MODE_TRUECOLOR ) {
-      if ( nz == 1 )
-        ist = INTEGER( res );
-      else
-        ist = INTEGER( VECTOR_ELT(res, im) );
-    }
-    else {
-      if ( nz == 1 )
-        dst = REAL( res );
-      else
-        dst = REAL( VECTOR_ELT(res, im) );
-    }
-    /* copy reference data into stack */
-    /* unset all non-perimeter points */
-    for ( x = 0; x < nx; x++ )
-      for ( y = 0; y < ny; y++ ) {
-        index = data[x + y * nx]; /* index of the object, R-style = 1-based */
-        if ( index < 1 ) continue;
-        /* all indexes were 1, 2, 3, but C has 0-based indexes!!! */
-        index--;
-        /* target frame x, y coordinates */
-        xx = x - floor(xy[index]);
-        yy = y - floor(xy[index + nobj]);
-        dox = 0; doy = 0;
-        if ( rot ) {
-          theta = -xy[index + 2 * nobj];
-          xxc = xx * cos(theta) - yy * sin(theta);
-          yyc = xx * sin(theta) + yy * cos(theta);
-          xx = floor(xxc);
-          yy = floor(yyc);
-          // check if we need to mark the adjucent pixels as well
-          if ( xxc > xx + 0.5 ) dox = 1; // + as we did floor
-          if ( yyc > yy + 0.5 ) doy = 1;
-        }
-        xx += ext + 1;
-        yy += ext + 1;
-        if ( xx < 0 || xx >= snx || yy < 0 || yy >= sny ) continue;
-        /* put a pixel */
-        pxi = xx + yy * snx + index * sny * snx;
-        if ( mode == MODE_TRUECOLOR ) ist[ pxi ] = iref[x + y * nx];
-        else dst[ pxi ] = dref[x + y * nx];
-        if ( !rot ) continue;
-        if ( dox && xx + 1 < nx ) {
-          pxi = xx + 1 + yy * snx + index * sny * snx;
-          if ( mode == MODE_TRUECOLOR ) ist[ pxi ] = iref[x + y * nx];
-          else dst[ pxi ] = dref[x + y * nx];
-        }
-        if ( doy && yy + 1 < ny ) {
-          pxi = xx + (yy + 1) * snx + index * sny * snx;
-          if ( mode == MODE_TRUECOLOR ) ist[ pxi ] = iref[x + y * nx];
-          else dst[ pxi ] = dref[x + y * nx];
-        }
+    if (nobj>0) {
+      // create stack
+      if (mode==MODE_GRAYSCALE) {
+	PROTECT(st = allocVector(REALSXP, nobj * snx * sny));
+	nprotect++;
+	dst = REAL(st);
+
+	// bg color initialization
+	for (i = 0; i < nobj * snx * sny; i++) dst[i] = bgcol[0];
+      
+	// set dims
+	PROTECT (dim = allocVector( INTSXP, 3 ));
+	nprotect++;
+	INTEGER (dim)[0] = snx;
+	INTEGER (dim)[1] = sny;
+	INTEGER (dim)[2] = nobj;
+	SET_DIM (st, dim);
+	UNPROTECT(1); nprotect--; // dim
       }
-  }
+      else if (mode==MODE_COLOR)  {
+	// create stack
+	PROTECT(st = allocVector(REALSXP, nobj * snx * sny * 3));
+	nprotect++;
+	dst = REAL( st );
+
+	// bg color initialization
+	for (j=0; j<nobj; j++) {
+	  redstride = j*3*snx*sny + 0*snx*sny;
+	  greenstride = j*3*snx*sny + 1*snx*sny;
+	  bluestride = j*3*snx*sny + 2*snx*sny;
+	  for (i=0; i<snx*sny; i++) {
+	    dst[i+redstride] = bgcol[0];
+	    dst[i+greenstride] = bgcol[1];
+	    dst[i+bluestride] = bgcol[2];
+	  }
+	}
+      
+	// set dims
+	PROTECT (dim = allocVector( INTSXP, 4));
+	nprotect++;
+	INTEGER (dim)[0] = snx;
+	INTEGER (dim)[1] = sny;
+	INTEGER (dim)[2] = 3;
+	INTEGER (dim)[3] = nobj;
+	SET_DIM (st, dim);
+	UNPROTECT(1); nprotect--; // dim
+      } else if (mode == MODE_TRUECOLOR) error("'TrueColor' mode is not supported for 'ref'");
+
+      // set slot
+      if (nz == 1 ) res = SET_SLOT(res, install(".Data"), st);
+      else SET_VECTOR_ELT(res, im, SET_SLOT(VECTOR_ELT(res, im), install(".Data"), st) );
+      UNPROTECT( 1 ); nprotect--; // st
+
+      // get xy
+      if (nz == 1) xys = xy_list;
+      else xys = VECTOR_ELT(xy_list, im);
+      if (xys == R_NilValue || INTEGER(GET_DIM(xys))[0] != nobj || INTEGER(GET_DIM(xys))[1] < 2) continue;
+      xy = REAL(xys);
+
+      if (nz == 1) dst = REAL(res);
+      else dst = REAL(VECTOR_ELT(res, im));
+      
+      // copy ref
+      for (x = 0; x < nx; x++) {
+	for (y = 0; y < ny; y++) {
+	  index = dobj[x + y * nx] - 1; // background index 0 is not kept
+	  if (index < 0) continue;
+	 
+	  // target frame x, y coordinates
+	  xx = x - floor(xy[index]) + ext + 1 ;
+	  yy = y - floor(xy[index + nobj]) + ext + 1;
+	  
+	  if ( xx < 0 || xx >= snx || yy < 0 || yy >= sny ) continue;
+	  else {
+	    pxi = xx + yy * snx;
+	    if (mode==MODE_GRAYSCALE) dst[ pxi + index * sny * snx ] = dref[x + y * nx + im*nx*ny];
+	    else { 
+	      redstride = index*3*snx*sny + 0*snx*sny;
+	      greenstride = index*3*snx*sny + 1*snx*sny;
+	      bluestride = index*3*snx*sny + 2*snx*sny;
+	      dst[pxi + redstride] = dref[x + y * nx + redstridet];
+	      dst[pxi + greenstride] = dref[x + y * nx + greenstridet];
+	      dst[pxi + bluestride] = dref[x + y * nx + bluestridet];
+	    }	  
+	  }
+	}
+      }
+    } // nobj>0
+    else {
+      // set slot 
+      if (nz == 1 ) res = SET_SLOT(res, install(".Data"), R_NilValue);
+      else SET_VECTOR_ELT(res, im, SET_SLOT(VECTOR_ELT(res, im), install(".Data"), R_NilValue));
+    } 
+  } // im
+
   UNPROTECT( nprotect );
   return res;
 }

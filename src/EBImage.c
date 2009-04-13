@@ -96,7 +96,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"rmObjects",          (DL_FUNC) &rmObjects, 2},
     {"tile",               (DL_FUNC) &tile,     3},
     {"untile",             (DL_FUNC) &untile,         3},
-    {"stackObjects",       (DL_FUNC) &stackObjects,  6},
+    {"stackObjects",       (DL_FUNC) &stackObjects,  5},
     {"ocontour",           (DL_FUNC) &ocontour,  1},
     {"lib_frameDist",      (DL_FUNC) &lib_frameDist,      5},
     {"lib_drawText",       (DL_FUNC) &lib_drawText,       5},

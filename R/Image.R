@@ -37,6 +37,7 @@ Image=function(data=array(0, dim=c(1,1)), dim, colormode=NULL) {
 
   if (is.null(colormode)) {
     if (is.Image(data)) colormode=colorMode(data)
+    else if (is.character(data)) colormode=NULL
     else colormode=Grayscale
   } else colormode=EBImage:::parseColorMode(colormode)
 
@@ -76,9 +77,9 @@ Image=function(data=array(0, dim=c(1,1)), dim, colormode=NULL) {
   }
 
   if (is.character(data)) {
-    colormode=Color
     datac = col2rgb(data)/255
     res = rgbImage(Image(datac[1,,drop=FALSE], dim=dim[1:2]),  Image(datac[2,,drop=FALSE], dim=dim[1:2]),  Image(datac[3,,drop=FALSE], dim=dim[1:2]))
+    if (!is.null(colormode)) if (colormode==Grayscale) res = channel(res, 'gray')
   } else {
     if (colormode==TrueColor) data=as.integer(data)
     res = new("Image", .Data=array(data,dim=dim), colormode=colormode)

@@ -33,108 +33,31 @@ paintObjects = function (x, tgt, opac=c(1, 1), col=c('red', NA)) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-stackObjects = function (x, ref, index, combine, rotate, bg.col, ext, centerby, rotateby) {
-  validImage(x)
+stackObjects = function (x, ref, index, combine=TRUE, rotate, bg.col='black', ext, centerby, rotateby) {
+  checkCompatibleImages(x, ref, 'render')
+  nz = getNumberOfFrames(x, 0)
   
-  if (!missing(index)) {
-    if (is.character(index)) {
-      index <- strsplit(index, ".", fixed=TRUE)
-      fct <- unlist(lapply(index, function(x) x[1]))
-      index <- split( as.numeric(unlist(lapply(index, function(x) x[2]))), fct )
-      if ( dim(x)[3] == 1 ) return( stackObjects(x, ref, index=as.numeric(index)) )
-      else stackObjects(x, ref, index=index)
-    }
-    else if (is.list(index)) {
-      if ( missing(combine) ) combine <- FALSE
-      .dim <- dim(x)
-      if ( !is.null(names(index)) ) {
-        suppressWarnings( ims <- as.numeric(names(index)) )
-        if ( any(is.na(ims)) | any(ims > .dim[3]) | any(ims < 1) )
-          stop("if 'index' is a named list, names must correspond to frame indexes")
-      } else {
-        if ( length(index) != .dim[3] )
-          stop("if 'index' is an unnamed list, its length must be equal to the number of frames")
-        names(index) <- 1:(.dim[3])
-      }
-      s <- stackObjects(x, ref, combine=FALSE)
-      if ( .dim[3] == 1 ) s <- list(s)
-      res <- list()
-      for ( i in as.numeric(names(index)) ) {
-        j <- index[[as.character(i)]]
-        if ( sum(j > dim(s[[i]])[3]) > 0 ) j <- j[ j <= dim(s[[i]])[3] ]
-        res[[as.character(i)]] <- s[[i]][,,j]
-      }
-      if ( length(res) < 2 || !combine ) return( res )
-      return( combine(res) )
-    } else if (is.numeric(index)) {
-      .dim <- dim(x)
-      if ( .dim[3] > 1 )
-        stop("index cannot be numeric if there is more than 1 frame in 'x', consider character or list-type index")
-      s <- stackObjects(x, ref)
-      if ( sum(index > dim(s)[3]) > 0 ) index <- index[ index <= dim(s)[3] ]
-      return( s[,,index] )
-    }
+  if (colorMode(x) != Grayscale) stop("'x' must be an image in 'Grayscale' color mode or an array")
+  if (!missing(centerby)) warning("'centerby' is deprecated and ignored") 
+  if (!missing(rotateby)) warning("'rotateby' is deprecated and ignored")
+  if (!missing(rotate)) warning("'rotate' is deprecated and ignored. Please use 'rotate' objects after 'stackObjects'.")
+  if (!missing(index)) warning("'index' is deprecated and ignored")
+    
+  ## uses 'hullFeatures' to get centers and theta
+  hf = hullFeatures(x)
+  if (nz==1) hf = list(hf)
+
+  if (missing(ext)) {
+    extx = unlist(sapply(hf, function(h) h[, 'g.l1']))
+    ext = 2.0*sqrt(quantile(extx, 0.98, na.rm=TRUE))
   }
-  
-  if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")
-  dimx <- dim(x)
-  if ( any(dimx != dim(ref)) )
-    stop( "dim(x) must equal dim(ref)" )
-  
-  if (missing(rotate)) rotate = TRUE
-  if (missing(combine)) combine = TRUE
-  
-  ## get centres
-  if (colorMode(ref)==TrueColor && (!missing(centerby)||!missing(rotateby)))
-    warning("'centerby' and 'rotateby' are only meaningful for TrueColor images")
-  if (missing(centerby)) centerby = "gray"
-  if (missing(rotateby)) rotateby = "gray"
-  
-  centerby = tolower(centerby)
-  rotateby = tolower(rotateby)
-  if (!all(centerby%in%c("gray","grey","red","green","blue")) ||
-      !all(rotateby%in%c("gray","grey","red","green","blue")))
-    stop("'centerby' and 'rotateby' must be any one of 'gray', 'grey', 'red', 'green', 'blue'")
-  
-  ## for grayscale images default conversion to gray will not do anything
-  ## get centers (using cmoments) and theta using moments
-  if (centerby==rotateby || !rotate) {
-    ## use 'moments' to get both centers and theta
-    xyt = moments(x, channel(ref, centerby))
-    if (dimx[3]==1) xyt = list(xyt)
-    if (missing(ext)) extx = unlist(sapply(xyt, function(m) m[,9])) #  l1: 2*sqrt(l1) ~ h.pdm + h.pdsd
-    xyt = lapply(xyt, function(m) m[,c(3,4,8),drop=FALSE])
-  } else {
-    ## use cmoments to get xy
-    xy = cmoments(x, channel(ref, centerby))
-    if (dimx[3]==1) xy = list(xy)
-    ## use moments to get theta
-    xyt = moments(x, channel(ref, rotateby))
-    if (dimx[3]==1) xyt = list(xyt)
-    if (missing(ext)) extx = unlist(sapply(xyt, function(m) m[,9])) #  l1: 2*sqrt(l1) ~ h.pdm + h.pdsd
-    xyt = mapply(function(coord,theta) cbind(coord[,c(3,4),drop=FALSE],theta[,8]),
-      xy, xyt, SIMPLIFY=FALSE, USE.NAMES=FALSE)
-  }
-  if (missing(ext)) ext = 2.0*sqrt(quantile(extx,0.98,na.rm=TRUE)) # 2*sqrt(l1) ~ h.pdm + h.pdsd
-  
-  if ( missing(bg.col) ) bg.col <- "black"
-  if ( colorMode(ref) == TrueColor ) col <- channel(bg.col, "rgb")
-  else col <- channel(bg.col, "gray")
-  
-  ## create image headers for the result: better to do in C, but too complicated
-  ## this hdr will be copied in C code, not modified
-  hdr=Image(array(col, c(1,1,1)), colormode=colorMode(ref))
-  
-  if (dimx[3]==1) xyt = xyt[[1]]
-  res <- .Call ("stackObjects", castImage(x), ref, hdr, xyt, as.numeric(ext), as.integer(rotate), PACKAGE='EBImage')
-  if (!combine || !is.list(res)) return( res )
-  ## if we are here, we have more than one frame and hf is a list
-  ## index of frames with no objects, these are to remove
-  ## index <- which( unlist( lapply(hf, function(x) all(x[,"h.s"] == 0)) ) )
-  ## if all are empty we return the first empty one
-  ##  if ( length(index) == .dim[3] ) return( res[[1]] )
-  ##  if ( length(index) > 0 ) res <- res[ -index ]
-  return( combine(res) )
+  xy = lapply(hf, function(h) h[,c('g.x', 'g.y'), drop=FALSE])
+  if (nz==1) xy = xy[[1]]
+  bg.col = Image(bg.col, colormode=colorMode(ref))
+    
+  res = .Call ("stackObjects", castImage(x), castImage(ref), bg.col, xy, as.numeric(ext), PACKAGE='EBImage')
+  if (!combine || !is.list(res)) return(res)
+  else return(combine(res))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

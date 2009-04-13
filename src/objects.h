@@ -11,7 +11,7 @@ extern "C" {
 SEXP paintObjects (SEXP, SEXP, SEXP, SEXP);
 SEXP matchObjects (SEXP, SEXP);
 SEXP rmObjects (SEXP, SEXP);
-SEXP stackObjects (SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP stackObjects (SEXP, SEXP, SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus
 };
