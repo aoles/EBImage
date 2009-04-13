@@ -4,55 +4,51 @@
 
 \concept{object detection}
 
-\title{ Voronoi-based segmentation on image manifolds }
+\title{Voronoi-based segmentation on image manifolds}
 
 \description{
   R implementation of the Voronoi-based image segmentation on image
-  manifolds [2].
+  manifolds from Carpenter et al. [2].
 }
 
 \usage{
-
   propagate(x, seeds, mask=NULL, lambda=0.1, 
      ext=1, seed.centers=FALSE)
 }
 
 \arguments{
 
-  \item{x}{An object of \code{\linkS4class{Image}} to be segmented,
-    in the \code{\link{Grayscale}} mode. }
+   \item{x}{An \code{Image} object in \code{Grayscale} color mode
+    or an array, containing the image to segment.}
 
-  \item{seeds}{An object of \code{\linkS4class{Image}} of the same
-    size as x in all three dimensions. This image provides seed points for object detection. }
+   \item{seeds}{An \code{Image} object in \code{Grayscale} color mode
+    or an array, containing the seeding objects from where to start
+    segmentation.}
 
-  \item{mask}{An object of \code{\linkS4class{Image}} of the same
-    size as \code{x} in all three dimensions; in the \code{\link{Grayscale}} mode.
-    All zero regions will be excluded from object detection. }
+  \item{mask}{An optional \code{Image} object or an array, 
+    containing the seeding objects from where to start
+    segmentation. \code{mask} is considered as a binary mask,
+    whose pixels of value 0 will be excluded from the final
+    segmentation objects.}
 
-  \item{lambda}{ A numeric value. The regularisation parameter for the
-    distance calculations, determines the trade-off between the Euclidian distance in
+  \item{lambda}{A numeric value. The regularisation parameter for the
+    distance calculations, determining the trade-off between the Euclidian distance in
     the image plane and the contribution of the gradient of the values
-    in \code{x}. See details. }
+    in \code{x}. See details.}
 
-  \item{ext}{ Extension of the neighborhood to estimate image
-    gradient, in pixels in every direction from the central point, i.e.
-    ext=1 means a 3x3 neighborhood. }
+  \item{ext}{Radius in pixels of the neighborhood to estimate image
+    gradient, e.g. ext=1 means a 3x3 neighborhood.}
 
-  \item{seed.centers}{ If \code{TRUE}, only centers of the seed points are left
-    in the seeds image supplied to the propagate algorithm. }
+  \item{seed.centers}{ If \code{TRUE}, only centers of the seeding objects
+    are considered as seeds for the propagate algorithm.}
 }
 
 \value{
-
-  An image of \code{\linkS4class{Image}}, with the same object indexing as
-  \code{seeds}. No new objects are created, only those specified by
-  seeds are propagated. Use \code{\link{getFeatures}} to assign the
-  feature matrix.
-
+  An \code{Image} object in \code{Grayscale} color mode or
+  an array, containing the labelled objects.
 }
 
 \details{
-
   The method operates by computing a discretized approximation of the
   Voronoi regions for given seed points on a manifold with a metric
   controlled by local image features.
@@ -60,7 +56,7 @@
   The metric is a Riemannian metric defined in terms of the image I and
   a regularization parameter lambda. With this metric the
   distance between pixels used to let the given seeds grow outwards
-  (propagate) is
+  (propagate) is:
 
   \preformatted{d^2 = (grad(I)^2 + lambda * (dx^2 + dy^2)) / (lambda + 1)}
 
@@ -70,58 +66,40 @@
   we use the following formula:
   
   \preformatted{d = sqrt(grad(I)) + 1e-3*lambda * (dx^2+dy^2)^2}
-  
-  The denominator is left out for speed reasons, so is the square root of the 
-  distance.
 
-  The gradient is calculated on a neighborhood of pixels (the width of which
-  is controlled by the argument \code{ext}) to avoid relying on single
-  (noisy) pixels. Lambda controls the weight of the Euclidian distance
-  term. In case of large
-  lambda, d turns into Euclidian distance in the \code{(x,y)}-plane.
-  For small lambda, the distance will be dominated by the intensity gradient.
-
+  The gradient is calculated on a neighborhood of \code{ext} pixels. \code{lambda}
+  controls the weight of the Euclidian distance term. In case of large
+  values, d turns into the Euclidian distance. For small values of 
+  \code{lambda}, the distance will be dominated by the intensity gradient.
 }
 
-\seealso{ \code{
-    \linkS4class{Image}, \link{watershed}, \link{getFeatures}
-}}
+\seealso{ \code{\link{bwlabel}}, \code{\link{watershed}}
+}
 
 \examples{
-  
-  ## load images of nuclei (seed points later)
-  f <- paste( system.file(package="EBImage"), "images/Gene1_G.tif", sep="/" )
-  ii = readImage(f)
-  ii = channel(ii, 'gray')
+  ## load images
+  nuc = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
+  cel = readImage(system.file('images', 'cells.tif', package='EBImage'))
+  img = rgbImage(green=cel, blue=nuc)
+  if (interactive()) display(img, title='Cells')
 
-  ## normalize images
-  ii = normalize(ii, separate=TRUE)
-  ## segment
-  mask = thresh(ii, 25, 25, 0.02)
-  ## refine segmentation with morphology filters
-  mk3 = makeBrush(3, shape='diamond')
-  mk5 = makeBrush(5, shape='diamond')
-  mask = dilate(erode(closing(mask, mk5), mk3), mk5)
-  ## index objects with 'watershed'
-  io = watershed( distmap(mask), 1.5, 1)
-  if (interactive()) display(io)
+  ## segment nuclei
+  nmask = thresh(nuc, 10, 10, 0.05)
+  nmask = opening(nmask, makeBrush(5, shape='disc'))
+  nmask = fillHull(nmask)
+  nmask = bwlabel(nmask)
+  if (interactive()) display(normalize(nmask), title='Cell nuclei mask')
 
-  ## load images of cells (the ones to segment with propagate)
-  f <- paste( system.file(package="EBImage"), "images/Gene1_R.tif", sep="/" )
-  xi = readImage(f)
-  xi = channel(xi, 'gray')
+  ## segment cells, using propagate and nuclei as 'seeds'
+  ctmask = opening(cel>0.1, makeBrush(5, shape='disc'))
+  cmask = propagate(cel, nmask, ctmask)
+  if (interactive()) display(normalize(cmask), title='Cell mask')
 
-  ## normalize images
-  xi = normalize(xi, separate=TRUE)
-  ## segment
-  mask = thresh(xi, 40, 40, 0.0)
-  ## refine segmentation with morphology filters
-  mk7 = makeBrush(7, shape='diamond')
-  mask = dilate(erode(closing(mask, mk7), mk5), mk7)
-  ## index objects of xi with 'propagate' using ii as seeds
-  xo = propagate(xi, io, mask, 1e-2, 2)
-  if (interactive()) display(xo)
-  
+  ## segmentation results
+  res = paintObjects(cmask, img, col='#ff00ff')
+  res = paintObjects(nmask, res, col='#ffff00')
+  if (interactive()) display(res, title='Segmented cells')
+
 }
 
 \author{
@@ -133,7 +111,7 @@
 
 \section{ License }{
 
-  The underlying \code{C++} code is based on code from CellProfiler
+  The underlying C++ code is based on code from CellProfiler
   [1,3]. An LGPL license was granted by Thouis Jones to use this part
   of CellProfiler's code for the \code{propagate} function.
 
@@ -152,5 +130,4 @@
     \code{[3]} CellProfiler: http://www.cellprofiler.org
 }
 
-\keyword{manip}
 

@@ -78,7 +78,7 @@ Image=function(data=array(0, dim=c(1,1)), dim, colormode=NULL) {
   if (is.character(data)) {
     colormode=Color
     datac = col2rgb(data)/255
-    res = rgbImage(Image(datac[1,,drop=FALSE], dim=dim),  Image(datac[2,,drop=FALSE], dim=dim),  Image(datac[3,,drop=FALSE], dim=dim))
+    res = rgbImage(Image(datac[1,,drop=FALSE], dim=dim[1:2]),  Image(datac[2,,drop=FALSE], dim=dim[1:2]),  Image(datac[3,,drop=FALSE], dim=dim[1:2]))
   } else {
     if (colormode==TrueColor) data=as.integer(data)
     res = new("Image", .Data=array(data,dim=dim), colormode=colormode)
@@ -222,7 +222,7 @@ setMethod ("[", signature(x="Image", i="ANY", j="ANY", drop="ANY"),
 ## If type='total', returns the total number of frames
 ## If type='render', return the number of frames to be rendered after color channel merging
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-getNumberOfFrames = function(y,type='total') {
+getNumberOfFrames = function(y, type='total') {
   if (missing(type)) type='total'
   if (type=='render' & colorMode(y)==Color) {
     if (length(dim(y))< 3) return(1)

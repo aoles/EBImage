@@ -3,15 +3,14 @@
 \alias{rmObjects}
 \alias{reenumerate}
 
-\concept{object detection}
 \concept{delete objects}
 
-\title{ Object removal }
+\title{Object removal and reindexation}
 
 \description{
-  The \code{rmObjects} functions deletes objects indexed by a list of
-  integer vectors (indexes) from an image with indexed objects. \code{reenumerate}
-  re-enumerates all objects in an \linkS4class{Image} from 0 - background
+  The \code{rmObjects} functions deletes objects from an image
+  by setting their pixel intensity values to 0.
+  \code{reenumerate} re-enumerates all objects in an image from 0 (background)
   to the actual number of objects.
 }
 
@@ -23,30 +22,39 @@
 
 \arguments{
 
-  \item{x}{An object of \code{\linkS4class{Image}}. }
+ \item{x}{An \code{Image} object in \code{Grayscale} color mode or an
+    array containing object masks. Object masks are sets of pixels
+    with the same unique integer value.}
 
-  \item{index}{ A numeric (integer) vector of indexes of objects to
-    remove in the frame if \code{x} contains one frame only. For multiple
-    frames, a list of such vectors.}
+  \item{index}{A numeric vector (or a list of vectors if \code{x} contains multiple frames) 
+    containing the indexes of objects to remove in the frame.}
 }
 
 \value{
-
-  An image of \code{\linkS4class{Image}}.
+ An \code{Image} object or an array, containing the new objects.
 
 }
 
-\seealso{ \code{
-  \linkS4class{Image}, \link{watershed}, \link{getFeatures}, \link{paintObjects}
-}}
+\seealso{ 
+  \code{\link{bwlabel}}, \code{\link{watershed}}}
 
 \examples{
-  ## see example(drawtext)
+  ## make objects
+  x = readImage(system.file('images', 'shapes.png', package='EBImage'))
+  x = x[110:512,1:130]
+  y = bwlabel(x)
+  if (interactive()) display(normalize(y), title='Objects')
+  
+  ## remove and reenumerate
+  y = rmObjects(y, 5)
+  if (interactive()) display(normalize(y), title='Removal')
+  y = reenumerate(y)
+  if (interactive()) display(normalize(y), title='Reenumerated')
 }
 
 \author{
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006-2007
 }
 
-\keyword{manip}
+
 

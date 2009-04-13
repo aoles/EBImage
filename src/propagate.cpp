@@ -1,4 +1,4 @@
-#include "filters_propagate.h"
+#include "propagate.h"
 
 /* -------------------------------------------------------------------------
 Implementation of the Voronoi-based segmentation on image manifolds [1]
@@ -26,9 +26,9 @@ Copyright (C) of the implementation below:
 See: ../LICENSE for license, LGPL.
 
 ------------------------------------------------------------------------- */
-
 #include <R_ext/Error.h>
 #include <queue>
+#include "tools.h"
 
 using namespace std;
 
@@ -62,13 +62,13 @@ static int jy[8] = { 0, 1,  0, -1, -1, +1, +1, -1};
 
 /* ----  R Interface entry point  --------------------------------------- */
 SEXP
-lib_propagate (SEXP x, SEXP seeds_, SEXP mask_, SEXP ext_, SEXP lambda_) {
+propagate (SEXP x, SEXP seeds_, SEXP mask_, SEXP ext_, SEXP lambda_) {
   SEXP res;
   int i, ii, j, jj, cntr, nprotect = 0;
 
-  int nx = INTEGER ( GET_DIM(x) )[0];
-  int ny = INTEGER ( GET_DIM(x) )[1];
-  int nz = INTEGER ( GET_DIM(x) )[2];
+  int nx = INTEGER(GET_DIM(x))[0];
+  int ny = INTEGER(GET_DIM(x))[1];
+  int nz = getNumberOfFrames(x, 0);
 
   int ext = INTEGER( ext_ )[0];
   double lambda = REAL( lambda_ )[0];

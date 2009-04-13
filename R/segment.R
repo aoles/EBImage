@@ -12,32 +12,35 @@ watershed = function (x, tolerance=1, ext=1) {
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 propagate = function (x, seeds, mask=NULL, lambda=0.1, ext=1, seed.centers=FALSE) {
   validImage(x)
-  if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")
+  if (colorMode(x) != Grayscale) stop("'x' must be a 'Grayscale' image or an array")
+  if (colorMode(seeds) != Grayscale) stop("'seeds' must be a 'Grayscale' image or an array")
+  checkCompatibleImages(x, seeds)
   
-  checkCompatibleImages(x,seeds)
-  if (!is.null(mask)) checkCompatibleImages(x,mask)
+  if (!is.null(mask)) {
+    if (colorMode(mask) != Grayscale) stop("'mask' must be a 'Grayscale' image or an array")
+    checkCompatibleImages(x, mask)
+    mask = castImage(mask)
+  }
   
-  ext <- as.integer (ext)
-  if ( ext < 0 )
-    stop("'ext' must be non-negative" )
-  lambda <- as.numeric (lambda)
-  if ( lambda < 0.0 )
-    stop("'lambda' must be non-negative" )
+  ext = as.integer (ext)
+  if (ext < 0) stop("'ext' must be positive" )
+  lambda = as.numeric (lambda)
+  if (lambda < 0.0) stop("'lambda' must be positive" )
+  
   if (seed.centers) {
-    cm = cmoments(seeds)
+    cm = hullFeatures(seeds)
     dimx = dim(seeds)
-    if (dimx[3]==1) cm = list(cm)
-    index = lapply(cm, function(xy) {
-      floor(xy[,3]) + floor(xy[,4])*dimx[1]
-    })
-    for (i in 1:dimx[3]) index[[i]] = index[[i]] + (i-1)*dimx[1]*dimx[2]
+    nz = getNumberOfFrames(seeds, 'total')
+    if (nz==1) cm = list(cm)
+    index = lapply(cm, function(xy) floor(xy[,'g.x']) + floor(xy[,'g.y'])*dimx[1])
+    for (i in 1:nz) index[[i]] = index[[i]] + (i-1)*dimx[1]*dimx[2]
     index = unlist(index)
-    s = seeds
-    s[] = 0.0
+    s = Image(0, dim=dim(seeds))
     s[index] = seeds[index]
     seeds = s
   }
-  return(.Call( "lib_propagate", castImage(x), seeds, mask, ext, lambda, PACKAGE='EBImage'))
+  
+  return(.Call( "propagate", castImage(x), castImage(seeds), mask, ext, lambda, PACKAGE='EBImage'))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

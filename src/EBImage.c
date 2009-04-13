@@ -13,7 +13,7 @@ See: ../LICENSE for license, LGPL
 #include "filters_magick.h"
 #include "morphology.h"
 #include "translate.h"
-#include "filters_propagate.h"
+#include "propagate.h"
 #include "normalize.h"
 #include "watershed.h"
 #include "thresh.h"
@@ -90,7 +90,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"normalize",          (DL_FUNC) &normalize,      3},
     {"distmap",            (DL_FUNC) &distmap,            2},
     {"watershed",          (DL_FUNC) &watershed,    3},
-    {"lib_propagate",      (DL_FUNC) &lib_propagate,      5},
+    {"propagate",          (DL_FUNC) &propagate,      5},
     {"paintObjects",       (DL_FUNC) &paintObjects,  4},
     {"matchObjects",       (DL_FUNC) &matchObjects,  2},
     {"rmObjects",          (DL_FUNC) &rmObjects, 2},
