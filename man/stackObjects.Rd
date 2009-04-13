@@ -4,83 +4,65 @@
 
 \concept{image manipulation}
 
-\title{ Generate a stack of images for detected objects, one object per image }
+\title{Places detected objects into an image stack}
 
 \description{
-  From an indexed image the functions generates an image stack with one image
-  per object placing each object in the middle of the image. Objects can be
-  automatically rotated to align them along the horizontal axis.
+  Places detected objects into an image stack.
 }
 
 \usage{
-  stackObjects(x, ref, index, combine, rotate, bg.col, ext, centerby, rotateby)
+  stackObjects(x, ref, index, combine=TRUE, rotate, bg.col='black', ext, centerby, rotateby)
 }
 
 \arguments{
-  \item{x}{An object of \code{\linkS4class{Image}}.
-    Images must be Grayscale and carry object indexing information, like those
-    returned by \code{\link{watershed}} or \code{\link{propagate}}. }
+  \item{x}{An \code{Image} object or an array containing object masks.
+    Object masks are sets of pixels with the same unique integer value.}
+    
+  \item{ref}{An \code{Image} object or an array, containing the
+    intensity values of the objects.}
 
-  \item{ref}{ A reference image containing images of the objects to be
-    stacked using \code{x} both as index and the mask. Can be in any
-    color mode. }
+  \item{combine}{If \code{x} contains multiple images, specifies if the resulting
+    list of image stacks with individual objects should be combined
+    using \code{combine} into a single image stack.}
 
-  \item{index}{ Indexes of objects to stack. See details for supported
-    types. }
+  \item{bg.col}{Background pixel color.}
 
-  \item{combine}{ Called on a stack if images, specifies if the resulting
-    list of image stacks with individual objects should be combined into a single
-    image stack. Defaults to \code{FALSE}. }
-
-  \item{rotate}{ Specifies if the objects should be aligned rotationally.
-    Defaults to \code{TRUE}. }
-
-  \item{bg.col}{ Color for pixels outside the mask defined by \code{x}.
-    Defaults to \code{TRUE}. }
-
-  \item{ext}{ Extension of the target bounding box. See details. If not
-    given, \code{ext} is calculated from data. }
-  
-  \item{centerby,rotateby}{ If \code{ref} is a TrueColor image, these character 
-    values specify which channel should be used to center and rotate objects. 
-    By default the image is converted by \code{\link{channel}(ref,"gray")}. 
-    Other possible values are \code{"red", "green"} or \code{"blue"}. }  
+  \item{ext}{A numeric controlling the size of the output simage.
+    If missing, \code{ext} is estimated from data. See details.}
+ 
+   \item{index, rotate, centerby, rotateby}{Deprecated.}
 }
 
 \value{
-  An image stack or a list of image stacks if \code{x} was itself a stack
-  (contained more than one image).
+  An \code{Image} object containing the stacked objects contained in
+  \code{x}. If \code{x} contains multiple images and if \code{combine}
+  is \code{TRUE}, \code{stackObjects} returns a list of \code{Image}
+  objects.  
 }
 
 \details{
-  The bounding box is set to be a square, which centre coinsides with the geometric
-  center of the object. The \code{ext} argument can be used to specified its size,
-  where edge length will be given by \code{2*ext+1}. If \code{ext} is not specified,
-  it is calculated from the data by taking the 95\% quantile of the vector of
-  \code{h.s2major} descriptor of \code{\link{hullFeatures}} taken over all,
-  objects in the image. This descriptor specifies the extension of the object
-  along its major axis starting from its center.
-
-  The size of the bounding box is fixed for all frames to enable combining
-  the resulting frames into a single multiframe image.
-
-  \code{index} must be coersable to numeric to specify object indexes that
-  are taken into the resulting stack. It can be specified as \code{numeric}
-  directly only for images with 1 frame. For images with multiple frames it can
-  be either a \code{list} or a \code{character}. If specified as a \code{list},
-  it can be a named list of numeric indexes where names are converted to
-  \code{character} frame indexes in an arbitrary order, or it can be an unnamed
-  list of the same length as the number of frames. If specifies as \code{character},
-  each element must contain two numbers separated by a dot where the first number
-  is the index of the frame and the second one is the index of the object within
-  the frame, e.g. \code{"2.035"} will specify frame 2 and object 35.
+  \code{stackObjects} creates a set of \code{nbobj} images of size
+  (\code{2*ext+1}, \code{2*ext+1}), where \code{nbobj} is the number of objects
+  in \code{x}, and places each object of \code{x} in this set.
+  
+  If not specified, \code{ext} is estimated using the 95\% quantile of
+  2*sqrt(\code{g.l1}), where \code{g.l1} is the semi-major axis
+  descriptor extracted from \code{hullFeatures}, taken over
+  all the objects of the image \code{x}.
 }
 
-\seealso{ \code{
-  \link{tile}, \link{combine}, \link{paintObjects}
-}}
+\seealso{ \code{\link{combine}}, \code{\link{tile}}, \code{\link{hullFeatures}} 
+}
 
 \examples{
+  ## simple example
+  x = readImage(system.file('images', 'shapes.png', package='EBImage'))
+  x = x[110:512,1:130]
+  y = bwlabel(x)
+  if (interactive()) display(normalize(y), title='Objects')
+  z = stackObjects(y, normalize(y))
+  if (interactive()) display(z, title='Stacked objects')
+
   ## load images
   nuc = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
   cel = readImage(system.file('images', 'cells.tif', package='EBImage'))
@@ -90,25 +72,22 @@
   ## segment nuclei
   nmask = thresh(nuc, 10, 10, 0.05)
   nmask = opening(nmask, makeBrush(5, shape='disc'))
-  nmask = fillHull(nmask)
-  nmask = bwlabel(nmask)
+  nmask = fillHull(bwlabel(nmask))
 
   ## segment cells, using propagate and nuclei as 'seeds'
   ctmask = opening(cel>0.1, makeBrush(5, shape='disc'))
   cmask = propagate(cel, nmask, ctmask)
 
-  ## segmentation results
+  ## using paintObjects to highlight objects
   res = paintObjects(cmask, img, col='#ff00ff')
   res = paintObjects(nmask, res, col='#ffff00')
   if (interactive()) display(res, title='Segmented cells')
 
-  
-  
+  ## stacked cells
+  st = stackObjects(cmask, img)
+  if (interactive()) display(st, title='Stacked objects')
 }
 
 \author{
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006-2007
 }
-
-\keyword{manip}
-

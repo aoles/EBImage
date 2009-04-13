@@ -39,30 +39,28 @@
 }
 
 \examples{
-  x = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
-  x = x[,,1]
-  if (interactive()) display(x)
+  ## load images
+  nuc = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
+  cel = readImage(system.file('images', 'cells.tif', package='EBImage'))
+  img = rgbImage(green=cel, blue=nuc)
+  if (interactive()) display(img, title='Cells')
 
-  ## computes object mask
-  y = thresh(x, 10, 10, 0.05)
-  y = opening(y, makeBrush(5, shape='disc'))
-  mask = bwlabel(y)
+  ## segment nuclei
+  nmask = thresh(nuc, 10, 10, 0.05)
+  nmask = opening(nmask, makeBrush(5, shape='disc'))
+  nmask = fillHull(nmask)
+  nmask = bwlabel(nmask)
+  if (interactive()) display(normalize(nmask), title='Cell nuclei mask')
 
-  ## moments
-  mom = moments(mask, x)
+  ## segment cells, using propagate and nuclei as 'seeds'
+  ctmask = opening(cel>0.1, makeBrush(5, shape='disc'))
+  cmask = propagate(cel, nmask, ctmask)
+  if (interactive()) display(normalize(cmask), title='Cell mask')
 
-  ## highlight nuclei with an eccentricity higher than 0.85
-  maskb = mask
-  id = which(mom[,'m.ecc']<0.85)
-  maskb[!is.na(match(maskb, id))] = 0
-  img = paintObjects(maskb, channel(x, 'rgb'), col='red')
-
-  ## highlight nuclei with an intensity lower than 150
-  maskb = mask
-  id = which(mom[,'m.int']>150)
-  maskb[!is.na(match(maskb, id))] = 0
-  img = paintObjects(maskb, img, col=c(NA, 'blue'), opac=c(0,0.5))
-  if (interactive()) display(img, title='Highlighted nuclei')
+  ## using paintObjects to highlight objects
+  res = paintObjects(cmask, img, col='#ff00ff')
+  res = paintObjects(nmask, res, col='#ffff00')
+  if (interactive()) display(res, title='Segmented cells')
 }
 
 \author{
