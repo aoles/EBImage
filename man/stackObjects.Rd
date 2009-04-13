@@ -81,33 +81,28 @@
 }}
 
 \examples{
-
   ## load images
-  f <- paste( system.file(package="EBImage"), "images/Gene1_G.tif", sep="/" )
-  ii = readImage(f)
-  ii = channel(ii, 'gray')
+  nuc = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
+  cel = readImage(system.file('images', 'cells.tif', package='EBImage'))
+  img = rgbImage(green=cel, blue=nuc)
+  if (interactive()) display(img, title='Cells')
 
-  ## normalize images
-  ii = normalize(ii, separate=TRUE)
-  ## segment
-  mask = thresh(ii, 25, 25, 0.02)
-  ## refine segmentation with morphology filters
-  mk3 = makeBrush(3, shape='diamond')
-  mk5 = makeBrush(5, shape='diamond')
-  mask = dilate(erode(closing(mask, mk5), mk3), mk5)
-  ## index objects with 'watershed'
-  io = watershed( distmap(mask), 1.5, 1)
-  if (interactive()) display(io)
+  ## segment nuclei
+  nmask = thresh(nuc, 10, 10, 0.05)
+  nmask = opening(nmask, makeBrush(5, shape='disc'))
+  nmask = fillHull(nmask)
+  nmask = bwlabel(nmask)
 
-  ## stack individual objects
-  s = stackObjects(io, ii, combine=FALSE)
-  ## display stack of objects of from the first image
-  if (interactive()) display(s[[1]])
-  ## combine stacks of objects into a single stack
-  s = combine(s)
-  ## tile the stack into one frame
-  t = tile(s)
-  if (interactive()) display(t)
+  ## segment cells, using propagate and nuclei as 'seeds'
+  ctmask = opening(cel>0.1, makeBrush(5, shape='disc'))
+  cmask = propagate(cel, nmask, ctmask)
+
+  ## segmentation results
+  res = paintObjects(cmask, img, col='#ff00ff')
+  res = paintObjects(nmask, res, col='#ffff00')
+  if (interactive()) display(res, title='Segmented cells')
+
+  
   
 }
 

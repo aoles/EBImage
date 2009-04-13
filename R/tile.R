@@ -17,14 +17,13 @@ tile = function (x, nx=10, lwd=1, fg.col="#E4AF2B", bg.col="gray") {
   if (is.list(x)) lapply(x, tile, nx=nx, lwd=lwd, fg.col=fg.col, bg.col=bg.col)
   else {
     validImage(x)
-    if ( nx < 1 || lwd < 0 || lwd > 100 )
-      stop( "wrong range of arguments, see help for range details" )
+    if ( nx < 1 || lwd < 0 || lwd > 100 ) stop( "wrong range of arguments, see help for range details" )
     
-    hdr = Image(t(col2rgb(c(fg.col,bg.col)))/256,dim=c(2,1,3),col=Color)
-    if (colorMode(x)==Grayscale) hdr=channel(hdr,'gray')
+    hdr = Image(c(fg.col,bg.col), col=Color, dim=c(2,1))
+    
+    if (colorMode(x)==Grayscale) hdr=channel(hdr, 'gray')
     else if (colorMode(x)==TrueColor) colorMode(hdr)=TrueColor
-    x = .Call("tile", castImage(x), hdr, as.integer(c(nx, lwd)), PACKAGE='EBImage')
-    return(x)
+    .Call("tile", castImage(x), hdr, as.integer(c(nx, lwd)), PACKAGE='EBImage')
   }
 }
 
@@ -35,5 +34,5 @@ untile = function (x, nim, lwd=1) {
   lwd = as.integer(lwd)
   if (length(nim)<2) stop("'nim' must contain two values for the number of images in x and y directions")
   if (lwd<0) stop("wrong line width")
-  return(.Call("untile", castImage(x), nim, lwd, PACKAGE='EBImage'))
+  .Call("untile", castImage(x), nim, lwd, PACKAGE='EBImage')
 }

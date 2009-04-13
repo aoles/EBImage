@@ -38,7 +38,7 @@
 \value{
   \code{moments}, \code{cmoments} and \code{rmoments} returns a matrix
   (or a list of matrices if \code{x} contains multiple frames) of
-  features computed of the objects defined in \code{x} and using the
+  features computed of the objects present in \code{x} and using the
   intensity values of \code{ref}.
 
   \code{smoments} returns a 3-dimensional array of size (\code{pw+1},
@@ -90,7 +90,7 @@
     \item \code{m.l1} = largest eigenvalue of the covariance matrix [\eqn{mu_20}, \eqn{mu_11} ;
      \eqn{mu_11}, \eqn{mu_02}]/\eqn{m_00}
     \item \code{m.l2} = smallest eigenvalue of the covariance matrix
-    \item \code{m.ecc} = \eqn{sqrt(1-l2/l1)}
+    \item \code{m.ecc} = \eqn{sqrt(1-m.l2/m.l1)}
     \item \code{m.Ik} = k-th Hu's moment, see References.
   }
 
@@ -130,7 +130,7 @@
   ## computes object mask
   y = thresh(x, 10, 10, 0.05)
   y = opening(y, makeBrush(5, shape='disc'))
-  mask = bwlabel(y)
+  mask = fillHull(bwlabel(y))
   if (interactive()) display(mask, title='Cell nuclei')
 
   ## moments

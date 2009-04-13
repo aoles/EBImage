@@ -19,7 +19,7 @@ animate(x)
 }
 
 \arguments{
-  \item{x}{An \code{\linkS4class{Image}} object or an array.} 
+  \item{x}{An \code{Image} object or an array.} 
   \item{useGTK}{A logical of length 1. See details.} 
   \item{title}{Window title.}
   \item{no.GTK, main, colorize}{Deprecated.}
@@ -53,14 +53,15 @@ animate(x)
 \examples{
    ## single image
    lena = readImage(system.file("images", "lena-color.png", package="EBImage"))
-   if(interactive()) display(lena)
+   if (interactive()) display(lena)
 
    ## animated threshold
-   lena = resize(lena, 256, 256)
-   lenat = list()
-   for (t in seq(0.8, 0.2, len=10)) lenat=c(lenat, list(lena>t))
-   lenat = combine(lenat)
-   if(interactive()) display(lenat)
+   x = readImage(system.file("images", "lena-color.png", package="EBImage"))
+   x = resize(x, 128, 128)
+   xt = list()
+   for (t in seq(0.1, 5, len=9)) xt=c(xt, list(blur(x, s=t)))
+   xt = combine(xt)
+   if (interactive()) display(xt, title='Blurred Lenas')
 }
 
 \author{

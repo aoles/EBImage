@@ -29,7 +29,7 @@ castImage=function(x) {
 }
 
 ## check if x (indexing image) and ref (image) are compatible
-checkCompatibleImages=function(x, ref) {
+checkCompatibleImages=function(x, ref, type='total') {
   xn = paste(deparse(substitute(x)))
   refn = paste(deparse(substitute(ref)))
   validImage(x)
@@ -42,8 +42,8 @@ checkCompatibleImages=function(x, ref) {
     if (colorMode(x) == TrueColor || colorMode(ref) == TrueColor)
       stop( "'", xn, "' and '", refn, "' must be Image objects not in 'TrueColor' color mode" )
     
-    if (getNumberOfFrames(x,'total')!=getNumberOfFrames(ref, 'total'))
-      stop( "'", xn, "' and '", refn, "' must have the same total number of frames" )
+    if (getNumberOfFrames(x, type)!=getNumberOfFrames(ref, type))
+      stop( "'", xn, "' and '", refn, "' must have the same ",type," number of frames" )
     
     if (any(dim(x)[1:2]!=dim(ref)[1:2])  )
       stop( "'", xn, "' and '", refn, "' must have the same spatial 2D dimensions" )

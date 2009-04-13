@@ -52,10 +52,10 @@
   is.Image(x)
 
   colorMode(y)	
-  colorMode(y)<-value
+  colorMode(y) <- value
 
   imageData(y)
-  imageData(y)<-value	
+  imageData(y) <- value	
 	
   getNumberOfFrames(y, type='total')  	
 }
@@ -92,7 +92,9 @@
   of \code{y}.
 
   \code{imageData} returns the array contained in an \code{Image} object.
+}
 
+\details{
   Depending of \code{type}, \code{getNumberOfFrames} returns the total number of frames contained
   in the object \code{y} or the number of renderable frames. The total number of frames is independent
   of the color mode and is equal to the product of all the dimensions except the two first ones. The

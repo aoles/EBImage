@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-    SEXP lib_propagate (SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP propagate (SEXP, SEXP, SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus
 };

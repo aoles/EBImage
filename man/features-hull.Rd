@@ -2,61 +2,71 @@
 
 \alias{hullFeatures}
 
-\concept{feature extraction}
+\concept{features extraction}
 
-\title{ Extraction of hull features from images of indexed objects }
+\title{Extraction of hull features from image objects }
 
 \description{
-  Hull features are a set of numeric descriptors of the hull of an object. These
-  include coordinates, perimeter, size, acircularity etc.
+  Computes hull features from image objects.
 }
 
 \usage{
   hullFeatures(x)
-  
 }
 
 \arguments{
-
-  \item{x}{An object of \code{\linkS4class{Image}}.}
-  
+  \item{x}{An \code{Image} object or an array containing object masks.
+    Object masks are sets of pixels with the same unique integer value.}
 }
 
 \value{
-  For a single frame, a matrix of descriptors with objects in rows and features
-  in columns. For image stacks, a list of such matrices.
-
+  A matrix (or a list of matrices if \code{x} contains multiple frames) of
+  features computed of the objects present in \code{x}.
 }
 
 \details{
-  The extracted features are (names carry an \code{h.} prefix to indicate hull
-  features): \code{x,y} - coordinates of the geometric center, \code{s} - size (area),
-  \code{p} - perimeter, \code{pdm} - mean distance to perimeter (from the center),
-  \code{pdsd} - standard deviation of the distance to perimeter, \code{effr} - 
-  effective radius (is the radius of a circle with the same area), \code{acirc} -
-  acircularity (fraction of pixels outside of the circle with \code{r=reff}), 
-  \code{sf} - shape factor (\code{per / ( 2 * sqrt(Pi * s))}), \code{edge} - 
-  number of pixels at the edge of the image, \code{theta} - hull's rotation
-  angle (calculated without taking intensity values into account), \code{s2maj} -
-  2 times semi major (square root of the larger eigenvalue of the 
-  \code{\link{moments}} covariance matrix) - correlates with the distance from
-  the center to the edge along the major axis, \code{s2min} - same but for the 
-  smaller eigenvalue (minor axis), \code{ecc} - eccentricity 
-  (\code{sqrt(eig1-eig2)/smaj}), \code{I1, I2} - first and second rotation invariant
-  moments of the hull (as in \code{\link{moments}}).
+  Extracted object features are:
+  \itemize{ 
+  \item \code{g.x ,g.y} - coordinates of the geometric center.
+  \item \code{g.s} - size in pixels.
+  \item \code{g.p} - perimeter in pixels. 
+  \item \code{g.pdm} - mean distance from the center to perimeter.
+  \item \code{g.pdsd} - standard deviation of the distance to perimeter.
+  \item \code{g.effr} - effective radius (is the radius of a circle with the same area).
+  \item \code{g.acirc} - acircularity (fraction of pixels outside of the circle with radius \code{g.effr}). 
+  \item \code{g.sf} - shape factor, equals to (\code{g.p/ ( 2*sqrt(i*g.s))}).
+  \item \code{g.edge} - number of pixels at the edge of the image. 
+  \item \code{g.theta} - hull orientation angle, in radians. See above.
+  \item \code{g.l1} - largest eigeinvalue of the covariance matrix. See above.
+  \item \code{g.l2} - lowest eigenvalue of the covariance matrix. See above.
+  \item \code{g.ecc} - eccentricity, equals to \eqn{sqrt(1-g.l2/g.l1)}. See above.
+  \item \code{g.I1, g.I2} - first and second Hu's translation/scale/rotation invariant moment. See above.
 }
 
-\seealso{\code{
-  \linkS4class{Image}, \link{watershed}, \link{getFeatures}, 
-  \link{edgeFeatures}, \link{moments}
-}}
+ The features \code{g.theta}, \code{g.l1}, \code{g.l2}, \code{g.ecc}, \code{g.I1}, 
+ \code{g.I2} are computed with the function \code{moments} using the binary objects
+ as intensity values, e.g. \code{g.theta = moment(x,x>0)[, 'm.theta']}. See \code{moments} for details 
+ on properties of these features.
+}
+
+\seealso{
+\code{\link{moments}}, \code{\link{getFeatures}}
+}
 
 \author{
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2007
 }
 
 \examples{
-  ## see example(getFeatures)
+  x = readImage(system.file('images', 'shapes.png', package='EBImage'))
+  x = x[110:512,1:130]
+  y = bwlabel(x)
+  if (interactive()) display(normalize(y), title='Objects')
+
+  ## hullFeatures
+  hf = hullFeatures(y)
+  print(hf)
+	
 }
 
 \keyword{manip}
