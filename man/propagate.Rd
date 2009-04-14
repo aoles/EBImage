@@ -80,7 +80,7 @@
   ## load images
   nuc = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
   cel = readImage(system.file('images', 'cells.tif', package='EBImage'))
-  img = rgbImage(green=cel, blue=nuc)
+  img = rgbImage(green=1.5*cel, blue=nuc)
   if (interactive()) display(img, title='Cells')
 
   ## segment nuclei

@@ -71,10 +71,10 @@
 \examples{	
     x = readImage(system.file("images", "shapes.png", package="EBImage"))
     if (interactive()) display(x)
-    kern=makeBrush(5, shape='diamond')
+    kern = makeBrush(5, shape='diamond')
     if (interactive()) display(kern, title='Structuring element')
-    if (interactive()) display(erode(x), title='Erosion of x')
-    if (interactive()) display(dilate(x), title='Dilatation of x')
+    if (interactive()) display(erode(x, kern), title='Erosion of x')
+    if (interactive()) display(dilate(x, kern), title='Dilatation of x')
 
     ## makeBrush 
     x = makeBrush(100, shape='diamond')
