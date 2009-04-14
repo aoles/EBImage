@@ -31,8 +31,8 @@
   The package \code{EBImage} uses the class \code{Image} to store and process
   images. Images are stored as multi-dimensional arrays containing the pixel
   intensities. The class \code{Image} extends the base class \code{array} and
-  uses the \code{colormode} slot to store how the color information of the multi-dimensional
-  data should be handled.
+  uses the \code{colormode} slot to store how the color information of
+  the multi-dimensional data is handled.
 
   The \code{colormode} slot could be either \code{Grayscale} or \code{Color}. In both modes, the
   two first dimensions of the underlying array are understood to be the spatial
@@ -122,6 +122,9 @@
   m = abind(w, t(w), along=3)
   z = Image(m, colormode='Color')
   if (interactive()) display(normalize(z))
+
+  y = Image(c('red', 'violet', '#ff51a5', 'yellow'), dim=c(71, 71))
+  if (interactive()) display(y)
 
   ## colorMode example
   x = readImage(system.file('images', 'nuclei.tif', package='EBImage'))

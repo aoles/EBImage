@@ -59,11 +59,8 @@
 
 \examples{
   lena = readImage(system.file("images", "lena-color.png", package="EBImage"))
-  lena = drawtext(lena,
-     xy = c(250, 450),
-     labels = "Lena",
-     font = drawfont(weight=600, size=28),
-     col = "white")
+  font = drawfont(weight=600, size=28)
+  lena = drawtext(lena, xy=c(250, 450), labels="Lena", font=font, col="white")
   if (interactive()) display(lena)
 }
 

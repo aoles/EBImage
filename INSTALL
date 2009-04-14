@@ -1,102 +1,51 @@
-  The package was tested to work on Linux, MacOS, Windows XP and Solaris.
-It should be possible to install and run the package on other versions of
-UNIX alike and Windows systems in a similar manner. It is advisable to
-install recommended dependencies as well to enjoy the full functionality of
-the package. On Windows, all dependencies are required, not recommended.
-GTK+ support was not tested on MacOS, but the package should support it.
+1. UNIX/Linux and Mac OS installation
 
---------------------------------------------------------------------------------
-1. UNIX/Linux installation
+EBImage requires the following softwares to be installed:
+1) pkg-config
+2) gtk+-2.0
+3) ImageMagick
 
-  The installation should be performed from the source after the dependencies
-described below are satisfied.
+On UNIX/Linux systems, pkg-config and gtk+-2.0 are most likely present. 
+ImageMagick is available in many UNIX distributions (Ubuntu,
+Debian, Fedora, Suse). Alternatively, you may download and compile it 
+from 'http://www.imagemagick.org/script/install-source.php#unix'.
 
-- required are header files and libraries (dev/devel) of ImageMagick
-- recommended are header files and libraries of GTK2 with dependencies
+On Mac OS systems, an easy way to get these tools is to first install 
+MacPorts from 'http://www.macports.org/'. To install MacPorts, you'll need
+to install the XCode developement suite and the X11 SDK on your machine. 
+These tools are located in the DVDs shipped with your Mac. The commands 
+'sudo port install ImageMagick' and 'sudo port install gtk2' will then 
+install the required softwares. Before installing or using EBImage, you'll 
+have to start the X11 server, located in the Application/Utilities directory.
+The new release of EBImage will be much easier to install on MacOS systems.
+Drop me an email (gregoire.pau@ebi.ac.uk) if you have troubles to install
+EBImage on MacOS systems.
 
-  On most Linux distributions, these are available as packages in 'rpm' or 'deb'
-format. Hereafter, the examples concern Ubuntu Linux, but other distributions
-have similar packages that have only slight naming differences.
+Please note that the development versions (with C header and libraries) of 
+gtk+-2.0 and ImageMagick are needed to install EBImage.
 
-  For ImageMagick, you will need to install  'libmagick9-dev' with all
-dependencies using apt-get or synaptic. Alternatively, you can download the
-latest version of ImageMagick from http://www.imagemagick.org and install it
-from source as usual using ./configure && make && make install. The latter will
-install the required development files as well.
+Just download and install the package EBImage from Bioconductor then or do
+a "biocLite('EBImage')" in R or "R CMD INSTALL ." in a terminal located in
+a the EBImage package directory to install EBImage.
 
-  The package will function without GTK2, but most of GUI functionality (image
-chooser, interactive image display with zoom features etc) will be disabled.
-You will need 'libgtk2.0-dev' and dependencies (normally include glib,
-pango-dev, libcairo-dev, atk-dev and some others). Alternatively, all these
-packages can be installed from source available at http://www.gtk.org along
-with installation instructions. When installing GTK2, please ensure that you
-also install 'pkg-config' as it is used to determine the location of GTK2
-include files and its compile flags. Without this package, GTK2 will not be
-located on your system by the package installer.
+EBImage works fine with gtk+-2.0 2.12.9 and ImageMagick 6.3.7 Q16.
 
---------------------------------------------------------------------------------
-2. MacOS installation
+2. Windows installation
 
-  Analogously to UNIX/Linux installation, the installation should be performed
-from source using the same technique and dependencies.
+EBImage requires the following softwares to be installed:
+1) gtk+-2.0
+2) ImageMagick
 
-  One can use http://fink.sf.net packages for dependencies or install them from
-source as in Linux. The author did not have any opportunity to check if
-GTK-enabled version works on MacOS, but since gtk+2-dev and gtk+2-shlib
-are available from 'fink', it is worth trying. Please remember again, that you
-will need 'pkgconfig', also available from 'fink', in order for the
-installation script to find your GTK2 includes.
+The gtk+-2.0 bundle can be downloaded from 'http://ftp.gnome.org/pub/gnome/binaries/win32/gtk+/2.16/gtk+-bundle_2.16.0-20090317_win32.zip'
+or 'http://www.gtk.org/download-windows.html' (select the binary GTK+ all-in-one bundle).
+Please install it somewhere (C:\gtk, for example) and please tick the checkbox 
+to install the development tools.
 
---------------------------------------------------------------------------------
-2. Windows installation (tested and pre-compiled on Windows XP)
+ImageMagick can be downloaded from 'http://www.imagemagick.org/script/binary-releases.php#windows'. 
+Select the Q16 DLL version and install it on your computer.
 
-Whether you are installing a binary package or compiling it from source on
-Windows, you will need to have BOTH ImageMagick and GTK2 installed and ADDED to
-your or system-wide PATH variable prior to the package installation.
+Just download and install the package EBImage from Bioconductor.
 
-If you plan to compile the package from source, first follow R instructions on
-compiling Windows packages and install all the necessary tools. In this case
-it is recommended to install MinGW and MSYS into c:\mingw as this path is hard
-coded into src/Makevars.win of my package (or you will need to edit this file)
-You do NOT need MinGW or MSYS if you install the binary package. For the binary
-package, just install the following two packages so that the library could function.
+EBImage works fine with gtk+-2.0 2.12.9 and ImageMagick 6.3.7 Q16.
 
-2.1 Installing ImageMagick
-
-ImageMagick is available from http://www.imagemagick.org. Please ensure that you
-download ImageMagick-6.x.x-x-Q16-windows-dll.exe (both 16 and dll instead of
-8 and static). If you are planning to compile my package from source, select
-that you want development files to be installed during the installation of
-ImageMagick. It is strongly recommended to install ImageMagick into a path that
-does NOT contain any spaces. The recommended (and hard coded into src/Makevars.win)
-is c:\ImageMagick. If you install into a different path, you will need to edit
-src/Makevars.win. The latter is not required for binary installation.
-
-Finally add the path to ImageMagick to your PATH variable, c:\ImageMagick; or
-similar.
-
-2.2 Installing GTK2
-
-GTK2 for Windows is available from http://gladewin32.sf.net
-Please download the latest available release of 'Gtk+/Win32 Development
-Environment' if you plan to compile my package from source, or 'Gtk+/Win32
-Runtime Environment' if you plan to use the binary installation.
-Install the above into a path that does not contain spaces. If you compile my
-package from source, it is strongly recommended to install it to the same location
-where you have your MinGW installed, e.g. c:\mingw
-
-Add the paths to {GTK}/lib and {GTK}/bin to your PATH variable. If you intend to
-compile my package from source and you installed GTK2 and MinGW in the directories
-other than c:\mingw, you will need to edit src/Makevars.win in my package.
-
-2.3 Installation
-Now as both ImageMagick and GTK2 are installed, you can start R GUI and install
-binary package as any other. If you compile from source, unpack the source tar.gz
-somewhere and if R is in your path you can simply create the package with
-'R CMD build --binary'. Then install it as above.
-
-That's about it.
-
-
-Oleg Sklyar
-
+Gregoire (gregoire.pau@ebi.ac.uk)

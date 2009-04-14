@@ -27,16 +27,17 @@ multi-dimensional matrices/arrays/Image objects, with several storage modes.
 
 6) Deprecation
 28 EBImage functions have been deprecated, mostly functions coming from ImageMagick 
-because they were poorely documented (even in the ImageMagick documentation !) and/or 
-useless in the R environement. We want EBImage to be a quantitative, precise image 
-processing toolbox.
+because they were poorly documented (even in the ImageMagick documentation !)
+and/or not useful aynmore (eg. negate(x) could be replaced by 1-x ; mkball, mkbox and
+morphKern have been fused in makeBrush ; normalize2 is now replaced by normalize, 
+etc...)
 
 7) Attribute deprecation
 Many attributes have been deprecated since they were poorly documented, useless in 
 the new framework or too vague to be kept. Many useless '...' arguments have been 
 removed.
 
-8) Many bug and speeding issue fixes
+8) Many bug fixes and speeding issues resolved
 distmap, readImage, watershed, display and many more. See the DONE file.
 
 9) New features/functions added

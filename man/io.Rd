@@ -35,8 +35,7 @@
   the quality can be specified used a \code{quality} value in the
   range \code{[1,100]}. The best quality is obtained with 100.
 
-  The file format is deduced from the file name extension(s), there is neither
-  a need nor a way to specify the format otherwise.
+  The file format is deduced from the file name extension.
 
   \code{ImageMagick} is used to perform all image I/O operations. Therefore,
   the package supports all the file types supported by \code{ImageMagick}.
