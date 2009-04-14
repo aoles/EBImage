@@ -1,0 +1,628 @@
+%\VignetteIndexEntry{Introduction to EBImage, an image processing and analysis toolkit for R}
+%\VignetteDepends{}
+%\VignetteKeywords{image processing, visualization}
+%\VignettePackage{EBImage}
+
+\documentclass[10pt,a4paper]{article}
+
+\RequirePackage{amsfonts,amsmath,amstext,amssymb,amscd}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{hyperref}
+\usepackage{color}
+\definecolor{darkblue}{rgb}{0.2,0.0,0.4}
+
+\topmargin -1.5cm
+\oddsidemargin -0cm   % read Lamport p.163
+\evensidemargin -0cm  % same as oddsidemargin but for left-hand pages
+\textwidth 17cm
+\textheight 24.5cm
+
+\newcommand{\lib}[1]{{\mbox{\normalfont\textsf{#1}}}}
+\newcommand{\file}[1]{{\mbox{\normalfont\textsf{'#1'}}}}
+\newcommand{\R}{{\mbox{\normalfont\textsf{R}}}}
+\newcommand{\Rfunction}[1]{{\mbox{\normalfont\texttt{#1}}}}
+\newcommand{\Robject}[1]{{\mbox{\normalfont\texttt{#1}}}}
+\newcommand{\Rpackage}[1]{{\mbox{\normalfont\textsf{#1}}}}
+\newcommand{\Rclass}[1]{{\mbox{\normalfont\textit{#1}}}}
+\newcommand{\code}[1]{{\mbox{\normalfont\texttt{#1}}}}
+
+\newcommand{\email}[1]{\mbox{\href{mailto:#1}{\textcolor{darkblue}{\normalfont{#1}}}}}
+\newcommand{\web}[2]{\mbox{\href{#2}{\textcolor{darkblue}{\normalfont{#1}}}}}
+
+%\usepackage[baseurl={http://www.ebi.ac.uk/~osklyar/EBImage/},pdftitle={EBImage - Image Processing Toolkit For R},pdfauthor={Oleg Sklyar},pdfsubject={EBImage},pdfkeywords={image processing},pagebackref,bookmarks,colorlinks,linkcolor=darkblue,citecolor=darkblue,pagecolor=darkblue,raiselinks,plainpages,pdftex]{hyperref}
+
+\SweaveOpts{keep.source=TRUE,eps=FALSE}
+
+\begin{document}
+
+\begin{figure}
+\begin{center}
+\scalebox{0.2}{\includegraphics{logo.png}}
+\end{center}
+\end{figure}
+
+\title{Introduction to \Rpackage{EBImage},\\
+an image processing and analysis toolkit for R}
+\author{Gregoire Pau, Oleg Sklyar, Wolfgang Huber\\\email{osklyar@ebi.ac.uk}}
+\maketitle
+
+\tableofcontents
+
+
+\section{Reading/displaying/writing images}
+
+The package \Rpackage{EBImage} is loaded by the following command.
+<<library,results=hide>>=
+library("EBImage")
+@
+<<display-hack,echo=FALSE>>= 
+display = function(...) if (interactive()) EBImage::display(...)
+@
+
+The function \Rfunction{readImage} is able to read images from files
+or URLs. The supported image formats depend on the capabilities of
+underlying \Rpackage{ImageMagick} library.
+
+<<readImage1>>= 
+f = system.file("images", "lena.gif", package="EBImage")
+lena = readImage(f)
+@
+
+Images can be displayed using the function \Rfunction{display}. Pixel 
+intensities should range from 0 (black) to 1 (white).
+<<display>>= 
+display(lena)
+@
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.49\textwidth]{lena.jpeg}
+\includegraphics[width=0.49\textwidth]{lenac.jpeg}
+\caption{\code{lena}, \code{lenac}}
+\end{center}
+\end{figure}
+
+Color images or images with multiple frames can also be read with 
+\Rfunction{readImage}.
+<<readImage2>>= 
+lenac = readImage(system.file("images", "lena-color.png", package="EBImage"))
+display(lenac)
+nuc = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
+display(nuc)
+@
+<<readImage2h,echo=FALSE>>= 
+writeImage(nuc, 'nuc.jpeg', quality=95)
+@
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.24\textwidth]{nuc-0.jpeg}
+\includegraphics[width=0.24\textwidth]{nuc-1.jpeg}
+\includegraphics[width=0.24\textwidth]{nuc-2.jpeg}
+\includegraphics[width=0.24\textwidth]{nuc-3.jpeg}
+\caption{\code{nuc}}
+\end{center}
+\end{figure}
+
+Images can be written with \Rfunction{writeImage}. The file format
+is deduced from the file name extension. This is useful to convert
+image formats, here from PNG format to JPEG format.
+
+<<writeImage>>= 
+writeImage(lena,  'lena.jpeg', quality=95)
+writeImage(lenac, 'lenac.jpeg', quality=95)
+@
+
+\pagebreak
+\newpage
+\section{Image objects and matrices}
+
+The package \Rpackage{EBImage} uses the class \code{Image} to store and process
+images. Images are stored as multi-dimensional arrays containing the
+pixel intensities. All EBImage functions are also able to work with 
+matrices and arrays.
+
+<<print>>= 
+print(lena)
+@ 
+
+As matrices, images can be manipulated with all R mathematical operators.
+This includes \code{+} to control the brightness of an image, \code{*} to 
+control the contrast of an image or \code{\^} to control the gamma 
+correction parameter.
+
+<<math1>>= 
+lena1 = lena+0.5
+lena2 = 3*lena
+lena3 = (0.2+lena)^3
+@
+<<math1h, echo=FALSE>>= 
+writeImage(lena1, 'lena1.jpeg', quality=95)
+writeImage(lena2, 'lena2.jpeg', quality=95)
+writeImage(lena3, 'lena3.jpeg', quality=95)
+@
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.24\textwidth]{lena.jpeg}
+\includegraphics[width=0.24\textwidth]{lena1.jpeg}
+\includegraphics[width=0.24\textwidth]{lena2.jpeg}
+\includegraphics[width=0.24\textwidth]{lena3.jpeg}
+\caption{\code{lena}, \code{lena1}, \code{lena2}, \code{lena3}}
+\end{center}
+\end{figure}
+
+Others operators include \code{[} to crop images, \code{<} to threshold 
+images or \code{t} to transpose images. 
+
+<<math2>>= 
+lena4 = lena[299:376, 224:301]
+lena5 = lena>0.5
+lena6 = t(lena)
+print(median(lena))
+@
+<<math2h, echo=FALSE>>= 
+writeImage(lena4, 'lena4.jpeg', quality=95)
+writeImage(lena5, 'lena5.png')
+writeImage(lena6, 'lena6.jpeg', quality=95)
+@
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.24\textwidth]{lena.jpeg}
+\includegraphics[width=0.24\textwidth]{lena4.jpeg}
+\includegraphics[width=0.24\textwidth]{lena5.png}
+\includegraphics[width=0.24\textwidth]{lena6.jpeg}
+\caption{\code{lena}, \code{lena4}, \code{lena5}, \code{lena6}}
+\end{center}
+\end{figure}
+
+Images with multiple frames are created using \code{combine} which merges images.
+<<combine>>= 
+lenacomb = combine(lena, lena*2, lena*3, lena*4)
+display(lenacomb)
+@
+<<combineh, echo=FALSE>>= 
+writeImage(lenacomb, 'lenacomb.jpeg', quality=95)
+@
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.24\textwidth]{lenacomb-0.jpeg}
+\includegraphics[width=0.24\textwidth]{lenacomb-1.jpeg}
+\includegraphics[width=0.24\textwidth]{lenacomb-2.jpeg}
+\includegraphics[width=0.24\textwidth]{lenacomb-3.jpeg}
+\caption{\code{lenacomb}}
+\end{center}
+\end{figure}
+
+\pagebreak
+\newpage
+\section{Spatial transformations}
+
+Specific spatial image transformations are done with the functions
+\code{reize}, \code{rotate}, \code{translate} and the functions 
+\code{flip} and \code{flop} to reflect images.
+
+<<spatial>>= 
+lena7 = rotate(lena, 30)
+lena8 = translate(lena, c(40, 70))
+lena9 = flip(lena)
+@
+<<spatialh, echo=FALSE>>= 
+writeImage(lena7, 'lena7.jpeg', quality=95)
+writeImage(lena8, 'lena8.jpeg', quality=95)
+writeImage(lena9, 'lena9.jpeg', quality=95)
+@
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.24\textwidth]{lena.jpeg}
+\includegraphics[width=0.24\textwidth]{lena7.jpeg}
+\includegraphics[width=0.24\textwidth]{lena8.jpeg}
+\includegraphics[width=0.24\textwidth]{lena9.jpeg}
+\caption{\code{lena}, \code{lena7}, \code{lena8}, \code{lena9}}
+\end{center}
+\end{figure}
+
+\pagebreak
+\newpage
+\section{Color management}
+
+The class \code{Image} extends the base class \code{array} and uses 
+the \code{colormode} slot to store how the color information
+of the multi-dimensional data should be handled.
+
+As an example, the color image \code{lenac} is a 512x512x3 array, with a 
+\code{colormode} slot equals to \code{Color}. The object is understood as 
+a color image by \Rpackage{EBImage} functions.
+<<print>>= 
+print(lenac)
+@
+
+The function \code{colorMode} can access and change the value of the slot 
+\code{colormode}, modifying the rendering mode of an image. In the next
+example, the \code{Color} image \code{lenac} with one frame is changed 
+into a \code{Grayscale} image with 3 frames, corresponding to the red, 
+green and blue channels. The function \code{colorMode} does not change
+the content of the image but changes only the way the image is rendered
+by \Rpackage{EBImage}.
+
+<<colorMode>>= 
+colorMode(lenac) = Grayscale
+display(lenac)
+@
+<<colorModeh,echo=FALSE>>= 
+writeImage(lenac, 'lenac.jpeg', quality=95)
+@
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.24\textwidth]{lenac.jpeg}
+\includegraphics[width=0.24\textwidth]{lenac-0.jpeg}
+\includegraphics[width=0.24\textwidth]{lenac-1.jpeg}
+\includegraphics[width=0.24\textwidth]{lenac-2.jpeg}
+\caption{\code{lenac}, rendered as a \code{Color} image and as a \code{Grayscale} image with 3 frames (red channel, green channel, blue channel)}
+\end{center}
+\end{figure}
+
+The color mode of image \code{lenac} is reverted back to \code{Color}.
+<<colorMode2>>= 
+colorMode(lenac) = Color
+@
+
+The function \code{channel} performs colorspace conversion and can convert 
+\code{Grayscale} images into \code{Color} ones both ways and can extract color
+channels from \code{Color} images. Unlike \code{colorMode}, \code{channel} 
+changes the pixel intensity values of the image. The function \code{rgbImage}
+is able to combine 3 \code{Grayscale} images into a \code{Color} one.
+
+<<channel>>= 
+lenak = channel(lena, 'rgb')
+lenak[236:276, 106:146, 1] = 1
+lenak[236:276, 156:196, 2] = 1
+lenak[236:276, 206:246, 3] = 1
+lenab = rgbImage(red=lena, green=flip(lena), blue=flop(lena))
+@
+<<channelh,echo=FALSE>>= 
+writeImage(lenak, 'lenak.jpeg', quality=95)
+writeImage(lenab, 'lenab.jpeg', quality=100)
+@
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.49\textwidth]{lenak.jpeg}
+\includegraphics[width=0.49\textwidth]{lenab.jpeg}
+\caption{\code{lenak}, \code{lenab}}
+\end{center}
+\end{figure}
+
+\pagebreak
+\newpage
+\section{Image filtering}
+
+Images can be linearly filtered using \code{filter2}. \code{filter2} 
+convolves the image with a matrix filter. Linear filtering is useful
+to perform low-pass filtering (to blur images, remove noise, ...) and 
+high-pass filtering (to detect edges, sharpen images, ...). Various filter 
+shapes can be generated using \code{makeBrush}.
+
+<<filter>>= 
+flo = makeBrush(21, shape='disc', step=FALSE)^2
+flo = flo/sum(flo)
+lenaflo = filter2(lenac, flo)
+
+fhi =  matrix(1, nc=3, nr=3)
+fhi[2,2] = -8
+lenafhi = filter2(lenac, fhi)
+@
+<<filterh,echo=FALSE>>= 
+writeImage(lenaflo, 'lenaflo.jpeg', quality=95)
+writeImage(lenafhi, 'lenafhi.jpeg', quality=100)
+@
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.49\textwidth]{lenaflo.jpeg}
+\includegraphics[width=0.49\textwidth]{lenafhi.jpeg}
+\caption{Low-pass filtered \code{lenaflo} and high-pass filtered \code{lenafhi}}
+\end{center}
+\end{figure}
+
+\pagebreak
+\newpage
+\section{Drawing on images}
+The function \Rpackage{drawtext} draws text labels on images.
+
+<<drawtext>>= 
+font = drawfont(weight=600, size=28)
+lenatext = drawtext(lena, xy=c(250, 450), labels="Lena", font=font, col="white")
+@
+<<filterh,echo=FALSE>>= 
+writeImage(lenatext, 'lenatext.jpeg', quality=95)
+@
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.49\textwidth]{lenatext.jpeg}
+\caption{\code{lenatext}}
+\end{center}
+\end{figure}
+
+\pagebreak
+\newpage
+\section{Morphological operations}
+Binary images are images where the pixels of value 0 constitute the 
+background and the other ones constitute the foreground. These images
+are subject to several non-linear  mathematical operators called 
+morphological operators, able to \code{erode} and \code{dilate} an 
+image.
+<<morpho>>= 
+ei = readImage(system.file('images', 'shapes.png', package='EBImage'))
+ei = ei[110:512,1:130]
+display(ei)
+
+kern = makeBrush(5, shape='diamond')
+eierode = erode(ei, kern)
+eidilat = dilate(ei, kern)
+@
+<<morphoh,echo=FALSE>>= 
+writeImage(ei, 'ei.png')
+writeImage(kern, 'kern.png')
+writeImage(eierode, 'eierode.png')
+writeImage(eidilat, 'eidilat.png')
+@
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.49\textwidth]{ei.png}\\{\tiny $ $}\\
+\includegraphics[width=0.49\textwidth]{eierode.png}\\{\tiny $ $}\\
+\includegraphics[width=0.49\textwidth]{eidilat.png}
+\caption{\code{ei} ; \code{eierode} ; \code{eidilat}}
+\end{center}
+\end{figure}
+
+\pagebreak
+\newpage
+\section{Segmentation}
+
+Segmentation consists in extracting objects from an image. The function 
+\code{bwlabel} is a simple function able to extract every connected sets
+of pixels from an image and relabel these sets with an unique increasing
+integer. \code{bwlabel} can be used on binary images and is useful after
+thresholding.
+
+<<segmentation>>= 
+eilabel = bwlabel(ei)
+cat('Number of objects=', max(eilabel),'\n')
+
+nuct = nuc[,,1]>0.2
+nuclabel = bwlabel(nuct)
+cat('Number of nuclei=', max(nuclabel),'\n')
+@
+<<segmentationh,echo=FALSE>>= 
+writeImage(eilabel/max(eilabel), 'eilabel.png')
+writeImage(nuclabel/max(nuclabel), 'nuclabel.png')
+@
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.49\textwidth]{ei.png}
+\includegraphics[width=0.49\textwidth]{eilabel.png}
+\end{center}
+\caption{\code{ei}, \code{eilabel/max(eilabel)}}
+\end{figure}
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.49\textwidth]{nuc-0.jpeg}
+\includegraphics[width=0.49\textwidth]{nuclabel.png}
+\caption{\code{nuc[ , ,1]}, \code{nuclabel/max(nuclabel)}}
+\end{center}
+\end{figure}
+
+Since the images \code{eilabel} and \code{nuclabel} range from 0 to the
+number of object they contain (given by \code{max(eilabel)} and 
+\code{max(eilabel)}), they have to be divided by these number before 
+displaying, in order to fit the [0,1] range needed by \code{display}.
+
+The grayscale top-bottom gradient observable in \code{eilabel} and \code{nuclabel}
+is due to the way \code{bwlabel} labels the connected sets, from top-left to 
+bottom-right.
+
+Adaptive thresholding consists in comparing the intensity of pixels with
+their neighbors, where the neighborood is specified by a filter matrix.
+The function \code{thresh} performs a fast adaptive thresholding of an image
+with a rectangular window while the combination of \code{filter2} and \code{<} 
+allows a finer control. Adaptive thresholding allows a better segmentation
+when objects are close together. 
+
+<<segmentation2>>= 
+nuct2 =  thresh(nuc[,,1], 10, 10, 0.05)
+kern = makeBrush(5, shape='disc')
+nuct2 = dilate(erode(nuct2, kern), kern)
+nuclabel2 = bwlabel(nuct2)
+cat('Number of nuclei=', max(nuclabel2),'\n')
+@
+<<segmentation2h,echo=FALSE>>= 
+writeImage(nuclabel2/max(nuclabel2), 'nuclabel2.png')
+@
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.49\textwidth]{nuc-0.jpeg}
+\includegraphics[width=0.49\textwidth]{nuclabel2.png}
+\caption{\code{nuc[ , ,1]}, \code{nuclabel2/max(nuclabel)} }
+\end{center}
+\end{figure}
+
+\pagebreak
+\newpage
+\section{Objects manipulation}
+
+Objects, defined as sets of pixels with the same unique integer value
+can be outlined and painted using \code{paintObjects}. Some holes are 
+present in objects of \code{nuclabel2} which can be filled using 
+\code{fillHull}.
+
+<< manip >>= 
+nucgray = channel(nuc[,,1], 'rgb')
+nuch1 = paintObjects(nuclabel2, nucgray, col='#ff00ff')
+nuclabel3 = fillHull(nuclabel2)
+nuch2 = paintObjects(nuclabel3, nucgray, col='#ff00ff')
+@
+<<maniph,echo=FALSE>>= 
+writeImage(nuch1, 'nuch1.jpeg', quality=100)
+writeImage(nuch2, 'nuch2.jpeg', quality=100)
+@
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.49\textwidth]{nuch1.jpeg}
+\includegraphics[width=0.49\textwidth]{nuch2.jpeg}
+\caption{\code{nuch1}, \code{nuch2} }
+\end{center}
+\end{figure}
+
+Objects features like hull features, shape descriptors, moments, centers,
+texture descriptors are extracted using \code{hullFeatures}, \code{moments}
+and \code{getFeatures} for more complex features. Nucleus centers 
+are here extracted to obtain nuclei coordinates, which are used to 
+draw the nucleus indexes. 
+<< manip2 >>= 
+xy = hullFeatures(nuclabel3)[, c('g.x', 'g.y')]
+font = drawfont(weight=600, size=16)
+nuctext = drawtext(nuch2, xy=xy, labels=as.character(1:nrow(xy)), font=font, col="yellow")
+@
+<<manip2h,echo=FALSE>>= 
+writeImage(nuctext, 'nuctext.jpeg', quality=100)
+@
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.49\textwidth]{nuc-0.jpeg} 
+\includegraphics[width=0.49\textwidth]{nuctext.jpeg}
+\caption{Original \code{nuc}, segmented \code{nuctext}}
+\end{center}
+\end{figure}
+
+\pagebreak
+\newpage
+\section{Cell segmentation example}
+
+This is a complete example of segmentation of cells (nucleus + cell bodies) using
+the functions described before and the function \code{propagate}, able to 
+perform Voronoi-based region segmentation.
+
+Images of nuclei and cell bodies are first loaded:
+<< cs1 >>= 
+nuc = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
+cel = readImage(system.file('images', 'cells.tif', package='EBImage'))
+img = rgbImage(green=1.5*cel, blue=nuc)
+@ 
+<<cs1h, echo=FALSE>>= 
+writeImage(cel, 'cel.jpeg')
+writeImage(img, 'img.jpeg')
+@
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.24\textwidth]{nuc-0.jpeg}
+\includegraphics[width=0.24\textwidth]{nuc-1.jpeg}
+\includegraphics[width=0.24\textwidth]{nuc-2.jpeg}
+\includegraphics[width=0.24\textwidth]{nuc-3.jpeg}
+\caption{\code{nuc}}
+\end{center}
+\end{figure}
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.24\textwidth]{cel-0.jpeg}
+\includegraphics[width=0.24\textwidth]{cel-1.jpeg}
+\includegraphics[width=0.24\textwidth]{cel-2.jpeg}
+\includegraphics[width=0.24\textwidth]{cel-3.jpeg}
+\caption{\code{cel}}
+\end{center}
+\end{figure}
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.24\textwidth]{img-0.jpeg}
+\includegraphics[width=0.24\textwidth]{img-1.jpeg}
+\includegraphics[width=0.24\textwidth]{img-2.jpeg}
+\includegraphics[width=0.24\textwidth]{img-3.jpeg}
+\caption{\code{img}}
+\end{center}
+\end{figure}
+
+
+Nuclei are first segmented using \code{thresh}, \code{fillHull}, \code{bwlabel}
+and \code{opening}, which is an \code{erosion} followed by a \code{dilatation}.
+<< cs2 >>= 
+nmask = thresh(nuc, 10, 10, 0.05)
+nmask = opening(nmask, makeBrush(5, shape='disc'))
+nmask = fillHull(nmask)
+nmask = bwlabel(nmask)
+@ 
+<<cs2h, echo=FALSE>>= 
+writeImage(nmask/max(nmask), 'nmask.png')
+@
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.24\textwidth]{nmask-0.png}
+\includegraphics[width=0.24\textwidth]{nmask-1.png}
+\includegraphics[width=0.24\textwidth]{nmask-2.png}
+\includegraphics[width=0.24\textwidth]{nmask-3.png}
+\caption{\code{nmask/max(nmask)}}
+\end{center}
+\end{figure}
+
+Cell bodies are segmented using \code{propagate}.
+<< cs3 >>= 
+ctmask = opening(cel>0.1, makeBrush(5, shape='disc'))
+cmask = propagate(cel, nmask, ctmask)
+@ 
+<<cs3h, echo=FALSE>>= 
+writeImage(cmask/max(cmask), 'cmask.png')
+@
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.24\textwidth]{cmask-0.png}
+\includegraphics[width=0.24\textwidth]{cmask-1.png}
+\includegraphics[width=0.24\textwidth]{cmask-2.png}
+\includegraphics[width=0.24\textwidth]{cmask-3.png}
+\caption{\code{cmask/max(cmask)}}
+\end{center}
+\end{figure}
+
+Cells are outlined using \code{paintObjects} and labels are printed 
+using \code{hullFeatures} and \code{drawtext}.
+
+<< cs4 >>= 
+res = paintObjects(cmask, img, col='#ff00ff')
+res = paintObjects(nmask, res, col='#ffff00')
+xy = lapply(hullFeatures(cmask), function(hf) hf[, c('g.x', 'g.y')])
+labels = lapply(xy, function(z) as.character(1:nrow(z)))
+font = drawfont(weight=600, size=16)
+res = drawtext(res, xy=xy, labels=labels , font=font, col="white")
+@ 
+<<cs4h, echo=FALSE>>= 
+writeImage(res, 'res.jpeg', quality=100)
+@
+
+
+\begin{figure}[!h]
+\begin{center}
+\includegraphics[width=0.49\textwidth]{res-0.jpeg}
+\includegraphics[width=0.49\textwidth]{res-1.jpeg}\\{\tiny$ $}\\
+\includegraphics[width=0.49\textwidth]{res-2.jpeg}
+\includegraphics[width=0.49\textwidth]{res-3.jpeg}
+\caption{Final segmentation \code{res}}
+\end{center}
+\end{figure}
+
+\end{document}
+
+
