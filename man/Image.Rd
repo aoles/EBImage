@@ -99,7 +99,7 @@
   in the object \code{y} or the number of renderable frames. The total number of frames is independent
   of the color mode and is equal to the product of all the dimensions except the two first ones. The
   number of renderable frames is equal to the total number of frames in the \code{Grayscale} color mode
-  and is equal of the product of all the dimensions except the three first ones in the \code{Color} color mode.
+  and is equal to the product of all the dimensions except the three first ones in the \code{Color} color mode.
 }
 
 \seealso{

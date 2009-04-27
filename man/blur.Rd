@@ -21,12 +21,12 @@
     The default value 0 enables automatic radius selection.}
 
   \item{s}{The standard deviation of the Gaussian filter used for
-    blurring. For reasonable results, in most functions \code{r} must be
-    larger than \code{s}. }
+    blurring. For reasonable results, \code{r} must be larger
+    than \code{s}. }
 }
 
 \value{
-  An \code{Image} object or an array, containing the transformed version
+  An \code{Image} object or an array, containing the blurred version
   of \code{x}.
 }
 

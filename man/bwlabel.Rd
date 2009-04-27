@@ -24,9 +24,9 @@
 }
 
 \details{
-  Each connected set of foreground (non-zero) pixels in \code{x} is set
-  to an unique increasing integer, starting from 1. Hence, \code{max(x)}
-  tells you the number of connected objects in \code{x}.
+  All pixels for each connected set of foreground (non-zero) pixels
+  in \code{x} are set to an unique increasing integer, starting from 1.
+  Hence, \code{max(x)} gives the number of connected objects in \code{x}.
 }
 
 \author{

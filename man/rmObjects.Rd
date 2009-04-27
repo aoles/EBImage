@@ -17,6 +17,7 @@
 \usage{
   rmObjects(x, index)
 
+
   reenumerate(x)
 }
 
