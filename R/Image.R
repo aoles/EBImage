@@ -99,12 +99,12 @@ as.Image = function(x) {
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 colorMode = function (y) {
-  if (class(y)=='Image') y@colormode
+  if (is(y, 'Image')) y@colormode
   else Grayscale
 }
 
 `colorMode<-` = function(y, value) {
-  if (class(y)=='Image') {
+    if (is(y, 'Image')) {
     ## conversion here should not be possible ! kept for compatibility
     if ((y@colormode==TrueColor & value!=TrueColor) |
         (y@colormode!=TrueColor & value==TrueColor)) {
@@ -119,12 +119,12 @@ colorMode = function (y) {
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 imageData = function (y) {
-  if (class(y)=='Image') y@.Data
+  if (is(y, 'Image')) y@.Data
   else y
 }
 
 `imageData<-` = function (y, value) {
-  if (class(y)=='Image') {
+    if (is(y, 'Image')) {
     y@.Data = value
     ## conversion here should not be possible ! kept for compatibility !
     if (is.integer(value)) y@colormode = TrueColor
