@@ -1,6 +1,12 @@
-3.1.1
+3.1.3 
+- merge devel with release version 3.0.1
+
+3.0.1
 - updated CHANGES
-- updated man pages till channel
+- updated manual pages
+- now uses is(x, 'Image') instead of class(x)=='Image' to allow people inherit from the EBImage class
+- updated INSTALL file, with new tips for Windows and MacOS users
+- removed Gene*.tif old images
 
 2.99.8
 - new INSTALL

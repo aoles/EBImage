@@ -5,27 +5,26 @@
 
 \concept{feature extraction}
 
-\title{ Extraction of edge profiles and edge features from images of indexed objects }
+\title{ Extraction of edge profiles and edge features from image objects }
 
 \description{
-  Edge profile is a distance profile from the geometric center of the object
-  to all its perimeter points calculated by taking the distance at different
-  rotation angles (rotation around the center). The profile is calculated for
-  the rotation angle, theta in \code{[-pi,pi]}.
+  Extract the edge profile from image objects, computing for each object
+  the distances of edge points to the object geometric center, at
+  different rotation angles.
 }
 
 \usage{
-
-  edgeProfile(x, ref, n=32, fft=TRUE, scale=TRUE, rotate=TRUE)
   edgeFeatures(x, ref)
+  edgeProfile(x, ref, n=32, fft=TRUE, scale=TRUE, rotate=TRUE)
+ 
 }
 
 \arguments{
-
-  \item{x}{An object of \code{\linkS4class{Image}}.}
-
-  \item{ref}{A reference Grayscale image of the same size as \code{x}.
-    See details.}
+  \item{x}{An \code{Image} object or an array containing object masks.
+    Object masks are sets of pixels with the same unique integer value.}
+  
+  \item{ref}{An \code{Image} object or an array, containing the
+    intensity values of the objects.}
 
   \item{n}{ An integer value giving the number of angle measures. The
     full circle of \code{[-pi,pi]} is divided into \code{n-1} segments, at
@@ -47,42 +46,42 @@
 }
 
 \value{
-  For a single frame, both functions return a matrix of descriptors with
-  objects in rows and ordered profile points (or features) in columns.
-  For image stacks, a list of such matrices.
-
-  The matrix columns in \code{edge.profile} correspond, from left to right,
-  to the equidistant divisions of the range \code{[-pi,pi]} if \code{fft} is
-  not used, otherwise to the frequences of angular changes (lower frequences on
-  the left, higher on the right up to the middle of the vector).
+ \code{edgeFeatures} returns a matrix (or a list of matrices if
+  \code{x} contains multiple frames) of features computed of the objects
+  present in \code{x} and using the intensity values of \code{ref}.
+  
+  \code{edgeProfile} returns a matrix ((or a list of matrices if
+  \code{x} contains multiple frames) of profile values, corresponding,
+  from left to right, to the equidistant divisions of the range
+  \code{[-pi,pi]} if \code{fft} is \code{FALSE}. Otherwise, the matrix
+  contains the FFT transform of the corresponding distance profile.
 }
 
 \details{
-  The \code{ref} image can be omitted. However, if supplied it affects the
-  centers of objects and their angles of rotation as in \code{\link{moments}}.
-
-  The \code{edge.features} runs with \code{n=16} calculating scale and rotation
-  invariant features. From the original distance profile, it returns the measure
-  of object's irregularity taken by calculating the difference between the
-  farthest and the closest to the center edge points. Then it computes the
-  \code{fft} and returns 4 of it's lowest frequences, corresponding to
-  \code{2*Pi, 2*Pi/2=Pi, 2*Pi/3} and \code{2*Pi/4=Pi/2}.
-
-  The extracted feature names carry a \code{e.} prefix to indicate edge features.
+  \code{edgeFeatures} returns the following features:
+  \itemize{
+    \item \code{e.irr}: difference between the smallest and largest
+    distance profile values.
+    \item \code{e.f2Pi}: 2pi/1 frequency component of the distance
+      profile.
+    \item \code{e.fPi}: 2pi/2 frequency component of the distance
+      profile.
+    \item \code{e.f2Pi3}: 2pi/3 frequency component of the distance
+      profile.
+    \item \code{e.fPi2}: 2pi/4 frequency component of the distance
+      profile.
+    }
 }
 
-\seealso{\code{
-  \linkS4class{Image}, \link{watershed}, \link{getFeatures},
-  \link{hullFeatures}, \link{moments}
-}}
+\seealso{
+  \code{\link{getFeatures}}, \code{\link{ocontour}}
+}
 
 \author{
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2007
 }
 
 \examples{
-  ## see example(getFeatures)
+   example(getFeatures)
 }
-
-\keyword{file}
 
