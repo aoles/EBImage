@@ -1,4 +1,4 @@
-1. UNIX/Linux and Mac OS installation
+1. UNIX/Linux 
 
 EBImage requires the following softwares to be installed:
 1) pkg-config
@@ -10,17 +10,6 @@ ImageMagick is available in many UNIX distributions (Ubuntu,
 Debian, Fedora, Suse). Alternatively, you may download and compile it 
 from 'http://www.imagemagick.org/script/install-source.php#unix'.
 
-On Mac OS systems, an easy way to get these tools is to first install 
-MacPorts from 'http://www.macports.org/'. To install MacPorts, you'll need
-to install the XCode developement suite and the X11 SDK on your machine. 
-These tools are located in the DVDs shipped with your Mac. The commands 
-'sudo port install ImageMagick' and 'sudo port install gtk2' will then 
-install the required softwares. Before installing or using EBImage, you'll 
-have to start the X11 server, located in the Application/Utilities directory.
-The new release of EBImage will be much easier to install on MacOS systems.
-Drop me an email (gregoire.pau@ebi.ac.uk) if you have troubles to install
-EBImage on MacOS systems.
-
 Please note that the development versions (with C header and libraries) of 
 gtk+-2.0 and ImageMagick are needed to install EBImage.
 
@@ -30,7 +19,33 @@ a the EBImage package directory to install EBImage.
 
 EBImage works fine with gtk+-2.0 2.12.9 and ImageMagick 6.3.7 Q16.
 
-2. Windows installation
+2. MacOS installation
+
+EBImage requires the following softwares to be installed:
+1) pkg-config
+2) gtk+-2.0
+3) ImageMagick
+
+These softwares can be easily installed with the MacPorts package management
+software, available at 'http://www.macports.org/'. To install MacPorts, 
+you'll first need to install the XCode developement suite and the X11 SDK.
+These tools are located in the DVDs shipped with your Mac.
+
+Next, the packages 'gtk+-2.0' and 'ImageMagick' are installed by simply 
+typing the commands 'sudo port install ImageMagick' and 'sudo port install gtk2' 
+in a terminal. The package 'pkg-config' will be automatically installed as a
+dependency of 'gtk+-2.0'.
+
+Download the latest **SOURCE** package of EBImage at
+http://www.bioconductor.org/packages/2.4/bioc/html/EBImage.html
+and install it by just typing 'R CMD INSTALL .' in a terminal. 
+
+Before using EBImage, you'll have to start the X11 server located 
+in the Application/Utilities directory. Start R and type 
+'library(EBImage) ; example(EBImage)' to check whether everything
+went fine.
+
+3. Windows installation
 
 EBImage requires the following softwares to be installed:
 1) gtk+-2.0
@@ -38,14 +53,19 @@ EBImage requires the following softwares to be installed:
 
 The gtk+-2.0 bundle can be downloaded from 'http://ftp.gnome.org/pub/gnome/binaries/win32/gtk+/2.16/gtk+-bundle_2.16.0-20090317_win32.zip'
 or 'http://www.gtk.org/download-windows.html' (select the binary GTK+ all-in-one bundle).
-Please install it somewhere (C:\gtk, for example) and please tick the checkbox 
-to install the development tools.
+Please install it somewhere ('C:\gtk', for example) and add the 'C:\gtk\bin' path to the 
+system environment PATH variable by editing the tab 'System/Advanced/Environment variables' 
+of the 'My computer' desktop icon properties.
 
 ImageMagick can be downloaded from 'http://www.imagemagick.org/script/binary-releases.php#windows'. 
-Select the Q16 DLL version and install it on your computer.
-
-Just download and install the package EBImage from Bioconductor.
+Select the Q16 DLL version and install it on your computer. The checkboxes 'Update executable search 
+path' and 'Install developement headers and libraries' must be checked on.
 
 EBImage works fine with gtk+-2.0 2.12.9 and ImageMagick 6.3.7 Q16.
+
+Please note that on some older Window systems, you may see a runtime error stating that 'an application
+has made an attempt to load the C runtime library incorrectly'. This is an ImageMagick related issue 
+which can be fixed by downloading the Microsoft VC++ 2008 Redistributable Package here:
+http://www.microsoft.com/downloads/details.aspx?FamilyID=9b2da534-3e03-4391-8a4d-074b9f2bc1bf&displaylang=en 
 
 Gregoire (gregoire.pau@ebi.ac.uk)

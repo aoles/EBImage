@@ -4,10 +4,10 @@
 
 \concept{feature extraction}
 
-\title{ Extraction of Zernike moments from images of indexed objects }
+\title{ Extraction of Zernike moments from image objects.}
 
 \description{
-  Extraction of Zernike moments from images of indexed objects
+  Computation of Zernike moment features from image objects.
 }
 
 \usage{
@@ -15,55 +15,47 @@
 }
 
 \arguments{
+  \item{x}{An \code{Image} object or an array containing object masks.
+    Object masks are sets of pixels with the same unique integer value.}
+    
+  \item{ref}{An \code{Image} object or an array, containing the
+    intensity values of the objects.}
+  
+  \item{N}{A numeric. Indicates the maximal order of Zernike polynomials
+    to be computed. Default value is 12.}
 
-  \item{x}{An object of \code{\linkS4class{Image}}.}
-
-  \item{ref}{An object of \code{\link{Image-class}} in the Grayscale
-    mode.}
-
-  \item{N}{Integer value defining the degree of the Zernike polynomials,
-    which in turn defines the number of features calculated. Defaults to 12.}
-
-  \item{R}{ Defines the radius of the circle around an object centre
-    from which the features are calculated.}
+  \item{R}{A numeric. Defines the radius of the circle in pixels around
+    object centers from which the features are calculated.}
 
   \item{apply.Gaussian, pseudo}{Deprecated.}
 }
 
 \value{
-  For a single frame, a matrix of descriptors with objects in rows and features
-  in columns. For image stacks, a list of such matrices. Frames with no objects
-  will result in 0-populated a matrix for 1 object.
+  Returns a matrix (or a list of matrices if \code{x} contains multiple
+  frames) of features computed of the objects present in \code{x} and
+  using the  intensity values of \code{ref}.
 }
 
 \details{
-  Zernike features are calculated as follows:
+  Zernike features are computed by projecting image objects on the
+  Zernike complex polynomials, using:
 
-  \code{Z_nl = (n+1) / pi * ABS( sum_x,y(V*nl(x,y) * i(x,y)) )},
+  \code{z.{nl} = (n+1) / pi * abs( sum_x,y(V*nl(x,y) * i(x,y)) )},
 
-  \code{0 <= l <= n, n - l} is even and \code{i(x,y)} is the intensity of the
-  reference image at the corrdinates \code{(x,y)} that fall withing a circle of
-  radius \code{R} from the object's centre. Coordinates taken relative to the
-  object's centre. The \code{ABS} of the sum gives a real value of the complex
-  feature and makes it rotation invariant.
+  where \code{0 <= l <= n, n - l} is even and \code{i(x,y)} is the
+  intensity of the reference image at the coordinates \code{(x,y)} that
+  fall withing a circle of radius \code{R} from the object's centre.
+  Coordinates are taken relative to the object's centre.
 
-  \code{V*nl} is a complex conjugate of a Zernike polynomial of degree \code{n}
-  and angular dependence \code{l}:
+  \code{V*nl} is a complex conjugate of a Zernike polynomial of degree
+  \code{n} and angular dependence \code{l}:
 
   \code{Vnl(x,y) = Qnl(x,y) * exp(j*l*theta)}, where \code{j = sqrt(-1),
-  theta=atan2(y,x)}, and
+    theta=atan2(y,x)}, and
 
   \code{Qnl(x,y) = sum[_m=0^((n-l)/2)] ((-1)^m * (n-m)! * r^(n-2*m)) /
-  (m! * ((n-2*m+l)/2)! * ((n-2*m-l)/2)!) }, where \code{r = sqrt(x^2+y^2)}.
-
-  The extracted features all carry a \code{"z"}-prefix, for Zernike, and have
-  the indexing of the form \code{z.0402} where 04 in this is for \code{n=4}
-  and 02 for \code{l=2}. The number of differnt \code{l}-values is calculated
-  automatically from \code{N}. For a given \code{N} all
-  combinations of \code{(n,l)} are calculated. For the default \code{N = 12}
-  the resulting number of features is 49. Columns in the results matrix are
-  firstly ordered by increasing value of \code{n} and secondly by increasing
-  value of \code{l}.
+    (m! * ((n-2*m+l)/2)! * ((n-2*m-l)/2)!) }, where \code{r =
+    sqrt(x^2+y^2)}.
 }
 
 \references{
@@ -83,7 +75,7 @@
 }
 
 \examples{
-  ## see example(getFeatures)
+ example(getFeatures)
 }
 
 \keyword{manip}

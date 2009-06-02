@@ -26,7 +26,7 @@
 }
 
 \value{
-  For \code{readImage}, a new instance of \code{\linkS4class{Image}}.
+  \code{readImage} returns a new \code{Image} object.
   \code{writeImage} returns \code{invisible(files)}.
 }
 
