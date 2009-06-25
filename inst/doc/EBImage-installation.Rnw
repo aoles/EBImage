@@ -1,0 +1,122 @@
+%\VignetteIndexEntry{EBImage installation}
+%\VignetteKeywords{image processing, visualization}
+%\VignettePackage{EBImage}
+
+\documentclass[10pt,a4paper]{article}
+\usepackage{hyperref}
+\usepackage{color}
+\definecolor{darkblue}{rgb}{0.2,0.0,0.4}
+
+\topmargin -1.5cm
+\oddsidemargin -0cm   % read Lamport p.163
+\evensidemargin -0cm  % same as oddsidemargin but for left-hand pages
+\textwidth 17cm
+\textheight 24.5cm
+\setlength{\parindent}{0mm}
+\SweaveOpts{keep.source=FALSE,eps=FALSE}
+
+\newcommand{\code}[1]{{\mbox{\normalfont{'#1'}}}}
+\newcommand{\pkg}[1]{{\mbox{\normalfont{#1}}}}
+\newcommand{\email}[1]{\mbox{\href{mailto:#1}{\textcolor{darkblue}{\normalfont{#1}}}}}
+\begin{document}
+
+\title{EBImage installation}
+\author{Gregoire Pau, Oleg Sklyar, Wolfgang Huber\\\email{gpau@ebi.ac.uk}}
+\maketitle
+
+\section{UNIX/Linux}
+
+EBImage requires the following softwares/libraries to be installed:
+\begin{itemize}
+\item \pkg{pkg-config}
+\item \pkg{gtk+-2.0}
+\item \pkg{ImageMagick}
+\end{itemize}
+
+On UNIX/Linux systems, \pkg{pkg-config} and \pkg{gtk+-2.0} are most likely present. 
+The \pkg{ImageMagick} library is available in many UNIX distributions (Ubuntu,
+Debian, Fedora, Suse). Alternatively, you may download and compile it 
+from \url{http://www.imagemagick.org/script/install-source.php#unix}.
+Please note that the development versions (with C header and libraries) of 
+\pkg{gtk+-2.0} and \pkg{ImageMagick} are required to install EBImage.\\
+
+Check if \pkg{gtk+-2.0} works by typing in a terminal \code{gtk-demo}. Check if 
+\pkg{ImageMagick} works by typing \code{convert -version}. Check if the libraries are correctly
+installed by typing \code{pkg-config gtk+-2.0 --libs} and \code{Magick-config --libs}.
+You should see some output without error messages.\\
+
+EBImage is ready to be installed. Just type \code{biocLite("EBImage")} in an R terminal
+to install EBImage. Otherwise, download the EBImage {\bf source} package from the Bioconductor website 
+at \url{http://www.bioconductor.org/packages/release/bioc/html/EBImage.html} and type 
+\code{R CMD INSTALL x}, where \code{x} is the name of the downloaded package.\\
+
+EBImage works fine with gtk+-2.0 2.12.9 and ImageMagick 6.3.7 Q16.
+
+\section{MacOS systems}
+
+EBImage requires the following softwares/libraries to be installed:
+\begin{itemize}
+\item \pkg{pkg-config}
+\item \pkg{gtk+-2.0}
+\item \pkg{ImageMagick}
+\end{itemize}
+
+These softwares can be easily installed with the \pkg{MacPorts} package management
+software, available at \url{http://www.macports.org}. To install \pkg{MacPorts}, 
+you first need to install the XCode developement suite and the X11 SDK.
+These tools are located in the DVDs shipped with your Mac.\\
+
+Next, install the packages \pkg{gtk+-2.0} and \pkg{ImageMagick} by 
+typing the commands \code{sudo port install ImageMagick} and \code{sudo port install gtk2}
+in a terminal. The package \pkg{pkg-config} is automatically installed as a 
+dependency of \pkg{gtk+-2.0}.\\
+
+Check if \pkg{gtk+-2.0} works by typing in a terminal \code{gtk-demo}. Check if 
+\pkg{ImageMagick} works by typing \code{convert -version}. Check if the libraries are correctly
+installed by typing \code{pkg-config gtk+-2.0 --libs} and \code{Magick-config --libs}.
+You should see some output, without error messages, and notice that all libraries are located in 
+\code{/opt/local/lib}. \\
+
+EBImage is ready to be installed. Just download the EBImage {\bf source} package
+from the Bioconductor website at \url{http://www.bioconductor.org/packages/release/bioc/html/EBImage.html}
+and type in a terminal \code{R CMD INSTALL x}, where \code{x} is the name of the downloaded package.\\
+
+Before using EBImage, you have to start the X11 server located in the \code{Application/Utilities} directory.
+Start R and type 'library(EBImage) ; example(EBImage)' to check whether the installation of EBImage went fine.\\
+
+Most installation problems come from:
+\begin{itemize}
+\item Installation of the EBImage binary Mac package instead of the {\bf source} one. The binary Mac package works fine
+but is tedious to install. It requires \pkg{ImageMagick} to be installed in \code{/usr/local/lib} and \pkg{gtk+-2.0} 
+to be installed in \code{/Library/Frameworks/GTK+.framework}.
+\item Clash between previous installed libraires (manually installed or installed with Fink). Please check that the 
+\pkg{gtk+2-.0} and \pkg{ImageMagick} libraries are located in \code{/opt/local/lib} and not in \code{/usr/local} or /code{/sw/}.
+\item The X11 server is not running. Please start the X11 server before installing or running EBImage.
+\end{itemize}
+
+EBImage works fine with gtk+-2.0 2.12.9 and ImageMagick 6.3.7 Q16.
+
+\section{Windows}
+
+EBImage requires the following softwares/libraries to be installed:
+\begin{itemize}
+\item \pkg{gtk+-2.0}
+\item \pkg{ImageMagick}
+\end{itemize}
+
+The \pkg{gtk+-2.0} bundle can be downloaded from \url{http://ftp.gnome.org/pub/gnome/binaries/win32/gtk+/2.16/gtk+-bundle_2.16.0-20090317_win32.zip} or \url{http://www.gtk.org/download-windows.html} (select the binary GTK+ all-in-one bundle). Please install it, for example in \code{C:\textbackslash gtk}, and add the \code{C: \textbackslash  gtk \textbackslash bin} path to the system environment PATH variable by editing the tab 'System/Advanced/Environment' variables of the 'My computer' desktop icon properties.\\
+
+\pkg{ImageMagick} can be downloaded from \url{http://www.imagemagick.org/script/binary-releases.php#windows}. 
+Select the Q16 DLL version and install it on your computer. During installation, the checkboxes 'Update executable search 
+path' and 'Install developement headers and libraries' must be checked on.\\
+
+EBImage works fine with gtk+-2.0 2.12.9 and ImageMagick 6.3.7 Q16.\\
+
+Please note that on some older Window systems, you may see a runtime error stating that 'an application
+has made an attempt to load the C runtime library incorrectly'. This is an ImageMagick related issue 
+which can be fixed by downloading the Microsoft VC++ 2008 Redistributable Package here:
+\url{http://www.microsoft.com/downloads/details.aspx?FamilyID=9b2da534-3e03-4391-8a4d-074b9f2bc1bf&displaylang=en}\\
+
+Gregoire Pau (gregoire.pau@ebi.ac.uk)
+
+\end{document}

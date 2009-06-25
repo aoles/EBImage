@@ -1,5 +1,4 @@
-%\VignetteIndexEntry{Introduction to EBImage, an image processing and analysis toolkit for R}
-%\VignetteDepends{}
+%\VignetteIndexEntry{Introduction to EBImage}
 %\VignetteKeywords{image processing, visualization}
 %\VignettePackage{EBImage}
 
@@ -44,7 +43,7 @@
 
 \title{Introduction to \Rpackage{EBImage},\\
 an image processing and analysis toolkit for R}
-\author{Gregoire Pau, Oleg Sklyar, Wolfgang Huber\\\email{osklyar@ebi.ac.uk}}
+\author{Gregoire Pau, Oleg Sklyar, Wolfgang Huber\\\email{gpau@ebi.ac.uk}}
 \maketitle
 
 \tableofcontents
