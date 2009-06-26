@@ -1,16 +1,8 @@
 #include "display.h"
-
-/* -------------------------------------------------------------------------
-Image conversions between MagickCore and R
-Copyright (c) 2006 Oleg Sklyar
-See: ../LICENSE for license, LGPL
-------------------------------------------------------------------------- */
-
 #include "tools.h"
 #include "conversions.h"
 
 #include <stdio.h>
-
 #include <R_ext/Memory.h>
 #include <R_ext/Error.h>
 #include <magick/ImageMagick.h>
@@ -19,44 +11,46 @@ See: ../LICENSE for license, LGPL
 #   include <pthread.h>
 #endif
 
-/* These are to use GTK */
+// GTK includes
 #ifdef USE_GTK
-#   include <gtk/gtk.h>
-#   ifdef WIN32
-        typedef unsigned long ulong;
-#       include <sys/types.h>
-#   else
-#       include <gdk/gdkx.h>
-#   endif
+  #include <gtk/gtk.h>
+  #ifdef WIN32
+    typedef unsigned long ulong;
+    #include <sys/types.h>
+  #else
+    #include <gdk/gdkx.h>
+  #endif
 #endif
 
-typedef struct {
-  double nx,ny,nz;
-  double x,y;
-  double zoom;
-  GtkWidget *hSlider;
-  GtkWidget *imgWG;
-  GtkWidget *stbarWG;
-  int index;
-  SEXP xx;
-} udata;
-
-#define INTERP_METHOD GDK_INTERP_NEAREST
 int THREAD_ON = 0;
 
 // C preferred way to get rid of 'unused parameter' warnings
 #define UNUSED(expr) do { (void)(expr); } while (0)
 
-/*----------------------------------------------------------------------- */
 void * _showInImageMagickWindow (void *);
 void * _animateInImageMagickWindow (void *);
+
+// GTK declarations
 #ifdef USE_GTK
-void _showInGtkWindow (SEXP, SEXP);
-GdkPixbuf *newPixbufFromSEXP (SEXP x, int index);
+  void _showInGtkWindow (SEXP, SEXP);
+  GdkPixbuf *newPixbufFromSEXP (SEXP x, int index);
+
+  typedef struct {
+    double nx,ny,nz;
+    double x,y;
+    double zoom;
+    GtkWidget *hSlider;
+    GtkWidget *imgWG;
+    GtkWidget *stbarWG;
+    int index;
+    SEXP xx;
+  } udata;
+
+  #define INTERP_METHOD GDK_INTERP_NEAREST
+
 #endif
-/*----------------------------------------------------------------------- */
-SEXP
-lib_display(SEXP x, SEXP caption, SEXP useGTK) {
+
+SEXP lib_display(SEXP x, SEXP caption, SEXP useGTK) {
 #ifndef WIN32
     pthread_t res;
 #endif
@@ -84,9 +78,7 @@ lib_display(SEXP x, SEXP caption, SEXP useGTK) {
     return R_NilValue;
 }
 
-/*----------------------------------------------------------------------- */
-SEXP
-lib_animate (SEXP x) {
+SEXP lib_animate (SEXP x) {
 #ifndef WIN32
     pthread_t res;
 #endif
@@ -104,9 +96,7 @@ lib_animate (SEXP x) {
     return R_NilValue;
 }
 
-/*----------------------------------------------------------------------- */
-void *
-_showInImageMagickWindow (void * ptr) {
+void *_showInImageMagickWindow (void * ptr) {
     SEXP x;
     Image * images;
     ImageInfo * image_info;
@@ -123,9 +113,7 @@ _showInImageMagickWindow (void * ptr) {
     return NULL;
 }
 
-/*----------------------------------------------------------------------- */
-void *
-_animateInImageMagickWindow (void * ptr) {
+void *_animateInImageMagickWindow (void * ptr) {
     SEXP x;
     Image * images;
     ImageInfo * image_info;
@@ -142,7 +130,7 @@ _animateInImageMagickWindow (void * ptr) {
     return NULL;
 }
 
-/*----------------------------------------------------------------------- */
+
 #ifdef USE_GTK
 
 /* forward declarations */
@@ -158,7 +146,7 @@ gboolean onSlide(GtkRange *range, gpointer user_data);
 void updateStatusBar(gpointer user_data);
 void updateFrame(gpointer user_data,double factor);
 
-/*----------------------------------------------------------------------- */
+
 void
 _showInGtkWindow (SEXP xx, SEXP caption) {
     int nx, ny, nz, width, height;
