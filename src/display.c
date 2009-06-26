@@ -34,9 +34,9 @@ typedef struct {
   double nx,ny,nz;
   double x,y;
   double zoom;
-  GtkWidget *hSlider;
-  GtkWidget *imgWG;
-  GtkWidget *stbarWG;
+  void *hSlider;
+  void *imgWG;
+  void *stbarWG;
   int index;
   SEXP xx;
 } udata;
