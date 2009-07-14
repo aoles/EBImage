@@ -127,7 +127,7 @@ R_init_EBImage (DllInfo * winDll) {
     // initialize gtk, vars defined in common.h and initialised in init.c
     gtk_disable_setlocale();
     if ( !gtk_init_check(&argc, &argv) )
-        warning ( "failed to initialize GTK+. GTK+ dependent functions will not work" );
+        warning ( "Failed to initialize GTK+. Most of the functionality of EBImage will work, but not the GTK+ widgets for interactive use. If you want to use the GTK+ dependent functionality, please make sure you have an X-Server available for this process." );
     else {
         GTK_OK = 1;
         // add R event handler to enable automatic window redraw
