@@ -7,8 +7,9 @@
 \title{Voronoi-based segmentation on image manifolds}
 
 \description{
-  R implementation of the Voronoi-based image segmentation on image
-  manifolds from Carpenter et al. [2].
+  *** Under construction **** 
+  Voronoi segmentation on image
+  manifolds as described by Jones et al. [2].
 }
 
 \usage{
@@ -58,16 +59,10 @@
   distance between pixels used to let the given seeds grow outwards
   (propagate) is:
 
-  \preformatted{d^2 = (grad(I)^2 + lambda * (dx^2 + dy^2)) / (lambda + 1)}
+  \preformatted{d^2 = (grad(I)^2 + lambda / (lambda + 1) * (dx^2 + dy^2)) }
 
-  The above formulation was proposed by Carpenter et al, however in the 
-  calculation we use a modified distance measture, in which sharp gradients
-  are downregulated and large distances additionally penalized. Effectively,
-  we use the following formula:
-  
-  \preformatted{d = sqrt(grad(I)) + 1e-3*lambda * (dx^2+dy^2)^2}
-
-  The gradient is calculated on a neighborhood of \code{ext} pixels. \code{lambda}
+  The gradient is calculated on a neighborhood of \code{ext} pixels. 
+  \code{lambda}
   controls the weight of the Euclidian distance term. In case of large
   values, d turns into the Euclidian distance. For small values of 
   \code{lambda}, the distance will be dominated by the intensity gradient.
