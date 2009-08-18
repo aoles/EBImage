@@ -54,7 +54,7 @@ Algorithm and implementation are from Jones et al. [1].
   Under this metric, the infinitesimal distance d between points
   v and v+dv is defined by: 
   \preformatted{d^2 = ( (t(dv)*g)^2 + lambda*t(dv)*dv )/(lambda + 1) },
-  where is g is the gradient of image \code{x} at point v.
+  where g is the gradient of image \code{x} at point v.
 
   \code{lambda} controls the weight of the Euclidian distance term. 
   When \code{lambda} tends to infinity, d tends to the Euclidian
