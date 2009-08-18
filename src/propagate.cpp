@@ -106,7 +106,7 @@ propagate (SEXP x, SEXP seeds_, SEXP mask_, SEXP ext_, SEXP lambda_) {
         index = i + nx * j;
         masked = false;
         if ( mask )
-          if ( mask[ index] <= 0 )
+          if ( mask[ index] == 0 )
               masked = true;
         /* initialize distances */
         dists[ index ] = R_PosInf;
@@ -202,14 +202,14 @@ deltaG ( double * src, int x1,  int y1, int x2,  int y2,
   dI /= (2.0*ext+1.0)*(2.0*ext+1.0);
 
   double dEucl = (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1);
-  /* we downplay sharp changes in intensity and penalize high Eucl distances */
-  return sqrt(dI) + 1e-3*lambda*dEucl*dEucl;
-  /* Our original formula
-      return sqrt((dI*dI + lambda*dEucl)/(1.0 + lambda));
-  */ 
-  /* CellProfiler uses this formula
-      double dManh = abs(x2 - x1) + abs(y2 - y1);
-      return sqrt( dI*dI + dManh * lambda * lambda);
+
+  // Gradient described in the original paper [1]
+  return sqrt((dI*dI + lambda*dEucl)/(1.0 + lambda));
+
+  /* CellProfiler's gradient
+     double dManh = abs(x2 - x1) + abs(y2 - y1);
+     return sqrt( dI*dI + dManh * lambda * lambda);
   */
+  // return sqrt(dI) + 1e-3*lambda*dEucl*dEucl;
 }
 
