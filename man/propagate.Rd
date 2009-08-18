@@ -7,65 +7,62 @@
 \title{Voronoi-based segmentation on image manifolds}
 
 \description{
-  *** Under construction **** 
-  Voronoi segmentation on image
-  manifolds as described by Jones et al. [2].
+Find boundaries between adjacent regions in an image, where seeds
+have been already identified in the individual regions to be
+segmented. The method finds the Voronoi region of each seed on
+a manifold with a metric controlled by local image properties.
+The method is motivated by the problem of finding the borders of
+cells in microscopy images, given a labelling of the nuclei
+in the images.
+
+Algorithm and implementation are from Jones et al. [1].
 }
 
 \usage{
-  propagate(x, seeds, mask=NULL, lambda=0.1, 
-     ext=1, seed.centers=FALSE)
+  propagate(x, seeds, mask=NULL, lambda=1e-4, ext=1, seed.centers)
 }
 
 \arguments{
+   \item{x}{An \code{Image} object or an array, containing the image to segment.}
 
-   \item{x}{An \code{Image} object in \code{Grayscale} color mode
-    or an array, containing the image to segment.}
+   \item{seeds}{An \code{Image} object or an array, containing the seeding objects of
+   the already identified regions.}	
 
-   \item{seeds}{An \code{Image} object in \code{Grayscale} color mode
-    or an array, containing the seeding objects from where to start
-    segmentation.}
+   \item{mask}{An optional \code{Image} object or an array, containing
+   the binary image mask of the regions that can be segmented. If missing, 
+   the whole image is segmented.}
 
-  \item{mask}{An optional \code{Image} object or an array, 
-    containing the seeding objects from where to start
-    segmentation. \code{mask} is considered as a binary mask,
-    whose pixels of value 0 will be excluded from the final
-    segmentation objects.}
-
-  \item{lambda}{A numeric value. The regularisation parameter for the
-    distance calculations, determining the trade-off between the Euclidian distance in
-    the image plane and the contribution of the gradient of the values
-    in \code{x}. See details.}
+   \item{lambda}{A numeric value. The regularisation parameter used in the
+   metric, determining the trade-off between the Euclidian distance in the
+   image plane and the contribution of the gradient of \code{x}. See details.}
 
   \item{ext}{Radius in pixels of the neighborhood to estimate image
     gradient, e.g. ext=1 means a 3x3 neighborhood.}
 
-  \item{seed.centers}{ If \code{TRUE}, only centers of the seeding objects
-    are considered as seeds for the propagate algorithm.}
+  \item{seed.centers}{Deprecated.}
 }
 
 \value{
-  An \code{Image} object in \code{Grayscale} color mode or
-  an array, containing the labelled objects.
+  An \code{Image} object or an array, containing the labelled objects.
 }
 
 \details{
   The method operates by computing a discretized approximation of the
-  Voronoi regions for given seed points on a manifold with a metric
-  controlled by local image features.
+  Voronoi regions for given seed points on a Riemann manifold with a
+  metric controlled by local image features.
 
-  The metric is a Riemannian metric defined in terms of the image I and
-  a regularization parameter lambda. With this metric the
-  distance between pixels used to let the given seeds grow outwards
-  (propagate) is:
+  Under this metric, the infinitesimal distance d between points
+  v and v+dv is defined by: 
+  \preformatted{d^2 = ( (t(dv)*g)^2 + lambda*t(dv)*dv )/(lambda + 1) },
+  where is g is the gradient of image \code{x} at point v.
 
-  \preformatted{d^2 = (grad(I)^2 + lambda / (lambda + 1) * (dx^2 + dy^2)) }
+  \code{lambda} controls the weight of the Euclidian distance term. 
+  When \code{lambda} tends to infinity, d tends to the Euclidian
+  distance. When \code{lambda} tends to 0, d tends to the intensity
+  gradient of the image.
 
-  The gradient is calculated on a neighborhood of \code{ext} pixels. 
-  \code{lambda}
-  controls the weight of the Euclidian distance term. In case of large
-  values, d turns into the Euclidian distance. For small values of 
-  \code{lambda}, the distance will be dominated by the intensity gradient.
+  To avoid to rely too much on single noisy pixels, the gradient is
+  calculated on a neighborhood of \code{ext} pixels. 
 }
 
 \seealso{ \code{\link{bwlabel}}, \code{\link{watershed}}
@@ -101,26 +98,25 @@
   Original CellProfiler code: Anne Carpenter <carpenter@wi.mit.edu>,
   Thouis Jones <thouis@csail.mit.edu>, In Han Kang <inthek@mit.edu>.
 
-  Port for this package: Oleg Sklyar <osklyar@ebi.ac.uk> and Wolfgang Huber <huber@ebi.ac.uk>.
+  Port for this package: Oleg Sklyar <osklyar@ebi.ac.uk> and Wolfgang Huber
+  <huber@ebi.ac.uk>.
 }
 
-\section{ License }{
-
-  The underlying C++ code is based on code from CellProfiler
-  [1,3]. An LGPL license was granted by Thouis Jones to use this part
-  of CellProfiler's code for the \code{propagate} function.
+\section{License}{
+  The implementation is based on CellProfiler C++ source code [2, 3].
+  An LGPL license was granted by Thouis Jones to use this part of CellProfiler's code for the \code{propagate} function.
 
 }
 
 \references{
-    \code{[1]} \emph{A. Carpenter, T.R. Jones, M.R. Lamprecht, C. Clarke, I.H. Kang,
-    O. Friman, D. Guertin, J.H. Chang, R.A. Lindquist, J. Moffat,
-    P. Golland and D.M. Sabatini}, "CellProfiler: image analysis software
-    for identifying and quantifying cell phenotypes", Genome Biology 2006, 7:R100
-
-    \code{[2]} \emph{T. Jones, A. Carpenter and P. Golland},
+    \code{[1]} T. Jones, A. Carpenter and P. Golland,
     "Voronoi-Based Segmentation of Cells on Image Manifolds",
     CVBIA05 (535-543), 2005
+
+    \code{[2]} A. Carpenter, T.R. Jones, M.R. Lamprecht, C. Clarke, I.H. Kang,
+    O. Friman, D. Guertin, J.H. Chang, R.A. Lindquist, J. Moffat,
+    P. Golland and D.M. Sabatini, "CellProfiler: image analysis software
+    for identifying and quantifying cell phenotypes", Genome Biology 2006, 7:R100
 
     \code{[3]} CellProfiler: http://www.cellprofiler.org
 }

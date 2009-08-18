@@ -10,14 +10,11 @@ watershed = function (x, tolerance=1, ext=1) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-propagate = function (x, seeds, mask=NULL, lambda=0.1, ext=1, seed.centers=FALSE) {
+propagate = function (x, seeds, mask=NULL, lambda=1e-4, ext=1, seed.centers) {
   validImage(x)
-  if (colorMode(x) != Grayscale) stop("'x' must be a 'Grayscale' image or an array")
-  if (colorMode(seeds) != Grayscale) stop("'seeds' must be a 'Grayscale' image or an array")
   checkCompatibleImages(x, seeds)
   
   if (!is.null(mask)) {
-    if (colorMode(mask) != Grayscale) stop("'mask' must be a 'Grayscale' image or an array")
     checkCompatibleImages(x, mask)
     mask = castImage(mask)
   }
@@ -26,7 +23,9 @@ propagate = function (x, seeds, mask=NULL, lambda=0.1, ext=1, seed.centers=FALSE
   if (ext < 0) stop("'ext' must be positive" )
   lambda = as.numeric (lambda)
   if (lambda < 0.0) stop("'lambda' must be positive" )
-  
+
+  if (!missing(seed.centers)) warning("'seed.centers' is deprecated.")
+  else seed.centers = FALSE
   if (seed.centers) {
     cm = hullFeatures(seeds)
     dimx = dim(seeds)
