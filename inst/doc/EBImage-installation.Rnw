@@ -15,7 +15,7 @@
 \setlength{\parindent}{0mm}
 \SweaveOpts{keep.source=FALSE,eps=FALSE}
 
-\newcommand{\code}[1]{{\mbox{\normalfont{'#1'}}}}
+\newcommand{\code}[1]{{\mbox{\normalfont{`#1'}}}}
 \newcommand{\pkg}[1]{{\mbox{\normalfont{#1}}}}
 \newcommand{\email}[1]{\mbox{\href{mailto:#1}{\textcolor{darkblue}{\normalfont{#1}}}}}
 \begin{document}
@@ -42,13 +42,16 @@ Please note that the development versions (with C header and libraries) of
 
 Check if \pkg{gtk+-2.0} works by typing in a terminal \code{gtk-demo}. Check if 
 \pkg{ImageMagick} works by typing \code{convert -version}. Check if the libraries are correctly
-installed by typing \code{pkg-config gtk+-2.0 --libs} and \code{Magick-config --libs}.
+installed by typing \code{pkg-config gtk+-2.0 -{}-libs} and \code{Magick-config -{}-libs}.
 You should see some output without error messages.\\
 
 EBImage is ready to be installed. Just type \code{biocLite("EBImage")} in an R terminal
 to install EBImage. Otherwise, download the EBImage {\bf source} package from the Bioconductor website 
 at \url{http://www.bioconductor.org/packages/release/bioc/html/EBImage.html} and type 
 \code{R CMD INSTALL x}, where \code{x} is the name of the downloaded package.\\
+
+Please note that in some Linux distributions, such as Ubuntu 9.04, the MagickWand subcomponent is not part of the core ImageMagick package and
+should be installed separately.
 
 EBImage works fine with gtk+-2.0 2.12.9 and ImageMagick 6.3.7 Q16.
 
@@ -73,7 +76,7 @@ dependency of \pkg{gtk+-2.0}.\\
 
 Check if \pkg{gtk+-2.0} works by typing in a terminal \code{gtk-demo}. Check if 
 \pkg{ImageMagick} works by typing \code{convert -version}. Check if the libraries are correctly
-installed by typing \code{pkg-config gtk+-2.0 --libs} and \code{Magick-config --libs}.
+installed by typing \code{pkg-config gtk+-2.0 -{}-libs} and \code{Magick-config -{}-libs}.
 You should see some output, without error messages, and notice that all libraries are located in 
 \code{/opt/local/lib}. \\
 
@@ -82,7 +85,7 @@ from the Bioconductor website at \url{http://www.bioconductor.org/packages/relea
 and type in a terminal \code{R CMD INSTALL x}, where \code{x} is the name of the downloaded package.\\
 
 Before using EBImage, you have to start the X11 server located in the \code{Application/Utilities} directory.
-Start R and type 'library(EBImage) ; example(EBImage)' to check whether the installation of EBImage went fine.\\
+Start R and type `library(EBImage) ; example(EBImage)' to check whether the installation of EBImage went fine.\\
 
 Most installation problems come from:
 \begin{itemize}
@@ -104,15 +107,15 @@ EBImage requires the following softwares/libraries to be installed:
 \item \pkg{ImageMagick}
 \end{itemize}
 
-The \pkg{gtk+-2.0} bundle can be downloaded from \url{http://ftp.gnome.org/pub/gnome/binaries/win32/gtk+/2.16/gtk+-bundle_2.16.0-20090317_win32.zip} or \url{http://www.gtk.org/download-windows.html} (select the binary GTK+ all-in-one bundle). Please install it, for example in \code{C:\textbackslash gtk}, and add the \code{C: \textbackslash  gtk \textbackslash bin} path to the system environment PATH variable by editing the tab 'System/Advanced/Environment' variables of the 'My computer' desktop icon properties.\\
+The \pkg{gtk+-2.0} bundle can be downloaded from \url{http://ftp.gnome.org/pub/gnome/binaries/win32/gtk+/2.16/gtk+-bundle_2.16.0-20090317_win32.zip} or \url{http://www.gtk.org/download-windows.html} (select the binary GTK+ all-in-one bundle). Please install it, for example in \code{C:\textbackslash gtk}, and add the \code{C: \textbackslash  gtk \textbackslash bin} path to the system environment PATH variable by editing the tab `System/Advanced/Environment' variables of the `My computer' desktop icon properties.\\
 
 \pkg{ImageMagick} can be downloaded from \url{http://www.imagemagick.org/script/binary-releases.php#windows}. 
-Select the Q16 DLL version and install it on your computer. During installation, the checkboxes 'Update executable search 
-path' and 'Install developement headers and libraries' must be checked on.\\
+Select the Q16 DLL version and install it on your computer. During installation, the checkboxes `Update executable search 
+path' and `Install developement headers and libraries' must be checked on.\\
 
 EBImage works fine with gtk+-2.0 2.12.9 and ImageMagick 6.3.7 Q16.\\
 
-Please note that on some older Window systems, you may see a runtime error stating that 'an application
+Please note that on some older Window systems, you may see a runtime error stating that `an application
 has made an attempt to load the C runtime library incorrectly'. This is an ImageMagick related issue 
 which can be fixed by downloading the Microsoft VC++ 2008 Redistributable Package here:
 \url{http://www.microsoft.com/downloads/details.aspx?FamilyID=9b2da534-3e03-4391-8a4d-074b9f2bc1bf&displaylang=en}\\

@@ -60,7 +60,7 @@ display = function(...) if (interactive()) EBImage::display(...)
 @
 
 The function \Rfunction{readImage} is able to read images from files
-or URLs. The supported image formats depend on the capabilities of
+or URLs. The supported image formats depend on the capabilities of the
 underlying \Rpackage{ImageMagick} library.
 
 <<readImage1>>= 
@@ -201,7 +201,7 @@ writeImage(lenacomb, 'lenacomb.jpeg', quality=95)
 \section{Spatial transformations}
 
 Specific spatial image transformations are done with the functions
-\code{reize}, \code{rotate}, \code{translate} and the functions 
+\code{resize}, \code{rotate}, \code{translate} and the functions 
 \code{flip} and \code{flop} to reflect images.
 
 <<spatial>>= 
@@ -387,7 +387,7 @@ writeImage(eidilat, 'eidilat.png')
 
 Segmentation consists in extracting objects from an image. The function 
 \code{bwlabel} is a simple function able to extract every connected sets
-of pixels from an image and relabel these sets with an unique increasing
+of pixels from an image and relabel these sets with a unique increasing
 integer. \code{bwlabel} can be used on binary images and is useful after
 thresholding.
 
@@ -422,7 +422,7 @@ writeImage(nuclabel/max(nuclabel), 'nuclabel.png')
 
 Since the images \code{eilabel} and \code{nuclabel} range from 0 to the
 number of object they contain (given by \code{max(eilabel)} and 
-\code{max(eilabel)}), they have to be divided by these number before 
+\code{max(nucabel)}), they have to be divided by these number before 
 displaying, in order to fit the [0,1] range needed by \code{display}.
 
 The grayscale top-bottom gradient observable in \code{eilabel} and \code{nuclabel}
@@ -430,7 +430,7 @@ is due to the way \code{bwlabel} labels the connected sets, from top-left to
 bottom-right.
 
 Adaptive thresholding consists in comparing the intensity of pixels with
-their neighbors, where the neighborood is specified by a filter matrix.
+their neighbors, where the neighborhood is specified by a filter matrix.
 The function \code{thresh} performs a fast adaptive thresholding of an image
 with a rectangular window while the combination of \code{filter2} and \code{<} 
 allows a finer control. Adaptive thresholding allows a better segmentation
@@ -457,7 +457,7 @@ writeImage(nuclabel2/max(nuclabel2), 'nuclabel2.png')
 
 \pagebreak
 \newpage
-\section{Objects manipulation}
+\section{Object manipulation}
 
 Objects, defined as sets of pixels with the same unique integer value
 can be outlined and painted using \code{paintObjects}. Some holes are 
