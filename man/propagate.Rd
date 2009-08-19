@@ -69,28 +69,41 @@ Algorithm and implementation are from Jones et al. [1].
 }
 
 \examples{
-  ## load images
-  nuc = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
-  cel = readImage(system.file('images', 'cells.tif', package='EBImage'))
-  img = rgbImage(green=1.5*cel, blue=nuc)
-  if (interactive()) display(img, title='Cells')
 
-  ## segment nuclei
-  nmask = thresh(nuc, 10, 10, 0.05)
-  nmask = opening(nmask, makeBrush(5, shape='disc'))
-  nmask = fillHull(nmask)
-  nmask = bwlabel(nmask)
-  if (interactive()) display(normalize(nmask), title='Cell nuclei mask')
+## a paraboloid mountain in a plane
+n = 400
+a = (n/4)^2 - matrix(
+       (rep(1:n, times=n) - n/2)^2 + (rep(1:n, each=n) - n/2)^2,
+       nrow=400,
+       ncol=400)
+a[a<0] = 0
+a = normalize(a)
 
-  ## segment cells, using propagate and nuclei as 'seeds'
-  ctmask = opening(cel>0.1, makeBrush(5, shape='disc'))
-  cmask = propagate(cel, nmask, ctmask)
-  if (interactive()) display(normalize(cmask), title='Cell mask')
+## 'color' version of a
+ac = rgbImage(green=a, red=a)
 
-  ## segmentation results
-  res = paintObjects(cmask, img, col='#ff00ff')
-  res = paintObjects(nmask, res, col='#ffff00')
-  if (interactive()) display(res, title='Segmented cells')
+## two seeds: a little rectangle on the left,
+##  a large rectangle on the right
+seeds = Image(dim=dim(a))
+seeds[1:10, n/2+(-5:5)] = 1
+seeds[n+(-5:0), (n*0.2):(n*0.8)] = 2
+
+lambda = 10^seq(-10, 0, by=2)
+segmented = Image(dim=c(dim(a), 3, length(lambda)), colormode="Color")
+flip = (seeds>0 | a>0)
+for(i in seq(along=lambda)) {
+
+  prop = propagate(a, seeds, lambda=lambda[i]) - 1
+
+  img = paintObjects(prop, ac, col="lightblue") 
+  segmented[,,,i] = paintObjects(seeds, img, col=rep("lightblue", 2))
+
+}
+
+if(interactive()){
+  plot(a[200,], main="cut through 'a' at x=200")
+  display(segmented, title="Voronoi regions")
+}
 
 }
 
@@ -98,8 +111,7 @@ Algorithm and implementation are from Jones et al. [1].
   Original CellProfiler code: Anne Carpenter <carpenter@wi.mit.edu>,
   Thouis Jones <thouis@csail.mit.edu>, In Han Kang <inthek@mit.edu>.
 
-  Port for this package: Oleg Sklyar <osklyar@ebi.ac.uk> and Wolfgang Huber
-  <huber@ebi.ac.uk>.
+  Port for this package: Greg Pau, Oleg Sklyar, Wolfgang Huber
 }
 
 \section{License}{
