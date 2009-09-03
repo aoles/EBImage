@@ -19,7 +19,7 @@ Algorithm and implementation are from Jones et al. [1].
 }
 
 \usage{
-  propagate(x, seeds, mask=NULL, lambda=1e-4, ext=1, seed.centers)
+  propagate(x, seeds, mask=NULL, lambda=1e-4, ext, seed.centers)
 }
 
 \arguments{
@@ -36,8 +36,7 @@ Algorithm and implementation are from Jones et al. [1].
    metric, determining the trade-off between the Euclidian distance in the
    image plane and the contribution of the gradient of \code{x}. See details.}
 
-  \item{ext}{Radius in pixels of the neighborhood to estimate image
-    gradient, e.g. ext=1 means a 3x3 neighborhood.}
+  \item{ext}{Deprecated.}
 
   \item{seed.centers}{Deprecated.}
 }
@@ -62,7 +61,7 @@ Algorithm and implementation are from Jones et al. [1].
   gradient of the image.
 
   To avoid to rely too much on single noisy pixels, the gradient is
-  calculated on a neighborhood of \code{ext} pixels.
+  computed on a neighborhood of 3x3 pixels.
 
   Segmentation of the Voronoi regions in the vincinity of flat areas
   (having a null gradient) with small values of \code{lambda} can
@@ -87,7 +86,7 @@ seeds[301:305, 101:105] = 2
 seeds[201:205, 141:145] = 3
 seeds[331:335, 351:355] = 4
 
-lambda = 10^seq(-8, -3, by=1)
+lambda = 10^seq(-8, -1, by=1)
 segmented = Image(dim=c(dim(x), length(lambda)))
 
 for(i in seq(along=lambda)) {

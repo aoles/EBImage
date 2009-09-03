@@ -10,7 +10,7 @@ watershed = function (x, tolerance=1, ext=1) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-propagate = function (x, seeds, mask=NULL, lambda=1e-4, ext=1, seed.centers) {
+propagate = function (x, seeds, mask=NULL, lambda=1e-4, ext, seed.centers) {
   validImage(x)
   checkCompatibleImages(x, seeds)
   
@@ -18,14 +18,15 @@ propagate = function (x, seeds, mask=NULL, lambda=1e-4, ext=1, seed.centers) {
     checkCompatibleImages(x, mask)
     mask = castImage(mask)
   }
-  
-  ext = as.integer (ext)
-  if (ext < 0) stop("'ext' must be positive" )
-  lambda = as.numeric (lambda)
+
+  lambda = as.numeric(lambda)
   if (lambda < 0.0) stop("'lambda' must be positive" )
 
+  if (!missing(ext)) warning("'ext' is deprecated.")
+  
   if (!missing(seed.centers)) warning("'seed.centers' is deprecated.")
   else seed.centers = FALSE
+  
   if (seed.centers) {
     cm = hullFeatures(seeds)
     dimx = dim(seeds)
@@ -39,7 +40,7 @@ propagate = function (x, seeds, mask=NULL, lambda=1e-4, ext=1, seed.centers) {
     seeds = s
   }
   
-  return(.Call( "propagate", castImage(x), castImage(seeds), mask, ext, lambda, PACKAGE='EBImage'))
+  return(.Call( "propagate", castImage(x), castImage(seeds), mask, lambda, PACKAGE='EBImage'))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
