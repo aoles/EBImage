@@ -1,13 +1,11 @@
 
-R version 2.8.0 (2008-10-20)
-Copyright (C) 2008 The R Foundation for Statistical Computing
+R version 2.9.0 (2009-04-17)
+Copyright (C) 2009 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
-
-  Natural language support but running in an English locale
 
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
@@ -236,7 +234,7 @@ checking '+' ... OK (hash=77333420)
 checking '/' ... OK (hash=19333355)
 checking 'getNumberOfFrames' ... OK (hash=1)
 checking 'writeImage' ... OK (hash=NA)
-checking 'resize' ... OK (hash=214938067)
+checking 'resize' ... OK (hash=214938068)
 checking 'rotate' ... OK (hash=67388563)
 checking 'flip' ... OK (hash=42760022)
 checking 'flop' ... OK (hash=38558733)
