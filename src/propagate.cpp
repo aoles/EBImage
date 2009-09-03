@@ -51,18 +51,16 @@ struct Pixel_compare {
 
 typedef priority_queue<Pixel, vector<Pixel>, Pixel_compare> PixelQueue;
 
-/* forward declaration: distance calculation function */
 inline double
 deltaG (double *, int, int, int, int, int, int, double, int);
 
-/* these will form indexes for a neighbourhood of surrounding pixels, going
- * firsth through the ones left-right and top-bottom and then diagonals */
+// offsets of 8-connected neigbouring pixels
 static int ix[8] = {-1, 0, +1,  0, -1, +1, -1, +1};
 static int jy[8] = { 0, 1,  0, -1, -1, +1, +1, -1};
 
-/* ----  R Interface entry point  --------------------------------------- */
+// R entry point
 SEXP
-propagate (SEXP x, SEXP seeds_, SEXP mask_, SEXP ext_, SEXP lambda_) {
+propagate(SEXP x, SEXP seeds_, SEXP mask_, SEXP ext_, SEXP lambda_) {
   SEXP res;
   int i, ii, j, jj, cntr, nprotect = 0;
 
@@ -76,7 +74,7 @@ propagate (SEXP x, SEXP seeds_, SEXP mask_, SEXP ext_, SEXP lambda_) {
   PROTECT ( res = Rf_duplicate(x) );
   nprotect++;
  
-  /* we will keep distances here, reset for every new image */
+  // keep distances here
   double * dists = new double[ nx * ny ];
 
   for ( int im = 0; im < nz; im++ ) {
@@ -94,79 +92,70 @@ propagate (SEXP x, SEXP seeds_, SEXP mask_, SEXP ext_, SEXP lambda_) {
     double seed, d;
     int index;
     bool masked;
-    /* main algorithm */
 
-    /* res initialization */
+    // tgt initialization
     for ( index = 0; index < nx * ny; index++ )
       tgt[ index ] = 0.0;
 
-    /* initialization */
-    for ( j = 0; j < ny; j++ )
+    // initialization 
+    for ( j = 0; j < ny; j++ ) {
       for ( i = 0; i < nx; i++ ) {
         index = i + nx * j;
         masked = false;
         if ( mask )
           if ( mask[ index] == 0 )
               masked = true;
-        /* initialize distances */
+        // initialize distances
         dists[ index ] = R_PosInf;
 
-        /* mark seed in returns, indexing should start at 1; */
-        /* 0.5 is reserved to mark contact regions (EBImage) */
-        if ( (seed = seeds[index]) <= 0.9 || masked ) continue;
+        // copy seeds in target ; background is 0
+	seed = seeds[index];
+        if (seed==0.0 || masked) continue;
         tgt[ index ] = seed;
         dists[ index ] = 0.0;
-        /* push neighbours onto the queue */
+
+	// push neighbours in the queue
         for ( cntr = 0; cntr < 8; cntr++ ) {
           ii = i + ix[cntr];
           jj = j + jy[cntr];
           if ( ii < 0 || ii >= nx || jj < 0 || jj >= ny ) continue;
-          /* at this initialization step we do not push pixels on the queue which are
-            * already assigned, i.e. which are seeds because their distance is 0 and cannot be smaller */
-          if ( tgt[ INDEX(ii, jj) ] > 0.9 ) continue;
-          pixel_queue.push( Pixel(deltaG(src, i, j, ii, jj, nx, ny, lambda, ext), ii, jj, seed) );
+          // at this initialization step we do not push pixels on the queue which are
+          // already assigned, i.e. which are seeds because their distance is 0 and cannot be smaller
+          if ( tgt[ INDEX(ii, jj) ]==0.0) pixel_queue.push( Pixel(deltaG(src, i, j, ii, jj, nx, ny, lambda, ext), ii, jj, seed) );
         }
+	
       }
+    }
 
-    /* propagation */
-    /* the queue only has pixels around the seeds originally, but it
-      * gets new pixels dynamically as the assigned regions extend */
+    // propagation
+    // the queue only has pixels around the seeds originally, but it
+    // gets new pixels dynamically as the assigned regions extend
     while ( !pixel_queue.empty() ) {
-      /* get the topmost pixel as its distance is largerst */
+      // get the topmost pixel as its distance is largest
       Pixel px = pixel_queue.top();
       index = INDEX(px.i, px.j);
-      /* and remove it from the queue */
+      // and remove it from the queue
       pixel_queue.pop();
 
       masked = false;
       if ( mask )
-        if ( mask[ index] <= 0 )
+        if ( mask[ index] == 0 )
           masked = true;
 
-      /* if currently assigned distance for this pixel (PosInf)
-        * is larger than the one stored in the pixel when pushing
-        * onto the queue, then reassign distance and seed */
-      if ( dists[ index ] <= px.distance || masked ) continue;
+      // if currently assigned distance for this pixel (PosInf)
+      // is larger than the one stored in the pixel when pushing
+      // onto the queue, then reassign distance and seed
+      if ( (dists[ index ] <= px.distance) || masked ) continue;
       dists[ index ] = px.distance;
       tgt[ index ] = px.seed;
-      /* push neighbours onto the queue */
+
+      // push neighbours in the queue
       for ( cntr = 0; cntr < 8; cntr++ ) {
         ii = px.i + ix[cntr];
         jj = px.j + jy[cntr];
         if ( ii < 0 || ii >= nx || jj < 0 || jj >= ny ) continue;
         index = INDEX(ii, jj) ;
-        /* now we do not want to push onto the queue pixels that are already
-          * assigned to the same seed, we only update their distance. pixels assigned
-          * to other seeds are pushed up as their distance to this seed can be
-          * smaller later on (in L.163 above). anyway this should be much faster than
-          * CellProfile'r original algorithm as we do not resize the queue on
-          * pixels that we are not going to reassign */
-        d = px.distance + deltaG(src, px.i, px.j, ii, jj, nx, ny, lambda, ext);
-        if ( tgt[ index ] == px.seed ) {
-          if ( dists[ index ] > d )
-            dists[ index ] = d;
-          continue;
-        }
+	d = px.distance + deltaG(src, px.i, px.j, ii, jj, nx, ny, lambda, ext);
         pixel_queue.push( Pixel(d, ii, jj, px.seed) );
       }
     }
@@ -186,30 +175,26 @@ clamped_fetch (double * data, int i, int j, int nx, int ny) {
   return data[ INDEX(i, j) ];
 }
 
-/* this is the distance evaluation in the modified metric */
+// discretized metric
 inline double
 deltaG ( double * src, int x1,  int y1, int x2,  int y2,
         int nx, int ny, double lambda, int ext) {
   int x, y;
   double dI = 0.0;
 
+  // average image gradient, to avoid to rely too much on single noisy pixels
   for (x=-ext; x<=ext; x++)
     for (y=-ext; y<=ext; y++)
       dI += fabs(clamped_fetch(src, x1+x, y1+y, nx, ny) -
                  clamped_fetch(src, x2+x, y2+y, nx, ny));
-  /* this is not because we calculate dI/dx as it is dx*(dI/dx)=dI, this is
-  * because we want the mean value of the gradient in the region */
   dI /= (2.0*ext+1.0)*(2.0*ext+1.0);
 
+  // metric described in the original paper [1]
   double dEucl = (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1);
-
-  // Gradient described in the original paper [1]
   return sqrt((dI*dI + lambda*dEucl)/(1.0 + lambda));
-
-  /* CellProfiler's gradient
-     double dManh = abs(x2 - x1) + abs(y2 - y1);
-     return sqrt( dI*dI + dManh * lambda * lambda);
-  */
-  // return sqrt(dI) + 1e-3*lambda*dEucl*dEucl;
+  
+  // metric used in CellProfiler [2]
+  // double dManh = abs(x2 - x1) + abs(y2 - y1);
+  // return sqrt( dI*dI + dManh * lambda * lambda);
 }
 

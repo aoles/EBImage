@@ -62,46 +62,43 @@ Algorithm and implementation are from Jones et al. [1].
   gradient of the image.
 
   To avoid to rely too much on single noisy pixels, the gradient is
-  calculated on a neighborhood of \code{ext} pixels. 
+  calculated on a neighborhood of \code{ext} pixels.
+
+  Segmentation of the Voronoi regions in the vincinity of flat areas
+  (having a null gradient) with small values of \code{lambda} can
+  suffer from artefacts coming from the metric approximation.
 }
 
 \seealso{ \code{\link{bwlabel}}, \code{\link{watershed}}
 }
 
 \examples{
-
 ## a paraboloid mountain in a plane
 n = 400
-a = (n/4)^2 - matrix(
+x = (n/4)^2 - matrix(
        (rep(1:n, times=n) - n/2)^2 + (rep(1:n, each=n) - n/2)^2,
-       nrow=400,
-       ncol=400)
-a[a<0] = 0
-a = normalize(a)
+       nrow=n, ncol=n)
+x = normalize(x)
 
-## 'color' version of a
-ac = rgbImage(green=a, red=a)
+## 4 seeds
+seeds = array(0, dim=c(n,n))
+seeds[51:55, 301:305] = 1
+seeds[301:305, 101:105] = 2
+seeds[201:205, 141:145] = 3
+seeds[331:335, 351:355] = 4
 
-## two seeds: a little rectangle on the left,
-##  a large rectangle on the right
-seeds = Image(dim=dim(a))
-seeds[1:10, n/2+(-5:5)] = 1
-seeds[n+(-5:0), (n*0.2):(n*0.8)] = 2
+lambda = 10^seq(-8, -3, by=1)
+segmented = Image(dim=c(dim(x), length(lambda)))
 
-lambda = 10^seq(-10, 0, by=2)
-segmented = Image(dim=c(dim(a), 3, length(lambda)), colormode="Color")
-flip = (seeds>0 | a>0)
 for(i in seq(along=lambda)) {
-
-  prop = propagate(a, seeds, lambda=lambda[i]) - 1
-
-  img = paintObjects(prop, ac, col="lightblue") 
-  segmented[,,,i] = paintObjects(seeds, img, col=rep("lightblue", 2))
-
+  prop = propagate(x, seeds, lambda=lambda[i])
+  prop = prop/max(prop)
+  segmented[,,i] = prop
 }
 
 if(interactive()){
-  plot(a[200,], main="cut through 'a' at x=200")
+  display(x, title='Image')
+  display(seeds/max(seeds), title='Seeds')
   display(segmented, title="Voronoi regions")
 }
 
@@ -111,7 +108,7 @@ if(interactive()){
   Original CellProfiler code: Anne Carpenter <carpenter@wi.mit.edu>,
   Thouis Jones <thouis@csail.mit.edu>, In Han Kang <inthek@mit.edu>.
 
-  Port for this package: Greg Pau, Oleg Sklyar, Wolfgang Huber
+  Port for this package: Oleg Sklyar, Gregoire Pau, Wolfgang Huber
 }
 
 \section{License}{
@@ -121,16 +118,16 @@ if(interactive()){
 }
 
 \references{
-    \code{[1]} T. Jones, A. Carpenter and P. Golland,
+   [1] T. Jones, A. Carpenter and P. Golland,
     "Voronoi-Based Segmentation of Cells on Image Manifolds",
     CVBIA05 (535-543), 2005
 
-    \code{[2]} A. Carpenter, T.R. Jones, M.R. Lamprecht, C. Clarke, I.H. Kang,
+   [2] A. Carpenter, T.R. Jones, M.R. Lamprecht, C. Clarke, I.H. Kang,
     O. Friman, D. Guertin, J.H. Chang, R.A. Lindquist, J. Moffat,
     P. Golland and D.M. Sabatini, "CellProfiler: image analysis software
     for identifying and quantifying cell phenotypes", Genome Biology 2006, 7:R100
 
-    \code{[3]} CellProfiler: http://www.cellprofiler.org
+   [3] CellProfiler: http://www.cellprofiler.org
 }
 
 

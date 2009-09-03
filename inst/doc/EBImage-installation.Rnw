@@ -51,7 +51,7 @@ at \url{http://www.bioconductor.org/packages/release/bioc/html/EBImage.html} and
 \code{R CMD INSTALL x}, where \code{x} is the name of the downloaded package.\\
 
 Please note that in some Linux distributions, such as Ubuntu 9.04, the MagickWand subcomponent is not part of the core ImageMagick package and
-should be installed separately.
+should be installed separately. \\
 
 EBImage works fine with gtk+-2.0 2.12.9 and ImageMagick 6.3.7 Q16.
 
@@ -93,7 +93,7 @@ Most installation problems come from:
 but is tedious to install. It requires \pkg{ImageMagick} to be installed in \code{/usr/local/lib} and \pkg{gtk+-2.0} 
 to be installed in \code{/Library/Frameworks/GTK+.framework}.
 \item Clash between previous installed libraires (manually installed or installed with Fink). Please check that the 
-\pkg{gtk+2-.0} and \pkg{ImageMagick} libraries are located in \code{/opt/local/lib} and not in \code{/usr/local} or /code{/sw/}.
+\pkg{gtk+2-.0} and \pkg{ImageMagick} libraries are located in \code{/opt/local/lib} and not in \code{/usr/local} or \code{/sw/}.
 \item The X11 server is not running. Please start the X11 server before installing or running EBImage.
 \end{itemize}
 
