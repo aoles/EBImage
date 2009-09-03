@@ -63,7 +63,7 @@ Algorithm and implementation are from Jones et al. [1].
   To avoid to rely too much on single noisy pixels, the gradient is
   computed on a neighborhood of 3x3 pixels.
 
-  Segmentation of the Voronoi regions in the vincinity of flat areas
+  Segmentation of the Voronoi regions in the vicinity of flat areas
   (having a null gradient) with small values of \code{lambda} can
   suffer from artefacts coming from the metric approximation.
 }
