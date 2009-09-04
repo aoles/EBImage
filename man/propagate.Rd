@@ -60,7 +60,7 @@ Algorithm and implementation are from Jones et al. [1].
   distance. When \code{lambda} tends to 0, d tends to the intensity
   gradient of the image.
 
-  To avoid to rely too much on single noisy pixels, the gradient is
+  The gradient is
   computed on a neighborhood of 3x3 pixels.
 
   Segmentation of the Voronoi regions in the vicinity of flat areas
@@ -104,16 +104,15 @@ if(interactive()){
 }
 
 \author{
-  Original CellProfiler code: Anne Carpenter <carpenter@wi.mit.edu>,
+  The original CellProfiler code is from Anne Carpenter <carpenter@wi.mit.edu>,
   Thouis Jones <thouis@csail.mit.edu>, In Han Kang <inthek@mit.edu>.
-
-  Port for this package: Oleg Sklyar, Gregoire Pau, Wolfgang Huber
+  Responsible for this implementation: Greg Pau.
 }
 
 \section{License}{
   The implementation is based on CellProfiler C++ source code [2, 3].
-  An LGPL license was granted by Thouis Jones to use this part of CellProfiler's code for the \code{propagate} function.
-
+  An LGPL license was granted by Thouis Jones to use this part of
+  CellProfiler's code for the \code{propagate} function.
 }
 
 \references{
