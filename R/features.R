@@ -14,10 +14,10 @@ getFeatures = function (x, ref, N = 12, R = 30, apply.Gaussian, nc = 32, pseudo)
   ## remove the feature 'm.pxs', which is equal to 'h.s'
   if (getNumberOfFrames(x,'total')==1) {
     impxs = match('m.pxs', colnames(mf)) 
-    mf = mf[, -impxs]
+    mf = mf[, -impxs, drop=FALSE]
   } else {
     impxs = match('m.pxs', colnames(mf[[1]])) 
-    for (i in seq_along(hf)) mf[[i]] = mf[[i]][, -impxs]
+    for (i in seq_along(hf)) mf[[i]] = mf[[i]][, -impxs, drop=FALSE]
   }
   
   if (getNumberOfFrames(x,'total')==1) features = list( cbind(gf, mf, ef, hf, zf) )
