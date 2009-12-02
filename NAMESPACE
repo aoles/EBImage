@@ -63,14 +63,4 @@ export(moments, cmoments, smoments, rmoments)
 export(haralickMatrix, haralickFeatures, zernikeMoments)
 
 ## deprecated
-export(frameDist, matchObjects)
-export(stopIfNotImage)
-export(morphKern, mkbox, mkball)
-export(header, assert)
-export(chooseImage)
-export(resample, sharpen, umask, modulate)
-export(negate, affinet, normalize2, noise)
-export(mediansmooth, cgamma, enhance, denoise)
-export(contrast, despeckle, edge, segment)
-export(cthresh, athresh)
-export(channelMix)
+

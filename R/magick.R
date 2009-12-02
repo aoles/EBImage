@@ -19,27 +19,9 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 flt.blur      <- as.integer(0)
 flt.gaussblur <- as.integer(1)
-flt.contrast  <- as.integer(2)
-flt.denoise   <- as.integer(3)
-flt.despeckle <- as.integer(4)
-flt.edge      <- as.integer(5)
-flt.enhance   <- as.integer(6)
 flt.equalize  <- as.integer(7)
-flt.gamma     <- as.integer(8)
-flt.median    <- as.integer(9)
-flt.noise     <- as.integer(10)
 flt.resize    <- as.integer(11)
 flt.rotate    <- as.integer(12)
-flt.sample    <- as.integer(13)
-flt.segment   <- as.integer(14)
-flt.sharpen   <- as.integer(15)
-flt.unsharp   <- as.integer(16)
-flt.athresh   <- as.integer(17)
-flt.cthresh   <- as.integer(18)
-flt.affinet   <- as.integer(19)
-flt.modulate  <- as.integer(20)
-flt.negate    <- as.integer(21)
-flt.norm      <- as.integer(22)
 
 ## Normalize to [0;1] if needed and go back to the original scale since ImageMagick assumes that image values are within [0;1]
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

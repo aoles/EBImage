@@ -91,21 +91,6 @@
     \item \code{haralickFeatures}, \code{haralickMatrix}
     \item \code{zernikeMoments}
   }
-
-  Deprecated
-  \itemize{
-    \item \code{frameDist}, \code{matchObjects}
-    \item \code{stopIfNotImage}
-    \item \code{morphKern}, \code{mkbox}, \code{mkball}
-    \item \code{header}, \code{assert}
-    \item \code{chooseImage}
-    \item \code{resample}, \code{sharpen}, \code{umask}, \code{modulate}
-    \item \code{negate}, \code{affinet}, \code{normalize2}, \code{noise}
-    \item \code{mediansmooth}, \code{cgamma}, \code{enhance}, \code{denoise}
-    \item \code{contrast}, \code{despeckle}, \code{edge}, \code{segment} 
-    \item \code{cthresh}, \code{athresh}
-    \item \code{channelMix}
-  }
 }
 
 \section{Authors}{

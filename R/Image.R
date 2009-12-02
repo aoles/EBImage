@@ -200,8 +200,7 @@ writeImage = function (x, files, quality=100) {
 readImage = function(files, colormode) {
   if (!missing(colormode)) warning("'colormode' is deprecated")
   else colormode=-1
-  if (missing(files)) .Call ("lib_chooseImages", as.integer(colormode), PACKAGE='EBImage')
-  else .Call ("lib_readImages", as.character(files), as.integer(colormode), PACKAGE='EBImage')
+  .Call ("lib_readImages", as.character(files), as.integer(colormode), PACKAGE='EBImage')
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

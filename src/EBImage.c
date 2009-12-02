@@ -29,7 +29,6 @@ See: ../LICENSE for license, LGPL
 #include "objects.h"
 #include "ocontour.h"
 #include "tile.h"
-#include "frameDist.h"
 
 #include <R.h>
 #include <Rdefines.h>
@@ -76,7 +75,6 @@ See: ../LICENSE for license, LGPL
 /*----------------------------------------------------------------------- */
 static R_CallMethodDef libraryRCalls[] = {
     {"lib_readImages",     (DL_FUNC) &lib_readImages,     2},
-    {"lib_chooseImages",   (DL_FUNC) &lib_chooseImages,   1},
     {"lib_writeImages",    (DL_FUNC) &lib_writeImages,    3},
     {"lib_display",        (DL_FUNC) &lib_display,        3},
     {"lib_animate",        (DL_FUNC) &lib_animate,        1},
@@ -92,13 +90,11 @@ static R_CallMethodDef libraryRCalls[] = {
     {"watershed",          (DL_FUNC) &watershed,    3},
     {"propagate",          (DL_FUNC) &propagate,      4},
     {"paintObjects",       (DL_FUNC) &paintObjects,  4},
-    {"matchObjects",       (DL_FUNC) &matchObjects,  2},
     {"rmObjects",          (DL_FUNC) &rmObjects, 2},
     {"tile",               (DL_FUNC) &tile,     3},
     {"untile",             (DL_FUNC) &untile,         3},
     {"stackObjects",       (DL_FUNC) &stackObjects,  5},
     {"ocontour",           (DL_FUNC) &ocontour,  1},
-    {"lib_frameDist",      (DL_FUNC) &lib_frameDist,      5},
     {"lib_drawText",       (DL_FUNC) &lib_drawText,       5},
     {"lib_basic_hull",     (DL_FUNC) &lib_basic_hull,     1},
     {"lib_cmoments",       (DL_FUNC) &lib_cmoments,       2},
@@ -106,8 +102,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_edge_profile",   (DL_FUNC) &lib_edge_profile,   2},
     {"lib_co_occurrence",  (DL_FUNC) &lib_co_occurrence,  3},
     {"lib_haralick",       (DL_FUNC) &lib_haralick,       1},
-    {"lib_zernike",        (DL_FUNC) &lib_zernike,        6},
-    {"lib_pseudo_zernike", (DL_FUNC) &lib_pseudo_zernike, 6},
+    {"zernike",            (DL_FUNC) &zernike,        5},
 
     /* add above all R-lib functions from common.h */
     {NULL, NULL, 0}

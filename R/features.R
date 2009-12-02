@@ -1,15 +1,13 @@
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-getFeatures = function (x, ref, N = 12, R = 30, apply.Gaussian, nc = 32, pseudo) {
+getFeatures = function (x, ref, N = 12, R = 30, nc = 32) {
   validImage(x)
   if (colorMode(ref) == TrueColor) stop("\'ref\' must not be in \'TrueColor\' color mode")
-  if (!missing(apply.Gaussian)) warning("'apply.Gaussian' is deprecated.")
-  if (!missing(pseudo))  warning("'pseudo' is deprecated.")
   
   gf = hullFeatures(x)
   mf = moments(x=x, ref=ref)
   ef = edgeFeatures(x=x, ref=ref)
   hf = haralickFeatures(x=x, ref=ref, nc=nc)
-  zf = zernikeMoments(x=x, ref=ref, N=N, R=R, apply.Gaussian=apply.Gaussian, pseudo=pseudo)
+  zf = zernikeMoments(x=x, ref=ref, N=N, R=R)
 
   ## remove the feature 'm.pxs', which is equal to 'h.s'
   if (getNumberOfFrames(x,'total')==1) {
@@ -29,18 +27,13 @@ getFeatures = function (x, ref, N = 12, R = 30, apply.Gaussian, nc = 32, pseudo)
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-zernikeMoments = function(x, ref, N=12, R=30, apply.Gaussian, pseudo) {
+zernikeMoments = function(x, ref, N=12, R=30) {
   checkCompatibleImages(x, ref)
-  if (!missing(apply.Gaussian))  warning("'apply.Gaussian' is deprecated.")
-  else apply.Gaussian=FALSE
-  if (!missing(pseudo))  warning("'pseudo' is deprecated.")
-  else pseudo=FALSE
  
   if (getNumberOfFrames(x,'total') == 1) xy <- moments(x=x, ref=ref)[, c('m.x','m.y'), drop=FALSE]
   else xy <- lapply(moments(x=x, ref=ref), function(x) x[, c('m.x','m.y'), drop=FALSE] )
   
-  if (!pseudo) return(.Call("lib_zernike", castImage(x), castImage(ref), xy, as.numeric(R), as.integer(N), as.integer(apply.Gaussian), PACKAGE='EBImage'))
-  else return(.Call("lib_pseudo_zernike", castImage(x), castImage(ref), xy, as.numeric(R), as.integer(N), as.integer(apply.Gaussian), PACKAGE='EBImage'))
+  return(.Call("zernike", castImage(x), castImage(ref), xy, as.numeric(R), as.integer(N), PACKAGE='EBImage'))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
