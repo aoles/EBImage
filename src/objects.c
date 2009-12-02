@@ -84,69 +84,6 @@ paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col) {
 
 /*----------------------------------------------------------------------- */
 SEXP
-matchObjects (SEXP x, SEXP ref) {
-    SEXP res, xf, * indexes, ft;
-    int nprotect, nx, ny, nz, i, ix, jy, im, nobj;
-    double * data, * ftrs;
-
-    validImage(x,0);
-    validImage(ref,0);
-
-    nx = INTEGER ( GET_DIM(x) )[0];
-    ny = INTEGER ( GET_DIM(x) )[1];
-    nz = getNumberOfFrames(x,0);
-    nprotect = 0;
-
-    indexes = (SEXP *) R_alloc (nz, sizeof(SEXP) );
-
-    /* we need this to know centres of objects in x */
-    PROTECT (xf = lib_basic_hull(x) );
-    nprotect++;
-
-    for ( im = 0; im < nz; im++ ) {
-        /* get image data */
-        data = &( REAL(x)[ im * nx * ny ] );
-        /* get number of objects -- max index */
-        nobj = 0;
-        for ( i = 0; i < nx * ny; i++ )
-            if ( data[i] > nobj ) nobj = data[i];
-        /* create results vector */
-        PROTECT ( indexes[im] = allocVector(INTSXP, nobj) );
-        nprotect++;
-        if ( nobj < 1 ) continue;
-        if ( nz == 1 ) ft = xf;
-        else ft = VECTOR_ELT(xf, im);
-        if ( ft == R_NilValue ) continue;
-        /* check if features correspond to objects */
-        ftrs = REAL( ft );
-        /* reset data to ref */
-        data = &( REAL(ref)[ im * nx * ny ] );
-
-        /* scan through objects, collect indexes */
-        for ( i = 0; i < nobj; i++ ) {
-            ix = ftrs [i];
-            jy = ftrs [i + nobj];
-            INTEGER (indexes[im])[i] = NA_INTEGER;
-            if ( ix >= 0 && jy >= 0 && ix < nx && jy < ny )
-                if ( data[ix + jy * nx] > 0.9 )
-                    INTEGER (indexes[im])[i] = (int)data[ix + jy * nx];
-        }
-    }
-
-    if ( nz > 1 ) {
-      PROTECT (res = allocVector(VECSXP, nz) );
-      nprotect++;
-      for ( im = 0; im < nz; im++ )
-        SET_VECTOR_ELT (res, im, indexes[im] );
-    }
-    else
-      res = indexes[0];
-    UNPROTECT (nprotect);
-    return res;
-}
-
-/*----------------------------------------------------------------------- */
-SEXP
 rmObjects (SEXP x, SEXP _index) {
     SEXP res, index;
     int nprotect, nx, ny, nz, i, j, im, nobj, * indexes, found;

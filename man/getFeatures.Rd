@@ -11,7 +11,7 @@
 }
 
 \usage{
-  getFeatures(x, ref, N=12, R=30, apply.Gaussian, nc=32, pseudo)
+  getFeatures(x, ref, N=12, R=30, nc=32)
 }
 
 \arguments{
@@ -32,8 +32,6 @@
   \item{nc}{ Passed to \code{\link{haralickFeatures}}. A numeric value. 
     Specifies the number of gray levels to bin \code{ref} into when 
     computing the co-occurrence matrix. Defaults to 32.}
-
-  \item{apply.Gaussian, pseudo}{Deprecated.}
 }
 
 \value{

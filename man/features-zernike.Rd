@@ -11,7 +11,7 @@
 }
 
 \usage{
-  zernikeMoments(x, ref, N = 12, R = 30, apply.Gaussian, pseudo)
+  zernikeMoments(x, ref, N = 12, R = 30)
 }
 
 \arguments{
@@ -26,8 +26,6 @@
 
   \item{R}{A numeric. Defines the radius of the circle in pixels around
     object centers from which the features are calculated.}
-
-  \item{apply.Gaussian, pseudo}{Deprecated.}
 }
 
 \value{

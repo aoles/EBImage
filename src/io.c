@@ -101,53 +101,6 @@ lib_readImages (SEXP files, SEXP mode) {
 
 /*----------------------------------------------------------------------- */
 SEXP
-lib_chooseImages (SEXP mode) {
-#ifndef USE_GTK
-  error ( "'choose.image' is only available if package is compiled with GTK+ support" );
-  return R_NilValue;
-#else
-  SEXP res = R_NilValue, filename = R_NilValue;
-  int nprotect = 0, nfiles = 0, i;
-
-  if ( !GTK_OK ) error ("GTK+ was not properly initialised" );
-
-  GSList * fileNameList;
-
-  GtkWidget * dialog = gtk_file_chooser_dialog_new ("Select images to read into the R session",
-      NULL, //parent_window,
-      GTK_FILE_CHOOSER_ACTION_OPEN, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
-  gtk_file_chooser_set_select_multiple ( GTK_FILE_CHOOSER(dialog), TRUE);
-  //    GtkImage * preview;
-  // CHECK   GtkFileFilter* gtk_file_filter_new
-  // CHECK   gtk_file_chooser_set_preview_widget ( GTK_FILE_CHOOSER(dialog), preview);
-  //     g_signal_connect (my_file_chooser, "update-preview", G_CALLBACK (update_preview_cb), preview);
-
-  if ( gtk_dialog_run( GTK_DIALOG(dialog) ) == GTK_RESPONSE_ACCEPT ) {
-    fileNameList = gtk_file_chooser_get_filenames ( GTK_FILE_CHOOSER(dialog) );
-    nfiles = g_slist_length (fileNameList);
-    if ( nfiles >= 1 ) {
-      PROTECT ( filename = allocVector(STRSXP, nfiles) );
-      nprotect++;
-      for ( i = 0; i < nfiles; i++ ) {
-        SET_STRING_ELT (filename, i, mkChar( (char *) g_slist_nth_data (fileNameList, i) ) );
-      }
-    }
-    else error ( "no files were selected" );
-    g_slist_free (fileNameList);
-  }
-  gtk_widget_destroy (dialog);
-  if ( filename != R_NilValue && mode != R_NilValue )
-    res = lib_readImages(filename, mode);
-  UNPROTECT (nprotect);
-  if ( res == R_NilValue )
-    error ( "cancel pressed or no image could be loaded" );
-  return res;
-#endif
-}
-
-/*----------------------------------------------------------------------- */
-SEXP
 lib_writeImages (SEXP x, SEXP files, SEXP quality) {
     int nz, nfiles, i;
     Image * images, * image;

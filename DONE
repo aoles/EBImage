@@ -1,3 +1,15 @@
+3.3.1
+- removed frameDist, matchObject
+- removed stopIfNotImage, morphKern, mkball, mkbox
+- removed header, assert, chooseImage
+- removed resample, sharpen, umask, modulate
+- removed negate, affinet, normalize2, noise
+- removed mediansmooth, cgamma, enhance, denoise
+- removed contrast, despeckle, edge, segment
+- removed cthresh, athresh
+- removed channelMix
+- removed applyGaussian and pseudoZernike
+
 3.1.3 
 - merge devel with release version 3.0.1
 
