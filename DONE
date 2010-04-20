@@ -1,3 +1,6 @@
+3.3.2
+- now uses MagickCoreGenesis and MagickCoreTerminus to start/terminate ImageMagick, to be compatible with IM 6.6.x
+
 3.3.1
 - removed frameDist, matchObject
 - removed stopIfNotImage, morphKern, mkball, mkbox
