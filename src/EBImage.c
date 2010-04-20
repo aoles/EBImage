@@ -144,24 +144,15 @@ R_init_EBImage (DllInfo * winDll) {
 #endif // GTK
     R_registerRoutines (winDll, NULL, libraryRCalls, NULL, NULL);
     R_useDynamicSymbols (winDll, FALSE);
-#   ifdef WIN32
-    InitializeMagick ("");
-    if ( !IsMagickInstantiated () )
-        error ( "cannot initialize ImageMagick" );
-#   endif
-    /* MagickWand must be started */
+    MagickCoreGenesis("", MagickTrue);
+    if (!IsMagickInstantiated ()) error("cannot initialize ImageMagick");
     MagickWandGenesis();
 }
 
 void
 R_unload_EBImage (DllInfo * winDll) {
   UNUSED(winDll);
-  
-  /* MagickWand must be terminated at the end of the process since MagickWandTerminus() closes all the Wand AND ALSO the MagickCore services ! */
   MagickWandTerminus();
-#ifdef WIN32
-    if ( IsMagickInstantiated() )
-        DestroyMagick();
-#endif
+  if (IsMagickInstantiated()) MagickCoreTerminus();
 }
 
