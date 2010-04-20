@@ -145,7 +145,6 @@ R_init_EBImage (DllInfo * winDll) {
     R_registerRoutines (winDll, NULL, libraryRCalls, NULL, NULL);
     R_useDynamicSymbols (winDll, FALSE);
     MagickCoreGenesis("", MagickTrue);
-    if (!IsMagickInstantiated ()) error("cannot initialize ImageMagick");
     MagickWandGenesis();
 }
 
