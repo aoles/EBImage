@@ -1,3 +1,9 @@
+3.5.1
+- lgomp was removed from linking options, to prevent a segfault caused in OpenSUSE 11.2 and 11.3 by dynamic linking of lgomp (optionally used by ImageMagick but not used in EBImage) together with lpthread (required and used by GTK)
+- removed Makevars.in
+- minimal IM required version is now 6.3.7
+- lower vignette image quality to save space
+
 3.3.2
 - now uses MagickCoreGenesis and MagickCoreTerminus to start/terminate ImageMagick, to be compatible with IM 6.6.x
 
