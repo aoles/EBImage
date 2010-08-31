@@ -91,7 +91,7 @@ nuc = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
 display(nuc)
 @
 <<readImage2h,echo=FALSE>>= 
-writeImage(nuc, 'nuc.jpeg', quality=95)
+writeImage(nuc, 'nuc.jpeg', quality=85)
 @
 
 \begin{figure}[!h]
@@ -109,8 +109,8 @@ is deduced from the file name extension. This is useful to convert
 image formats, here from PNG format to JPEG format.
 
 <<writeImage>>= 
-writeImage(lena,  'lena.jpeg', quality=95)
-writeImage(lenac, 'lenac.jpeg', quality=95)
+writeImage(lena,  'lena.jpeg', quality=85)
+writeImage(lenac, 'lenac.jpeg', quality=85)
 @
 
 \pagebreak
@@ -137,9 +137,9 @@ lena2 = 3*lena
 lena3 = (0.2+lena)^3
 @
 <<math1h, echo=FALSE>>= 
-writeImage(lena1, 'lena1.jpeg', quality=95)
-writeImage(lena2, 'lena2.jpeg', quality=95)
-writeImage(lena3, 'lena3.jpeg', quality=95)
+writeImage(lena1, 'lena1.jpeg', quality=85)
+writeImage(lena2, 'lena2.jpeg', quality=85)
+writeImage(lena3, 'lena3.jpeg', quality=85)
 @
 
 \begin{figure}[!h]
@@ -162,9 +162,9 @@ lena6 = t(lena)
 print(median(lena))
 @
 <<math2h, echo=FALSE>>= 
-writeImage(lena4, 'lena4.jpeg', quality=95)
+writeImage(lena4, 'lena4.jpeg', quality=85)
 writeImage(lena5, 'lena5.png')
-writeImage(lena6, 'lena6.jpeg', quality=95)
+writeImage(lena6, 'lena6.jpeg', quality=85)
 @
 
 \begin{figure}[!h]
@@ -183,7 +183,7 @@ lenacomb = combine(lena, lena*2, lena*3, lena*4)
 display(lenacomb)
 @
 <<combineh, echo=FALSE>>= 
-writeImage(lenacomb, 'lenacomb.jpeg', quality=95)
+writeImage(lenacomb, 'lenacomb.jpeg', quality=85)
 @
 
 \begin{figure}[!h]
@@ -210,9 +210,9 @@ lena8 = translate(lena, c(40, 70))
 lena9 = flip(lena)
 @
 <<spatialh, echo=FALSE>>= 
-writeImage(lena7, 'lena7.jpeg', quality=95)
-writeImage(lena8, 'lena8.jpeg', quality=95)
-writeImage(lena9, 'lena9.jpeg', quality=95)
+writeImage(lena7, 'lena7.jpeg', quality=85)
+writeImage(lena8, 'lena8.jpeg', quality=85)
+writeImage(lena9, 'lena9.jpeg', quality=85)
 @
 
 \begin{figure}[!h]
@@ -253,7 +253,7 @@ colorMode(lenac) = Grayscale
 display(lenac)
 @
 <<colorModeh,echo=FALSE>>= 
-writeImage(lenac, 'lenac.jpeg', quality=95)
+writeImage(lenac, 'lenac.jpeg', quality=85)
 @
 
 \begin{figure}[!h]
@@ -285,8 +285,8 @@ lenak[236:276, 206:246, 3] = 1
 lenab = rgbImage(red=lena, green=flip(lena), blue=flop(lena))
 @
 <<channelh,echo=FALSE>>= 
-writeImage(lenak, 'lenak.jpeg', quality=95)
-writeImage(lenab, 'lenab.jpeg', quality=100)
+writeImage(lenak, 'lenak.jpeg', quality=85)
+writeImage(lenab, 'lenab.jpeg', quality=85)
 @
 
 \begin{figure}[!h]
@@ -317,8 +317,8 @@ fhi[2,2] = -8
 lenafhi = filter2(lenac, fhi)
 @
 <<filterh,echo=FALSE>>= 
-writeImage(lenaflo, 'lenaflo.jpeg', quality=95)
-writeImage(lenafhi, 'lenafhi.jpeg', quality=100)
+writeImage(lenaflo, 'lenaflo.jpeg', quality=85)
+writeImage(lenafhi, 'lenafhi.jpeg', quality=85)
 @
 
 \begin{figure}[!h]
@@ -339,7 +339,7 @@ font = drawfont(weight=600, size=28)
 lenatext = drawtext(lena, xy=c(250, 450), labels="Lena", font=font, col="white")
 @
 <<filterh,echo=FALSE>>= 
-writeImage(lenatext, 'lenatext.jpeg', quality=95)
+writeImage(lenatext, 'lenatext.jpeg', quality=85)
 @
 
 \begin{figure}[!h]
@@ -471,8 +471,8 @@ nuclabel3 = fillHull(nuclabel2)
 nuch2 = paintObjects(nuclabel3, nucgray, col='#ff00ff')
 @
 <<maniph,echo=FALSE>>= 
-writeImage(nuch1, 'nuch1.jpeg', quality=100)
-writeImage(nuch2, 'nuch2.jpeg', quality=100)
+writeImage(nuch1, 'nuch1.jpeg', quality=85)
+writeImage(nuch2, 'nuch2.jpeg', quality=85)
 @
 
 \begin{figure}[!h]
@@ -494,7 +494,7 @@ font = drawfont(weight=600, size=16)
 nuctext = drawtext(nuch2, xy=xy, labels=as.character(1:nrow(xy)), font=font, col="yellow")
 @
 <<manip2h,echo=FALSE>>= 
-writeImage(nuctext, 'nuctext.jpeg', quality=100)
+writeImage(nuctext, 'nuctext.jpeg', quality=85)
 @
 
 \begin{figure}[!h]
@@ -520,8 +520,8 @@ cel = readImage(system.file('images', 'cells.tif', package='EBImage'))
 img = rgbImage(green=1.5*cel, blue=nuc)
 @ 
 <<cs1h, echo=FALSE>>= 
-writeImage(cel, 'cel.jpeg')
-writeImage(img, 'img.jpeg')
+writeImage(cel, 'cel.jpeg', quality=85)
+writeImage(img, 'img.jpeg', quality=85)
 @
 
 \begin{figure}[!h]
@@ -608,7 +608,7 @@ font = drawfont(weight=600, size=16)
 res = drawtext(res, xy=xy, labels=labels , font=font, col="white")
 @ 
 <<cs4h, echo=FALSE>>= 
-writeImage(res, 'res.jpeg', quality=100)
+writeImage(res, 'res.jpeg', quality=85)
 @
 
 
