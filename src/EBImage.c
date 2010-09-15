@@ -103,6 +103,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_co_occurrence",  (DL_FUNC) &lib_co_occurrence,  3},
     {"lib_haralick",       (DL_FUNC) &lib_haralick,       1},
     {"zernike",            (DL_FUNC) &zernike,        5},
+    {"drawCircle",         (DL_FUNC) &drawCircle, 4},
 
     /* add above all R-lib functions from common.h */
     {NULL, NULL, 0}
