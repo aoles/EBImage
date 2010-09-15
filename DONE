@@ -1,3 +1,6 @@
+3.5.2
+- added drawCircle
+
 3.5.1
 - lgomp was removed from linking options, to prevent a segfault caused in OpenSUSE 11.2 and 11.3 by dynamic linking of lgomp (optionally used by ImageMagick but not used in EBImage) together with lpthread (required and used by GTK)
 - removed Makevars.in

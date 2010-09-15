@@ -81,7 +81,7 @@ int
 getColorMode(SEXP x) {
   int colorMode;
   if (strcmp( CHAR( asChar( GET_CLASS(x) ) ), "Image") == 0) colorMode=INTEGER(GET_SLOT(x, mkString("colormode")))[0];
-  else colorMode=0;
+  else colorMode = MODE_GRAYSCALE;
 
   return(colorMode);
 }
