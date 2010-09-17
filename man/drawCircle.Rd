@@ -36,6 +36,7 @@
 }
 
 \examples{
+  ## Simple white circle
   x = matrix(0, nrow=300, ncol=300)
   drawCircle(x, 100, 200, 47, col=1)
   if (interactive()) display(x)
