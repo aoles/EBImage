@@ -1,48 +1,180 @@
-Major changes since EBImage 2.6.0
+3.5.2
+- added drawCircle()
+- display() now prints click positions
 
-1) Slots
-The slots 'filename', 'compression', 'resolution', and 'features' have been removed 
-since they are not intrisic properties of images. Only the slot 'colormode' has been
-kept to help EBImage functions to know how to render Image objects.
+3.5.1
+- lgomp was removed from linking options, to prevent a segfault caused in OpenSUSE 11.2 and 11.3 by dynamic linking of lgomp (optionally used by ImageMagick but not used in EBImage) together with lpthread (required and used by GTK)
+- removed Makevars.in
+- minimal IM required version is now 6.3.7
+- lower vignette image quality to save space
 
-2) TrueColor mode
-This color mode 'TrueColor' is now deprecated and will be defunct in the next 
-Bioconductor release. In this color mode, color pixels were stored as integers and 
-resulting matrices didn't constitute a mathematical field anymore, breaking all
-the compatibility with basic mathematical operators and R commands. Please use 
-the color mode 'Color' instead. In this mode, color RGB channels are stored in 
-the third dimension and are more natural to process with R.
+3.3.2
+- now uses MagickCoreGenesis and MagickCoreTerminus to start/terminate ImageMagick, to be compatible with IM 6.6.x
 
-3) Image object, arrays and dimensions
-All EBImage functions now work with Image objects and arrays having more than
-2 dimensions. Extra dimensions are used to store image stacks and image color 
-channels. Storage mode can be 'integer', 'numeric' or 'logical'.
+3.3.1
+- removed frameDist, matchObject
+- removed stopIfNotImage, morphKern, mkball, mkbox
+- removed header, assert, chooseImage
+- removed resample, sharpen, umask, modulate
+- removed negate, affinet, normalize2, noise
+- removed mediansmooth, cgamma, enhance, denoise
+- removed contrast, despeckle, edge, segment
+- removed cthresh, athresh
+- removed channelMix
+- removed applyGaussian and pseudoZernike
 
-4) All S4 methods removed
-All EBImage functions are now R functions, not anymore S4 methods.
+3.1.3 
+- merge devel with release version 3.0.1
 
-5) Testing procedure
-All EBImage functions are now tested during 'R CMD check' with several types of
-multi-dimensional matrices/arrays/Image objects, with several storage modes.
+3.0.1
+- updated CHANGES
+- updated manual pages
+- now uses is(x, 'Image') instead of class(x)=='Image' to allow people inherit from the EBImage class
+- updated INSTALL file, with new tips for Windows and MacOS users
+- removed Gene*.tif old images
 
-6) Deprecation
-28 EBImage functions have been deprecated, mostly functions coming from ImageMagick 
-because they were poorly documented (even in the ImageMagick documentation !)
-and/or not useful aynmore (eg. negate(x) could be replaced by 1-x ; mkball, mkbox and
-morphKern have been fused in makeBrush ; normalize2 is now replaced by normalize, 
-etc...)
+2.99.8
+- new INSTALL
+- new vignette
 
-7) Attribute deprecation
-Many attributes have been deprecated since they were poorly documented, useless in 
-the new framework or too vague to be kept. Many unnecessary '...' arguments have been 
-removed.
+2.99.7
+- stackObjects OK
 
-8) Many bug fixes and speeding issues resolved
-distmap, readImage, watershed, display and many more. See the DONE file.
+2.99.6
+- doc: propagate, combine, tile, untile, rmObjects, reenumerate, hullFeatures
 
-9) New features/functions added
-display, ocontour, bwlabel, makeBrush
+2.99.5
+- channel OK
+- paintObjects, drawtext OK
+- colors.c removed
+- doc: watershed
+- simpler combine
 
-10) IndexedImage class
-This class doesn't exist aynmore. All EBImage functions are now able to work
-on arrays.
+2.99.4
+- deprecated channelMix
+- doc: filter2, moments, cmoments, smoments, rmoments
+- doc: paintObjects, getFeatures, rgbImage, channel
+
+2.99.3
+- bwlabel OK
+- safer rgbImage
+
+2.99.2
+- doc: tresh
+- floodFill and fillHull : doc + test + examples
+
+2.99.1
+- starting the pre 3.0.0 release
+- doc: equalize, blur, gblur, normalize, EBImage, EBImage-deprecated
+
+2.7.22
+- fixed a bug preventing from reading palette images in color
+- deprecated all ImageMagick functions except blur, gblur, equalize, resize and rotate
+- validImage now checks validity of arrays
+- new doc for ocontour, translate, resize, rotate , flip, flop
+- new examples for makeBrush
+
+2.7.21
+- moment features renamed from '*' to 'm.*'
+- geometric hull features  from 'h.*' to 'g.*' to not to be confused with Haralick's features 'h.*'
+- moment features now need ref to be computed
+- getFeatures now just concatenate hull, moments, edge, haralick and zernike features
+- no more s2maj and s2min in hullFeatures: now only l1 and l2 (eigenvalues of the covariance matrix)(to be consistent with moments)
+
+2.7.20
+- outline renamed in ocontour, ocontour documentation added
+- build warnings should disappear
+
+2.7.19
+- outline added
+
+2.7.16
+- fixed warnings due to unused variables in C code
+- fixed a drawtext bug which prevented EBImage to be checked on R 2.9.0
+- fixed floodFill example by restoring inst/images/holes.png
+
+2.7.15
+- no warnings anymore in R CMD check
+- S4 methods removed
+- header and assert deprecated
+- test framework added
+- documentation updated
+- morphKern, mkball and mkbox deprecated 
+- all '...' arguments removed
+- horizontal slider and clean display.c code added
+- zernikeMoments arguments 'pseudo' and 'apply.Gaussian' deprecated
+- display and readImage argument 'colormode' deprecated
+- display arguments: 'main', 'no.GTK' deprecated
+- .ImageCall and ensureStorageMode functions removed
+
+2.7.11
+- no ImageX object anymore: Image now extends array
+
+2.7.10
+- fixed ReadImage bug when filename=''
+
+2.7.9
+- created tile.c, tile.h
+- out of range [0:1] normalize for Magick
+- matrix: channel 4, untile, getFeatures fixed
+- x11 channel OK
+
+2.7.8
+- validImage in C, removed isImage in C
+- merged IndexedImage class within Image, no IndexedImage class anymore !
+- removed spurious '...'
+- classUnion ImageX instead of Image !
+- now Image supports non-numeric storage.mode (e.g. logical) !
+- ImageCall instead of Call to check Image validity and storage.mode
+- deprecated: matchObject, stopIfNotImage
+
+2.7.7
+- reenumerate, hullFeatures, rmObjects, watershed: work fine on md and Color
+- watershed: fixed bug when used on distmap(lena>0.5)
+- getFeatures, hullFeatures, edgeProfile, edgeFeatures: work fine on md and Color
+- cmoments, smoment, rmoments, moments: work fine on md and Color
+- haralickFeatures, haralickMatrix, zernikeMoments: work fine on md and Color
+- zernikeMoments: work fine on md and Color
+- frameDist deprecated
+- class.IndexedImage.R: stop message in case of TrueColor now OK
+- checked all INTEGER(GET_DIM())[2] OK
+- merged all features in features.R
+- renamed methods-display.R in display.R, filters_watershed.cpp in watershed.cpp
+- watershed is now interruptable
+- objects methods moved from class.IndexedImage.R to objects.R
+
+2.7.6
+- fixed dy instead of dx in lib_filterThresh L37 in nFramePix = (2 * dx + 1) * (2 * dx + 1); (bug submitted by Glenn Davis)
+- tile, untile, thresh: works fine on md, Color
+- vignettes build OK
+- translate: check param input OK
+- keeping correct storage.mode after binary operations on TrueColor images
+- deprecated functions moved to deprecated.R
+- vignette changes: (indexing a[,,,1] instead of a[,,1] and promote usage of rgbImage)
+- unit test inst/scripts/test.R added
+- new deprecated.R file
+
+2.7.5
+- functions copy, .isCorrectType, .correctType have been removed
+- multidimensional arrays are now handled
+- new color mode Color added
+- functions getNumberOfFrames, translate added
+- signature combine has been changed
+- validity method added
+- file filters.R renamed in magick.R
+- file spatial.R added
+- abind dependency added
+- new fast distmap algorithm, up to 1000 times faster
+- readImage now uses by default the native image color mode
+- C functions getColorMode, getNumberOfFrames, getNumberOfChannels, getColorStrides added
+- C function lib_paintFeatures renamed to paintObjects
+- C function lib_matchFeatures renamed to matchObjects
+- C function lib_deleteFeatures renamed to rmObjects
+- C function lib_stack_objects renamed to stackObjects
+- C function lib_tile_stack renamed to tile
+- C function lib_untile renamed to untile
+- display is faster since pixbuf are now directly built from SEXP
+- writeImage now uses a quality of 100 by default
+- keep correct storage.mode after binary operations 
+- the Image constructor is doing now the conversion between TrueColor and (Grayscale or Color) images
+- cleaner show, print methods

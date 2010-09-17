@@ -139,6 +139,7 @@ gboolean onZoomInPress  (GtkToolButton *, gpointer);         // "button-press-ev
 gboolean onZoomOutPress (GtkToolButton *, gpointer);         // "button-press-event"
 gboolean onZoomOnePress (GtkToolButton *, gpointer);         // "button-press-event"
 gboolean onNextImPress  (GtkToolButton *, gpointer);         // "button-press-event"
+gboolean onClickImage(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 gboolean onPrevImPress  (GtkToolButton *, gpointer);         // "button-press-event"
 gboolean onScroll       (GtkAdjustment *adjustment, gpointer ptr) ;  // "value-changed"
 gboolean onMouseMove    (GtkWidget *, GdkEventMotion *, gpointer); // "motion-notify-event"
@@ -228,7 +229,7 @@ _showInGtkWindow (SEXP xx, SEXP caption) {
     gtk_scrolled_window_add_with_viewport ( GTK_SCROLLED_WINDOW(scrollWG), evBox);
     gtk_signal_connect(GTK_OBJECT(gtk_scrolled_window_get_hadjustment(GTK_SCROLLED_WINDOW(scrollWG))),"value-changed", GTK_SIGNAL_FUNC(onScroll), dat);
     gtk_signal_connect(GTK_OBJECT(gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrollWG))),"value-changed", GTK_SIGNAL_FUNC(onScroll), dat);
-
+    
     /* create status bar and push it to layout */
     dat->stbarWG = gtk_statusbar_new ();
     gtk_box_pack_start ( GTK_BOX(vboxWG), dat->stbarWG, FALSE, FALSE, 0);
@@ -254,9 +255,10 @@ _showInGtkWindow (SEXP xx, SEXP caption) {
         gtk_container_add ( GTK_CONTAINER(tbarWG), btnNextWG);
         g_signal_connect ( G_OBJECT(btnNextWG), "clicked", G_CALLBACK(onNextImPress), dat);
     }
-
+    
     gtk_signal_connect( GTK_OBJECT(evBox), "motion-notify-event", GTK_SIGNAL_FUNC(onMouseMove), dat);
-    gtk_widget_set_events(evBox, GDK_POINTER_MOTION_MASK ); // GDK_BUTTON_PRESS_MASK | 
+    gtk_signal_connect ( GTK_OBJECT(evBox), "button-press-event", GTK_SIGNAL_FUNC(onClickImage), dat);
+    gtk_widget_set_events(evBox, GDK_BUTTON_PRESS_MASK | GDK_POINTER_MOTION_MASK );
     
     /* resize to fit image */
     width = gdk_screen_get_width ( gdk_screen_get_default() );
@@ -351,6 +353,12 @@ gboolean onScroll(GtkAdjustment *adjustment, gpointer user_data)
   UNUSED(adjustment);
 
   return onMouseMove(NULL,NULL,user_data);
+}
+
+gboolean onClickImage(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
+  udata *dat=(udata *)user_data;
+  printf("%d %d\n", (int)dat->x, (int)dat->y);
+  return TRUE;
 }
 
 gboolean onNextImPress (GtkToolButton * btn, gpointer user_data) {
