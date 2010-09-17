@@ -109,7 +109,7 @@ lib_drawText (SEXP obj, SEXP xylist, SEXP textlist, SEXP thefont, SEXP thecol) {
   return res;
 }
 
-#define SET_PIXEL(a, width, height, x, y, color) if (((x)>=0) & ((x)<=(width)) & ((y)>=0) & ((y)<=(height))) a[(x) + (y)*(width)] = (color);
+#define SET_PIXEL(a, width, height, x, y, color) if (((x)>=0) & ((x)<(width)) & ((y)>=0) & ((y)<(height))) a[(x) + (y)*(width)] = (color);
 void rasterCircle(double *a, int width, int height, int x0, int y0, int radius, double color, int fill) {
   int f = 1 - radius;
   int ddF_x = 1;

@@ -79,7 +79,7 @@
   
   Drawing on images
   \itemize{
-    \item \code{drawfont}, \code{drawtext}
+    \item \code{drawfont}, \code{drawtext}, \code{drawCircle}
   }
     
   Features extraction
