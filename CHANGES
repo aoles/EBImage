@@ -1,3 +1,6 @@
+3.5.3
+- removed print click position feature
+
 3.5.2
 - added drawCircle()
 - display() now prints click positions
