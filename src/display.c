@@ -357,7 +357,7 @@ gboolean onScroll(GtkAdjustment *adjustment, gpointer user_data)
 
 gboolean onClickImage(GtkWidget *widget, GdkEventButton *event, gpointer user_data) {
   udata *dat=(udata *)user_data;
-  printf("%d %d\n", (int)dat->x, (int)dat->y);
+  // printf("%d %d\n", (int)dat->x, (int)dat->y);
   return TRUE;
 }
 
