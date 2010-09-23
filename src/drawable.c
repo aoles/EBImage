@@ -159,21 +159,21 @@ void rasterCircle(double *a, int width, int height, int x0, int y0, int radius, 
 // draw a circle on the 2D image _a using (x, y, z, radius) and color (red, green, blue)
 // if colormode = Grayscale, only the red component is used
 SEXP drawCircle(SEXP _a, SEXP _xyzr, SEXP _rgb, SEXP _fill) {
+  SEXP _res;
   int nprotect = 0;
   int width, height;
   int x, y, z, radius;
   int redstride, greenstride, bluestride;
-  double *a;
+  double *res;
   int fill;
 
-  // check image validity
+  // check image validity and copy _a
   validImage(_a, 0);
-  width = INTEGER(GET_DIM(_a))[0];
-  height = INTEGER(GET_DIM(_a))[1];
-
-  // protects _a
-  PROTECT(_a);
+  PROTECT(_res=Rf_duplicate(_a));
   nprotect++;
+
+  width = INTEGER(GET_DIM(_res))[0];
+  height = INTEGER(GET_DIM(_res))[1];
 
   // get strides
   x = INTEGER(_xyzr)[0];
@@ -181,19 +181,19 @@ SEXP drawCircle(SEXP _a, SEXP _xyzr, SEXP _rgb, SEXP _fill) {
   z = INTEGER(_xyzr)[2];
   radius = INTEGER(_xyzr)[3];
   fill = INTEGER(_fill)[0];
-  getColorStrides(_a, z, &redstride, &greenstride, &bluestride);
-  a = REAL(_a);
+  getColorStrides(_res, z, &redstride, &greenstride, &bluestride);
+  res = REAL(_res);
 
   // draw circle
-  if (getColorMode(_a)==MODE_GRAYSCALE) {
-    rasterCircle(&a[redstride], width, height, x, y, radius, REAL(_rgb)[0], fill);
+  if (getColorMode(_res)==MODE_GRAYSCALE) {
+    rasterCircle(&res[redstride], width, height, x, y, radius, REAL(_rgb)[0], fill);
   } 
-  else if (getColorMode(_a)==MODE_COLOR) {
-    rasterCircle(&a[redstride], width, height, x, y, radius, REAL(_rgb)[0], fill);
-    rasterCircle(&a[greenstride], width, height, x, y, radius, REAL(_rgb)[1], fill);
-    rasterCircle(&a[bluestride], width, height, x, y, radius, REAL(_rgb)[2], fill);
+  else if (getColorMode(_res)==MODE_COLOR) {
+    rasterCircle(&res[redstride], width, height, x, y, radius, REAL(_rgb)[0], fill);
+    rasterCircle(&res[greenstride], width, height, x, y, radius, REAL(_rgb)[1], fill);
+    rasterCircle(&res[bluestride], width, height, x, y, radius, REAL(_rgb)[2], fill);
   }
   
   UNPROTECT (nprotect);
-  return _a;
+  return _res;
 }
