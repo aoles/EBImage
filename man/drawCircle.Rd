@@ -28,7 +28,8 @@
 }
 
 \value{
-  An invisible image object \code{img}.
+  An \code{Image} object or an array, containing the transformed version
+  of \code{img}.
 }
 
 \author{
@@ -38,13 +39,13 @@
 \examples{
   ## Simple white circle
   x = matrix(0, nrow=300, ncol=300)
-  drawCircle(x, 100, 200, 47, col=1)
-  if (interactive()) display(x)
+  y = drawCircle(x, 100, 200, 47, col=1)
+  if (interactive()) display(y)
   
-  ## Color
-  x = channel(x, 'rgb')
-  drawCircle(x, 200, 140, 57, col='yellow', fill=TRUE)
-  if (interactive()) display(x)
+  ## Simple filled yellow circle
+  x = channel(y, 'rgb')
+  y = drawCircle(x, 200, 140, 57, col='yellow', fill=TRUE)
+  if (interactive()) display(y)
 }
 
 

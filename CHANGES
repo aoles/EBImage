@@ -1,5 +1,6 @@
 3.5.3
 - removed print click position feature
+- drawCircle() now returns the transformed image and does not modify the input image anymore 
 
 3.5.2
 - added drawCircle()
