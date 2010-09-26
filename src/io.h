@@ -10,6 +10,7 @@ extern "C" {
 
 SEXP lib_readImages (SEXP, SEXP);
 SEXP lib_writeImages (SEXP, SEXP, SEXP);
+SEXP readCellomics(const char *);
 
 #ifdef __cplusplus
 };
