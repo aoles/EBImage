@@ -8,7 +8,8 @@ See: ../LICENSE for license, LGPL
 
 #include "tools.h"
 #include "conversions.h"
-
+#include "zlib.h"
+#include "assert.h"
 #include <R_ext/Error.h>
 #include <magick/ImageMagick.h>
 
@@ -40,6 +41,16 @@ lib_readImages (SEXP files, SEXP mode) {
     _mode = INTEGER (mode)[0];
     if ( _mode < -1 || _mode > MODE_MAX)
         error ( "requested mode is not supported" );
+
+    // Special call for reading Cellomics image
+    if (LENGTH(files)==1) {
+      file = CHAR(STRING_ELT(files, 0));
+      i = strlen(file);
+      if (i>4 && (strncmp(&file[i-4], ".c01", 4)==0 || strncmp(&file[i-4], ".C01", 4)==0)) {
+	return (readCellomics(file));
+      }
+    }
+
     image_info = (ImageInfo *) NULL;
     /* images loaded into image and moved into this list */
     images = NewImageList ();
@@ -155,4 +166,138 @@ lib_writeImages (SEXP x, SEXP files, SEXP quality) {
     images = DestroyImageList (images);
     DestroyExceptionInfo(&exception);
     return R_NilValue;
+}
+
+#define CHUNK 65536
+int inflateData(FILE *source, unsigned char **dat, int *datsize) {
+  int ret;
+  unsigned have;
+  z_stream strm;
+  unsigned char in[CHUNK];
+  unsigned char out[CHUNK];
+  int datmaxsize;
+
+  // allocate dat with a fixed size ; will be reallocated if necessary
+  datmaxsize = CHUNK*16;
+  *datsize = 0;
+  *dat = (unsigned char *)malloc(datmaxsize);
+
+  // allocate inflate state
+  strm.zalloc = Z_NULL;
+  strm.zfree = Z_NULL;
+  strm.opaque = Z_NULL;
+  strm.avail_in = 0;
+  strm.next_in = Z_NULL;
+  ret = inflateInit(&strm);
+  if (ret != Z_OK) return ret;
+
+  // decompress until deflate stream ends or end of file
+  do {
+    strm.avail_in = fread(in, 1, CHUNK, source);
+    if (ferror(source)) {
+      (void)inflateEnd(&strm);
+      return Z_ERRNO;
+    }
+    if (strm.avail_in == 0) break;
+    strm.next_in = in;
+    // run inflate() on input until output buffer not full
+    do {
+      strm.avail_out = CHUNK;
+      strm.next_out = out;
+      ret = inflate(&strm, Z_NO_FLUSH);
+      assert(ret != Z_STREAM_ERROR);  // state not clobbered
+      switch (ret) {
+      case Z_NEED_DICT:
+	ret = Z_DATA_ERROR;     // and fall through
+      case Z_DATA_ERROR:
+      case Z_MEM_ERROR:
+	(void)inflateEnd(&strm);
+	return ret;
+      }
+      have = CHUNK - strm.avail_out; 
+      // reallocate dat if needed
+      if (*datsize + have >= datmaxsize) {
+	datmaxsize = datmaxsize +  CHUNK*16;
+	printf("realloc datmaxsize=%d\n", datmaxsize);
+	*dat = realloc(*dat, datmaxsize);
+      }
+      printf("have=%d\n", have);
+      memcpy(*dat + *datsize, out, have);
+      datsize += have;
+    } while (strm.avail_out == 0);
+    
+    // done when inflate() says it's done
+  } while (ret != Z_STREAM_END);
+  
+  // clean up and return
+  (void)inflateEnd(&strm);
+  return ret == Z_STREAM_END ? Z_OK : Z_DATA_ERROR;
+}
+
+SEXP readCellomics(const char *filename) {
+  FILE *fin;
+  unsigned char *dat, *pdat;
+  int datsize;
+  SEXP image, dim;
+  int i, width, height, nplanes, nbits, compression;
+  int nprotect;
+  double *dimage;
+  int ret;
+
+  // init
+  nprotect = 0;
+
+  // open file
+  fin = fopen(filename, "rb");
+  if (!fin) error("cannot open file");
+  else printf("file opened\n");
+  
+  // inflate zlib stream
+  fseek(fin, 4, SEEK_SET);
+  ret = inflateData(fin, &dat, &datsize);
+  if (ret!=Z_OK) error("cannot decompress stream");
+  fclose(fin);
+  printf("datsize=%d\n", datsize);
+
+  // read header
+  width = *(int *)(&dat[4]); 
+  height = *(int *)(&dat[8]); 
+  nplanes = *(short *)(&dat[12]); 
+  nbits = *(short *)(&dat[14]);
+  compression = (int *)(&dat[16]);
+
+  printf("width=%d height=%d, nplanes=%d nbits=%d compression=%d\n", width, height, nplanes, nbits, compression);
+  // if (x*y*nplates*(nbits/8)+52 > in.length()) {
+  // }
+
+  // allocate new image
+  image = PROTECT(allocVector(REALSXP, width * height * nplanes));
+  nprotect++;
+  if (nplanes==1) PROTECT(dim=allocVector(INTSXP, 2));
+  else PROTECT(dim=allocVector(INTSXP, 3));
+  nprotect++;
+  INTEGER (dim)[0] = width;
+  INTEGER (dim)[1] = height;
+  if (nplanes>1) INTEGER (dim)[1] = nplanes;
+  SET_DIM (image, dim);
+
+  // copy planes
+  dimage = REAL(image);
+  pdat = &dat[52];
+  if (nbits==8) {
+    for (i=0; i<width*height*nplanes; i++) *dimage++ = (double)(*((unsigned char *)pdat)++)/256.0;
+  } else if (nbits==16) {
+    for (i=0; i<width*height*nplanes; i++) *dimage++ = (double)(*((unsigned short *)pdat)++)/65536.0;
+  } else if (nbits==32) {
+    for (i=0; i<width*height*nplanes; i++) *dimage++ = (double)(*((unsigned int *)pdat)++)/4294967296.0;
+  } else {
+    free(dat);
+    error("unsupported nbits/pixel mode");
+  }
+ 
+  // free dat
+  free(dat);
+  
+  UNPROTECT(nprotect);
+  return(image);
 }
