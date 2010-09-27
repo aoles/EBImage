@@ -169,18 +169,20 @@ lib_writeImages (SEXP x, SEXP files, SEXP quality) {
 }
 
 #define CHUNK 65536
-int inflateData(FILE *source, unsigned char **dat, int *datsize) {
+int inflateData(FILE *source, unsigned char **_dat, int *_datsize) {
   int ret;
   unsigned have;
   z_stream strm;
   unsigned char in[CHUNK];
   unsigned char out[CHUNK];
   int datmaxsize;
+  unsigned char *dat;
+  int datsize;
 
   // allocate dat with a fixed size ; will be reallocated if necessary
-  datmaxsize = CHUNK*16;
-  *datsize = 0;
-  *dat = (unsigned char *)malloc(datmaxsize);
+  datmaxsize = CHUNK*2;
+  datsize = 0;
+  dat = (unsigned char *)malloc(datmaxsize);
 
   // allocate inflate state
   strm.zalloc = Z_NULL;
@@ -216,13 +218,11 @@ int inflateData(FILE *source, unsigned char **dat, int *datsize) {
       }
       have = CHUNK - strm.avail_out; 
       // reallocate dat if needed
-      if (*datsize + have >= datmaxsize) {
-	datmaxsize = datmaxsize +  CHUNK*16;
-	printf("realloc datmaxsize=%d\n", datmaxsize);
-	*dat = realloc(*dat, datmaxsize);
+      if (datsize + have >= datmaxsize) {
+	datmaxsize = datmaxsize +  CHUNK*2;
+	dat = realloc(dat, datmaxsize);
       }
-      printf("have=%d\n", have);
-      memcpy(*dat + *datsize, out, have);
+      memcpy(&dat[datsize], out, have);
       datsize += have;
     } while (strm.avail_out == 0);
     
@@ -231,9 +231,12 @@ int inflateData(FILE *source, unsigned char **dat, int *datsize) {
   
   // clean up and return
   (void)inflateEnd(&strm);
+  *_datsize = datsize;
+  *_dat = dat;
   return ret == Z_STREAM_END ? Z_OK : Z_DATA_ERROR;
 }
 
+// File based on http://dev.loci.wisc.edu/trac/software/browser/trunk/components/bio-formats/src/loci/formats/in/CellomicsReader.java
 SEXP readCellomics(const char *filename) {
   FILE *fin;
   unsigned char *dat, *pdat;
@@ -249,26 +252,23 @@ SEXP readCellomics(const char *filename) {
 
   // open file
   fin = fopen(filename, "rb");
-  if (!fin) error("cannot open file");
-  else printf("file opened\n");
+  if (!fin) error("readCellomics: cannot open file");
   
   // inflate zlib stream
   fseek(fin, 4, SEEK_SET);
   ret = inflateData(fin, &dat, &datsize);
-  if (ret!=Z_OK) error("cannot decompress stream");
+  if (ret!=Z_OK) error("readCellomics: cannot decompress stream");
   fclose(fin);
-  printf("datsize=%d\n", datsize);
 
   // read header
   width = *(int *)(&dat[4]); 
   height = *(int *)(&dat[8]); 
   nplanes = *(short *)(&dat[12]); 
   nbits = *(short *)(&dat[14]);
-  compression = (int *)(&dat[16]);
-
-  printf("width=%d height=%d, nplanes=%d nbits=%d compression=%d\n", width, height, nplanes, nbits, compression);
-  // if (x*y*nplates*(nbits/8)+52 > in.length()) {
-  // }
+  compression = *(int *)(&dat[16]);
+  if (width*height*nplanes*(nbits/8)+52 > datsize) {
+    error("readCellomics: compressed mode is not yed supported");
+  }
 
   // allocate new image
   image = PROTECT(allocVector(REALSXP, width * height * nplanes));
@@ -276,25 +276,34 @@ SEXP readCellomics(const char *filename) {
   if (nplanes==1) PROTECT(dim=allocVector(INTSXP, 2));
   else PROTECT(dim=allocVector(INTSXP, 3));
   nprotect++;
-  INTEGER (dim)[0] = width;
-  INTEGER (dim)[1] = height;
-  if (nplanes>1) INTEGER (dim)[1] = nplanes;
+  INTEGER(dim)[0] = width;
+  INTEGER(dim)[1] = height;
+  if (nplanes>1) INTEGER(dim)[1] = nplanes;
   SET_DIM (image, dim);
 
   // copy planes
   dimage = REAL(image);
   pdat = &dat[52];
   if (nbits==8) {
-    for (i=0; i<width*height*nplanes; i++) *dimage++ = (double)(*((unsigned char *)pdat)++)/256.0;
+    for (i=0; i<width*height*nplanes; i++) {
+      *dimage++ = (*((unsigned char *)pdat))/256.0;
+      pdat += sizeof(unsigned char);
+    } 
   } else if (nbits==16) {
-    for (i=0; i<width*height*nplanes; i++) *dimage++ = (double)(*((unsigned short *)pdat)++)/65536.0;
+    for (i=0; i<width*height*nplanes; i++) {
+      *dimage++ = (*((unsigned short *)pdat))/65536.0;
+      pdat += sizeof(unsigned short);
+    } 
   } else if (nbits==32) {
-    for (i=0; i<width*height*nplanes; i++) *dimage++ = (double)(*((unsigned int *)pdat)++)/4294967296.0;
+    for (i=0; i<width*height*nplanes; i++) {
+      *dimage++ = (*((unsigned int *)pdat))/4294967296.0;
+      pdat += sizeof(unsigned int);
+    } 
   } else {
     free(dat);
-    error("unsupported nbits/pixel mode");
+    error("readCellomics: unsupported nbits/pixel mode");
   }
- 
+  
   // free dat
   free(dat);
   
