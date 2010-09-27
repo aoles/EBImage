@@ -1,3 +1,6 @@
+3.5.5
+- now supports Cellomics .c01 image file format
+
 3.5.4
 - drawCircle() now returns the transformed image and does not modify the input image anymore 
 
