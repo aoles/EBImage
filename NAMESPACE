@@ -14,7 +14,7 @@ export(Image, is.Image, as.Image, print.Image)
 export(Grayscale, TrueColor, Color)
 exportMethods(Ops, "[")
 export(colorMode, "colorMode<-", imageData, "imageData<-")
-export(getNumberOfFrames)
+export(getFrame, getNumberOfFrames)
 
 ## image IO, display
 exportMethods('show')

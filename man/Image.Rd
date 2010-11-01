@@ -12,6 +12,7 @@
 \alias{quantile.Image}
 \alias{colorMode}
 \alias{colorMode<-}
+\alias{getFrame}
 \alias{getNumberOfFrames}
 \alias{imageData}
 \alias{imageData<-}
@@ -56,7 +57,8 @@
 
   imageData(y)
   imageData(y) <- value	
-	
+
+  getFrame(y, i, type='total')
   getNumberOfFrames(y, type='total')  	
 }
 
@@ -76,11 +78,12 @@
 
   \item{y}{An \code{Image} object or an array.}
 
+  \item{i}{A numeric.}
+
   \item{value}{For \code{colorMode}, a numeric or a character string containing the color mode which
     could be either \code{Grayscale} or \code{Color}. For \code{imageData}, an \code{Image} object or an array.}
 
-  \item{type}{A character string containing \code{total} or \code{render}. If missing, equals to
-  \code{total}.}
+  \item{type}{A character string containing \code{total} or \code{render}. Default is \code{total}.}
 }
 
 \value{
@@ -100,6 +103,10 @@
   of the color mode and is equal to the product of all the dimensions except the two first ones. The
   number of renderable frames is equal to the total number of frames in the \code{Grayscale} color mode
   and is equal to the product of all the dimensions except the three first ones in the \code{Color} color mode.
+
+  \code{getFrame} returns the i-th frame contained in the image \code{y}. If \code{type} is \code{total}, the
+  function is unaware of the color mode and returns an xy-plane. If \code{render}, the function returns the
+  i-th image as shown by the \code{display} function.
 }
 
 \seealso{
