@@ -102,10 +102,12 @@ lib_readImages (SEXP files, SEXP mode) {
     image_info = DestroyImageInfo (image_info);
 
     /* convert image list into R object */
-    res = magick2SEXP (images, _mode);
+    res = PROTECT(magick2SEXP (images, _mode));
     images = DestroyImageList (images);
 
     DestroyExceptionInfo(&exception);
+
+    UNPROTECT(1);
 
     return res;
 }

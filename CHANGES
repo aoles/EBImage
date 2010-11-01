@@ -1,5 +1,7 @@
 3.7.1
 - added getFrame(), to extract the i-th frame of an image
+- from Paul Murrell: added a PROTECT/UNPROTECT statement in lib_readImages()
+- from Paul Murrell: added as.raster.Image() 
 
 3.5.5
 - now supports Cellomics .c01 image file format
