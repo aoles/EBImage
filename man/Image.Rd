@@ -7,6 +7,7 @@
 \alias{Color}
 \alias{is.Image}
 \alias{as.Image}
+\alias{as.raster.Image}
 \alias{print.Image}
 \alias{median.Image}
 \alias{quantile.Image}
@@ -51,6 +52,7 @@
   Image(data, dim, colormode)
   as.Image(x)
   is.Image(x)
+  as.raster.Image(y)
 
   colorMode(y)	
   colorMode(y) <- value
@@ -90,6 +92,8 @@
   \code{Image} and \code{as.Image} return a new \code{Image} object.
 
   \code{is.Image} returns TRUE if \code{x} is an \code{Image} object and FALSE otherwise.
+
+  \code{as.raster.Image} coerces an Image object to a raster object.
 
   \code{colorMode} returns the color mode of \code{y} and \code{colorMode<-} changes the color mode 
   of \code{y}.

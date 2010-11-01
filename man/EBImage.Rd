@@ -24,7 +24,7 @@
   Image methods
   \itemize{
     \item \code{Image}
-    \item \code{as.Image}, \code{is.Image}
+    \item \code{as.Image}, \code{is.Image}, \code{as.raster.Image}
     \item \code{colorMode}, \code{imageData}
     \item \code{getFrame}, \code{getNumberOfFrames}
   }

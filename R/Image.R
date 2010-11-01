@@ -482,3 +482,21 @@ parseColorMode=function(colormode) {
   as.integer(icolormode)
 }
 
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+as.raster.Image <- function(y) {
+  ## For now, bail if there is more than one image
+  if (getNumberOfFrames(y, "render") > 1)
+    stop("Cannot handle multiple frames")
+  image <- imageData(y)
+  ## Either a grey scale or a color image
+  if (colorMode(y) == Grayscale) {
+    r <- t(image)
+    dim(r) <- dim(image)[2:1]  
+  } else {
+    r <- rgb(aperm(image[,,1]),
+             aperm(image[,,2]),
+             aperm(image[,,3]))
+    dim(r) <- dim(image)[2:1]
+  }
+  r
+} 
