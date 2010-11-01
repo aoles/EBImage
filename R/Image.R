@@ -218,13 +218,29 @@ setMethod ("[", signature(x="Image", i="ANY", j="ANY", drop="ANY"),
              x
            })
 
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+getFrame = function(y, i, type='total') {
+  n = getNumberOfFrames(y, type=type)
+  if (i<1 || i>n) stop("'i' must belong between 1 and ", n)
+  if (type=='render' && colorMode(y)==Color) {
+    if (length(dim(y))==2) nchannels = 1
+    else nchannels = dim(y)[3]
+    dim(y) = c(dim(y)[1:2], nchannels, n)
+    return(y[,,,i])
+  }
+  else {
+    dim(y) = c(dim(y)[1:2], n)
+    return(y[,,i])
+  }
+}
+
 ## getNumberOfFrames
 ## If type='total', returns the total number of frames
 ## If type='render', return the number of frames to be rendered after color channel merging
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 getNumberOfFrames = function(y, type='total') {
   if (missing(type)) type='total'
-  if (type=='render' & colorMode(y)==Color) {
+  if (type=='render' && colorMode(y)==Color) {
     if (length(dim(y))< 3) return(1)
     else return(prod(dim(y)[-1:-3]))
   }

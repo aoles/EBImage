@@ -26,7 +26,7 @@
     \item \code{Image}
     \item \code{as.Image}, \code{is.Image}
     \item \code{colorMode}, \code{imageData}
-    \item \code{getNumberOfFrames}
+    \item \code{getFrame}, \code{getNumberOfFrames}
   }
   
   Image I/O, display
