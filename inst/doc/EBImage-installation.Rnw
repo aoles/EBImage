@@ -107,7 +107,7 @@ EBImage requires the following softwares/libraries to be installed:
 \item \pkg{ImageMagick}
 \end{itemize}
 
-The \pkg{gtk+-2.0} bundle can be downloaded from \url{http://ftp.gnome.org/pub/gnome/binaries/win32/gtk+/2.16/gtk+-bundle_2.16.0-20090317_win32.zip} or \url{http://www.gtk.org/download-windows.html} (select the binary GTK+ all-in-one bundle). Please install it, for example in \code{C:\textbackslash gtk}, and add the \code{C: \textbackslash  gtk \textbackslash bin} path to the system environment PATH variable by editing the tab `System/Advanced/Environment' variables of the `My computer' desktop icon properties.\\
+The \pkg{gtk+-2.0} bundle can be downloaded from \url{http://ftp.gnome.org/pub/gnome/binaries/win32/gtk+/2.16/gtk+-bundle_2.16.6-20100912_win32.zip} or \url{http://www.gtk.org/download-windows.html} (select the binary GTK+ all-in-one bundle). Please install it, for example in \code{C:\textbackslash gtk}, and add the \code{C: \textbackslash  gtk \textbackslash bin} path to the system environment PATH variable by editing the tab `System/Advanced/Environment' variables of the `My computer' desktop icon properties.\\
 
 \pkg{ImageMagick} can be downloaded from \url{http://www.imagemagick.org/script/binary-releases.php#windows}. 
 Select the Q16 DLL version and install it on your computer. During installation, the checkboxes `Update executable search 
