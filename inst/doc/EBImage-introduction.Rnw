@@ -29,7 +29,7 @@
 \newcommand{\email}[1]{\mbox{\href{mailto:#1}{\textcolor{darkblue}{\normalfont{#1}}}}}
 \newcommand{\web}[2]{\mbox{\href{#2}{\textcolor{darkblue}{\normalfont{#1}}}}}
 
-%\usepackage[baseurl={http://www.ebi.ac.uk/~osklyar/EBImage/},pdftitle={EBImage - Image Processing Toolkit For R},pdfauthor={Oleg Sklyar},pdfsubject={EBImage},pdfkeywords={image processing},pagebackref,bookmarks,colorlinks,linkcolor=darkblue,citecolor=darkblue,pagecolor=darkblue,raiselinks,plainpages,pdftex]{hyperref}
+%\usepackage[baseurl={http://www.bioconductor.org/packages/release/bioc/html/EBImage.html},pdftitle={EBImage - Image Processing Toolkit For R},pdfauthor={Oleg Sklyar},pdfsubject={EBImage},pdfkeywords={image processing},pagebackref,bookmarks,colorlinks,linkcolor=darkblue,citecolor=darkblue,pagecolor=darkblue,raiselinks,plainpages,pdftex]{hyperref}
 
 \SweaveOpts{keep.source=TRUE,eps=FALSE}
 
