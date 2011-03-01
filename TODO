@@ -3,3 +3,4 @@ greg:
 - hullFeatures g.x and g.y are 0-based indexed, must be 1-based indexed
 - test object functions when only one object is present
 - replace DispatchImage by ExportImagePixels (available from >= IM 6.4.7)
+- deprecate TrueColor and unused arguments
