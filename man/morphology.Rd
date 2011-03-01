@@ -49,13 +49,11 @@
 }
 
 \details{
-  \code{erode} applies the mask positioning its centre over every background pixel
+  \code{dilate} applies the mask positioning its centre over every background pixel
   (0), every pixel which is not covered by the mask is reset to foreground (1).
-  In this way image features grow in size.
   
-  \code{dilate} applies the mask positioning its centre over every foreground pixel
+  \code{erode} applies the mask positioning its centre over every foreground pixel
   (!=0), every pixel which is not covered by the mask is reset to background (0).
-  In this way image features seem shrink in size.
 
   \code{opening} is an erosion followed by a dilation and \code{closing} is a dilation
   followed by an erosion.

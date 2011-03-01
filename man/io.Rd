@@ -45,6 +45,11 @@
   The result will contain a stack with all images and stacks,
   at the size of the first image read. Subsequent images are cropped (if
   larger) or filled with background (if smaller).
+
+  \code{readImage} returns an \code{Image} object, containing an array of
+  double values ranging from 0 (black) to 1 (white). Image formats have
+  a limited dynamic range (e.g. JPEG: 8 bit, TIFF: 16 bit) and
+  \code{writeImage} may cause some loss of accuracy.
 }
 
 
