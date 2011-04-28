@@ -1,3 +1,7 @@
+3.9.1
+- added the gaussian shape in makeBrush()
+- fixed the quality argument in writeImage()
+
 3.7.1
 - added getFrame(), to extract the i-th frame of an image
 - from Paul Murrell: added a PROTECT/UNPROTECT statement in lib_readImages()

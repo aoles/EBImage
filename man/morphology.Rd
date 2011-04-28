@@ -18,7 +18,7 @@
   opening(x, kern, iter)
   closing(x, kern, iter)
 
-  makeBrush(size, shape=c('box', 'disc', 'diamond'), step=TRUE)
+  makeBrush(size, shape=c('box', 'disc', 'diamond', 'gaussian'), step=TRUE, sigma=0.3)
 }
 
 \arguments{
@@ -34,8 +34,15 @@
   
   \item{size}{A numeric containing the size of the brush, in pixels.}
   \item{shape}{A character vector indicating the shape of the brush. Can
-    be \code{box}, \code{disc} or \code{diamond}. Default is \code{box}.}
-  \item{step}{a logical indicating if the brush is binary. Default is \code{TRUE}.}
+    be \code{box}, \code{disc}, \code{diamond} or \code{gaussian}. Default is
+    \code{box}.}
+  
+  \item{step}{a logical indicating if the brush is binary. Default is
+    \code{TRUE}. The argument is relevant only for the \code{disc} and
+    \code{diamond} shapes.}
+
+  \item{sigma}{An optional numeric containing the standard deviation of
+    the Gaussian shape. Default is 0.3.}
   
   \item{iter}{Deprecated argument.}
 }
@@ -79,6 +86,6 @@
     if (interactive()) display(x, title="makeBrush(100, shape='diamond')")
     x = makeBrush(100, shape='disc', step=FALSE)
     if (interactive()) display(x, title="makeBrush(100, shape='disc', step=FALSE)")
+    x = makeBrush(100, shape='gaussian', sigma=0.3)
+    if (interactive()) display(x, title="makeBrush(100, shape='gaussian', sigma=0.3)")
 }
-
-

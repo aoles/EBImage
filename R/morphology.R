@@ -36,12 +36,16 @@ distmap = function (x, metric=c('euclidean', 'manhattan')) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-makeBrush = function(size, shape=c('box', 'disc', 'diamond'), step=TRUE) {
+makeBrush = function(size, shape=c('box', 'disc', 'diamond', 'gaussian'), step=TRUE, sigma=0.3) {
   if(! (is.numeric(size) && (length(size)==1L) && (size>=1)) ) stop("'size' must be a numeric of length 1 with value >=1.")
   shape=match.arg(shape)
-
-  if (shape=='box') z=array(1,dim=c(size,size))
-  else {
+  
+  if (shape=='box') z = array(1,dim=c(size,size))
+  else if (shape=='gaussian') {
+    x = seq(-1, 1, length=size)
+    x = matrix(x, nrow=size, ncol=size)
+    z = 1 / (sqrt(2*pi)*sigma)^2 * exp(- (x^2 + t(x)^2) / (2*sigma^2))
+  } else {
     ## pixel center coordinates
     x = 1:size -((size+1)/2)
     
@@ -57,10 +61,10 @@ makeBrush = function(size, shape=c('box', 'disc', 'diamond'), step=TRUE) {
       z = (mz - z)/mz
       z = ifelse(z>0, z, 0)
     }
+
+    if (step) z = ifelse(z>0, 1, 0)
   }
- 
-  if (step) ifelse(z>0, 1, 0)
-  else z
+  z
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
