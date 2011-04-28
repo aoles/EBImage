@@ -142,6 +142,7 @@ lib_writeImages (SEXP x, SEXP files, SEXP quality) {
         strcpy (image_info->filename, CHAR(STRING_ELT(files, 0)) );
         /* we want to overwrite the feature imported from SEXP image */
         strcpy (images->filename, image_info->filename);
+	images->quality = image_info->quality;
         WriteImages(image_info, images, CHAR(STRING_ELT(files, 0)), &exception);
         CatchException (&exception);
     }
@@ -156,6 +157,7 @@ lib_writeImages (SEXP x, SEXP files, SEXP quality) {
             strcpy (image_info->filename, CHAR(STRING_ELT(files, i)));
             /* we want to overwrite the feature imported from SEXP image */
             strcpy (image->filename, image_info->filename);
+	    image->quality = image_info->quality;
             WriteImage (image_info, image);
             CatchException (&image->exception);
             // WriteImages(image_info, image, CHAR(STRING_ELT(files, i)), &exception);
