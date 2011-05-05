@@ -4,6 +4,7 @@
 \alias{flop}
 \alias{resize}
 \alias{rotate}
+\alias{affine}
 
 \concept{transformation}
 \concept{rotation}
@@ -21,6 +22,7 @@
   flop(x)
   resize(x, w, h, blur=1, filter="Lanczos")
   rotate(x, angle=90)
+  affine(x, m)
 }
 
 \arguments{
@@ -33,8 +35,8 @@
     0 (\code{FALSE}) is sharp.}
 
   \item{filter}{Interpolating sampling filter.}
-
   \item{angle}{Image rotation angle in degrees.}
+  \item{m}{The affine 3x2 transformation matrix.}
 }
 
 \value{
@@ -66,6 +68,10 @@
   angle. Rotated images are usually larger than the originals and have
   empty triangular corners filled in black. The algorithm used by this
   ImageMagick function is not well defined.
+
+  \code{affine} returns the affine transformation of the image, where
+  pixels coordinates, denoted by the matrix \code{px}, are
+  transformed to \code{cbind(px, 1)\%*\%m}.
 }
 
 \seealso{ \code{translate} 
@@ -94,4 +100,7 @@
 
    y = rotate(x, 30) 
    if (interactive()) display(y, title='rotate(x, 30)')
+
+   m = matrix(c(0.6, 0.2, 0, -0.2, 0.3, 300), nrow=3)
+   if (interactive()) display(affine(x, m), title='affine transform')
 }

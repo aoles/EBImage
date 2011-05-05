@@ -1,3 +1,7 @@
+3.9.2
+- the gaussian shape in makeBrush() is now conform to Matlab (J. Barry)
+- added the affine() transform
+
 3.9.1
 - added the gaussian shape in makeBrush()
 - fixed the quality argument in writeImage()

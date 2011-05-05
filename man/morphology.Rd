@@ -86,6 +86,6 @@
     if (interactive()) display(x, title="makeBrush(100, shape='diamond')")
     x = makeBrush(100, shape='disc', step=FALSE)
     if (interactive()) display(x, title="makeBrush(100, shape='disc', step=FALSE)")
-    x = makeBrush(100, shape='gaussian', sigma=0.3)
-    if (interactive()) display(x, title="makeBrush(100, shape='gaussian', sigma=0.3)")
+    x = makeBrush(100, shape='gaussian', sigma=10)
+    if (interactive()) display(2000*x, title="makeBrush(100, shape='gaussian', sigma=10)")
 }

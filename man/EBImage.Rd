@@ -39,7 +39,7 @@
   Spatial transform
   \itemize{
     \item \code{resize}, \code{flip}, \code{flop}
-    \item \code{rotate}, \code{translate}
+    \item \code{rotate}, \code{translate}, \code{affine}
   }
   
   Image segmentation, objects manipulation
