@@ -24,6 +24,7 @@ export(readImage, writeImage, display, animate)
 export(resize, rotate)
 export(flip, flop)
 export(translate)
+export(affine)
 
 ## image segmentation, objects manipulation
 export(thresh, bwlabel)

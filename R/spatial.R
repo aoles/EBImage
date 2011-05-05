@@ -53,3 +53,16 @@ translate = function (x, v) {
   
   return (.Call("translate", castImage(x), v, PACKAGE='EBImage'))
 }
+
+## Do an affine transform on a set of images
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+affine = function (x, m) {
+  validImage(x)
+  if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
+  if (!is.matrix(m) || nrow(m)!=3 || ncol(m)!=2) stop("'m' must be a 3x2 matrix")
+  if (any(is.na(m))) stop("'m' shouldn't contain any NAs")
+  m = cbind(m, c(0, 0, 1))
+  ## backtransform
+  m = solve(m)
+  return (.Call("affine", castImage(x), m, PACKAGE='EBImage'))
+}

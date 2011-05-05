@@ -42,9 +42,10 @@ makeBrush = function(size, shape=c('box', 'disc', 'diamond', 'gaussian'), step=T
   
   if (shape=='box') z = array(1,dim=c(size,size))
   else if (shape=='gaussian') {
-    x = seq(-1, 1, length=size)
+    x = seq(-(size-1)/2, (size-1)/2, length=size)
     x = matrix(x, nrow=size, ncol=size)
-    z = 1 / (sqrt(2*pi)*sigma)^2 * exp(- (x^2 + t(x)^2) / (2*sigma^2))
+    z = exp(- (x^2 + t(x)^2) / (2*sigma^2))
+    z = z / sum(z)
   } else {
     ## pixel center coordinates
     x = 1:size -((size+1)/2)

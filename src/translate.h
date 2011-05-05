@@ -9,6 +9,7 @@ extern "C" {
 #endif
 
 SEXP translate (SEXP, SEXP);
+SEXP affine (SEXP, SEXP);
 
 #ifdef __cplusplus
 };
