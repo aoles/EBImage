@@ -1,45 +1,81 @@
-## TODO
-## feed list
-## zero objects
+## example
+example = function() {
+  library("EBImage")
+  source("R/computeFeatures.R")
+
+  ## build labeled image x and reference y
+  y = readImage(system.file("images", "nuclei.tif", package="EBImage"))[,,1]
+  x = thresh(y, 10, 10, 0.05)
+  x = opening(x, makeBrush(5, shape='disc'))
+  x = bwlabel(x)
+  display(x)
+  display(y)
+
+  ## standard call 88 features
+  ft = computeFeatures(x, y)
+  pft = computeFeatures(x, y, properties=TRUE)
+  stopifnot(all(colnames(ft)==pft$name))
+  
+  ## call without expandRef 49 features
+  ft = computeFeatures(x, y, expandRef=NULL)
+  pft = computeFeatures(x, y, expandRef=NULL, properties=TRUE)
+  stopifnot(all(colnames(ft)==pft$name))
+  
+  ## changing parameters
+  ft = computeFeatures(x, y, basic.quantiles=c(0.2, 0.3), haralick.scales=c(1, 4, 8), expandRef=NULL)
+  pft = computeFeatures(x, y, basic.quantiles=c(0.2, 0.3), haralick.scales=c(1, 4, 8), expandRef=NULL, properties=TRUE)
+  stopifnot(all(colnames(ft)==pft$name))
+  
+  ## call with 3 reference images
+  yc = list(d=y, t=flip(y), a=flop(y))
+  ft = computeFeatures(x, yc)
+  pft = computeFeatures(x, yc, properties=TRUE)
+  stopifnot(all(colnames(ft)==pft$name))
+  
+  ## test standardExpandRef
+  z = standardExpandRef(yc)
+  str(z)
+  display(combine(z))
+  
+  ## image with one point
+  x2 = array(0, dim=dim(x))
+  x2[100, 100] = 1
+  ft = computeFeatures(x2, y)
+}
 
 ## main function
 ## x: labelled image
 ## ref: a list of images
 ## expandRef: a function to expand ref
+## returns NULL if no object in x
 computeFeatures = function(x, ref, methods.noref=c("computeFeatures.moment", "computeFeatures.shape"),
   methods.ref=c("computeFeatures.basic", "computeFeatures.moment", "computeFeatures.haralick"),
-  xname="x", refnames, properties=FALSE, expandRef=genericExpandRef, ...) {
+  xname="x", refnames, properties=FALSE, expandRef=standardExpandRef, ...) {
   ## check arguments
-  if (!is.array(x) || getNumberOfFrames(x)>1)  stop("'x' must be a matrix containing a labelled image")
-  if (class(x)=="Image") x = imageData(x)
-  if (is.list(ref)) {
-    if (!is.null(names(ref))) refnames = names(ref)
-    ref = do.call(EBImage::combine, ref)
-  }
-  if (!is.array(ref)) stop("'ref' must be an array containing the reference images")
-  if (class(ref)=="Image") ref = imageData(ref)
-  nref = getNumberOfFrames(ref)
-  dim(ref) = c(dim(ref)[1:2], nref)
-  if (missing(refnames)) refnames = letters[1:nref]
-  if (length(refnames)!=nref) stop("'refnames' must have the same length as the number of images in 'ref'")
-  
-  ## transform references
+  x = checkx(x)
+  ref = convertRef(ref, refnames)
+  refnames = names(ref)
+  nref = length(ref)
+ 
+  ## expand ref
   if (!is.null(expandRef)) {
-    ref = expandRef(ref=ref, refnames=refnames)
-    refnames = attr(ref, "refnames")
-    nref = getNumberOfFrames(ref)
+    ref = expandRef(ref, refnames)
+    refnames = names(ref)
+    nref = length(ref)
   }
-
+  
   ## compute features
   if (!properties) {
+    ## prepare data
     xs = splitObjects(x)
+    if (length(xs)==0) return(NULL)
+    
     ## compute features without reference
     features.noref = do.call(cbind, lapply(methods.noref, do.call, list(x=x, xs=xs, properties=FALSE, ...)))
     
     ## compute features with reference, for each channel
     features.ref = lapply(1:nref, function(i) {
-      ref0 = ref[,,i]
-      do.call(cbind, lapply(methods.ref, do.call, list(x=x, ref=ref0, xs=xs, properties=FALSE, ...)))
+      do.call(cbind, lapply(methods.ref, do.call, list(x=x, ref=ref[[i]], xs=xs, properties=FALSE, ...)))
     })
     names(features.ref) = refnames
 
@@ -68,66 +104,43 @@ computeFeatures = function(x, ref, methods.noref=c("computeFeatures.moment", "co
   }
 }
 
-example = function() {
-  y = readImage(system.file('images', 'nuclei.tif', package='EBImage'))[,,1]
-  x = thresh(y, 10, 10, 0.05)
-  x = opening(x, makeBrush(5, shape='disc'))
-  x = bwlabel(x)
-
-  system.time({ft = computeFeatures(x, combine(y, flip(y), flop(y)))})
-  
-}
-
-genericExpandRef = function(ref, refnames) {
-  ## compute join channels
-  n = getNumberOfFrames(ref)
-  if (n>1) {
-    comb = combn(n, 2)
-    jref = list()
-    for (i in 1:ncol(comb)) {
-      i1 = comb[1, i]
-      i2 = comb[2, i]
-      jref0 = list((ref[,,i1] - mean(ref[,,i1])) * (ref[,,i2] - mean(ref[,,i2])))
-      names(jref0) = paste(refnames[i1], refnames[i2], sep="")
-      jref = c(jref, jref0)
+## standard reference expansion
+standardExpandRef = function(ref, refnames) {
+  ## check arguments
+  ref = convertRef(ref, refnames)
+  nref = length(ref)
+  refnames = names(ref)
+    
+  ## adding joint channels
+  if (nref>1) {
+    for (i in 1:(nref-1)) {
+      for (j in (i+1):nref) {
+        refi = ref[[i]]
+        refj = ref[[j]]
+        jref0 = list( (refi - mean(refi)) * (refj - mean(refj)) )
+        names(jref0) = paste(refnames[i], refnames[j], sep="")
+        ref = c(ref, jref0)
+      }
     }
-    ref = combine(ref, combine(jref))
-    refnames = c(refnames, names(jref))
   }
-  
-  ## add granulometry by blob transform
+
+  ## adding granulometry by blob transform
   blob = gblob(x0=15, n=49, alpha=0.8, beta=1.2)
-  bref = filter2(ref, blob)/2
-  ref = combine(ref, bref)
-  refnames = c(refnames, paste("B", refnames, sep=""))
-  attr(ref, "refnames") = refnames
-  ref
+  bref = lapply(ref, function(r) filter2(r, blob)/2)
+  names(bref) = paste("B", names(ref), sep="")
+  c(ref, bref)
 }
-
-splitObjects = function(x) {
-  z = which(as.integer(x)>=1)
-  split(z, x[z])
-}
-
-
-
-gblob = function(x0, n, alpha, beta) {
-  xx = seq(-x0, x0, length.out=n)
-  xx = matrix(xx, nrow=length(xx), ncol=length(xx))
-  xx = sqrt(xx^2+t(xx)^2)
-  z = dnorm(xx, mean=0, sd=alpha) -  0.65*dnorm(xx, mean=0, sd=beta)
-  z/sum(z)
-}
-
-
 
 ## basic pixel-independant statistics
 computeFeatures.basic = function(x, ref, xs, properties=FALSE, basic.quantiles=c(0.01, 0.05, 0.5, 0.95, 0.99), ...) {
   qnames = paste('b.q', gsub('\\.', '', as.character(basic.quantiles)), sep='')
   if (!properties) {
     ## check arguments
+    x = checkx(x)
     if (missing(xs)) xs = splitObjects(x)
-
+    if (length(xs)==0) return(NULL)
+    ref = convertRef(ref)[[1]]
+    
     ## compute features
     features = do.call(rbind, lapply(xs, function(z) {
       z = ref[z]
@@ -150,11 +163,19 @@ computeFeatures.basic = function(x, ref, xs, properties=FALSE, basic.quantiles=c
 }
 
 ## image moments
+## m.cx: center of mass x (in pixels)
+## m.cy: center of mass y (in pixels)
+## m.majoraxis: elliptical fit major axis (in pixels)
+## m.eccentricity: elliptical eccentricity = sqrt(1-majoraxis^2/minoraxis^2) ; circle eccentricity is 0 ; max eccentricity is 1
+## m.theta: object angle (in radians)
 computeFeatures.moment = function(x, ref, xs, properties=FALSE, ...) {
   if (!properties) {
     ## check arguments
+    x = checkx(x)
     if (missing(xs)) xs = splitObjects(x)
+    if (length(xs)==0) return(NULL)
     if (missing(ref)) ref = array(1, dim=dim(x))
+    ref = convertRef(ref)[[1]]
     
     ## image moments: computing m{pq} = sum_{x^p*y^q*f(x, y)}
     m00 = sapply(xs, function(z) sum(ref[z]))
@@ -193,12 +214,19 @@ computeFeatures.moment = function(x, ref, xs, properties=FALSE, ...) {
 }
 
 ## shape features
+## s.area: area size (in pixels)
+## s.perimeter: perimeter (in pixels)
+## s.radius.mean: mean radius (in pixels)
+## s.radius.max: min radius (in pixels)
+## s.radius.min: max radius (in pixels)
 computeFeatures.shape = function(x, xs, properties=FALSE, ...) {
   if (!properties) {
     ## check arguments
+    x = checkx(x)
     if (missing(xs)) xs = splitObjects(x)
+    if (length(xs)==0) return(NULL)
+    
     contours = ocontour(x)
-
     ## compute features
     features = do.call(rbind, lapply(contours, function(z) {
       cz = apply(z, 2, mean)
@@ -214,11 +242,18 @@ computeFeatures.shape = function(x, xs, properties=FALSE, ...) {
                rotation.invariant = c(TRUE, TRUE, TRUE, TRUE, TRUE))
   }
 }
-  
+
 ## haralick features
-computeFeatures.haralick = function(x, ref, properties=FALSE, haralick.nbins=32, haralick.scales=c(1, 2), ...) {
+## h.*: haralick features
+computeFeatures.haralick = function(x, ref, xs, properties=FALSE, haralick.nbins=32, haralick.scales=c(1, 2), ...) {
   snames = paste("s", haralick.scales, sep="")
   if (!properties) {
+    ## check arguments
+    x = checkx(x)
+    if (missing(xs)) xs = splitObjects(x)
+    if (length(xs)==0) return(NULL)
+    ref = convertRef(ref)[[1]]
+  
     ## clip data
     ref[ref>1] = 1
     ref[ref<0] = 0
@@ -249,11 +284,99 @@ computeFeatures.haralick = function(x, ref, properties=FALSE, haralick.nbins=32,
   }
 }
 
-correlatedFeatures = function(f, threshold=0.99) {
-  zc = cor(f)
-  zc[upper.tri(zc, diag=TRUE)] = NA
-  ztw = which(abs(zc)<threshold, 2)
-  za = colnames(f)[ztw[,1]]
-  zb = colnames(f)[ztw[,2]]
-  cbind(za=za, zb=zb)
+## make a blob
+## library("lattice")
+## blob = gblob(x0=15, n=49, alpha=0.8, beta=1.2)
+## wireframe(blob)
+## display(0.5+blob)
+gblob = function(x0, n, alpha, beta) {
+  xx = seq(-x0, x0, length.out=n)
+  xx = matrix(xx, nrow=length(xx), ncol=length(xx))
+  xx = sqrt(xx^2+t(xx)^2)
+  z = dnorm(xx, mean=0, sd=alpha) -  0.65*dnorm(xx, mean=0, sd=beta)
+  z/sum(z)
+}
+
+computeFeatures.projection = function(x, ref, xs, properties=FALSE, filterbank=list(), ...) {
+}
+
+##
+##
+##
+##
+##
+##
+##
+##
+##
+##
+##
+##
+##
+##  private functions, not exported
+##
+##
+##
+##
+##
+##
+##
+##
+##
+##
+##
+##
+##
+##
+
+
+## convert ref into a list of images, for fast processing
+convertRef = function(ref, refnames) {
+  if (!is.array(ref) && !is.list(ref)) stop("'ref' must be an array or a list containing the reference images")
+  if (is.array(ref)) {
+    nref = getNumberOfFrames(ref)
+    if (class(ref)=="Image") ref = imageData(ref)
+    ndim = length(dim(ref))
+    if (ndim==2) ref = list(ref)
+    else if (ndim==3) ref = lapply(1:nref, function(i) ref[,,i])
+    else stop ("'ref' must be a 2D or 3D array")
+  }
+  else if (is.list(ref)) {
+    nref = length(ref)
+    if (missing(refnames) && !is.null(names(ref))) refnames = names(ref)
+    ## sanity check
+    ref = lapply(ref, function(r) {
+      ndim = length(dim(r))
+      if (class(r)=="Image") r = imageData(r)
+      if (ndim<2 || ndim>3) stop ("'ref' must contain only 2D arrays")
+      else if (ndim==3) {
+        if (dim(r)[3]>1) stop ("'ref' must contain only 2D arrays")
+        else r = r[,,1]
+      }
+      r
+    })
+  }
+  if (missing(refnames)) refnames = letters[1:nref]
+  if (length(refnames)!=nref) stop ("'refnames' must have the same length as 'ref'")
+  names(ref) = refnames
+  ref
+}
+
+## check x
+checkx = function(x) {
+  if (!is.array(x))  stop("'x' must be a 2D array")
+  if (class(x)=="Image") x = imageData(x)
+  ndim = length(dim(x))
+  if (ndim<2||ndim>3)  stop("'x' must be a 2D array")
+  if (ndim==3) {
+    if (dim(x)[3]>1) stop("'x' must be a 2D array")
+    else x = x[,,1]
+  }
+  x
+}
+
+## split an labelled image into list of points
+splitObjects = function(x) {
+  z = which(as.integer(x)>=1)
+  split(z, x[z])
 }

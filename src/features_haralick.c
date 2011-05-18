@@ -45,8 +45,7 @@ lib_co_occurrence (SEXP obj, SEXP ref, SEXP cgrades) {
       if ( data[index] > nobj ) nobj = floor( data[index] );
     if ( nobj < 1 ) {
       no_objects = 1;
-      nobj = 1; /* if no objects, create a matrix for 1 and fill all 0 */
-      warning("Image contains no objects");
+      nobj = 0; /* if no objects, create a 0-row matrix */
     }
     else no_objects = 0;
     /* create features matrix */
