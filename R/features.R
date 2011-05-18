@@ -105,9 +105,8 @@ hullFeatures = function(x) {
   xout <- (2*(0:(n-1))/(n-1) - 1) * pi
   ## this function will compose a profile matrix from the above matrix
   do.profile <- function(m, xyt, s) {
-    if ( is.null(m) ) { # no objects return 1 line full of zeros
-      warning("Image contains no objects");
-      return( matrix(0, ncol=n, nrow=1) )
+    if ( is.null(m) ) { # no objects
+      return( matrix(0, ncol=n, nrow=0) )
     }
     ## object indexes for each record
     index <- m[,1]
@@ -195,7 +194,8 @@ haralickFeatures = function(x, ref, nc=32) {
   hm <- haralickMatrix(x=x, ref=ref, nc=nc)
   if ( is.null(hm) || !(is.array(hm) || is.list(hm)) ) return( NULL )
   do.features <- function(m) {
-    res <- .Call( "lib_haralick", m, PACKAGE='EBImage')
+    if (dim(m)[3]>0) res <- .Call( "lib_haralick", m, PACKAGE='EBImage')
+    else res = matrix(0, nrow=0, ncol=13) ## no objects
     if ( is.matrix(res) )
       colnames(res) <- c("h.asm", "h.con", "h.cor", "h.var", "h.idm", "h.sav", "h.sva", 
                          "h.sen", "h.ent", "h.dva", "h.den", "h.f12", "h.f13")
