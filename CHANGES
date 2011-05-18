@@ -1,3 +1,7 @@
+3.9.3
+- experimental support for computeFeatures
+- ocontour does not return empty objects anymore
+
 3.9.2
 - the gaussian shape in makeBrush() is now conform to Matlab (J. Barry)
 - added the affine() transform
