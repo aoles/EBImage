@@ -49,7 +49,8 @@ ocontour = function(x) {
   storage.mode(x)='integer'
   y = .Call('ocontour', x, PACKAGE='EBImage')[-1]
   y = lapply(y, function(z) matrix(z, nc=2, byrow=TRUE))
-  y
+  names(y) = 1:length(y)
+  y[sapply(y, nrow)>0]
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
