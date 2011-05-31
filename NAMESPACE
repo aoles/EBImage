@@ -60,9 +60,15 @@ export(drawfont, drawtext)
 export(drawCircle)
 
 ## features extraction
-export(getFeatures, hullFeatures, edgeProfile, edgeFeatures)
-export(moments, cmoments, smoments, rmoments)
-export(haralickMatrix, haralickFeatures, zernikeMoments)
+export(computeFeatures)
+export(computeFeatures.basic, computeFeatures.moment, computeFeatures.shape, computeFeatures.haralick)
+export(standardExpandRef)
 
 ## deprecated
+export(getFeatures)
+export(edgeProfile, edgeFeatures)
 
+## no longer exported
+## export(moments, hullFeatures, haralickFeatures, zernikeMoments)
+## export(cmoments, smoments, rmoments)
+## export(haralickMatrix)
