@@ -69,6 +69,6 @@ export(getFeatures)
 export(edgeProfile, edgeFeatures)
 
 ## no longer exported
-## export(moments, hullFeatures, haralickFeatures, zernikeMoments)
-## export(cmoments, smoments, rmoments)
-## export(haralickMatrix)
+export(moments, hullFeatures, haralickFeatures, zernikeMoments)
+export(cmoments, smoments, rmoments)
+export(haralickMatrix)

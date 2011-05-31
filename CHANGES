@@ -1,6 +1,5 @@
 3.9.5
-- deprecated: getFeatures, edgeProfile, edgeFeatures
-- no longer exported: moments, hullFeatures, haralickFeatures, zernikeMoments, cmoments, smoments, rmoments, haralickMatrix
+- exporting computeFeatures
 
 3.9.4
 - fixed haralickFeatures and haralickMatrix when no objects are present
