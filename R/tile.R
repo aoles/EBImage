@@ -22,7 +22,6 @@ tile = function (x, nx=10, lwd=1, fg.col="#E4AF2B", bg.col="gray") {
     hdr = Image(c(fg.col,bg.col), col=Color, dim=c(2,1))
     
     if (colorMode(x)==Grayscale) hdr=channel(hdr, 'gray')
-    else if (colorMode(x)==TrueColor) colorMode(hdr)=TrueColor
     .Call("tile", castImage(x), hdr, as.integer(c(nx, lwd)), PACKAGE='EBImage')
   }
 }

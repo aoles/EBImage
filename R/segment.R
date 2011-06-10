@@ -1,9 +1,8 @@
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 watershed = function (x, tolerance=1, ext=1) {
   validImage(x)
-  if (colorMode(x)==TrueColor) stop("'x' must be an Image not in \'TrueColor\' color mode")
   tolerance = as.numeric(tolerance)
-  if (tolerance < 0) stop( "'tolerance' must be non-negative" )
+  if (tolerance<0) stop( "'tolerance' must be non-negative" )
   ext = as.integer(ext)
   if (ext<1) stop( "'ext' must be a positive integer" )
   .Call("watershed", castImage(x), tolerance, ext, PACKAGE='EBImage')

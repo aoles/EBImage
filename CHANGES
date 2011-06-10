@@ -1,3 +1,10 @@
+3.9.6
+- the functions getFeatures, hullFeatures, edgeProfile, edgeFeatures are now obsolete
+- the functions moments, cmoments, smoments, rmoments, haralickFeatures, haralickMatrix, zernikeMoments are now obsolete 
+- the functions are still exported for backward compatibility reasons
+- removed some TrueColor tests, which is going to be discarded from EBImage
+- removed the deprecated arguments: iter, no.GTK, main, colorize
+
 3.9.5
 - exporting computeFeatures
 
