@@ -1,8 +1,6 @@
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 getFeatures = function (x, ref, N = 12, R = 30, nc = 32) {
-  validImage(x)
-  if (colorMode(ref) == TrueColor) stop("\'ref\' must not be in \'TrueColor\' color mode")
-  
+  validImage(x)  
   gf = hullFeatures(x)
   mf = moments(x=x, ref=ref)
   ef = edgeFeatures(x=x, ref=ref)
@@ -39,8 +37,7 @@ zernikeMoments = function(x, ref, N=12, R=30) {
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 hullFeatures = function(x) {
   validImage(x)
-  if (colorMode(x) == TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
-
+  
   ## get basic hull features
   res <- .Call( "lib_basic_hull", castImage(x), PACKAGE='EBImage')
   if (is.null(res)) return( NULL )

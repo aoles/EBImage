@@ -17,7 +17,6 @@
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 normalize = function (x, separate=TRUE, ft=c(0,1)) {
   validImage(x)
-  if (colorMode(x) == TrueColor) stop("this method doesn't support the \'TrueColor\' color mode, use \'normalize2\' instead") 
   ft <- as.numeric (ft)
   if ( diff(ft) == 0 ) stop("normalization range is 0")
   separate <- as.integer(separate)
@@ -46,7 +45,6 @@ flop = function (x) {
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 translate = function (x, v) {
   validImage(x)
-  if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
   v = matrix(v, nrow=getNumberOfFrames(x,'total'), ncol=2, byrow=TRUE)
   if (length(v)!=2*getNumberOfFrames(x,'total')) stop("'v' must be a matrix of size (n,2), where \'n'\ is the total number of frames")
   if (any(is.na(v))) stop("'v' shouldn't contain any NAs")
@@ -58,7 +56,6 @@ translate = function (x, v) {
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 affine = function (x, m) {
   validImage(x)
-  if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
   if (!is.matrix(m) || nrow(m)!=3 || ncol(m)!=2) stop("'m' must be a 3x2 matrix")
   if (any(is.na(m))) stop("'m' shouldn't contain any NAs")
   m = cbind(m, c(0, 0, 1))

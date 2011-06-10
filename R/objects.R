@@ -15,8 +15,7 @@
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 paintObjects = function (x, tgt, opac=c(1, 1), col=c('red', NA)) {
   validImage(x)
-  if (colorMode(x) != Grayscale)  stop("'",paste(deparse(substitute(x))), "' must be in 'Grayscale' color mode")
-  if (colorMode(tgt) == TrueColor) tgt = Image(tgt, Color)
+  if (colorMode(x)!=Grayscale)  stop("'", paste(deparse(substitute(x))), "' must be in 'Grayscale' color mode")
   if (any(dim(x)[1:2] != dim(tgt)[1:2])) stop( "'x' and 'tgt' must have the same size" )
   if (getNumberOfFrames(x,'render') != getNumberOfFrames(tgt,'render')) stop( "'x' and 'tgt' must have the same number of render frames" )                           
 
@@ -63,7 +62,6 @@ stackObjects = function (x, ref, index, combine=TRUE, rotate, bg.col='black', ex
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 rmObjects = function (x, index) {
   validImage(x)
-  if ( colorMode(x) == TrueColor ) stop("'x' must be an Image not in \'TrueColor\' color mode")
   if (is.list(index)) index = lapply (index, as.integer)
   else index = list( as.integer(index) )
   return (.Call ("rmObjects", castImage(x), index, PACKAGE='EBImage') )

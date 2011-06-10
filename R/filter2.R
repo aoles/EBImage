@@ -18,7 +18,6 @@
 filter2 = function(x, filter) {
   validObject(x)
   validObject(filter)
-  if (colorMode(x)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
   
   dx = dim(x)
   cmx = colorMode(x)

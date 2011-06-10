@@ -1,5 +1,5 @@
-## example
-example = function() {
+## tests
+tests = function() {
   library("EBImage")
   source("R/computeFeatures.R")
 
@@ -44,10 +44,6 @@ example = function() {
 }
 
 ## main function
-## x: labelled image
-## ref: a list of images
-## expandRef: a function to expand ref
-## returns NULL if no object in x
 computeFeatures = function(x, ref, methods.noref=c("computeFeatures.moment", "computeFeatures.shape"),
   methods.ref=c("computeFeatures.basic", "computeFeatures.moment", "computeFeatures.haralick"),
   xname="x", refnames, properties=FALSE, expandRef=standardExpandRef, ...) {
@@ -71,11 +67,11 @@ computeFeatures = function(x, ref, methods.noref=c("computeFeatures.moment", "co
     if (length(xs)==0) return(NULL)
     
     ## compute features without reference
-    features.noref = do.call(cbind, lapply(methods.noref, do.call, list(x=x, xs=xs, properties=FALSE, ...)))
+    features.noref = do.call(cbind, lapply(methods.noref, do.call, list(x=x, properties=FALSE, xs=xs, ...)))
     
     ## compute features with reference, for each channel
     features.ref = lapply(1:nref, function(i) {
-      do.call(cbind, lapply(methods.ref, do.call, list(x=x, ref=ref[[i]], xs=xs, properties=FALSE, ...)))
+      do.call(cbind, lapply(methods.ref, do.call, list(x=x, ref=ref[[i]], properties=FALSE, xs=xs, ...)))
     })
     names(features.ref) = refnames
 
@@ -132,7 +128,7 @@ standardExpandRef = function(ref, refnames) {
 }
 
 ## basic pixel-independant statistics
-computeFeatures.basic = function(x, ref, xs, properties=FALSE, basic.quantiles=c(0.01, 0.05, 0.5, 0.95, 0.99), ...) {
+computeFeatures.basic = function(x, ref, properties=FALSE, basic.quantiles=c(0.01, 0.05, 0.5, 0.95, 0.99), xs, ...) {
   qnames = paste('b.q', gsub('\\.', '', as.character(basic.quantiles)), sep='')
   if (!properties) {
     ## check arguments
@@ -162,13 +158,33 @@ computeFeatures.basic = function(x, ref, xs, properties=FALSE, basic.quantiles=c
   }
 }
 
+## shape features
+computeFeatures.shape = function(x, properties=FALSE, xs, ...) {
+  if (!properties) {
+    ## check arguments
+    x = checkx(x)
+    if (missing(xs)) xs = splitObjects(x)
+    if (length(xs)==0) return(NULL)
+    
+    contours = ocontour(x)
+    ## compute features
+    features = do.call(rbind, lapply(contours, function(z) {
+      cz = apply(z, 2, mean)
+      radius = sqrt(rowSums((z - rep(cz, each=nrow(z)))^2))
+      c(s.perimeter=nrow(z), s.radius.mean=mean(radius), s.radius.min=min(radius),
+        s.radius.max=max(radius))
+    }))
+    cbind(s.area=sapply(xs, length), features)
+  } else {
+    ## feature properties
+    data.frame(name=c("s.area", "s.perimeter", "s.radius.mean", "s.radius.min", "s.radius.max"),
+               translation.invariant = c(TRUE, TRUE, TRUE, TRUE, TRUE),
+               rotation.invariant = c(TRUE, TRUE, TRUE, TRUE, TRUE))
+  }
+}
+
 ## image moments
-## m.cx: center of mass x (in pixels)
-## m.cy: center of mass y (in pixels)
-## m.majoraxis: elliptical fit major axis (in pixels)
-## m.eccentricity: elliptical eccentricity = sqrt(1-majoraxis^2/minoraxis^2) ; circle eccentricity is 0 ; max eccentricity is 1
-## m.theta: object angle (in radians)
-computeFeatures.moment = function(x, ref, xs, properties=FALSE, ...) {
+computeFeatures.moment = function(x, ref, properties=FALSE, xs, ...) {
   if (!properties) {
     ## check arguments
     x = checkx(x)
@@ -213,39 +229,9 @@ computeFeatures.moment = function(x, ref, xs, properties=FALSE, ...) {
   }
 }
 
-## shape features
-## s.area: area size (in pixels)
-## s.perimeter: perimeter (in pixels)
-## s.radius.mean: mean radius (in pixels)
-## s.radius.max: min radius (in pixels)
-## s.radius.min: max radius (in pixels)
-computeFeatures.shape = function(x, xs, properties=FALSE, ...) {
-  if (!properties) {
-    ## check arguments
-    x = checkx(x)
-    if (missing(xs)) xs = splitObjects(x)
-    if (length(xs)==0) return(NULL)
-    
-    contours = ocontour(x)
-    ## compute features
-    features = do.call(rbind, lapply(contours, function(z) {
-      cz = apply(z, 2, mean)
-      radius = sqrt(rowSums((z - rep(cz, each=nrow(z)))^2))
-      c(s.perimeter=nrow(z), s.radius.mean=mean(radius), s.radius.min=min(radius),
-        s.radius.max=max(radius))
-    }))
-    cbind(s.area=sapply(xs, length), features)
-  } else {
-    ## feature properties
-    data.frame(name=c("s.area", "s.perimeter", "s.radius.mean", "s.radius.min", "s.radius.max"),
-               translation.invariant = c(TRUE, TRUE, TRUE, TRUE, TRUE),
-               rotation.invariant = c(TRUE, TRUE, TRUE, TRUE, TRUE))
-  }
-}
-
 ## haralick features
 ## h.*: haralick features
-computeFeatures.haralick = function(x, ref, xs, properties=FALSE, haralick.nbins=32, haralick.scales=c(1, 2), ...) {
+computeFeatures.haralick = function(x, ref, properties=FALSE, haralick.nbins=32, haralick.scales=c(1, 2), xs, ...) {
   snames = paste("s", haralick.scales, sep="")
   if (!properties) {
     ## check arguments
@@ -285,10 +271,7 @@ computeFeatures.haralick = function(x, ref, xs, properties=FALSE, haralick.nbins
 }
 
 ## make a blob
-## library("lattice")
-## blob = gblob(x0=15, n=49, alpha=0.8, beta=1.2)
-## wireframe(blob)
-## display(0.5+blob)
+## example: blob = gblob(x0=15, n=49, alpha=0.8, beta=1.2)
 gblob = function(x0, n, alpha, beta) {
   xx = seq(-x0, x0, length.out=n)
   xx = matrix(xx, nrow=length(xx), ncol=length(xx))
@@ -296,39 +279,6 @@ gblob = function(x0, n, alpha, beta) {
   z = dnorm(xx, mean=0, sd=alpha) -  0.65*dnorm(xx, mean=0, sd=beta)
   z/sum(z)
 }
-
-computeFeatures.projection = function(x, ref, xs, properties=FALSE, filterbank=list(), ...) {
-}
-
-##
-##
-##
-##
-##
-##
-##
-##
-##
-##
-##
-##
-##
-##  private functions, not exported
-##
-##
-##
-##
-##
-##
-##
-##
-##
-##
-##
-##
-##
-##
-
 
 ## convert ref into a list of images, for fast processing
 convertRef = function(ref, refnames) {

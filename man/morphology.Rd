@@ -13,10 +13,10 @@
 }
 
 \usage{
-  dilate(x, kern, iter)
-  erode(x, kern, iter)
-  opening(x, kern, iter)
-  closing(x, kern, iter)
+  dilate(x, kern)
+  erode(x, kern)
+  opening(x, kern)
+  closing(x, kern)
 
   makeBrush(size, shape=c('box', 'disc', 'diamond', 'gaussian'), step=TRUE, sigma=0.3)
 }
@@ -43,8 +43,6 @@
 
   \item{sigma}{An optional numeric containing the standard deviation of
     the Gaussian shape. Default is 0.3.}
-  
-  \item{iter}{Deprecated argument.}
 }
 
 \value{

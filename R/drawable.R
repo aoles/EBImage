@@ -56,7 +56,6 @@ drawtext = function(img, xy, labels, font, col) {
 
 drawCircle = function(img, x, y, radius, col, fill=FALSE, z=1) {
   validImage(img)
-  if (colorMode(img)==TrueColor) stop("this method doesn't support the \'TrueColor\' color mode")
   if (any(is.na(img))) stop("'x' shouldn't contain any NAs")
 
   ## check whether parameters are OK

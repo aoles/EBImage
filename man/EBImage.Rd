@@ -84,6 +84,13 @@
     
   Features extraction
   \itemize{
+    \item \code{computeFeatures}
+    \item \code{computeFeatures.basic}, \code{computeFeatures.moment}, \code{computeFeatures.shape}, \code{computeFeatures.haralick}
+    \item \code{standardExpandRef}
+  }
+
+  Obsolete
+  \itemize{
     \item \code{getFeatures}
     \item \code{hullFeatures}
     \item \code{edgeProfile}, \code{edgeFeatures}

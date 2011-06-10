@@ -12,9 +12,7 @@
 }
 
 \usage{
-display(x, no.GTK, main, colorize,
-        title = paste(deparse(substitute(x))),
-        useGTK = TRUE)
+display(x, title=paste(deparse(substitute(x))), useGTK=TRUE)
 animate(x)
 }
 
@@ -22,7 +20,6 @@ animate(x)
   \item{x}{An \code{Image} object or an array.} 
   \item{useGTK}{A logical of length 1. See details.} 
   \item{title}{Window title.}
-  \item{no.GTK, main, colorize}{Deprecated.}
 }
 
 \value{
