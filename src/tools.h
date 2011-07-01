@@ -16,7 +16,6 @@ extern
 #endif
 
 #define MODE_GRAYSCALE  0
-#define MODE_TRUECOLOR  1
 #define MODE_COLOR      2
 #define MODE_MAX        2
 

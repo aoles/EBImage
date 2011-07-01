@@ -57,21 +57,15 @@ paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col) {
 	  }	  
 
 	  if (redstride!=-1) {
-	    dp=dres[redstride+j*nx + i] + col[index]*opac[index];		
-	    if (dp<0.0) dp=0.0;
-	    if (dp>1.0) dp=1.0;
+	    dp=dres[redstride+j*nx + i]*(1-opac[index]) + col[index]*opac[index];		
 	    dres[redstride+j*nx + i]=dp;
 	  }
 	  if (greenstride!=-1) {
-	    dp=dres[greenstride+j*nx + i] + col[index+3]*opac[index];
-	    if (dp<0.0) dp=0.0;
-	    if (dp>1.0) dp=1.0;
+	    dp=dres[greenstride+j*nx + i]*(1-opac[index]) + col[index+3]*opac[index];
 	    dres[greenstride+j*nx + i]=dp;
 	  }
 	  if (bluestride!=-1) {
-	    dp=dres[bluestride+j*nx + i] + col[index+3*2]*opac[index];	
-	    if (dp<0.0) dp=0.0;
-	    if (dp>1.0) dp=1.0;
+	    dp=dres[bluestride+j*nx + i]*(1-opac[index]) + col[index+3*2]*opac[index];	
 	    dres[bluestride+j*nx + i]=dp;
 	  }
 	}
@@ -226,7 +220,7 @@ stackObjects (SEXP obj, SEXP ref, SEXP _bgcol, SEXP xy_list, SEXP extension) {
 	INTEGER (dim)[3] = nobj;
 	SET_DIM (st, dim);
 	UNPROTECT(1); nprotect--; // dim
-      } else if (mode == MODE_TRUECOLOR) error("'TrueColor' mode is not supported for 'ref'");
+      }
 
       // set slot
       if (nz == 1 ) res = SET_SLOT(res, install(".Data"), st);

@@ -13,7 +13,7 @@ hash=function(x) {
 
 ## try to evaluate fun(x,...) 
 check=function(fun,x,...) {
-  passed=T
+  passed = TRUE
   
   cat('checking \'',fun,'\' ... ',sep='')
   y=try(do.call(fun,c(list(x),list(...))),silent=T)

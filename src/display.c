@@ -412,7 +412,6 @@ GdkPixbuf * newPixbufFromSEXP (SEXP xx, int index) {
   numeric *dx,dr,dg,db;
   unsigned char *dpixbuf,*data;
   int colorMode;
-  int *ix,*idata;
   int redstride=-1,greenstride=-1,bluestride=-1;
 
   width=INTEGER(GET_DIM(xx))[0];
@@ -424,44 +423,31 @@ GdkPixbuf * newPixbufFromSEXP (SEXP xx, int index) {
   rowstride = gdk_pixbuf_get_rowstride (pixbuf);
   dpixbuf=(unsigned char *)gdk_pixbuf_get_pixels(pixbuf);
 
-  // TrueColor
-  if (colorMode==MODE_TRUECOLOR) {
-    ix=INTEGER(xx);
-    for (y=0;y<height;y++) {
-      idata=(int *)(dpixbuf+y*rowstride);
-      for (x=0;x<width;x++) {
-	*idata=ix[x+y*width+index*width*height] | 0xff000000;
-	idata++;
-      }
-    }
-  } else {
-    dx=REAL(xx);
-    
-    getColorStrides(xx,index,&redstride,&greenstride,&bluestride);
-
-    for (y=0;y<height;y++) {
-      data=dpixbuf+y*rowstride;
-      for (x=0;x<width;x++) {
-	if (redstride!=-1) dr=256*dx[x+y*width+redstride];	
+  dx=REAL(xx);
+  getColorStrides(xx,index,&redstride,&greenstride,&bluestride);
+  
+  for (y=0;y<height;y++) {
+    data=dpixbuf+y*rowstride;
+    for (x=0;x<width;x++) {
+      if (redstride!=-1) dr=256*dx[x+y*width+redstride];	
 	else dr=0;
-	if (greenstride!=-1) dg=256*dx[x+y*width+greenstride];	
-	else dg=0;
-	if (bluestride!=-1) db=256*dx[x+y*width+bluestride];
-	else db=0;
-	if (dr<0.0) dr=0.0;
-	if (dr>255.0) dr=255.0;
-	if (dg<0.0) dg=0.0;
-	if (dg>255.0) dg=255.0;
-	if (db<0.0) db=0.0;
-	if (db>255.0) db=255.0;
-	*data++=(unsigned char)dr;   // R
-	*data++=(unsigned char)dg;   // G
-	*data++=(unsigned char)db;   // B
-	*data++=255;                 // A
-      }
+      if (greenstride!=-1) dg=256*dx[x+y*width+greenstride];	
+      else dg=0;
+      if (bluestride!=-1) db=256*dx[x+y*width+bluestride];
+      else db=0;
+      if (dr<0.0) dr=0.0;
+      if (dr>255.0) dr=255.0;
+      if (dg<0.0) dg=0.0;
+      if (dg>255.0) dg=255.0;
+      if (db<0.0) db=0.0;
+      if (db>255.0) db=255.0;
+      *data++=(unsigned char)dr;   // R
+      *data++=(unsigned char)dg;   // G
+      *data++=(unsigned char)db;   // B
+      *data++=255;                 // A
     }
-  } 
-    
+  }
+  
   return pixbuf;
 }
 

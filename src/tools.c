@@ -49,7 +49,6 @@ indexFromXY (const int x, const int y, const int xsize) {
 int
 validImage (SEXP x,int test) {
   int colorMode;
-  int *ip;
   double *dp;
   char *msg=NULL;
 
@@ -65,9 +64,7 @@ validImage (SEXP x,int test) {
     if (INTEGER(GET_DIM(x))[0]<1 || INTEGER(GET_DIM(x))[1]<1) msg="spatial dimensions of object must be higher than zero"; 
     if (getNumberOfFrames(x,0)<1) msg="object must contain at least one frame";
     
-    // check storage.mode
-    if (colorMode==MODE_TRUECOLOR) ip=INTEGER(x);
-    else dp=REAL(x);
+    dp=REAL(x);
   }
 
   if (test==0 && msg!=NULL) error(msg);
@@ -134,8 +131,6 @@ void getColorStrides(SEXP x,int index,int *redstride,int *greenstride,int *blues
   *redstride=index*width*height;
   *greenstride=index*width*height;
   *bluestride=index*width*height;
-
-  if (colorMode==MODE_TRUECOLOR) warning("getColorStrides cannot be called if colorMode=TrueColor");
 
   if (colorMode==MODE_COLOR) {
     nbChannels=getNumberOfChannels(x);

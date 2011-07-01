@@ -11,7 +11,7 @@ exportClasses(Image)
 
 ## image class, accessors
 export(Image, is.Image, as.Image, print.Image, as.raster.Image)
-export(Grayscale, TrueColor, Color)
+export(Grayscale, Color)
 exportMethods(Ops, "[")
 export(colorMode, "colorMode<-", imageData, "imageData<-")
 export(getFrame, getNumberOfFrames)
