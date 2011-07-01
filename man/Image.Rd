@@ -3,7 +3,6 @@
 \alias{Image}
 \alias{Image-class}
 \alias{Grayscale}
-\alias{TrueColor}
 \alias{Color}
 \alias{is.Image}
 \alias{as.Image}
@@ -41,7 +40,7 @@
   dimensions of the image. In the \code{Grayscale} mode, the remaining dimensions
   contain other images. In the the \code{Color} mode, the third dimension contains
   the red, green and blue channels of the image and the remaining dimensions contain
-  other images. The color mode \code{TrueColor} exists but is deprecated.
+  other images.
 
   All methods of the package \code{EBImage} works either with \code{Image} objects or
   multi-dimensional arrays but in the latter case, the color mode is assumed to be

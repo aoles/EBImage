@@ -1,3 +1,8 @@
+3.9.7
+- TrueColor is not present any more
+- fixed paintObjects using Kevin Keraudren's bug fix
+- paintObjects behavior has now changed with respect to the opacity parameter
+
 3.9.6
 - the functions getFeatures, hullFeatures, edgeProfile, edgeFeatures are now obsolete
 - the functions moments, cmoments, smoments, rmoments, haralickFeatures, haralickMatrix, zernikeMoments are now obsolete 

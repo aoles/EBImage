@@ -16,7 +16,6 @@
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Grayscale = 0L
-TrueColor = 1L  ## deprecated mode
 Color     = 2L
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -41,47 +40,11 @@ Image=function(data=array(0, dim=c(1,1)), dim, colormode=NULL) {
     else colormode=Grayscale
   } else colormode=EBImage:::parseColorMode(colormode)
 
-  ## TrueColor<->(Grayscale,Color) conversion, if requested
-  if (is.Image(data)) {
-    if (colorMode(data)==TrueColor) {
-      if (colormode==Grayscale) {
-        data=channel(data,'gray')
-        dim=dim(data)
-      }
-      else if (colormode==Color) {
-        data=rgbImage(r=channel(data,'red'),g=channel(data,'green'),b=channel(data,'blue'))
-        dim=dim(data)
-      }
-    }
-    if (colormode==TrueColor) {
-      if (colorMode(data)==Grayscale) {
-        dim=dim(data)
-        data=as.integer(floor(256*channel(data,'gray')))
-        data[data<0]=0
-        data[data>255]=255
-        data=256*256*data+256*data+data
-      } else if (colorMode(data)==Color) {
-        dim=c(dim(data)[1:2],getNumberOfFrames(data,'render'))
-        red=as.integer(floor(256*channel(data,'red')))
-        red[red<0]=0
-        red[red>255]=255
-        green=as.integer(floor(256*channel(data,'green')))
-        green[green<0]=0
-        green[green>255]=255
-        blue=as.integer(floor(256*channel(data,'blue')))
-        blue[blue<0]=0
-        blue[blue>255]=255
-        data=as.integer(256*256*blue+256*green+red)
-      } 
-    }
-  }
-
   if (is.character(data)) {
     datac = col2rgb(data)/255
     res = rgbImage(Image(datac[1,,drop=FALSE], dim=dim[1:2]),  Image(datac[2,,drop=FALSE], dim=dim[1:2]),  Image(datac[3,,drop=FALSE], dim=dim[1:2]))
     if (!is.null(colormode)) if (colormode==Grayscale) res = channel(res, 'gray')
   } else {
-    if (colormode==TrueColor) data=as.integer(data)
     res = new("Image", .Data=array(data,dim=dim), colormode=colormode)
   }
   
@@ -91,8 +54,7 @@ Image=function(data=array(0, dim=c(1,1)), dim, colormode=NULL) {
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 as.Image = function(x) {
-  if (is.integer(x)) return(Image(x, colormode=TrueColor))
-  else x = Image(x, colormode=Grayscale)
+  x = Image(x, colormode=Grayscale)
   validImage(x)    
   return(x)
 }
@@ -104,15 +66,9 @@ colorMode = function (y) {
 }
 
 `colorMode<-` = function(y, value) {
-    if (is(y, 'Image')) {
-    ## conversion here should not be possible ! kept for compatibility
-    if ((y@colormode==TrueColor & value!=TrueColor) |
-        (y@colormode!=TrueColor & value==TrueColor)) {
-      y=Image(y,colormode=value)
-    } else {
-      y@colormode = EBImage:::parseColorMode(value)
-      validObject(y)
-    }
+  if (is(y, 'Image')) {
+    y@colormode = EBImage:::parseColorMode(value)
+    validObject(y)
   } else warning('Color mode of an array cannot be changed, the array should be cast into an Image using \'Image\'')
   return(y)
 }
@@ -126,8 +82,6 @@ imageData = function (y) {
 `imageData<-` = function (y, value) {
     if (is(y, 'Image')) {
     y@.Data = value
-    ## conversion here should not be possible ! kept for compatibility !
-    if (is.integer(value)) y@colormode = TrueColor
     validObject(y)
   } else return(value)
   return (y)
@@ -144,7 +98,6 @@ validImageObject=function(object) {
   ## check colormode
   if (!is.integer(colorMode(object))) return('colormode must be an integer')
   if (colorMode(object)<0 | colorMode(object)>2) return('invalid colormode')
-  if (colorMode(object)==TrueColor) warning('deprecated: the colormode \'TrueColor\' is deprecated, you should use the colormode \'Color\' instead')
   
   ## check array
   if (!is.array(object)) return('object must be an array')
@@ -255,7 +208,7 @@ setMethod ("show", signature(object="Image"),
     valid=validObject(object,test=TRUE)
     if (!is.logical(valid)) valid=paste(FALSE,', ',valid,sep='')
 
-    cat('  colormode:',c('Grayscale','TrueColor','Color')[1+colorMode(object)],'\n')
+    cat('  colormode:',c('Grayscale', NA, 'Color')[1+colorMode(object)],'\n')
     cat('  storage.mode:',storage.mode(object),'\n')
     cat('  dim:',dim(object),'\n')
     cat('  nb.total.frames:',getNumberOfFrames(object,'total'),'\n')
@@ -329,7 +282,6 @@ channel = function (x, mode) {
   if (is.character(x)) x=Image(x)
   mode=tolower(mode)
   validObject(x)
-  if (colorMode(x)==TrueColor) x=Image(x, colormode=Color)
   if (colorMode(x)==Grayscale) {
     return(switch(mode,
                   rgb=rgbImage(r=x,g=x,b=x),
@@ -397,10 +349,6 @@ combine = function (x,...,along) {
     args=c(list(x),list(...))
     if (length(args)==1) return(x)
     
-    ## check colorMode
-    cm=sapply(args,colorMode)==TrueColor
-    if (any(cm) && !all(cm)) stop("\'TrueColor\' images cannot be combined with non \'TrueColor\' ones")
-
     ## check dim[1:2]
     dm=sapply(args,function(z) dim(z)[1:2])
     dmx=dm[1,]==dm[1,1]
@@ -476,7 +424,7 @@ parseColorMode=function(colormode) {
     ## warning('deprecated: colormode should be specified through a character string: \'grayscale\' or \'color\'')
     icolormode=colormode
   } else if (is.character(colormode)) {
-    icolormode=pmatch(tolower(colormode),c('grayscale','truecolor','color'),duplicates.ok=TRUE,nomatch=NA)-1
+    icolormode=pmatch(tolower(colormode),c('grayscale', NA, 'color'), duplicates.ok=TRUE,nomatch=NA)-1
   }
   
   as.integer(icolormode)

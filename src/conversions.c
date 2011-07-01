@@ -33,10 +33,6 @@ sexp2Magick (SEXP x) {
     GetExceptionInfo (&exception);
     for ( i = 0; i < nz; i++ ) {
         switch (colormode) {
-            case MODE_TRUECOLOR:
-                data = &( INTEGER(x)[i * nx * ny] );
-                image = ConstituteImage (nx, ny, "RGBO", CharPixel, data, &exception);
-            break;
 	case MODE_COLOR:
 	  // GP: Using a temporary double to constitute an ImageMagick Image
 	  // GP: I didn't find a better way to do it in ImageMagick...
@@ -70,11 +66,6 @@ sexp2Magick (SEXP x) {
             warning ( "cannot convert the image" );
             continue;
         }
-	/*
-        if ( colormode == MODE_GRAYSCALE )
-	  SetImageType (image, GrayscaleType);
-        else
-	  SetImageType (image, TrueColorType );*/
 	
         SetImageOpacity (image, 0);
         /* to enable display in all sessions, a used to be ssh and MacOS error */
@@ -120,10 +111,6 @@ magick2SEXP (Image * images, int colormode) {
     GetExceptionInfo(&exception);
     /* allocate memory and copy data */
     switch ( colormode ) {
-        case MODE_TRUECOLOR:
-            PROTECT ( resd = allocVector(INTSXP, nx * ny * nz) );
-            nprotect++;
-        break;
         case MODE_COLOR:
             PROTECT ( resd = allocVector(REALSXP, nx * ny * 3 * nz) );
             nprotect++;
@@ -142,11 +129,6 @@ magick2SEXP (Image * images, int colormode) {
         dy = image->rows < ny ? image->rows : ny;
         SetImageOpacity (image, 0);
         switch ( colormode ) {
-            case MODE_TRUECOLOR:
-                data = &( INTEGER(resd)[i * nx * ny] );
-                SetImageType (image, TrueColorType);
-                DispatchImage (image, 0, 0, dx, dy, "RGBO", CharPixel, data, &exception);
-            break;
 	    case MODE_COLOR:
                 data = &( REAL(resd)[i * 3 * nx * ny] );
                 SetImageType (image, TrueColorType);
