@@ -36,7 +36,7 @@ flip = function (x) {
 flop = function (x) {
   validImage(x)
   nd=as.list(rep(T, length(dim(x))))
-  nd[[1]]=dim(x)[2]:1
+  nd[[1]]=dim(x)[1]:1
   do.call('[', c(list(x),nd))
 }
 
