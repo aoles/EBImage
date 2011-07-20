@@ -1,3 +1,6 @@
+3.9.8
+- fixed flop() when working with rectangular images (bug reported by Takeo Katsuki)
+
 3.9.7
 - TrueColor is not present any more
 - fixed paintObjects using Kevin Keraudren's bug fix
