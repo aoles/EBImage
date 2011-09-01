@@ -1,3 +1,6 @@
+3.9.9
+- animate() does not work anymore (IM issues I guess...) and now calls display(); I will reimplement the animating function using timer messages in display()
+
 3.9.8
 - fixed flop() when working with rectangular images (bug reported by Takeo Katsuki)
 
