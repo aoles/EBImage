@@ -1,6 +1,6 @@
 - subset [1,1:10] or [1:10,1] doesn't have the good orientation
 - test object functions when only one object is present
 - replace DispatchImage by ExportImagePixels (available from >= IM 6.4.7)
-- deprecate TrueColor and unused arguments
 - document standardExpandRef
 - remove obsolete functions from tests
+- animate to reimplement using timer messages

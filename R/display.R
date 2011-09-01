@@ -10,6 +10,5 @@ display = function(x, title=paste(deparse(substitute(x))), useGTK=TRUE) {
 
 ## animate displays animated sequences of images
 animate = function (x) {
-  validImage(x)
-  invisible(.Call("lib_animate", castImage(x), PACKAGE="EBImage"))
+  display(x)
 }
