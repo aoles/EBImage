@@ -211,7 +211,7 @@ computeFeatures.moment = function(x, ref, properties=FALSE, xs, ...) {
       mu02 = m02/m00 - cy^2 ## temporary quantity
       mu11 = m11/m00 - cx*cy ## temporary quantity
       det = sqrt(4*mu11^2 + (mu20 - mu02)^2) ## temporary quantity
-      theta = atan(2*mu11/(mu20 - mu02))/2 ## angle
+      theta = atan2(2*mu11, (mu20 - mu02))/2 ## angle
       l1 = sqrt((mu20 + mu02 + det)/2)*4 ## major axis
       l2 = sqrt((mu20 + mu02 - det)/2)*4 ## minor axis
       eccentricity = sqrt(1-l2^2/l1^2) ## eccentricity

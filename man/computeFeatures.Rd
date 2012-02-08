@@ -7,7 +7,7 @@
 \alias{computeFeatures.haralick}
 \alias{standardExpandRef}
   
-\title{Compute objet features}
+\title{Compute object features}
 
 \description{
   Computes morphological and texture features from image objects.
