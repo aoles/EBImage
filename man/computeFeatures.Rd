@@ -94,11 +94,11 @@ standardExpandRef(ref, refnames)
     \item s.area: area size (in pixels)
     \item s.perimeter: perimeter (in pixels)
     \item s.radius.mean: mean radius (in pixels)
-    \item s.radius.max: min radius (in pixels)
-    \item s.radius.min: max radius (in pixels)
+    \item s.radius.max: max radius (in pixels)
+    \item s.radius.min: min radius (in pixels)
   }
   
-  The function \code{computeFeatures.moments} computes features
+  The function \code{computeFeatures.moment} computes features
   related to object moments, with can be computed with or without
   reference intensities:
   \itemize{
