@@ -19,6 +19,7 @@ See: ../LICENSE for license, LGPL
 #include "watershed.h"
 #include "thresh.h"
 #include "floodFill.h"
+#include "medianFilter.h"
 
 #include "features_hull.h"
 #include "features_moments.h"
@@ -109,6 +110,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"zernike",                         (DL_FUNC) &zernike,        5},
     {"drawCircle",                      (DL_FUNC) &drawCircle, 4},
     {"affine",                          (DL_FUNC) &affine, 2},
+    {"medianFilter",                          (DL_FUNC) &medianFilter, 4},
     /* add above all R-lib functions from common.h */
     {NULL, NULL, 0}
 };

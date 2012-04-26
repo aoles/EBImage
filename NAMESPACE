@@ -41,6 +41,7 @@ export(normalize)
 export(filter2)
 export(blur, gblur)
 export(equalize)
+export(medianFilter)
         
 ## morphological operations
 export(makeBrush)
