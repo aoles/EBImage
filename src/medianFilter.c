@@ -1,4 +1,4 @@
-/* ctmfForR16.c - Constant-time median filtering of 16-bit images
+/* medianFilter.c - Constant-time median filtering of 16-bit images
  *  (for inclusion in the Bioconductor Package EBImage)
  *
  *  The original ctmf algorithm here has minor modifications,
