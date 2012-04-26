@@ -15,9 +15,9 @@
 \arguments{
   \item{x}{An \code{Image} object or an array.}
 
-  \item{size}{The sizelength of the square median filter, in units of pixels.}
+  \item{size}{The sizelength of the square median filter in units of pixels.}
 
-  \item{cacheSize}{The L2 cache size of the system CPU, in kB}
+  \item{cacheSize}{The L2 cache size of the system CPU in kB.}
 }
 
 \value{
@@ -34,7 +34,7 @@
 }
 
 \seealso{
-  \code{\link{makeBrush}}, \code{\link{convolve}}, \code{\link{fft}}, \code{\link{blur}}
+  \code{\link{makeBrush}}, \code{\link{fft}}, \code{\link{blur}}
 }
 
 \author{Joseph Barry, \email{joseph.barry@embl.de}, 2012}

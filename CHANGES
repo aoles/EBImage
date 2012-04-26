@@ -1,4 +1,8 @@
-version 3.11.2:
+3.13.0
+- addition of greyscale functions for computation of the self-complementary top-hat (I. Kats)
+- a median filter based on Perreault's constant time median filter (J. Barry)
+
+3.11.2
 - fixed the angle computation of computeFeatures.moment (there was a sign inversion before for angles larger than pi/4)
 
 3.9.9
