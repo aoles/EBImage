@@ -44,7 +44,7 @@ export(equalize)
         
 ## morphological operations
 export(makeBrush)
-export(erode, dilate, opening, closing)
+export(erode, dilate, opening, closing, erodeGreyScale, dilateGreyScale, openingGreyScale, closingGreyScale, whiteTopHatGreyScale, blackTopHatGreyScale, selfcomplementaryTopHatGreyScale)
 export(distmap)
 export(floodFill, fillHull)
 
