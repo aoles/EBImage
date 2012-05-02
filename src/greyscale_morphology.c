@@ -118,7 +118,7 @@ chordSet buildChordSet(SEXP kernel) {
         int prevValue = 0, beginChord = 0;
         for (int j = 0; j < ksize.x; ++j) {
             int index = indexFromXY(j, i, ksize.x);
-            if (kern[index] == 0 && (prevValue == 1 || j == ksize.x - 1) && (prevValue == 1 || j == 0)) {
+            if ((kern[index] == 0 && prevValue == 1) || (j == ksize.x - 1 && (prevValue == 1 || j == 0))) {
                 int length = j - beginChord;
                 int yOff = i - korigin.y;
                 int xOff = beginChord - korigin.x;
