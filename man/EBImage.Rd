@@ -53,7 +53,7 @@
   Image enhancement, filtering
   \itemize{
     \item \code{normalize}
-    \item \code{filter2}, \code{blur}, \code{gblur}
+    \item \code{filter2}, \code{blur}, \code{gblur}, \code{medianFilter}
     \item \code{equalize}
   }
   
@@ -61,6 +61,8 @@
   \itemize{
     \item \code{makeBrush}
     \item \code{erode}, \code{dilate}, \code{opening}, \code{closing}
+    \item \code{erodeGreyScale}, \code{dilateGreyScale}, \code{openingGreyScale}, \code{closingGreyScale}
+    \item \code{whiteTopHatGreyScale}, \code{blackTopHatGreyScale}, \code{selfcomplementaryTopHatGreyScale}
     \item \code{distmap}
     \item \code{floodFill}, \code{fillHull}
   }
