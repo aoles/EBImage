@@ -1,3 +1,6 @@
+3.13.1
+- fixed a bug in ImageMagickCall that cause some matrices not to be normalized to [0;1] before IM calls
+
 3.13.0
 - addition of greyscale functions for computation of the self-complementary top-hat (I. Kats)
 - a median filter based on Perreault's constant time median filter (J. Barry)

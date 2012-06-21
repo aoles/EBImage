@@ -33,7 +33,7 @@ ImageMagickCall=function(x,flt,...) {
   min=r[1]
   scale=r[2]-r[1]
   if (scale==0.0) scale=1
-  if (min<0 | scale>1) {
+  if (min<0 | r[2]>1) {
     norm=TRUE
     x=(x-min)/scale
   }
