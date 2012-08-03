@@ -19,14 +19,14 @@ floodFill = function(x, pt, col, tolerance=0) {
   validImage(x)
 
   n = getNumberOfFrames(x, 'total')
-  pt = matrix(as.integer(pt), nr=n, nc=2, byrow=TRUE)
+  pt = matrix(as.integer(pt), nrow=n, ncol=2, byrow=TRUE)
   if (is.character(col)) col = as.numeric(col2rgb(col)/255)
-  col = as.numeric(matrix(col, nr=n, nc=1))
+  col = as.numeric(matrix(col, nrow=n, ncol=1))
   if (any(pt[,1]<1) || any(pt[,1]>dim(x)[1]) ||
       any(pt[,2]<1) || any(pt[,2]>dim(x)[2])) stop("coordinates 'pt' of the starting point(s) must be inside the image boundaries")
- 
+
   return( .Call("floodFill", castImage(x), pt, col, as.numeric(tolerance), PACKAGE='EBImage'))
-} 
+}
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 fillHull = function(x) {

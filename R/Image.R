@@ -47,7 +47,7 @@ Image=function(data=array(0, dim=c(1,1)), dim, colormode=NULL) {
   } else {
     res = new("Image", .Data=array(data,dim=dim), colormode=colormode)
   }
-  
+
   validObject(res)
   return(res)
 }
@@ -55,7 +55,7 @@ Image=function(data=array(0, dim=c(1,1)), dim, colormode=NULL) {
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 as.Image = function(x) {
   x = Image(x, colormode=Grayscale)
-  validImage(x)    
+  validImage(x)
   return(x)
 }
 
@@ -98,7 +98,7 @@ validImageObject=function(object) {
   ## check colormode
   if (!is.integer(colorMode(object))) return('colormode must be an integer')
   if (colorMode(object)<0 | colorMode(object)>2) return('invalid colormode')
-  
+
   ## check array
   if (!is.array(object)) return('object must be an array')
 
@@ -106,10 +106,10 @@ validImageObject=function(object) {
   d=dim(object)
   if (length(d)<2) return('object must have at least two dimensions')
   if (getNumberOfFrames(object,'total')<1) return('Image must contain at least one frame')
- 
+
   TRUE
 }
-setValidity("Image", validImageObject) 
+setValidity("Image", validImageObject)
 
 ## Overloading binary operators
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -144,7 +144,7 @@ writeImage = function (x, files, quality=100) {
   stopifnot(is(x, "array"), length(quality)==1L)
   if ((quality<1L) || (quality>100L))
     stop(sprintf("'quality' must be a value between 1 and 100, but it is %8g.", quality))
-  
+
   .Call("lib_writeImages", castImage(x), files, quality, PACKAGE='EBImage')
   invisible(files)
 }
@@ -224,7 +224,7 @@ setMethod ("show", signature(object="Image"),
     cat('\nimageData(object)',nds,':\n',sep='')
     print(do.call('[',c(list(object@.Data),ndl)))
     cat('\n')
-    
+
     invisible(NULL)
   }
 )
@@ -284,14 +284,14 @@ channel = function (x, mode) {
   validObject(x)
   if (colorMode(x)==Grayscale) {
     return(switch(mode,
-                  rgb=rgbImage(r=x,g=x,b=x),
+                  rgb=rgbImage(red=x,green=x,blue=x),
                   grey=,gray=x,
                   r=,red=stop('invalid conversion mode, can\'t extract the red channel from a \'Grayscale\' image'),
                   g=,green=stop('invalid conversion mode, can\'t extract the green channel from a \'Grayscale\' image'),
                   b=,blue=stop('invalid conversion mode, can\'t extract the blue channel from a \'Grayscale\' image'),
-                  asred=rgbImage(r=x),
-                  asgreen=rgbImage(g=x),
-                  asblue=rgbImage(b=x),
+                  asred=rgbImage(red=x),
+                  asgreen=rgbImage(green=x),
+                  asblue=rgbImage(blue=x),
                   x11=array(rgb(x,x,x),dim=dim(x)),
                   stop('invalid conversion mode')
                   ))
@@ -324,17 +324,17 @@ setMethod ("hist", signature(x="Image"),
     } else {
       y = list(black=imageData(x))
     }
-    
+
     rg = range(unlist(y), na.rm=TRUE)
     if(length(breaks)==1L) {
       dr = (rg[2]-rg[1])/(breaks*2L+2L)
       breaks = seq(rg[1]-dr, rg[2]+dr, length=breaks+1L)
     }
-    
+
     h = lapply(y, hist, breaks=breaks, plot=FALSE)
     px = sapply(h, "[[", "breaks")[-1L,,drop=FALSE]
     matplot(x = px + dr*(col(px)-ncol(px)/2)/2,
-            y = sapply(h, "[[", "counts"), type="s", lty=1L, 
+            y = sapply(h, "[[", "counts"), type="s", lty=1L,
             main=main, xlab=xlab, col=names(y), ylab="counts", ...)
   }
 )
@@ -348,7 +348,7 @@ combine = function (x,...,along) {
   else {
     args=c(list(x),list(...))
     if (length(args)==1) return(x)
-    
+
     ## check dim[1:2]
     dm=sapply(args,function(z) dim(z)[1:2])
     dmx=dm[1,]==dm[1,1]
@@ -364,11 +364,11 @@ combine = function (x,...,along) {
         else along=3
       } else along=3
     }
-    
+
     z=abind(args,along=along)
     dimnames(z)=NULL
     imageData(x)=z
-    
+
     validObject(x)
     return (x)
   }
@@ -387,7 +387,7 @@ quantile.Image <- function(x, ...) {
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 rgbImage = function(red=NULL, green=NULL, blue=NULL) {
   d=NULL
-  
+
   if (!is.null(red)) {
     red = Image(red, colormode=Grayscale)
     d = dim(red)
@@ -395,23 +395,23 @@ rgbImage = function(red=NULL, green=NULL, blue=NULL) {
   if (!is.null(green)) {
     green = Image(green, colormode=Grayscale)
     d=dim(green)
-  } 
+  }
   if (!is.null(blue)) {
     blue = Image(blue, colormode=Grayscale)
     d=dim(blue)
-  } 
+  }
 
   if (is.null(red)) red=Image(0, dim=d)
   if (is.null(green)) green=Image(0, dim=d)
   if (is.null(blue)) blue=Image(0, dim=d)
-  
+
   if (is.null(d)) stop('at least one non-null Image object must be specified')
-  
+
   x=combine(red, green, blue, along=2.5)
-  
+
   ## Cast to Color Image if x is an array
   if (class(x)=='array') x=Image(x)
-    
+
   colorMode(x)=Color
   x
 }
@@ -419,14 +419,14 @@ rgbImage = function(red=NULL, green=NULL, blue=NULL) {
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 parseColorMode=function(colormode) {
   icolormode=NA
-  
+
   if (is.numeric(colormode)) {
     ## warning('deprecated: colormode should be specified through a character string: \'grayscale\' or \'color\'')
     icolormode=colormode
   } else if (is.character(colormode)) {
     icolormode=pmatch(tolower(colormode),c('grayscale', NA, 'color'), duplicates.ok=TRUE,nomatch=NA)-1
   }
-  
+
   as.integer(icolormode)
 }
 
@@ -439,7 +439,7 @@ as.raster.Image <- function(y) {
   ## Either a grey scale or a color image
   if (colorMode(y) == Grayscale) {
     r <- t(image)
-    dim(r) <- dim(image)[2:1]  
+    dim(r) <- dim(image)[2:1]
   } else {
     r <- rgb(aperm(image[,,1]),
              aperm(image[,,2]),
@@ -447,4 +447,4 @@ as.raster.Image <- function(y) {
     dim(r) <- dim(image)[2:1]
   }
   r
-} 
+}

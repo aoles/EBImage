@@ -27,7 +27,7 @@ flt.rotate    <- as.integer(12)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ImageMagickCall=function(x,flt,...) {
   validImage(x)
-  
+
   norm=FALSE
   r=range(x)
   min=r[1]
@@ -47,7 +47,7 @@ blur = function (x, r=0, s=0.5) {
   if (r < 0 || s <= 0)
     stop("values of 'r' and 's' must be positive, set r=0 for automatic radius")
   if (r <= s && r != 0)
-    warning("for reasonable results, 'r' should be larger than 's'")      
+    warning("for reasonable results, 'r' should be larger than 's'")
   return(ImageMagickCall(x, flt.blur, as.numeric(c(r, s))))
 }
 
@@ -56,12 +56,13 @@ gblur = function (x, r=0, s=0.5) {
   if (r < 0 || s <= 0)
     stop("values of 'r' and 's' must be positive, set r=0 for automatic radius")
   if (r <= s && r != 0)
-    warning("for reasonable results, 'r' should be larger than 's'")    
+    warning("for reasonable results, 'r' should be larger than 's'")
   return(ImageMagickCall(x, flt.gaussblur, as.numeric(c(r, s))))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-equalize = function (x) {    
+equalize = function (x) {
+  .Deprecated(msg=gettextf("'%s' is deprecated.\nUse standard R functions such as 'rank' or 'cut' instead.", old))
   return(ImageMagickCall(x, flt.equalize, as.numeric(0)))
 }
 
@@ -76,15 +77,15 @@ resize = function (x, w, h, blur=1, filter="Lanczos") {
     stop("width and height of a new image must be non zero positive")
   if (length(w)>1 || length(h)>1)
       stop("width and height must be scalar values")
-  filter <- switch(tolower(substr(filter,1,3)), 
-                   poi=0, box=1, tri=2,  her=3,  han=4,  ham=5,  bla=6, gau=7, 
+  filter <- switch(tolower(substr(filter,1,3)),
+                   poi=0, box=1, tri=2,  her=3,  han=4,  ham=5,  bla=6, gau=7,
                    qua=8, cub=9, cat=10, mit=11, lan=12, bes=13, sin=14, 12)
   param = as.numeric(c(w, h, blur, filter))
   return(ImageMagickCall(x, flt.resize, param))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-rotate = function (x, angle=90) {  
+rotate = function (x, angle=90) {
   return(ImageMagickCall(x, flt.rotate, as.numeric(angle) ))
 }
 
