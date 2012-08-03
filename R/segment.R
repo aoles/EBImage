@@ -12,7 +12,7 @@ watershed = function (x, tolerance=1, ext=1) {
 propagate = function (x, seeds, mask=NULL, lambda=1e-4, ext, seed.centers) {
   validImage(x)
   checkCompatibleImages(x, seeds)
-  
+
   if (!is.null(mask)) {
     checkCompatibleImages(x, mask)
     mask = castImage(mask)
@@ -22,10 +22,10 @@ propagate = function (x, seeds, mask=NULL, lambda=1e-4, ext, seed.centers) {
   if (lambda < 0.0) stop("'lambda' must be positive" )
 
   if (!missing(ext)) warning("'ext' is deprecated.")
-  
+
   if (!missing(seed.centers)) warning("'seed.centers' is deprecated.")
   else seed.centers = FALSE
-  
+
   if (seed.centers) {
     cm = hullFeatures(seeds)
     dimx = dim(seeds)
@@ -38,7 +38,7 @@ propagate = function (x, seeds, mask=NULL, lambda=1e-4, ext, seed.centers) {
     s[index] = seeds[index]
     seeds = s
   }
-  
+
   return(.Call( "propagate", castImage(x), castImage(seeds), mask, lambda, PACKAGE='EBImage'))
 }
 
@@ -47,8 +47,8 @@ ocontour = function(x) {
   validImage(x)
   storage.mode(x)='integer'
   y = .Call('ocontour', x, PACKAGE='EBImage')[-1]
-  y = lapply(y, function(z) matrix(z, nc=2, byrow=TRUE))
-  names(y) = 1:length(y)
+  y = lapply(y, function(z) matrix(z, ncol=2, byrow=TRUE))
+  names(y) = seq(along=y)
   y[sapply(y, nrow)>0]
 }
 
