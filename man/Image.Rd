@@ -53,14 +53,14 @@
   is.Image(x)
   as.raster.Image(y)
 
-  colorMode(y)	
+  colorMode(y)
   colorMode(y) <- value
 
   imageData(y)
-  imageData(y) <- value	
+  imageData(y) <- value
 
   getFrame(y, i, type='total')
-  getNumberOfFrames(y, type='total')  	
+  getNumberOfFrames(y, type='total')
 }
 
 
@@ -69,12 +69,12 @@
   null array is used.}
 
   \item{dim}{A vector containing the final dimensions of an \code{Image} object. If missing, equals to
-  \code{dim(data)}.}    
+  \code{dim(data)}.}
 
   \item{colormode}{A numeric or a character string containing the color mode which could be
   either \code{Grayscale} or \code{Color}. If missing, equals to
   \code{Grayscale}.}
-  
+
   \item{x}{An R object.}
 
   \item{y}{An \code{Image} object or an array.}
@@ -94,7 +94,7 @@
 
   \code{as.raster.Image} coerces an Image object to a raster object.
 
-  \code{colorMode} returns the color mode of \code{y} and \code{colorMode<-} changes the color mode 
+  \code{colorMode} returns the color mode of \code{y} and \code{colorMode<-} changes the color mode
   of \code{y}.
 
   \code{imageData} returns the array contained in an \code{Image} object.
@@ -126,10 +126,10 @@
   if (interactive()) display(normalize(y))
 
   x = Image(rnorm(300*300*3),dim=c(300,300,3), colormode='Color')
-  if (interactive()) display(x)	
+  if (interactive()) display(x)
 
   w = matrix(seq(0, 1, len=300), nc=300, nr=300)
-  m = abind(w, t(w), along=3)
+  m = abind::abind(w, t(w), along=3)
   z = Image(m, colormode='Color')
   if (interactive()) display(normalize(z))
 

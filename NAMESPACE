@@ -5,6 +5,11 @@ importFrom("methods", "show")
 importFrom("graphics", "image")
 importFrom("graphics", "hist")
 importFrom("stats", "median")
+importFrom("abind", "abind")
+
+importFrom("tiff", "readTIFF", "writeTIFF")
+importFrom("jpeg", "readJPEG", "writeJPEG")
+importFrom("png", "readPNG", "writePNG")
 
 ## classes
 exportClasses(Image)

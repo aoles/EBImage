@@ -19,7 +19,6 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 flt.blur      <- as.integer(0)
 flt.gaussblur <- as.integer(1)
-flt.equalize  <- as.integer(7)
 flt.resize    <- as.integer(11)
 flt.rotate    <- as.integer(12)
 
@@ -62,8 +61,8 @@ gblur = function (x, r=0, s=0.5) {
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 equalize = function (x) {
-  .Deprecated(msg=gettextf("'%s' is deprecated.\nUse standard R functions such as 'rank' or 'cut' instead.", old))
-  return(ImageMagickCall(x, flt.equalize, as.numeric(0)))
+  .Defunct(msg=gettextf("'%s' is defunct.\nUse standard R functions such as 'rank' or 'cut' instead.", old))
+  NULL
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
