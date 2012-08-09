@@ -62,7 +62,7 @@ gblur = function (x, r=0, s=0.5) {
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 equalize = function (x) {
   .Defunct(msg=gettextf("'%s' is defunct.\nUse standard R functions such as 'rank' or 'cut' instead.", old))
-  NULL
+  x
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
