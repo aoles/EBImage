@@ -1,4 +1,4 @@
-useDynLib(EBImage)
+useDynLib("EBImage")
 
 importFrom("methods", "Ops")
 importFrom("methods", "show")
@@ -19,6 +19,7 @@ export(getFrame, getNumberOfFrames)
 ## image IO, display
 exportMethods('show')
 export(readImage, writeImage, display, animate)
+export(readImage2)
 
 ## spatial transform
 export(resize, rotate)
@@ -42,7 +43,7 @@ export(filter2)
 export(blur, gblur)
 export(equalize)
 export(medianFilter)
-        
+
 ## morphological operations
 export(makeBrush)
 export(erode, dilate, opening, closing, erodeGreyScale, dilateGreyScale, openingGreyScale, closingGreyScale, whiteTopHatGreyScale, blackTopHatGreyScale, selfcomplementaryTopHatGreyScale)

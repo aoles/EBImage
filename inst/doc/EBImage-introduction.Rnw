@@ -1,4 +1,5 @@
-%\VignetteIndexEntry{Introduction to EBImage}
+
+% \VignetteIndexEntry{Introduction to EBImage}
 %\VignetteKeywords{image processing, visualization}
 %\VignettePackage{EBImage}
 
