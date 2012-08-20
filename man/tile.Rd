@@ -49,7 +49,7 @@
   lena = readImage(system.file("images", "lena-color.png", package="EBImage"))
   x = resize(lena, 128, 128)
   xt = list()
-  for (t in seq(0.1, 5, len=9)) xt=c(xt, list(blur(x, s=t)))
+  for (t in seq(0.1, 5, len=9)) xt=c(xt, list(gblur(x, s=t)))
   xt = combine(xt)
   if (interactive()) display(xt, title='Blurred Lenas')
 

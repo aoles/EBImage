@@ -9,7 +9,6 @@ See: ../LICENSE for license, LGPL
 
 #include "tools.h"
 #include <R_ext/Error.h>
-#include <magick/ImageMagick.h>
 #include <stdio.h>
 
 /*----------------------------------------------------------------------- */
