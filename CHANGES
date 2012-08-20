@@ -1,3 +1,13 @@
+3.99.2
+- bumped version from 4.0.1 to 3.99.2 to prepare the future 4.0.0 version
+- refactored the functions, not using ImageMagick any longer: translate, affine, rotate, resize
+- removed: animate
+- deprecated: blur, equalize
+- todo: man pages have to be synced with recent changes (blur, resize, affine, rotate, translate, display)
+- todo: overhaul the unit tests
+- todo: remove the old moment generating functions: hullFeatures...
+- todo: remove last dependencies to IM
+
 3.13.1
 - fixed a bug in ImageMagickCall that cause some matrices not to be normalized to [0;1] before IM calls
 
