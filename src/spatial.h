@@ -1,5 +1,5 @@
-#ifndef EBIMAGE_TRANSLATE_H
-#define EBIMAGE_TRANSLATE_H
+#ifndef EBIMAGE_SPATIAL_H
+#define EBIMAGE_SPATIAL_H
 
 #include <R.h>
 #include <Rdefines.h>
@@ -8,8 +8,7 @@
 extern "C" {
 #endif
 
-SEXP translate (SEXP, SEXP);
-SEXP affine (SEXP, SEXP);
+SEXP affine (SEXP, SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus
 };

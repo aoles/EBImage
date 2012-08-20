@@ -10,7 +10,6 @@
 }
 
 \usage{
-  blur(x, r=0, s=0.5)
   gblur(x, r=0, s=0.5)
 }
 
@@ -52,9 +51,6 @@
 \examples{
    x = readImage(system.file("images", "lena.gif", package="EBImage"))
    if (interactive()) display(x)
-
-   y = blur(x, r=3, s=2)
-   if (interactive()) display(y, title='blur(x, r=3, s=2)')
 
    y = gblur(x, r=3, s=2)
    if (interactive()) display(y, title='gblur(x, r=3, s=2)')

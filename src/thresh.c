@@ -2,7 +2,7 @@
 #include "tools.h"
 
 /* -------------------------------------------------------------------------
-Adaptive thresholding, magick-independent implementation
+Adaptive thresholding
 Uses mean value estimated on a square frame, to speed up calculations
 the sum is not calculated for the full frame, but updated on the sum of
 a columns added and removed after the frame is replaced

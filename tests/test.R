@@ -68,7 +68,6 @@ testEBImageFunctions=function(x) {
   if (mode(x)!='logical' & interactive()) check('hist',x) 
 
   ## blur, gblur, normalize
-  y=check('blur',x,r=20,s=10)
   y=check('gblur',x,r=10,s=5)
   y=check('normalize',x)
 

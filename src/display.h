@@ -9,7 +9,6 @@ extern "C" {
 #endif
 
 SEXP lib_display (SEXP, SEXP, SEXP);
-SEXP lib_animate (SEXP);
 
 #ifdef __cplusplus
 };

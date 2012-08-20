@@ -23,7 +23,7 @@ export(getFrame, getNumberOfFrames)
 
 ## image IO, display
 exportMethods('show')
-export(readImage, writeImage, display, animate)
+export(readImage, writeImage, display)
 export(readImage2)
 
 ## spatial transform
@@ -45,8 +45,7 @@ exportMethods(hist)
 ## image enhancement, filtering
 export(normalize)
 export(filter2)
-export(blur, gblur)
-export(equalize)
+export(gblur)
 export(medianFilter)
 
 ## morphological operations
@@ -70,6 +69,9 @@ export(drawCircle)
 export(computeFeatures)
 export(computeFeatures.basic, computeFeatures.shape, computeFeatures.moment, computeFeatures.haralick)
 export(standardExpandRef)
+
+## deprecated
+export(blur, equalize)
 
 ## obsolete (still exported for backward compatibility reasons)
 export(getFeatures)

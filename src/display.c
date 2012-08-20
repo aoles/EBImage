@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <R_ext/Memory.h>
 #include <R_ext/Error.h>
-#include <magick/ImageMagick.h>
 
 #ifndef WIN32
 #   include <pthread.h>
@@ -26,9 +25,6 @@ int THREAD_ON = 0;
 
 // C preferred way to get rid of 'unused parameter' warnings
 #define UNUSED(expr) do { (void)(expr); } while (0)
-
-void * _showInImageMagickWindow (void *);
-void * _animateInImageMagickWindow (void *);
 
 // GTK declarations
 #ifdef USE_GTK
@@ -67,69 +63,8 @@ SEXP lib_display(SEXP x, SEXP caption, SEXP useGTK) {
     }
 #endif
 
-#ifdef WIN32
-    error ( "ImageMagick 'display' is not available on Windows" );
-#else
-    if ( THREAD_ON )
-        error ( "Cannot display multiple windows. Please close the currently displayed window first." );
-    if ( pthread_create(&res, NULL, _showInImageMagickWindow, (void *)x ) != 0 )
-        error ( "Failed to create 'display' thread" );
-#endif
     return R_NilValue;
 }
-
-SEXP lib_animate (SEXP x) {
-#ifndef WIN32
-    pthread_t res;
-#endif
-
-    validImage(x,0);
-
-#ifdef WIN32
-    error ( "ImageMagick 'animate' is not available on Windows." );
-#else
-    if ( THREAD_ON )
-        error ( "Cannot display multiple windows. Please close the currently displayed window first." );
-    if ( pthread_create(&res, NULL, _animateInImageMagickWindow, (void *)x ) != 0 )
-        error ( "Failed to create 'animate' thread" );
-#endif
-    return R_NilValue;
-}
-
-void *_showInImageMagickWindow (void * ptr) {
-    SEXP x;
-    Image * images;
-    ImageInfo * image_info;
-
-    x = (SEXP) ptr;
-    THREAD_ON = 1;
-    images = sexp2Magick (x);
-    image_info = CloneImageInfo ( (ImageInfo *)NULL );
-    strcpy (image_info->filename, "\0");
-    DisplayImages (image_info, images);
-    THREAD_ON = 0;
-    images = DestroyImageList (images);
-    image_info = DestroyImageInfo (image_info);
-    return NULL;
-}
-
-void *_animateInImageMagickWindow (void * ptr) {
-    SEXP x;
-    Image * images;
-    ImageInfo * image_info;
-
-    x = (SEXP) ptr;
-    THREAD_ON = 1;
-    images = sexp2Magick (x);
-    image_info = CloneImageInfo ( (ImageInfo *)NULL );
-    strcpy (image_info->filename, "\0");
-    AnimateImages (image_info, images);
-    THREAD_ON = 0;
-    images = DestroyImageList (images);
-    image_info = DestroyImageInfo (image_info);
-    return NULL;
-}
-
 
 #ifdef USE_GTK
 

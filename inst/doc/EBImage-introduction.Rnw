@@ -66,7 +66,7 @@ underlying \Rpackage{ImageMagick} library.
 
 <<readImage1>>=
 f = system.file("images", "lena.gif", package="EBImage")
-lena = readImage(f)
+lena = channel(readImage(f), "gray")
 @
 
 Images can be displayed using the function \Rfunction{display}. Pixel

@@ -40,26 +40,52 @@ flop = function (x) {
   do.call('[', c(list(x),nd))
 }
 
-## Translate a set of images according to a matrix of translation
-## This C function is needed for performance reasons !
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-translate = function (x, v) {
-  validImage(x)
-  v = matrix(v, nrow=getNumberOfFrames(x,'total'), ncol=2, byrow=TRUE)
-  if (length(v)!=2*getNumberOfFrames(x,'total')) stop("'v' must be a matrix of size (n,2), where \'n'\ is the total number of frames")
-  if (any(is.na(v))) stop("'v' shouldn't contain any NAs")
-  
-  return (.Call("translate", castImage(x), v, PACKAGE='EBImage'))
-}
-
-## Do an affine transform on a set of images
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-affine = function (x, m) {
+## performs an affine transform on a set of images
+affine <- function (x, m, filter=c("bilinear", "none"), output.dim) {
+  ## check arguments
   validImage(x)
   if (!is.matrix(m) || nrow(m)!=3 || ncol(m)!=2) stop("'m' must be a 3x2 matrix")
   if (any(is.na(m))) stop("'m' shouldn't contain any NAs")
-  m = cbind(m, c(0, 0, 1))
+  m <- cbind(m, c(0, 0, 1))
+  filter <- match.arg(filter)
+  filter <- as.integer(c(none=0, bilinear=1)[filter])
+
   ## backtransform
-  m = solve(m)
-  return (.Call("affine", castImage(x), m, PACKAGE='EBImage'))
+  m <- solve(m)
+
+  ## output image
+  if (missing(output.dim)) {
+    y <- Image(0, dim=dim(x), colormode=colorMode(x))
+  } else {
+    y <- Image(0, dim=c(output.dim[1], output.dim[2], tail(dim(x), -2)), colormode=colorMode(x))
+  }
+  
+  return (.Call("affine", castImage(x), castImage(y), m, filter, PACKAGE='EBImage'))
+}
+
+rotate <- function(x, angle, filter="bilinear", output.origin=c(0, 0), output.dim) {
+  theta <- angle*pi/180
+  cx <- nrow(x)/2+nrow(x)*sqrt(2)*cos(theta-pi/4-pi/2)/2 + output.origin[1]
+  cy <- ncol(x)/2+ncol(x)*sqrt(2)*sin(theta-pi/4-pi/2)/2 + output.origin[2]
+  m <- matrix(c(cos(theta), -sin(theta), cx,
+                sin(theta), cos(theta), cy), nrow=3)
+  affine(x, m, filter, output.dim=output.dim)
+}
+
+translate <- function(x, v, filter="none", output.dim) {
+  cx <- -v[1]
+  cy <- -v[2]
+  m <- matrix(c(1, 0, cx, 0, 1, cy), nrow=3)
+  affine(x, m, filter=filter, output.dim=output.dim)
+}
+
+resize <- function(x, w, h, filter="bilinear", output.dim, output.origin=c(0, 0)) {
+  ## checks
+  if (missing(h)) h = round(w*dim(x)[2]/dim(x)[1])
+  if (missing(output.dim)) output.dim <- c(w, h)
+  else output.dim <- output.dim [1:2]
+  
+  ratio <- c(w, h)/dim(x)[1:2]
+  m <-  matrix(c(ratio[1], 0, output.origin[1], 0, ratio[2], output.origin[2]), nrow=3)
+  affine(x, m, filter, output.dim=output.dim)
 }

@@ -10,10 +10,9 @@ See: ../LICENSE for license, LGPL
 #include "io.h"
 
 #include "distmap.h"
-#include "filters_magick.h"
 #include "morphology.h"
 #include "greyscale_morphology.h"
-#include "translate.h"
+#include "spatial.h"
 #include "propagate.h"
 #include "normalize.h"
 #include "watershed.h"
@@ -79,9 +78,6 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_readImages",                  (DL_FUNC) &lib_readImages,     2},
     {"lib_writeImages",                 (DL_FUNC) &lib_writeImages,    3},
     {"lib_display",                     (DL_FUNC) &lib_display,        3},
-    {"lib_animate",                     (DL_FUNC) &lib_animate,        1},
-    {"lib_filterMagick",                (DL_FUNC) &lib_filterMagick,   3},
-    {"translate",                       (DL_FUNC) &translate,          2},
     {"lib_erode_dilate",                (DL_FUNC) &lib_erode_dilate,   3},
     {"lib_erode_dilate_greyscale",      (DL_FUNC) &lib_erode_dilate_greyscale,   3},
     {"lib_opening_closing_greyscale",   (DL_FUNC) &lib_opening_closing_greyscale,   3},
@@ -109,8 +105,8 @@ static R_CallMethodDef libraryRCalls[] = {
     {"lib_haralick",                    (DL_FUNC) &lib_haralick,       1},
     {"zernike",                         (DL_FUNC) &zernike,        5},
     {"drawCircle",                      (DL_FUNC) &drawCircle, 4},
-    {"affine",                          (DL_FUNC) &affine, 2},
-    {"medianFilter",                          (DL_FUNC) &medianFilter, 4},
+    {"affine",                          (DL_FUNC) &affine, 4},
+    {"medianFilter",                    (DL_FUNC) &medianFilter, 4},
     /* add above all R-lib functions from common.h */
     {NULL, NULL, 0}
 };
