@@ -171,19 +171,32 @@ setMethod ("[", signature(x="Image", i="ANY", j="ANY", drop="ANY"),
              x
            })
 
+## getFrame
+## author: AO
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 getFrame = function(y, i, type='total') {
   n = getNumberOfFrames(y, type=type)
   if (i<1 || i>n) stop("'i' must belong between 1 and ", n)
-  if (type=='render' && colorMode(y)==Color) {
-    if (length(dim(y))==2) nchannels = 1
-    else nchannels = dim(y)[3]
-    dim(y) = c(dim(y)[1:2], nchannels, n)
-    return(y[,,,i])
-  }
+
+  ## image contains only a single frame of the given type
+  if (n==1) return(y)
+
+  ## more than 1 frame -> dim(y) at least 3
   else {
-    dim(y) = c(dim(y)[1:2], n)
-    return(y[,,i])
+    d = dim(y)
+
+    ## multiple G frames or a single GA/RGB/RGBA frame
+    if (length(d)==3) return(y[,,i])
+
+    ## multiple GA/RGB/RGBA frames
+    else {
+      if (type=='render') return(y[,,,i])
+      else {
+        frame = ceiling(i/d[3])
+        channel = i - d[3]*(frame-1)
+        return(y[,,channel,frame])
+      }
+    }
   }
 }
 
