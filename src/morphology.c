@@ -66,8 +66,8 @@ _match (numeric * kernel, PointXY * ksize, numeric * data, PointXY * dsize, Poin
 
     kcx = ksize->x / 2;
     kcy = ksize->y / 2;
-    for ( i = -kcx; i <= kcx; i++ )
-        for ( j = -kcy; j <= kcy; j++ ) {
+    for ( i = -kcx; i < kcx; i++ )
+        for ( j = -kcy; j < kcy; j++ ) {
             if ( kernel[ (i + kcx) + (j + kcy) * ksize->x ] == 0) continue;
             xx = at->x + i;
             yy = at->y + j;
