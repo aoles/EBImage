@@ -135,6 +135,188 @@ setMethod("Ops", signature(e1="numeric", e2="Image"),
 	}
 )
 
+## private
+## determines image type
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+determineFileType = function(files, type) {
+  ## helper function 
+  collapseTypeSynonyms = function(x){
+    x = tolower(x)
+    x[x=="tif"] = "tiff"
+    x[x=="jpg"] = "jpeg"
+    x
+  }
+
+  if (!(is.character(files)&&(length(files)>=1)))
+    stop("Please supply at least one filename.")
+
+  if (missing(type)) {
+    type = unique(collapseTypeSynonyms(sapply(strsplit(files, split=".", fixed=TRUE), 
+      function(x) {
+        if(length(x)>1) 
+          x[length(x)] 
+        else if (length(x)==1)
+          stop(sprintf("Unable to determine type of %s: Filename extension missing.", x)) 
+        else 
+          stop("Unable to determine type: Empty filename.") 
+      }
+    )))
+    if (length(type)>1)
+      stop(sprintf("File type implied by the file name extensions must be unique, but more than one type was found: %s.", paste(type, collapse=", ")))
+  } else {
+    if (!(is.character(type)&&(length(type)==1)))
+      stop("'type' must be a character vector of length 1.")
+    else 
+      type = collapseTypeSynonyms(type)
+  }
+  return(type)
+}
+
+readImage2 = function(files, type, all=TRUE, ...) {
+  
+  type = try (determineFileType(files, type), silent=TRUE)
+  if (inherits(type,"try-error")) 
+      stop(attr(type,"condition")$message)
+
+  readFun = switch(type,
+    tiff = function(x, ...) readTIFF(x, all=all, ...),
+    jpeg = function(x, ...) readJPEG(x, ...),
+    png  = function(x, ...) readPNG(x, ...),
+    stop(sprintf("Invalid type: %s. Currently supported formats are JPEG, PNG, and TIFF.", type))
+    )
+
+  stack = NULL
+  
+  for(i in seq_along(files)) {
+    if(!file.exists(files[i]))
+      warning(sprintf("Cannot open %s: No such file or directory.", files[i]))
+    else if (file.info(files[i])$isdir)
+      warning(sprintf("Cannot open %s: Is directory.", files[i]))
+    else {
+      img = readFun(files[i])
+      
+      ## readTIFF returns a list for stacked images.
+      nf = if(is.list(img)) length(img) else 1
+      
+      for(j in seq_len(nf)) {
+	frame = if(is.list(img)) img[[j]] else img
+	
+	## AO: Discard alpha channel in Greyscale images to maintain compatibility with the previous version
+         if (channelLayout(frame) == 'GA')
+           frame = frame[,,1]
+	
+	## fix image layout based on the first file (& frame)
+	if (is.null(stack)) {
+          refName = if (nf>1) paste(files[i], j, sep=",") else files[i]
+          dim = dim(frame)
+          channels = channelLayout(frame)
+          if (channels == 'unknown')
+            stop(sprintf("%s: Unsupported channel layout,", refName))
+	
+	  stack = frame
+	}
+	else {
+	  if ( identical(dim, dim(frame)) )
+	    stack = abind(stack, frame, along=length(dim)+1)
+	  else if (!identical(dim[1:2], dim(frame)[1:2]))
+	    stop(sprintf("%s: Image size (%s) does not match reference size (%s) of %s. All images need to have the same width and height.", if (nf>1) paste(files[i], j, sep=",") else files[i], paste(dim(frame)[1:2], collapse=" x "), paste(dim[1:2], collapse=" x "), refName ))
+	  else
+	    stop(sprintf("%s: Channel layout (%s) does not match reference channel layout (%s) of %s. All images need to have the same number of channels.", if (nf>1) paste(files[i], j, sep=",") else files[i], channelLayout(frame), channels, refName ))
+	}
+      }
+    }
+  }
+
+  ## perform image rotation by swapping the XY dimensions
+  Image(swapXY(stack), colormode = if(isTRUE(charmatch(channels,'GA') == 1)) 'Grayscale' else 'Color' )
+}
+
+## private
+## returns channel layout of a pixel array: G, GA, RGB, or RGBA
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+channelLayout = function(x){
+  y = dim(x) 
+  return( switch(if(length(y)==2) 1 else if (length(y)==3 && y[3]<=4) y[3] else 5, 'G', 'GA', 'RGB', 'RGBA', 'unknown') )
+}
+
+## private
+## helper function used to check whether image data can be written on X bits without accuracy loss
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+isXbitImage = function(x, bits) {
+        y = (2^bits - 1) * as.numeric(x)[1] ## fast termination if not
+        if(trunc(y)==y)
+          y = (2^bits - 1) * x
+	all(trunc(y)==y)
+}
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+writeImage2 = function (x, files, quality=100, type, bits.per.sample, compression='none', ...) {
+  validImage(x)
+
+  type = try (determineFileType(files, type), silent=TRUE)
+  if (inherits(type,"try-error")) 
+      stop(attr(type,"condition")$message)
+
+  ## automatic bits.per.sample guesss
+  if ( (type=='tiff') && missing(bits.per.sample) )
+    if (isXbitImage(x, 8L)) 
+      bits.per.sample = 8L 
+    else 
+      bits.per.sample = 16L
+
+  writeFun = switch(type,
+    tiff = function(x, file, ...) writeTIFF(x, file, bits.per.sample=bits.per.sample, compression=compression, ...),
+    jpeg = function(x, file, ...) writeJPEG(x, file, quality=quality/100, ...),
+    png  = function(x, file, ...) writePNG(x, file, ...),
+    stop(sprintf("Invalid type: %s. Currently supported formats are JPEG, PNG, and TIFF.", type))
+    )
+
+  if ((quality<1L) || (quality>100L))
+    stop("'quality' must be a value between 1 and 100.")
+  
+  nf = getNumberOfFrames(x, type='render')
+  lf = length(files)
+
+  if ( (lf!=1) && (lf!=nf) )
+    stop(sprintf("Image contains %g frame(s) which is different from the length of the file name list: %g. The number of files must be 1 or equal to the size of the image stack.", nf, lf))
+  
+  else{
+    x = swapXY(x)
+
+    if(lf==1) {
+      ## store all frames into a single TIFF file
+      if (type=='tiff'){
+        dims = dim(x)
+        ndim = length(dims)
+
+        ## create list of image frames
+        if(ndim==3)
+	  la = lapply(seq_len(dims[ndim]), function(y) x[,,y])
+        else
+	  la = lapply(seq_len(dims[ndim]), function(y) x[,,,y])
+
+        if (nf==writeFun(la, files, ...))
+          invisible(return(files))
+        else
+          stop(sprintf("Error writing file sequence to TIFF."))
+      }
+      ## generate frame file names
+      else {
+        basename = unlist(strsplit(files, split=".", fixed=TRUE))
+        prefix   = basename[-length(basename)]
+        sufix    = basename[length(basename)]
+        for(i in seq_len(nf))
+          files[i] = paste(paste(prefix, collapse='.'), '-', i-1, '.',sufix, sep='')
+      }
+    }
+
+    ## store image frames into individual files
+    for(i in seq_len(nf))
+      writeFun(getFrame(x, i, type='render'), files[i], ...)
+    invisible(return(files))
+  }
+}
+
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 writeImage = function (x, files, quality=100) {
   validImage(x)
@@ -149,7 +331,6 @@ writeImage = function (x, files, quality=100) {
   invisible(files)
 }
 
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 readImage = function(files, colormode) {
   if (!missing(colormode)) warning("'colormode' is deprecated")
   else colormode=-1
@@ -171,7 +352,6 @@ setMethod ("[", signature(x="Image", i="ANY", j="ANY", drop="ANY"),
              x
            })
 
-## getFrame
 ## author: AO
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 getFrame = function(y, i, type='total') {
@@ -245,7 +425,7 @@ setMethod ("show", signature(object="Image"),
 print.Image <- function(x,...) show(x)
 
 ## GP: Useful ?
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("image", signature(x="Image"),
   function(x, i, xlab = "", ylab = "", axes = FALSE, col=gray ((0:255) / 255), ...) {
     dimx <- dim (x)
@@ -444,20 +624,13 @@ parseColorMode=function(colormode) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-as.raster.Image <- function(y) {
-  ## For now, bail if there is more than one image
-  if (getNumberOfFrames(y, "render") > 1)
-    stop("Cannot handle multiple frames")
-  image <- imageData(y)
-  ## Either a grey scale or a color image
-  if (colorMode(y) == Grayscale) {
-    r <- t(image)
-    dim(r) <- dim(image)[2:1]
-  } else {
-    r <- rgb(aperm(image[,,1]),
-             aperm(image[,,2]),
-             aperm(image[,,3]))
-    dim(r) <- dim(image)[2:1]
-  }
-  r
+## returns the raster representation of an image (by default the first frame)
+as.raster.Image <- function(y, i=1) {
+  f = getFrame(y, i, type='render')
+  f[f<0] = 0	
+  f[f>1] = 1  
+  ## swap the XY dimensions
+  a = swapXY(f)
+  ## the actual raster representation
+  as.raster(a)
 }

@@ -121,7 +121,7 @@ testEBImageFunctions=function(x) {
 }
 
 ## Testing procedure
-lena=readImage(system.file("images","lena.gif", package="EBImage"))
+lena=readImage(system.file("images","lena.png", package="EBImage"))
 lenacolor=readImage(system.file("images","lena-color.png",package="EBImage"))
 
 ## Resizing images, for speeding up testing
