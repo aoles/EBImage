@@ -86,7 +86,7 @@
 }
 
 \examples{
-   x = readImage(system.file("images", "lena.gif", package="EBImage"))
+   x = readImage(system.file("images", "lena.png", package="EBImage"))
    if (interactive()) display(x)
 
    y = flip(x)

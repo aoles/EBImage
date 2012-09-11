@@ -89,3 +89,10 @@ resize <- function(x, w, h, filter="bilinear", output.dim, output.origin=c(0, 0)
   m <-  matrix(c(ratio[1], 0, output.origin[1], 0, ratio[2], output.origin[2]), nrow=3)
   affine(x, m, filter, output.dim=output.dim)
 }
+
+## swap the XY dimensions
+swapXY = function(x) {
+	dims = 1:length(dim(x))
+	dims[1:2] = c(2:1)
+	aperm(x, dims)
+}

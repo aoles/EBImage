@@ -49,7 +49,7 @@
   y = floodFill(y, c(156, 52), 'orange')	
   if (interactive()) display(y)
 
-  x = readImage(system.file("images", "lena.gif", package="EBImage"))
+  x = readImage(system.file("images", "lena.png", package="EBImage"))
   y = floodFill(x, c(226, 121), 1, tolerance=0.1)
   if (interactive()) display(y)
 }

@@ -65,8 +65,8 @@ or URLs. The supported image formats depend on the capabilities of the
 underlying \Rpackage{ImageMagick} library.
 
 <<readImage1>>=
-f = system.file("images", "lena.gif", package="EBImage")
-lena = channel(readImage(f), "gray")
+f = system.file("images", "lena.png", package="EBImage")
+lena = readImage(f)
 @
 
 Images can be displayed using the function \Rfunction{display}. Pixel
