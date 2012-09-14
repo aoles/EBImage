@@ -26,7 +26,7 @@ setClass ("Image",
 )
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Image=function(data=array(0, dim=c(1,1)), dim, colormode=NULL) {
+Image = function(data=array(0, dim=c(1,1)), dim, colormode=NULL) {
   if (missing(dim)) {
     if (is.array(data)) dim=base::dim(data)
     else dim=c(1,length(data))
@@ -94,7 +94,7 @@ is.Image <- function (x) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-validImageObject=function(object) {
+validImageObject = function(object) {
   ## check colormode
   if (!is.integer(colorMode(object))) return('colormode must be an integer')
   if (colorMode(object)<0 | colorMode(object)>2) return('invalid colormode')
@@ -153,7 +153,7 @@ determineFileType = function(files, type) {
   if (missing(type)) {
     type = unique(collapseTypeSynonyms(sapply(strsplit(files, split=".", fixed=TRUE), 
       function(x) {
-        if(length(x)>1) 
+        if (length(x)>1) 
           x[length(x)] 
         else if (length(x)==1)
           stop(sprintf("Unable to determine type of %s: Filename extension missing.", x)) 
@@ -227,6 +227,9 @@ readImage2 = function(files, type, all=TRUE, ...) {
     }
   }
 
+  if (is.null(stack))
+    stop("Empty image stack.")
+  else
   ## perform image rotation by swapping the XY dimensions
   Image(swapXY(stack), colormode = if(isTRUE(charmatch(channels,'GA') == 1)) 'Grayscale' else 'Color' )
 }
@@ -244,7 +247,7 @@ channelLayout = function(x){
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 isXbitImage = function(x, bits) {
         y = (2^bits - 1) * as.numeric(x)[1] ## fast termination if not
-        if(trunc(y)==y)
+        if (trunc(y)==y)
           y = (2^bits - 1) * x
 	all(trunc(y)==y)
 }
@@ -257,7 +260,7 @@ writeImage2 = function (x, files, quality=100, type, bits.per.sample, compressio
   if (inherits(type,"try-error")) 
       stop(attr(type,"condition")$message)
 
-  ## automatic bits.per.sample guesss
+  ## automatic bits.per.sample guess
   if ( (type=='tiff') && missing(bits.per.sample) )
     if (isXbitImage(x, 8L)) 
       bits.per.sample = 8L 
@@ -280,23 +283,22 @@ writeImage2 = function (x, files, quality=100, type, bits.per.sample, compressio
   if ( (lf!=1) && (lf!=nf) )
     stop(sprintf("Image contains %g frame(s) which is different from the length of the file name list: %g. The number of files must be 1 or equal to the size of the image stack.", nf, lf))
   
-  else{
-    x = swapXY(x)
-
-    if(lf==1) {
+  else {
+    if ( lf==1 && nf>1 ) {
       ## store all frames into a single TIFF file
-      if (type=='tiff'){
+      if (type=='tiff') {
+	x = swapXY(x, keepClass = FALSE)
         dims = dim(x)
         ndim = length(dims)
 
         ## create list of image frames
-        if(ndim==3)
-	  la = lapply(seq_len(dims[ndim]), function(y) x[,,y])
+        if (ndim==3)
+          la = lapply(seq_len(dims[ndim]), function(y) x[,,y])
         else
-	  la = lapply(seq_len(dims[ndim]), function(y) x[,,,y])
+          la = lapply(seq_len(dims[ndim]), function(y) x[,,,y])
 
         if (nf==writeFun(la, files, ...))
-          invisible(return(files))
+          return(invisible(files))
         else
           stop(sprintf("Error writing file sequence to TIFF."))
       }
@@ -304,16 +306,16 @@ writeImage2 = function (x, files, quality=100, type, bits.per.sample, compressio
       else {
         basename = unlist(strsplit(files, split=".", fixed=TRUE))
         prefix   = basename[-length(basename)]
-        sufix    = basename[length(basename)]
+        suffix    = basename[length(basename)]
         for(i in seq_len(nf))
-          files[i] = paste(paste(prefix, collapse='.'), '-', i-1, '.',sufix, sep='')
+          files[i] = paste(paste(prefix, collapse='.'), '-', i-1, '.',suffix, sep='')
       }
     }
 
     ## store image frames into individual files
-    for(i in seq_len(nf))
-      writeFun(getFrame(x, i, type='render'), files[i], ...)
-    invisible(return(files))
+    for (i in seq_len(nf))
+      writeFun(swapXY(getFrame(x, i, type='render'), keepClass = FALSE), files[i], ...)
+    return(invisible(files))
   }
 }
 
@@ -610,7 +612,7 @@ rgbImage = function(red=NULL, green=NULL, blue=NULL) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-parseColorMode=function(colormode) {
+parseColorMode = function(colormode) {
   icolormode=NA
 
   if (is.numeric(colormode)) {
@@ -625,12 +627,12 @@ parseColorMode=function(colormode) {
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## returns the raster representation of an image (by default the first frame)
-as.raster.Image <- function(y, i=1) {
+as.raster.Image = function(y, i=1) {
   f = getFrame(y, i, type='render')
   f[f<0] = 0	
   f[f>1] = 1  
-  ## swap the XY dimensions
-  a = swapXY(f)
+  ## get image data with swapped XY dimensions
+  a = swapXY(f, keepClass = FALSE)
   ## the actual raster representation
   as.raster(a)
 }
