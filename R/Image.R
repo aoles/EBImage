@@ -172,7 +172,7 @@ determineFileType = function(files, type) {
   return(type)
 }
 
-readImage2 = function(files, type, all=TRUE, ...) {
+readImage = function(files, type, all=TRUE, ...) {
   
   type = try (determineFileType(files, type), silent=TRUE)
   if (inherits(type,"try-error")) 
@@ -253,7 +253,7 @@ isXbitImage = function(x, bits) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-writeImage2 = function (x, files, quality=100, type, bits.per.sample, compression='none', ...) {
+writeImage = function (x, files, quality=100, type, bits.per.sample, compression='none', ...) {
   validImage(x)
 
   type = try (determineFileType(files, type), silent=TRUE)
@@ -284,6 +284,8 @@ writeImage2 = function (x, files, quality=100, type, bits.per.sample, compressio
     stop(sprintf("Image contains %g frame(s) which is different from the length of the file name list: %g. The number of files must be 1 or equal to the size of the image stack.", nf, lf))
   
   else {
+    x = castImage(x) ## if neede change storage mode to double 
+
     if ( lf==1 && nf>1 ) {
       ## store all frames into a single TIFF file
       if (type=='tiff') {
@@ -320,7 +322,7 @@ writeImage2 = function (x, files, quality=100, type, bits.per.sample, compressio
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-writeImage = function (x, files, quality=100) {
+writeImageOld = function (x, files, quality=100) {
   validImage(x)
   if (missing(files)) stop("Please specify a value for the argument 'files'.")
   files = as.character(files)
@@ -333,7 +335,7 @@ writeImage = function (x, files, quality=100) {
   invisible(files)
 }
 
-readImage = function(files, colormode) {
+readImageOld = function(files, colormode) {
   if (!missing(colormode)) warning("'colormode' is deprecated")
   else colormode=-1
   .Call ("lib_readImages", as.character(files), as.integer(colormode), PACKAGE='EBImage')

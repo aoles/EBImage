@@ -51,7 +51,7 @@
   Image(data, dim, colormode)
   as.Image(x)
   is.Image(x)
-  as.raster.Image(y)
+  as.raster.Image(y, i)
 
   colorMode(y)
   colorMode(y) <- value
@@ -92,7 +92,7 @@
 
   \code{is.Image} returns TRUE if \code{x} is an \code{Image} object and FALSE otherwise.
 
-  \code{as.raster.Image} coerces an Image object to a raster object.
+  \code{as.raster.Image} coerces an Image object to a raster object. For stacked images the \code{i}th frame is returned (by default the first one).
 
   \code{colorMode} returns the color mode of \code{y} and \code{colorMode<-} changes the color mode
   of \code{y}.

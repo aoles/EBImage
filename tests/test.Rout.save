@@ -1,11 +1,14 @@
 
-R version 2.9.0 (2009-04-17)
-Copyright (C) 2009 The R Foundation for Statistical Computing
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
 
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
@@ -17,7 +20,6 @@ Type 'q()' to quit R.
 
 > ## cat tests/test.R | R --vanilla &>tests/test.Rout.save
 > library(EBImage)
-Loading required package: abind
 > 
 > ## returns a hashcode given an object
 > hash=function(x) {
@@ -31,7 +33,7 @@ Loading required package: abind
 > 
 > ## try to evaluate fun(x,...) 
 > check=function(fun,x,...) {
-+   passed=T
++   passed = TRUE
 +   
 +   cat('checking \'',fun,'\' ... ',sep='')
 +   y=try(do.call(fun,c(list(x),list(...))),silent=T)
@@ -86,7 +88,6 @@ Loading required package: abind
 +   if (mode(x)!='logical' & interactive()) check('hist',x) 
 + 
 +   ## blur, gblur, normalize
-+   y=check('blur',x,r=20,s=10)
 +   y=check('gblur',x,r=10,s=5)
 +   y=check('normalize',x)
 + 
@@ -140,7 +141,7 @@ Loading required package: abind
 + }
 > 
 > ## Testing procedure
-> lena=readImage(system.file("images","lena.gif", package="EBImage"))
+> lena=readImage(system.file("images","lena.png", package="EBImage"))
 > lenacolor=readImage(system.file("images","lena-color.png",package="EBImage"))
 > 
 > ## Resizing images, for speeding up testing
@@ -149,7 +150,7 @@ Loading required package: abind
 > 
 > ## Image - Grayscale - 1 image  - 2 dim - numeric
 > testEBImageFunctions(lena)
-new test (hash=50433716)
+new test (hash=50335501)
 checking 'print' ... Image
   colormode: Grayscale 
   storage.mode: double 
@@ -159,51 +160,50 @@ checking 'print' ... Image
 
 imageData(object)[1:5,1:6]:
           [,1]      [,2]      [,3]      [,4]      [,5]      [,6]
-[1,] 0.5368276 0.5287404 0.5157092 0.5158465 0.5123827 0.5070878
-[2,] 0.5313344 0.5241321 0.5073472 0.5099107 0.5100175 0.5072862
-[3,] 0.5328756 0.5251850 0.5156329 0.5115282 0.5106737 0.5141833
-[4,] 0.5238422 0.5081559 0.5074083 0.5092699 0.5147936 0.5199207
-[5,] 0.5266346 0.5117571 0.5087053 0.5103532 0.5145953 0.5207904
+[1,] 0.5372549 0.5372549 0.5058824 0.5137255 0.5058824 0.5176471
+[2,] 0.5411765 0.5411765 0.5254902 0.5137255 0.5137255 0.5019608
+[3,] 0.5490196 0.5490196 0.5450980 0.5333333 0.5019608 0.5176471
+[4,] 0.5098039 0.5098039 0.5333333 0.5058824 0.5176471 0.5176471
+[5,] 0.5254902 0.5254902 0.5019608 0.5098039 0.4901961 0.5137255
 
 OK (hash=0)
-checking '>' ... OK (hash=38666710)
-checking '+' ... OK (hash=89100426)
-checking '/' ... OK (hash=25216858)
+checking '>' ... OK (hash=39171428)
+checking '+' ... OK (hash=89506929)
+checking '/' ... OK (hash=25167750)
 checking 'getNumberOfFrames' ... OK (hash=1)
 checking 'writeImage' ... OK (hash=NA)
-checking 'resize' ... OK (hash=278512432)
-checking 'rotate' ... OK (hash=85150057)
-checking 'flip' ... OK (hash=53904438)
-checking 'flop' ... OK (hash=50377209)
-checking 'translate' ... OK (hash=50618330)
-checking 'thresh' ... OK (hash=58123331)
-checking 'median' ... OK (hash=0.381033)
-checking 'blur' ... OK (hash=49934617)
-checking 'gblur' ... OK (hash=50328856)
-checking 'normalize' ... OK (hash=53225978)
-checking 'filter2' ... OK (hash=2084815)
-checking 'erode' ... OK (hash=19441755)
-checking 'dilate' ... OK (hash=64324775)
-checking 'opening' ... OK (hash=33218950)
-checking 'closing' ... OK (hash=42477507)
-checking 'distmap' ... OK (hash=113777193)
-checking 'watershed' ... OK (hash=331821330)
-checking 'floodFill' ... OK (hash=35528038)
-checking 'fillHull' ... OK (hash=38796843)
-checking 'bwlabel' ... OK (hash=1064835444)
-checking 'channel' ... OK (hash=258984280)
-checking 'channel' ... OK (hash=464126994)
-checking 'channel' ... OK (hash=51571787)
-checking 'channel' ... OK (hash=53904438)
+checking 'resize' ... OK (hash=277296103)
+checking 'rotate' ... OK (hash=45925639)
+checking 'flip' ... OK (hash=53915623)
+checking 'flop' ... OK (hash=50278455)
+checking 'translate' ... OK (hash=49327041)
+checking 'thresh' ... OK (hash=58099799)
+checking 'median' ... OK (hash=0.3803922)
+checking 'gblur' ... FAILED
+checking 'normalize' ... OK (hash=54530153)
+checking 'filter2' ... OK (hash=2104930)
+checking 'erode' ... OK (hash=19874718)
+checking 'dilate' ... OK (hash=65605139)
+checking 'opening' ... OK (hash=32358128)
+checking 'closing' ... OK (hash=43302337)
+checking 'distmap' ... OK (hash=105751790)
+checking 'watershed' ... OK (hash=350934323)
+checking 'floodFill' ... OK (hash=36055081)
+checking 'fillHull' ... OK (hash=39615366)
+checking 'bwlabel' ... OK (hash=1992660245)
+checking 'channel' ... OK (hash=258710939)
+checking 'channel' ... OK (hash=463569659)
+checking 'channel' ... OK (hash=51509860)
+checking 'channel' ... OK (hash=53915623)
 checking 'channel' ... OK (hash=NA)
-checking 'combine' ... OK (hash=464126994)
-checking 'tile' ... OK (hash=1167622281)
-checking 'untile' ... OK (hash=1164170660)
-checking 'reenumerate' ... OK (hash=524698803)
-checking 'hullFeatures' ... OK (hash=3425915)
-checking 'rmObjects' ... OK (hash=300487451)
-checking 'getFeatures' ... OK (hash=112458679)
-checking 'paintObjects' ... OK (hash=55130488)
+checking 'combine' ... OK (hash=463569659)
+checking 'tile' ... OK (hash=1166842895)
+checking 'untile' ... OK (hash=1163613325)
+checking 'reenumerate' ... OK (hash=718366481)
+checking 'hullFeatures' ... OK (hash=6524854)
+checking 'rmObjects' ... OK (hash=284644560)
+checking 'getFeatures' ... OK (hash=141850638)
+checking 'paintObjects' ... OK (hash=42775865)
 
 Warning messages:
 1: In hash(y) : NAs introduced by coercion
@@ -212,7 +212,7 @@ Warning messages:
 > ## Image - Grayscale - 1 image  - 2 dim - logical
 > x=lena>0.5
 > testEBImageFunctions(x)
-new test (hash=38666710)
+new test (hash=39171428)
 checking 'print' ... Image
   colormode: Grayscale 
   storage.mode: logical 
@@ -221,61 +221,58 @@ checking 'print' ... Image
   nb.render.frames: 1 
 
 imageData(object)[1:5,1:6]:
-     [,1] [,2] [,3] [,4] [,5] [,6]
-[1,] TRUE TRUE TRUE TRUE TRUE TRUE
-[2,] TRUE TRUE TRUE TRUE TRUE TRUE
-[3,] TRUE TRUE TRUE TRUE TRUE TRUE
-[4,] TRUE TRUE TRUE TRUE TRUE TRUE
-[5,] TRUE TRUE TRUE TRUE TRUE TRUE
+     [,1] [,2] [,3] [,4]  [,5] [,6]
+[1,] TRUE TRUE TRUE TRUE  TRUE TRUE
+[2,] TRUE TRUE TRUE TRUE  TRUE TRUE
+[3,] TRUE TRUE TRUE TRUE  TRUE TRUE
+[4,] TRUE TRUE TRUE TRUE  TRUE TRUE
+[5,] TRUE TRUE TRUE TRUE FALSE TRUE
 
 OK (hash=0)
-checking '>' ... OK (hash=38666710)
-checking '+' ... OK (hash=77333420)
-checking '/' ... OK (hash=19333355)
+checking '>' ... OK (hash=39171428)
+checking '+' ... OK (hash=78342856)
+checking '/' ... OK (hash=19585714)
 checking 'getNumberOfFrames' ... OK (hash=1)
 checking 'writeImage' ... OK (hash=NA)
-checking 'resize' ... OK (hash=214938068)
-checking 'rotate' ... OK (hash=67388563)
-checking 'flip' ... OK (hash=42760022)
-checking 'flop' ... OK (hash=38558733)
-checking 'translate' ... OK (hash=38893019)
-checking 'thresh' ... OK (hash=35024382)
-checking 'blur' ... OK (hash=37689383)
-checking 'gblur' ... OK (hash=38533540)
-checking 'normalize' ... OK (hash=38666710)
-checking 'filter2' ... OK (hash=2288640)
-checking 'erode' ... OK (hash=19441755)
-checking 'dilate' ... OK (hash=64324775)
-checking 'opening' ... OK (hash=33218950)
-checking 'closing' ... OK (hash=42477507)
-checking 'distmap' ... OK (hash=113777193)
-checking 'watershed' ... OK (hash=331821330)
-checking 'floodFill' ... OK (hash=35528038)
-checking 'fillHull' ... OK (hash=38796843)
-checking 'bwlabel' ... OK (hash=1064835444)
-checking 'channel' ... OK (hash=201294294)
-checking 'channel' ... OK (hash=359941506)
-checking 'channel' ... OK (hash=39995155)
-checking 'channel' ... OK (hash=42760022)
+checking 'resize' ... OK (hash=215965530)
+checking 'rotate' ... OK (hash=36960233)
+checking 'flip' ... OK (hash=42791268)
+checking 'flop' ... OK (hash=39068192)
+checking 'translate' ... OK (hash=38504713)
+checking 'thresh' ... OK (hash=35967569)
+checking 'gblur' ... FAILED
+checking 'normalize' ... OK (hash=39171428)
+checking 'filter2' ... OK (hash=1882880)
+checking 'erode' ... OK (hash=19874718)
+checking 'dilate' ... OK (hash=65605139)
+checking 'opening' ... OK (hash=32358128)
+checking 'closing' ... OK (hash=43302337)
+checking 'distmap' ... OK (hash=105751790)
+checking 'watershed' ... OK (hash=350934323)
+checking 'floodFill' ... OK (hash=36055081)
+checking 'fillHull' ... OK (hash=39615366)
+checking 'bwlabel' ... OK (hash=1992660245)
+checking 'channel' ... OK (hash=202880356)
+checking 'channel' ... OK (hash=363077676)
+checking 'channel' ... OK (hash=40343629)
+checking 'channel' ... OK (hash=42791268)
 checking 'channel' ... OK (hash=NA)
-checking 'combine' ... OK (hash=359941506)
-checking 'tile' ... OK (hash=1048293358)
-checking 'untile' ... OK (hash=1059985172)
-checking 'reenumerate' ... OK (hash=524698803)
-checking 'hullFeatures' ... OK (hash=3425915)
-checking 'rmObjects' ... OK (hash=300487451)
-checking 'getFeatures' ... OK (hash=243259173)
-checking 'paintObjects' ... OK (hash=38666710)
+checking 'combine' ... OK (hash=363077676)
+checking 'tile' ... OK (hash=1052490457)
+checking 'untile' ... OK (hash=1063121342)
+checking 'reenumerate' ... OK (hash=718366481)
+checking 'hullFeatures' ... OK (hash=6524854)
+checking 'rmObjects' ... OK (hash=284644560)
+checking 'getFeatures' ... OK (hash=314221321)
+checking 'paintObjects' ... OK (hash=26467155)
 
 Warning messages:
 1: In hash(y) : NAs introduced by coercion
 2: In hash(y) : NAs introduced by coercion
-3: In approx(x[, 2], x[, 1], xout = xout, n = n) :
-  collapsing to unique 'x' values
 > 
 > ## Image - Color - 1 image  - 3 dim - numeric
 > testEBImageFunctions(lenacolor)
-new test (hash=523333090)
+new test (hash=522787501)
 checking 'print' ... Image
   colormode: Color 
   storage.mode: double 
@@ -285,49 +282,48 @@ checking 'print' ... Image
 
 imageData(object)[1:5,1:6,1]:
           [,1]      [,2]      [,3]      [,4]      [,5]      [,6]
-[1,] 0.8805829 0.8821698 0.8780652 0.8889448 0.8842298 0.8823377
-[2,] 0.8876631 0.8884565 0.8860609 0.8857404 0.8824598 0.8833143
-[3,] 0.8885939 0.8885786 0.8830549 0.8837720 0.8884565 0.8903487
-[4,] 0.8747387 0.8799420 0.8865949 0.8865034 0.8894636 0.8930037
-[5,] 0.8683909 0.8763256 0.8843061 0.8860151 0.8905776 0.8901808
+[1,] 0.8862745 0.8862745 0.8823529 0.8901961 0.8941176 0.8784314
+[2,] 0.8862745 0.8862745 0.8823529 0.8901961 0.8823529 0.8823529
+[3,] 0.8901961 0.8901961 0.8862745 0.8784314 0.8823529 0.8823529
+[4,] 0.8745098 0.8745098 0.8745098 0.8941176 0.8823529 0.8941176
+[5,] 0.8666667 0.8666667 0.8901961 0.8862745 0.8823529 0.9058824
 
 OK (hash=0)
-checking '>' ... OK (hash=360987695)
-checking '+' ... OK (hash=884320785)
-checking '/' ... OK (hash=261666545)
+checking '>' ... OK (hash=372312531)
+checking '+' ... OK (hash=895100032)
+checking '/' ... OK (hash=261393751)
 checking 'getNumberOfFrames' ... OK (hash=1)
 checking 'writeImage' ... OK (hash=NA)
-checking 'resize' ... OK (hash=2890111652)
-checking 'rotate' ... OK (hash=864745347)
-checking 'flip' ... OK (hash=534169083)
-checking 'flop' ... OK (hash=523219064)
-checking 'translate' ... OK (hash=524410856)
-checking 'thresh' ... OK (hash=488499930)
-checking 'median' ... OK (hash=0.4649271)
-checking 'blur' ... OK (hash=521369852)
-checking 'gblur' ... OK (hash=523012960)
-checking 'normalize' ... OK (hash=491794301)
-checking 'filter2' ... OK (hash=6078833)
-checking 'erode' ... OK (hash=202763461)
-checking 'dilate' ... OK (hash=578653171)
-checking 'opening' ... OK (hash=298823356)
-checking 'closing' ... OK (hash=399769944)
-checking 'distmap' ... OK (hash=1559984795)
-checking 'watershed' ... OK (hash=2135276245)
-checking 'floodFill' ... OK (hash=563815602)
-checking 'fillHull' ... OK (hash=369782380)
-checking 'bwlabel' ... OK (hash=7709338861)
-checking 'channel' ... OK (hash=65709782)
-checking 'channel' ... OK (hash=50433716)
+checking 'resize' ... OK (hash=2880089815)
+checking 'rotate' ... OK (hash=466319655)
+checking 'flip' ... OK (hash=533942992)
+checking 'flop' ... OK (hash=522671866)
+checking 'translate' ... OK (hash=514169866)
+checking 'thresh' ... OK (hash=502612080)
+checking 'median' ... OK (hash=0.4666667)
+checking 'gblur' ... FAILED
+checking 'normalize' ... OK (hash=559369020)
+checking 'filter2' ... OK (hash=6139264)
+checking 'erode' ... OK (hash=199682385)
+checking 'dilate' ... OK (hash=625914875)
+checking 'opening' ... OK (hash=288039479)
+checking 'closing' ... OK (hash=428956439)
+checking 'distmap' ... OK (hash=1477468218)
+checking 'watershed' ... OK (hash=3742266665)
+checking 'floodFill' ... OK (hash=567708450)
+checking 'fillHull' ... OK (hash=392578365)
+checking 'bwlabel' ... OK (hash=22609023965)
+checking 'channel' ... OK (hash=65626043)
+checking 'channel' ... OK (hash=50335501)
 checking 'channel' ... OK (hash=NA)
-checking 'combine' ... OK (hash=5214602765)
-checking 'tile' ... OK (hash=10701043688)
-checking 'untile' ... OK (hash=11514959132)
-checking 'reenumerate' ... OK (hash=4762468379)
-checking 'hullFeatures' ... OK (hash=18493133)
-checking 'rmObjects' ... OK (hash=1828471793)
-checking 'getFeatures' ... OK (hash=535955461)
-checking 'paintObjects' ... OK (hash=529056647)
+checking 'combine' ... OK (hash=5211305197)
+checking 'tile' ... OK (hash=10695516194)
+checking 'untile' ... OK (hash=11511661564)
+checking 'reenumerate' ... OK (hash=11261019240)
+checking 'hullFeatures' ... OK (hash=49754029)
+checking 'rmObjects' ... OK (hash=2473184949)
+checking 'getFeatures' ... OK (hash=1000316559)
+checking 'paintObjects' ... OK (hash=479640327)
 
 Warning messages:
 1: In hash(y) : NAs introduced by coercion
@@ -336,7 +332,7 @@ Warning messages:
 > ## Image - Color - 2 images - 4 dim - numeric
 > x=combine(lenacolor, lenacolor)
 > testEBImageFunctions(x)
-new test (hash=2261534012)
+new test (hash=2259889233)
 checking 'print' ... Image
   colormode: Color 
   storage.mode: double 
@@ -346,49 +342,48 @@ checking 'print' ... Image
 
 imageData(object)[1:5,1:6,1,1]:
           [,1]      [,2]      [,3]      [,4]      [,5]      [,6]
-[1,] 0.8805829 0.8821698 0.8780652 0.8889448 0.8842298 0.8823377
-[2,] 0.8876631 0.8884565 0.8860609 0.8857404 0.8824598 0.8833143
-[3,] 0.8885939 0.8885786 0.8830549 0.8837720 0.8884565 0.8903487
-[4,] 0.8747387 0.8799420 0.8865949 0.8865034 0.8894636 0.8930037
-[5,] 0.8683909 0.8763256 0.8843061 0.8860151 0.8905776 0.8901808
+[1,] 0.8862745 0.8862745 0.8823529 0.8901961 0.8941176 0.8784314
+[2,] 0.8862745 0.8862745 0.8823529 0.8901961 0.8823529 0.8823529
+[3,] 0.8901961 0.8901961 0.8862745 0.8784314 0.8823529 0.8823529
+[4,] 0.8745098 0.8745098 0.8745098 0.8941176 0.8823529 0.8941176
+[5,] 0.8666667 0.8666667 0.8901961 0.8862745 0.8823529 0.9058824
 
 OK (hash=0)
-checking '>' ... OK (hash=1775106142)
-checking '+' ... OK (hash=4036640154)
-checking '/' ... OK (hash=1130767006)
+checking '>' ... OK (hash=1814025126)
+checking '+' ... OK (hash=4073914359)
+checking '/' ... OK (hash=1129944617)
 checking 'getNumberOfFrames' ... OK (hash=2)
 checking 'writeImage' ... OK (hash=NA)
-checking 'resize' ... OK (hash=12489520632)
-checking 'rotate' ... OK (hash=3723760783)
-checking 'flip' ... OK (hash=2283205998)
-checking 'flop' ... OK (hash=2261305960)
-checking 'translate' ... OK (hash=2264769850)
-checking 'thresh' ... OK (hash=1973802420)
-checking 'median' ... OK (hash=0.4649271)
-checking 'blur' ... OK (hash=2254280360)
-checking 'gblur' ... OK (hash=2260575565)
-checking 'normalize' ... OK (hash=2118652724)
-checking 'filter2' ... OK (hash=12157666)
-checking 'erode' ... OK (hash=1143593354)
-checking 'dilate' ... OK (hash=2599376870)
-checking 'opening' ... OK (hash=1544166776)
-checking 'closing' ... OK (hash=1937261232)
-checking 'distmap' ... OK (hash=12716798521)
-checking 'watershed' ... OK (hash=8974349738)
-checking 'floodFill' ... OK (hash=2159331683)
-checking 'fillHull' ... OK (hash=1822383320)
-checking 'bwlabel' ... OK (hash=26333960666)
-checking 'channel' ... OK (hash=266404879)
-checking 'channel' ... OK (hash=205142714)
+checking 'resize' ... OK (hash=12450507153)
+checking 'rotate' ... OK (hash=2006935518)
+checking 'flip' ... OK (hash=2282200216)
+checking 'flop' ... OK (hash=2259657963)
+checking 'translate' ... OK (hash=2224982373)
+checking 'thresh' ... OK (hash=2035056864)
+checking 'median' ... OK (hash=0.4666667)
+checking 'gblur' ... FAILED
+checking 'normalize' ... OK (hash=2330989943)
+checking 'filter2' ... OK (hash=12278528)
+checking 'erode' ... OK (hash=1140724386)
+checking 'dilate' ... OK (hash=2749982710)
+checking 'opening' ... OK (hash=1510212718)
+checking 'closing' ... OK (hash=2035496494)
+checking 'distmap' ... OK (hash=12461113647)
+checking 'watershed' ... OK (hash=14181100114)
+checking 'floodFill' ... OK (hash=2174785091)
+checking 'fillHull' ... OK (hash=1922140794)
+checking 'bwlabel' ... OK (hash=74249136058)
+checking 'channel' ... OK (hash=266175890)
+checking 'channel' ... OK (hash=204858720)
 checking 'channel' ... OK (hash=NA)
-checking 'combine' ... OK (hash=21363016015)
-checking 'tile' ... OK (hash=20144415189)
-checking 'untile' ... OK (hash=21061933752)
-checking 'reenumerate' ... OK (hash=19465732150)
-checking 'hullFeatures' ... OK (hash=66098474)
-checking 'rmObjects' ... OK (hash=7905101794)
-checking 'getFeatures' ... OK (hash=1888295204)
-checking 'paintObjects' ... OK (hash=2299205033)
+checking 'combine' ... OK (hash=21351438472)
+checking 'tile' ... OK (hash=20128251731)
+checking 'untile' ... OK (hash=21045916887)
+checking 'reenumerate' ... OK (hash=42197534928)
+checking 'hullFeatures' ... OK (hash=165465537)
+checking 'rmObjects' ... OK (hash=9958792554)
+checking 'getFeatures' ... OK (hash=3310273425)
+checking 'paintObjects' ... OK (hash=2132035037)
 
 Warning messages:
 1: In hash(y) : NAs introduced by coercion
@@ -398,45 +393,44 @@ Warning messages:
 > x=imageData(lena)
 > x=combine(x, x)
 > testEBImageFunctions(x)
-new test (hash=205142714)
-checking '>' ... OK (hash=158647212)
-checking '+' ... OK (hash=363789926)
-checking '/' ... OK (hash=102571357)
+new test (hash=204858720)
+checking '>' ... OK (hash=160197320)
+checking '+' ... OK (hash=365056040)
+checking '/' ... OK (hash=102429360)
 checking 'getNumberOfFrames' ... OK (hash=2)
 checking 'writeImage' ... OK (hash=NA)
-checking 'resize' ... OK (hash=1132892630)
-checking 'rotate' ... OK (hash=341473234)
-checking 'flip' ... OK (hash=212084158)
-checking 'flop' ... OK (hash=205029699)
-checking 'translate' ... OK (hash=205724632)
-checking 'thresh' ... OK (hash=230279302)
-checking 'median' ... OK (hash=0.381033)
-checking 'blur' ... OK (hash=203672584)
-checking 'gblur' ... OK (hash=204886454)
-checking 'normalize' ... OK (hash=216500439)
-checking 'filter2' ... OK (hash=4169629)
-checking 'erode' ... OK (hash=81678518)
-checking 'dilate' ... OK (hash=258722126)
-checking 'opening' ... OK (hash=138019596)
-checking 'closing' ... OK (hash=173526918)
-checking 'distmap' ... OK (hash=475551475)
-checking 'watershed' ... OK (hash=1307435556)
-checking 'floodFill' ... OK (hash=145324748)
-checking 'fillHull' ... OK (hash=159267926)
-checking 'bwlabel' ... OK (hash=3679695592)
-checking 'channel' ... OK (hash=830794407)
-checking 'channel' ... OK (hash=1866731527)
-checking 'channel' ... OK (hash=207418857)
-checking 'channel' ... OK (hash=212084158)
+checking 'resize' ... OK (hash=1128761234)
+checking 'rotate' ... OK (hash=184305774)
+checking 'flip' ... OK (hash=212018966)
+checking 'flop' ... OK (hash=204744629)
+checking 'translate' ... OK (hash=201415687)
+checking 'thresh' ... OK (hash=231755950)
+checking 'median' ... OK (hash=0.3803922)
+checking 'gblur' ... FAILED
+checking 'normalize' ... OK (hash=222053999)
+checking 'filter2' ... OK (hash=4209860)
+checking 'erode' ... OK (hash=82380604)
+checking 'dilate' ... OK (hash=262478886)
+checking 'opening' ... OK (hash=133922272)
+checking 'closing' ... OK (hash=176552834)
+checking 'distmap' ... OK (hash=435332184)
+checking 'watershed' ... OK (hash=1386572390)
+checking 'floodFill' ... OK (hash=146993234)
+checking 'fillHull' ... OK (hash=162592524)
+checking 'bwlabel' ... OK (hash=6809791018)
+checking 'channel' ... OK (hash=829985036)
+checking 'channel' ... OK (hash=1864828792)
+checking 'channel' ... OK (hash=207207439)
+checking 'channel' ... OK (hash=212018966)
 checking 'channel' ... OK (hash=NA)
-checking 'combine' ... OK (hash=1866731527)
-checking 'tile' ... OK (hash=1961946984)
-checking 'untile' ... OK (hash=1863294478)
-checking 'reenumerate' ... OK (hash=2598340966)
-checking 'hullFeatures' ... OK (hash=10277746)
-checking 'rmObjects' ... OK (hash=1189373494)
-checking 'getFeatures' ... OK (hash=337376036)
-checking 'paintObjects' ... OK (hash=224055747)
+checking 'combine' ... OK (hash=1864828792)
+checking 'tile' ... OK (hash=1959673274)
+checking 'untile' ... OK (hash=1861083829)
+checking 'reenumerate' ... OK (hash=3691187746)
+checking 'hullFeatures' ... OK (hash=19574563)
+checking 'rmObjects' ... OK (hash=1141074336)
+checking 'getFeatures' ... OK (hash=425551915)
+checking 'paintObjects' ... OK (hash=174324161)
 
 Warning messages:
 1: In hash(y) : NAs introduced by coercion

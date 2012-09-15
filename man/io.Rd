@@ -2,6 +2,8 @@
 
 \alias{readImage}
 \alias{writeImage}
+\alias{readImageOld}
+\alias{writeImageOld}
 
 \concept{image IO}
 
@@ -13,21 +15,28 @@
 }
 
 \usage{
-  readImage(files, colormode)
-  writeImage(x, files, quality = 100)
+  readImage(files, type, all = TRUE, ...)
+  readImageOld(files, colormode)
+  writeImage(x, files, quality = 100, type, bits.per.sample, compression = "none", ...)
+  writeImageOld(x, files, quality = 100)
 }
 
 \arguments{
-  \item{files}{A character vector of file names or URLs. If missing, an
-  interactive file chooser is displayed.}
+  \item{files}{A character vector of file names or URLs.}
+  \item{type}{Image type (string). Supported types are: 'jpeg', 'png', and 'tiff'.}
+  \item{all}{When 'all = TRUE' and the file contains more than one image then all frames are read, otherwise only the first frame}
   \item{x}{An \code{\linkS4class{Image}} object or an array.} 
+  \item{bits.per.sample}{Only TIFF files: Bits per sample (numeric scalar). Supported values are: 8 and 16.}
+  \item{compression}{Only TIFF files: desired compression algorithm. Supported values are: "LZW", "none", "PackBits", "RLE", "JPEG", "deflate".}
   \item{quality}{A numeric, ranging from 1 to 100. Default is 100.} 
   \item{colormode}{Deprecated.}
 }
 
 \value{
   \code{readImage} returns a new \code{Image} object.
+  \code{readImageOld} returns a new \code{Image} object.
   \code{writeImage} returns \code{invisible(files)}.
+  \code{writeImageOld} returns \code{invisible(files)}.
 }
 
 \details{
