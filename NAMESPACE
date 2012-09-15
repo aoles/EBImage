@@ -23,11 +23,11 @@ export(getFrame, getNumberOfFrames)
 
 ## image IO, display
 exportMethods('show')
-export(readImage2, writeImage2)
+export(readImage, writeImage)
 export(display, displayRaster)
 
 ## previous I/O functions (still here for comparing them against the new ones - to be removed in the final release)
-export(readImage, writeImage)
+export(readImageOld, writeImageOld)
 
 ## spatial transform
 export(resize, rotate)
