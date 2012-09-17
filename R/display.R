@@ -65,3 +65,38 @@ displayRaster = function(image, frame, all = FALSE){
 
   invisible(TRUE)
 }
+
+## displays an image using JavaScript
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+displayInBrowser = function(x){
+  tempdir = tempdir();
+
+  ## list of source files 
+  sourceDir = system.file("code",package="EBImage")
+  sourceFiles = list.files(sourceDir, full.names=TRUE)
+  names(sourceFiles) = list.files(sourceDir, full.names=FALSE)
+
+  ## temporarily change to tempdir to avoid cumbersome path manipulations  
+  wd = setwd(tempdir()) 
+
+  ## copy source files if needed
+  sourceFiles = sourceFiles[!file.exists(names(sourceFiles))]
+  if (length(sourceFiles)>0)
+    file.copy(sourceFiles, tempdir)
+  setwd(wd)
+
+  ## dump image to tempdir
+  filename = tempfile("",,".png")
+  writeImage(x, filename)
+
+  ## get image parameters
+
+  dims = dim(x)
+  nf = getNumberOfFrames(x, 'render')
+
+  ## construct browser query
+  htmlfile = normalizePath(paste0(tempdir,"/","display.html")) 
+  query = paste0("file://",htmlfile,"?imageName=",basename(filename),"&framesTotal=",nf,"&originalW=",dims[1],"&originalH=",dims[2])	
+
+  browseURL(query)
+}
