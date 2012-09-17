@@ -172,8 +172,24 @@ determineFileType = function(files, type) {
   return(type)
 }
 
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 readImage = function(files, type, all=TRUE, ...) {
-  
+
+  readURL = function(url, buffer=2^24){
+    f = try(file(url, "rb"), silent=TRUE)
+    if (inherits(f,"try-error")) 
+      stop(attr(f,"condition")$message)
+
+    rawData = bufData = NULL;
+
+    while( length(bufData <- readBin(f, 'raw', buffer))>0 )
+      rawData = c(rawData, bufData)
+
+    try(close(f), silent=TRUE)
+
+    rawData
+  }
+
   type = try (determineFileType(files, type), silent=TRUE)
   if (inherits(type,"try-error")) 
       stop(attr(type,"condition")$message)
@@ -186,43 +202,58 @@ readImage = function(files, type, all=TRUE, ...) {
     )
 
   stack = NULL
-  
+
   for(i in seq_along(files)) {
-    if(!file.exists(files[i]))
-      warning(sprintf("Cannot open %s: No such file or directory.", files[i]))
-    else if (file.info(files[i])$isdir)
+    ## first look for local files
+    if(!file.exists(files[i])){
+      ## might still be a remote URL  
+      w = options(warn=2)
+      rawData = try(readURL(files[i]), silent = TRUE)
+      options(w) 
+      if (inherits(rawData,"try-error")) {
+        warning( paste0(unlist(strsplit(attr(rawData,"condition")$message, "(converted from warning) ", fixed=TRUE)), collapse=""))
+        next
+      }
+      else
+      ## is url
+        img = readFun(rawData)
+    }
+    ## ensure that the file is not a directory
+    else if (file.info(files[i])$isdir){
       warning(sprintf("Cannot open %s: Is directory.", files[i]))
-    else {
+      next
+    }
+    else
+    ## appears to be a legit file
       img = readFun(files[i])
-      
-      ## readTIFF returns a list for stacked images.
-      nf = if(is.list(img)) length(img) else 1
-      
-      for(j in seq_len(nf)) {
-	frame = if(is.list(img)) img[[j]] else img
-	
-	## AO: Discard alpha channel in Greyscale images to maintain compatibility with the previous version
-         if (channelLayout(frame) == 'GA')
-           frame = frame[,,1]
-	
-	## fix image layout based on the first file (& frame)
-	if (is.null(stack)) {
-          refName = if (nf>1) paste(files[i], j, sep=",") else files[i]
-          dim = dim(frame)
-          channels = channelLayout(frame)
-          if (channels == 'unknown')
-            stop(sprintf("%s: Unsupported channel layout,", refName))
-	
-	  stack = frame
-	}
-	else {
-	  if ( identical(dim, dim(frame)) )
-	    stack = abind(stack, frame, along=length(dim)+1)
-	  else if (!identical(dim[1:2], dim(frame)[1:2]))
-	    stop(sprintf("%s: Image size (%s) does not match reference size (%s) of %s. All images need to have the same width and height.", if (nf>1) paste(files[i], j, sep=",") else files[i], paste(dim(frame)[1:2], collapse=" x "), paste(dim[1:2], collapse=" x "), refName ))
-	  else
-	    stop(sprintf("%s: Channel layout (%s) does not match reference channel layout (%s) of %s. All images need to have the same number of channels.", if (nf>1) paste(files[i], j, sep=",") else files[i], channelLayout(frame), channels, refName ))
-	}
+
+    ## readTIFF returns a list for stacked images.
+    nf = if(is.list(img)) length(img) else 1
+
+    for(j in seq_len(nf)) {
+      frame = if(is.list(img)) img[[j]] else img
+
+      ## AO: Discard alpha channel in Greyscale images to maintain compatibility with the previous version
+      if (channelLayout(frame) == 'GA')
+        frame = frame[,,1]
+
+      ## fix image layout based on the first file (& frame)
+      if (is.null(stack)) {
+        refName = if (nf>1) paste(files[i], j, sep=",") else files[i]
+        dim = dim(frame)
+        channels = channelLayout(frame)
+        if (channels == 'unknown')
+          stop(sprintf("%s: Unsupported channel layout,", refName))
+
+        stack = frame
+      }
+      else {
+        if ( identical(dim, dim(frame)) )
+          stack = abind(stack, frame, along=length(dim)+1)
+        else if (!identical(dim[1:2], dim(frame)[1:2]))
+          stop(sprintf("%s: Image size (%s) does not match reference size (%s) of %s. All images need to have the same width and height.", if (nf>1) paste(files[i], j, sep=",") else files[i], paste(dim(frame)[1:2], collapse=" x "), paste(dim[1:2], collapse=" x "), refName ))
+        else
+          stop(sprintf("%s: Channel layout (%s) does not match reference channel layout (%s) of %s. All images need to have the same number of channels.", if (nf>1) paste(files[i], j, sep=",") else files[i], channelLayout(frame), channels, refName ))
       }
     }
   }

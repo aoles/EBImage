@@ -4,7 +4,7 @@
 \title{Image Display}
 
 \description{
- Display images as raster objects using the R build-in graphics capabilities.
+ Displays \code{\linkS4class{Image}} objects as raster images using the R build-in graphics capabilities.
 }
 \usage{
 displayRaster(image, frame)
