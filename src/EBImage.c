@@ -7,7 +7,6 @@ See: ../LICENSE for license, LGPL
 #include "tools.h"
 #include "conversions.h"
 #include "display.h"
-#include "io.h"
 
 #include "distmap.h"
 #include "morphology.h"
@@ -75,8 +74,6 @@ See: ../LICENSE for license, LGPL
 
 /*----------------------------------------------------------------------- */
 static R_CallMethodDef libraryRCalls[] = {
-    {"lib_readImages",                  (DL_FUNC) &lib_readImages,     2},
-    {"lib_writeImages",                 (DL_FUNC) &lib_writeImages,    3},
     {"lib_display",                     (DL_FUNC) &lib_display,        3},
     {"lib_erode_dilate",                (DL_FUNC) &lib_erode_dilate,   3},
     {"lib_erode_dilate_greyscale",      (DL_FUNC) &lib_erode_dilate_greyscale,   3},

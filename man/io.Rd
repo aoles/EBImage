@@ -2,8 +2,6 @@
 
 \alias{readImage}
 \alias{writeImage}
-\alias{readImageOld}
-\alias{writeImageOld}
 
 \concept{image IO}
 
@@ -16,9 +14,7 @@
 
 \usage{
   readImage(files, type, all = TRUE, ...)
-  readImageOld(files, colormode)
   writeImage(x, files, quality = 100, type, bits.per.sample, compression = "none", ...)
-  writeImageOld(x, files, quality = 100)
 }
 
 \arguments{
@@ -34,9 +30,7 @@
 
 \value{
   \code{readImage} returns a new \code{Image} object.
-  \code{readImageOld} returns a new \code{Image} object.
   \code{writeImage} returns \code{invisible(files)}.
-  \code{writeImageOld} returns \code{invisible(files)}.
 }
 
 \details{

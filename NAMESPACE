@@ -26,9 +26,6 @@ exportMethods('show')
 export(readImage, writeImage)
 export(display, displayRaster, displayInBrowser)
 
-## previous I/O functions (still here for comparing them against the new ones - to be removed in the final release)
-export(readImageOld, writeImageOld)
-
 ## spatial transform
 export(resize, rotate)
 export(flip, flop)

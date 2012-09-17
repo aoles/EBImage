@@ -58,11 +58,11 @@ Type 'q()' to quit R.
 > dir.create(tempdir)
 > 
 > for (i in seq_along(testImages)) {
-+   original = readImage2(testImages[i])
++   original = readImage(testImages[i])
 +   filename = names(testImages)[i]
 +   tempfile = file.path(tempdir, filename)
-+   writeImage2(original, tempfile)
-+   copy = readImage2(tempfile)
++   writeImage(original, tempfile)
++   copy = readImage(tempfile)
 +   cat(filename, rep(" ", 40-nchar(filename)), if(identical(original, copy)) "PASS" else "FAIL", "\n", sep="")	
 + }
 lena.jpg                                FAIL
@@ -71,7 +71,7 @@ dices-grey.png                          PASS
 dices.png                               PASS
 photo_16b.png                           FAIL
 image 800 x 600 x 0, tiles 0 x 0, bps = 8, spp = 2 (output 2), config = 1, colormap = no
-image 800 x 600 x 0, tiles 0 x 0, bps = 8, spp = 1 (output 1), config = 1, colormap = no
+image 800 x 600 x 0, tiles 0 x 0, bps = 8, spp = 2 (output 2), config = 1, colormap = no
 dices-grey.tif                          PASS
 image 768 x 1152 x 0, tiles 0 x 0, bps = 8, spp = 3 (output 3), config = 1, colormap = no
 image 768 x 1152 x 0, tiles 0 x 0, bps = 8, spp = 3 (output 3), config = 1, colormap = no
