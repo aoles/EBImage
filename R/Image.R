@@ -234,16 +234,16 @@ readImage = function(files, type, all=TRUE, ...) {
       frame = if(is.list(img)) img[[j]] else img
 
       ## AO: Discard alpha channel in Greyscale images to maintain compatibility with the previous version
-      if (channelLayout(frame) == 'GA')
-        frame = frame[,,1]
+#       if (channelLayout(frame) == 'GA')
+#         frame = frame[,,1]
 
       ## fix image layout based on the first file (& frame)
       if (is.null(stack)) {
         refName = if (nf>1) paste(files[i], j, sep=",") else files[i]
         dim = dim(frame)
         channels = channelLayout(frame)
-        if (channels == 'unknown')
-          stop(sprintf("%s: Unsupported channel layout,", refName))
+#         if (channels == 'unknown')
+#           stop(sprintf("%s: Unsupported channel layout,", refName))
 
         stack = frame
       }
@@ -262,7 +262,7 @@ readImage = function(files, type, all=TRUE, ...) {
     stop("Empty image stack.")
   else
   ## perform image rotation by swapping the XY dimensions
-  Image(swapXY(stack), colormode = if(isTRUE(charmatch(channels,'GA') == 1)) 'Grayscale' else 'Color' )
+  Image(swapXY(stack), colormode = if(isTRUE(charmatch(channels,'G') == 1)) 'Grayscale' else 'Color' )
 }
 
 ## private
@@ -315,7 +315,7 @@ writeImage = function (x, files, quality=100, type, bits.per.sample, compression
     stop(sprintf("Image contains %g frame(s) which is different from the length of the file name list: %g. The number of files must be 1 or equal to the size of the image stack.", nf, lf))
   
   else {
-    x = castImage(x) ## if neede change storage mode to double 
+    x = castImage(x) ## if needed change storage mode to double 
 
     if ( lf==1 && nf>1 ) {
       ## store all frames into a single TIFF file
@@ -350,26 +350,6 @@ writeImage = function (x, files, quality=100, type, bits.per.sample, compression
       writeFun(swapXY(getFrame(x, i, type='render'), keepClass = FALSE), files[i], ...)
     return(invisible(files))
   }
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-writeImageOld = function (x, files, quality=100) {
-  validImage(x)
-  if (missing(files)) stop("Please specify a value for the argument 'files'.")
-  files = as.character(files)
-  quality = as.integer(quality)
-  stopifnot(is(x, "array"), length(quality)==1L)
-  if ((quality<1L) || (quality>100L))
-    stop(sprintf("'quality' must be a value between 1 and 100, but it is %8g.", quality))
-
-  .Call("lib_writeImages", castImage(x), files, quality, PACKAGE='EBImage')
-  invisible(files)
-}
-
-readImageOld = function(files, colormode) {
-  if (!missing(colormode)) warning("'colormode' is deprecated")
-  else colormode=-1
-  .Call ("lib_readImages", as.character(files), as.integer(colormode), PACKAGE='EBImage')
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

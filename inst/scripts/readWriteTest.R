@@ -38,11 +38,11 @@ tempdir = file.path(tempdir(),"copies")
 dir.create(tempdir)
 
 for (i in seq_along(testImages)) {
-  original = readImage2(testImages[i])
+  original = readImage(testImages[i])
   filename = names(testImages)[i]
   tempfile = file.path(tempdir, filename)
-  writeImage2(original, tempfile)
-  copy = readImage2(tempfile)
+  writeImage(original, tempfile)
+  copy = readImage(tempfile)
   cat(filename, rep(" ", 40-nchar(filename)), if(identical(original, copy)) "PASS" else "FAIL", "\n", sep="")	
 }
 
