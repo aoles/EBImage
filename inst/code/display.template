@@ -1,0 +1,30 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>TITLE</title>
+  <script type="text/javascript" src="./script.js"></script>
+  <style type="text/css">
+   img {image-rendering: -moz-crisp-edges; -ms-interpolation-mode: nearest-neighbor;}
+  </style>
+ </head>
+ <body style="margin: 0px">
+  <div id="parentElement" ></div>
+  <div id="status"></div>
+  <div id="debug" style="font-size: 10px; font-face: arial; display: none"></div>
+
+  <script type="text/javascript">
+   var debug = new debug_msgs();
+
+   var viewerObject = new viewer({
+    parent: document.getElementById('parentElement'),
+    status: document.getElementById('status'),
+    imageName: 'IMAGE',
+    framesTotal: 'FRAMES',
+    originalW: 'WIDTH',
+    originalH: 'HEIGHT'
+   });
+
+  </script>
+ </body>
+</html>

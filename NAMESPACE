@@ -24,7 +24,7 @@ export(getFrame, getNumberOfFrames)
 ## image IO, display
 exportMethods('show')
 export(readImage, writeImage)
-export(display, displayRaster, displayInBrowser)
+export(display)
 
 ## spatial transform
 export(resize, rotate)

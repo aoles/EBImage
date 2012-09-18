@@ -1,18 +1,17 @@
-## display displays static images
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-display = function(x, title=paste(deparse(substitute(x))), useGTK=TRUE) {
+display = function(x, title=paste(deparse(substitute(x))), method='browser', frame, all = FALSE) {
   validImage(x)
-  title = as.character(title)
-  useGTK = as.logical(useGTK)
-  stopifnot(length(useGTK)==1L, length(title)==1L)
-  
-  invisible(.Call("lib_display", castImage(x), title, useGTK, PACKAGE="EBImage"))
+
+  switch(method,
+    browser = displayInBrowser(x, title),
+    raster  = displayRaster(x, frame, all) ) 
+
+  invisible(NULL)
 }
 
 ## displays an image using R graphics
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 displayRaster = function(image, frame, all = FALSE){
-  validImage(image)
 
   nf = getNumberOfFrames(image, type='render')
 
@@ -45,14 +44,18 @@ displayRaster = function(image, frame, all = FALSE){
     }
   }
 
-  ## display a single frame only (by default the first one)
+  ## display a single frame only 
   else {
-    if (missing(frame)){
+    ## when the image containas a single frame only display it and don't care about the 'frame' argument at all
+    if (nf==1)
       frame = 1
-      warning("The image contains more than one frame: only the first one is displayed. To display all frames use 'all = TRUE'.")
-    }
-    else
-      if ( frame<1 || frame>nf ) stop("Incorrect 'frame' number: It must range between 1 and ", frame)
+    else 
+      if (missing(frame)){
+        frame = 1
+        warning("The image contains more than one frame: only the first one is displayed. To display all frames use 'all = TRUE'.")
+      }
+      else
+        if ( frame<1 || frame>nf ) stop("Incorrect 'frame' number: It must range between 1 and ", frame)
 
     plot(c(1, xdim), c(1, ydim), type = "n", xlab="", ylab="", asp=1)
 
@@ -62,41 +65,42 @@ displayRaster = function(image, frame, all = FALSE){
 
   ## restore saved graphical parameters
   par(op)
-
-  invisible(TRUE)
 }
 
 ## displays an image using JavaScript
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-displayInBrowser = function(x){
-  tempdir = tempdir();
+displayInBrowser = function(x, title){
+  ## template and script files
+  templateFile = system.file("code","display.template", package = "EBImage")
+  scriptFile = system.file("code","script.js", package = "EBImage")
+  tempDir = tempfile('',,'')
+  htmlFile = "display.html"
+  imageFile = tempfile("",tempDir,".png")
 
-  ## list of source files 
-  sourceDir = system.file("code",package="EBImage")
-  sourceFiles = list.files(sourceDir, full.names=TRUE)
-  names(sourceFiles) = list.files(sourceDir, full.names=FALSE)
+  if(!dir.create(tempDir))
+    stop("Error creating temporary directory.")
 
-  ## temporarily change to tempdir to avoid cumbersome path manipulations  
-  wd = setwd(tempdir()) 
-
-  ## copy source files if needed
-  sourceFiles = sourceFiles[!file.exists(names(sourceFiles))]
-  if (length(sourceFiles)>0)
-    file.copy(sourceFiles, tempdir)
-  setwd(wd)
-
-  ## dump image to tempdir
-  filename = tempfile("",,".png")
-  writeImage(x, filename)
+  ## read the template file
+  f = file(templateFile, "r")
+  a = readLines(f)
+  close(f)
 
   ## get image parameters
-
   dims = dim(x)
   nf = getNumberOfFrames(x, 'render')
 
-  ## construct browser query
-  htmlfile = normalizePath(paste0(tempdir,"/","display.html")) 
-  query = paste0("file://",htmlfile,"?imageName=",basename(filename),"&framesTotal=",nf,"&originalW=",dims[1],"&originalH=",dims[2])	
+  ## fill-in in the template
+  a = sub('HEIGHT',dims[2], sub('WIDTH',dims[1], sub('FRAMES',nf, sub('IMAGE',basename(imageFile), sub('TITLE', title, a)))))
+
+  ## temporarily switch to tempdir and write the files
+  wd = setwd(tempDir) 
+  writeImage(x, imageFile)
+  cat(a, file=htmlFile, sep="\n")
+  file.copy(scriptFile, tempDir)
+  setwd(wd)
+
+  ## create browser query
+  query = paste("file://", normalizePath(file.path(tempDir,"display.html")), sep="")
 
   browseURL(query)
 }

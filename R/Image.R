@@ -211,7 +211,7 @@ readImage = function(files, type, all=TRUE, ...) {
       rawData = try(readURL(files[i]), silent = TRUE)
       options(w) 
       if (inherits(rawData,"try-error")) {
-        warning( paste0(unlist(strsplit(attr(rawData,"condition")$message, "(converted from warning) ", fixed=TRUE)), collapse=""))
+        warning( paste(unlist(strsplit(attr(rawData,"condition")$message, "(converted from warning) ", fixed=TRUE)), sep="", collapse=""))
         next
       }
       else
