@@ -11,7 +11,7 @@
  <body style="margin: 0px">
   <div id="parentElement" ></div>
   <div id="status"></div>
-  <div id="debug" style="font-size: 10px; font-face: arial; display: none"></div>
+  <div id="debug" style="font-size:10px; font-family:Arial,sans-serif; display:none"></div>
 
   <script type="text/javascript">
    var debug = new debug_msgs();
