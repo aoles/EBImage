@@ -371,14 +371,17 @@ setMethod ("[", signature(x="Image", i="ANY", j="ANY", drop="ANY"),
 getFrame = function(y, i, type='total') {
   n = getNumberOfFrames(y, type=type)
   if (i<1 || i>n) stop("'i' must belong between 1 and ", n)
+  d = dim(y)
   if (type=='render' && colorMode(y)==Color) {
-    if (length(dim(y))==2) nchannels = 1
-    else nchannels = dim(y)[3]
-    dim(y) = c(dim(y)[1:2], nchannels, n)
+    if (length(d)==2) nchannels = 1
+    else nchannels = d[3]
+    if (!identical(d, (nd=as.integer(c(d[1:2], nchannels, n))) ))
+      dim(y) = nd
     return(y[,,,i])
   }
   else {
-    dim(y) = c(dim(y)[1:2], n)
+    if (!identical(d, (nd=as.integer(c(d[1:2], n))) ))
+      dim(y) = nd
     return(y[,,i])
   }
 }
