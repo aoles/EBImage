@@ -91,7 +91,7 @@ resize <- function(x, w, h, filter="bilinear", output.dim, output.origin=c(0, 0)
 }
 
 ## swaps the XY dimensions
-## AO: note on performance: when a permutation of imageData rather than an Image object is needed as output it is much faster to issue the function directly on the Image object with 'keepClass = FALSE' than to extract the imageData first ond only then perform the swapping
+## AO's note on performance: when a permutation of imageData rather than an Image object itself is needed it is much faster to issue the function directly on the Image object with 'keepClass = FALSE' than to extract the imageData first ond only then perform the swapping
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 swapXY = function(x, keepClass = TRUE) {
   validImage(x)

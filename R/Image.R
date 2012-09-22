@@ -316,6 +316,8 @@ writeImage = function (x, files, quality=100, type, bits.per.sample, compression
   
   else {
     x = castImage(x) ## if needed change storage mode to double 
+    x[x>1] = 1
+    x[x<0] = 0
 
     if ( lf==1 && nf>1 ) {
       ## store all frames into a single TIFF file
