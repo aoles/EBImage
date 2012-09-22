@@ -1,6 +1,7 @@
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-display = function(x, title=paste(deparse(substitute(x))), method='browser', frame, all = FALSE) {
+display = function(x, title = paste(deparse(substitute(x))), method = c("browser", "raster"), frame, all = FALSE) {
   validImage(x)
+  method = match.arg(method)
 
   switch(method,
     browser = displayInBrowser(x, title),
@@ -13,7 +14,7 @@ display = function(x, title=paste(deparse(substitute(x))), method='browser', fra
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 displayRaster = function(image, frame, all = FALSE){
 
-  nf = getNumberOfFrames(image, type='render')
+  nf = getNumberOfFrames(image, type="render")
 
   dim <- dim(image) 
   xdim <- dim[1]
@@ -36,7 +37,7 @@ displayRaster = function(image, frame, all = FALSE){
       for(c in 1:ncol) {
         ## plot the figure as a raster image
         if (f<=nf) {
-          rasterImage(getFrame(image, f, type='render'), 1 + ((c-1)*xdim) , 1 + ((r-1)*ydim), c*xdim, r*ydim, interpolate=TRUE)
+          rasterImage(getFrame(image, f, type="render"), 1 + ((c-1)*xdim) , 1 + ((r-1)*ydim), c*xdim, r*ydim, interpolate=TRUE)
           f = f + 1
         }
         else break
@@ -52,7 +53,7 @@ displayRaster = function(image, frame, all = FALSE){
     else 
       if (missing(frame)){
         frame = 1
-        warning("The image contains more than one frame: only the first one is displayed. To display all frames use 'all = TRUE'.")
+        message("The image contains more than one frame: only the first one is displayed. To display all frames use 'all = TRUE'.")
       }
       else
         if ( frame<1 || frame>nf ) stop("Incorrect 'frame' number: It must range between 1 and ", frame)
@@ -60,7 +61,7 @@ displayRaster = function(image, frame, all = FALSE){
     plot(c(1, xdim), c(1, ydim), type = "n", xlab="", ylab="", asp=1)
 
     ## plot the figure as a raster image
-    rasterImage(getFrame(image, frame, type='render'), 1, 1, xdim, ydim, interpolate=TRUE)
+    rasterImage(getFrame(image, frame, type="render"), 1, 1, xdim, ydim, interpolate=TRUE)
    }
 
   ## restore saved graphical parameters
@@ -73,7 +74,7 @@ displayInBrowser = function(x, title){
   ## template and script files
   templateFile = system.file("code","display.template", package = "EBImage")
   scriptFile = system.file("code","script.js", package = "EBImage")
-  tempDir = tempfile('',,'')
+  tempDir = tempfile("",,"")
   htmlFile = "display.html"
   imageFile = tempfile("",tempDir,".png")
 
@@ -87,10 +88,10 @@ displayInBrowser = function(x, title){
 
   ## get image parameters
   dims = dim(x)
-  nf = getNumberOfFrames(x, 'render')
+  nf = getNumberOfFrames(x, "render")
 
   ## fill-in in the template
-  a = sub('HEIGHT',dims[2], sub('WIDTH',dims[1], sub('FRAMES',nf, sub('IMAGE',basename(imageFile), sub('TITLE', title, a)))))
+  a = sub("HEIGHT",dims[2], sub("WIDTH",dims[1], sub("FRAMES",nf, sub("IMAGE",basename(imageFile), sub("TITLE", title, a)))))
 
   ## temporarily switch to tempdir and write the files
   wd = setwd(tempDir) 
