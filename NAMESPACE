@@ -31,7 +31,7 @@ export(resize, rotate)
 export(flip, flop)
 export(translate)
 export(affine)
-export(swapXY)
+export(transpose)
 
 ## image segmentation, objects manipulation
 export(thresh, bwlabel)

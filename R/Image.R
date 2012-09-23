@@ -261,8 +261,8 @@ readImage = function(files, type, all=TRUE, ...) {
   if (is.null(stack))
     stop("Empty image stack.")
   else
-  ## perform image rotation by swapping the XY dimensions
-  Image(swapXY(stack), colormode = if(isTRUE(charmatch(channels,'G') == 1)) 'Grayscale' else 'Color' )
+  ## perform image transposition by swapping the XY dimensions
+  Image(transpose(stack), colormode = if(isTRUE(charmatch(channels,'G') == 1)) 'Grayscale' else 'Color' )
 }
 
 ## private
@@ -284,7 +284,7 @@ isXbitImage = function(x, bits) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-writeImage = function (x, files, quality=100, type, bits.per.sample, compression='none', ...) {
+writeImage = function (x, files, type, quality=100, bits.per.sample, compression='none', ...) {
   validImage(x)
 
   type = try (determineFileType(files, type), silent=TRUE)
@@ -322,7 +322,7 @@ writeImage = function (x, files, quality=100, type, bits.per.sample, compression
     if ( lf==1 && nf>1 ) {
       ## store all frames into a single TIFF file
       if (type=='tiff') {
-	x = swapXY(x, keepClass = FALSE)
+	x = transpose(x, coerce = TRUE)
         dims = dim(x)
         ndim = length(dims)
 
@@ -349,7 +349,7 @@ writeImage = function (x, files, quality=100, type, bits.per.sample, compression
 
     ## store image frames into individual files
     for (i in seq_len(nf))
-      writeFun(swapXY(getFrame(x, i, type='render'), keepClass = FALSE), files[i], ...)
+      writeFun(transpose(getFrame(x, i, type='render'), coerce = TRUE), files[i], ...)
     return(invisible(files))
   }
 }
@@ -638,7 +638,7 @@ as.raster.Image = function(y, i=1) {
   f[f<0] = 0	
   f[f>1] = 1  
   ## get image data with swapped XY dimensions
-  a = swapXY(f, keepClass = FALSE)
+  a = transpose(f, coerce = TRUE)
   ## the actual raster representation
   as.raster(a)
 }

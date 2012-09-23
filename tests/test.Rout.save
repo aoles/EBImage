@@ -73,12 +73,13 @@ Type 'q()' to quit R.
 +   if (interactive()) check('display',x,main='x')
 +   check('writeImage',x,'test.png')
 + 
-+   ## resize, resample, rotate, flip, flop, translate
++   ## resize, resample, rotate, flip, flop, translate, transpose
 +   y=check('resize',x,277,139)
 +   y=check('rotate',x,20)
 +   y=check('flip',x)
 +   y=check('flop',x)
 +   y=check('translate',x,rep(1,2*getNumberOfFrames(x,'total')))
++   y=check('transpose',x)
 + 
 +   ## thresh
 +   y=check('thresh',x)
@@ -177,6 +178,7 @@ checking 'rotate' ... OK (hash=45925639)
 checking 'flip' ... OK (hash=53915623)
 checking 'flop' ... OK (hash=50278455)
 checking 'translate' ... OK (hash=49327041)
+checking 'transpose' ... OK (hash=55733970)
 checking 'thresh' ... OK (hash=58099799)
 checking 'median' ... OK (hash=0.3803922)
 checking 'gblur' ... FAILED
@@ -239,6 +241,7 @@ checking 'rotate' ... OK (hash=36960233)
 checking 'flip' ... OK (hash=42791268)
 checking 'flop' ... OK (hash=39068192)
 checking 'translate' ... OK (hash=38504713)
+checking 'transpose' ... OK (hash=47522694)
 checking 'thresh' ... OK (hash=35967569)
 checking 'gblur' ... FAILED
 checking 'normalize' ... OK (hash=39171428)
@@ -299,6 +302,7 @@ checking 'rotate' ... OK (hash=466319655)
 checking 'flip' ... OK (hash=533942992)
 checking 'flop' ... OK (hash=522671866)
 checking 'translate' ... OK (hash=514169866)
+checking 'transpose' ... OK (hash=535664493)
 checking 'thresh' ... OK (hash=502612080)
 checking 'median' ... OK (hash=0.4666667)
 checking 'gblur' ... FAILED
@@ -359,6 +363,7 @@ checking 'rotate' ... OK (hash=2006935518)
 checking 'flip' ... OK (hash=2282200216)
 checking 'flop' ... OK (hash=2259657963)
 checking 'translate' ... OK (hash=2224982373)
+checking 'transpose' ... OK (hash=2285643218)
 checking 'thresh' ... OK (hash=2035056864)
 checking 'median' ... OK (hash=0.4666667)
 checking 'gblur' ... FAILED
@@ -404,6 +409,7 @@ checking 'rotate' ... OK (hash=184305774)
 checking 'flip' ... OK (hash=212018966)
 checking 'flop' ... OK (hash=204744629)
 checking 'translate' ... OK (hash=201415687)
+checking 'transpose' ... OK (hash=215655660)
 checking 'thresh' ... OK (hash=231755950)
 checking 'median' ... OK (hash=0.3803922)
 checking 'gblur' ... FAILED

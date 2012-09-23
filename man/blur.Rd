@@ -37,7 +37,7 @@
 }
 
 \seealso{
-  \code{filter2}
+  \code{\link{filter2}}
 }
 
 \references{
