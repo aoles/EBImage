@@ -4,21 +4,65 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>TITLE</title>
   <script type="text/javascript" src="./script.js"></script>
-  <style type="text/css">
-   img {image-rendering: -moz-crisp-edges; -ms-interpolation-mode: nearest-neighbor;}
+   <style type="text/css">
+   body {  
+    margin: 0px;
+	padding: 0px;
+	border: 0px; 
+	background-color:#dddddd;
+    overflow: hidden;
+   }
+   img {
+    image-rendering: -moz-crisp-edges; -ms-interpolation-mode: nearest-neighbor;
+   }
+   div {
+    display:block;
+    margin:0px;
+	padding:0px;
+	border:0px;
+	overflow: hidden;
+   }
+   button {
+    font-size:20px;
+    font-family:Arial,sans-serif;
+    width:32px;
+    height:32px;
+    line-height:100%;
+    vertical-align:top;
+   }
+   .buttons{
+	float:left;
+	width:50%;
+	min-width:128px;
+   }
+   #toolbar{
+    overflow: inherit;
+	min-width:128px;
+   }
+   #zoombuttons{
+    text-align:right;
+    margin-right:-1px;
+   }
+   #statusbar, .status{	
+    font-size:14px;
+    font-family:"Lucida Console", Monaco, monospace;
+    margin-right:10px;
+	padding:1px;
+	overflow: show;
+	float:left;
+   }
   </style>
  </head>
- <body style="margin: 0px">
-  <div id="parentElement" ></div>
-  <div id="status"></div>
-  <div id="debug" style="font-size:10px; font-family:Arial,sans-serif; display:none"></div>
+ <body>
+  <div id="viewer" ></div>
 
+  <div id="debug" style="font-size:10px; font-family:Arial,sans-serif; display:none"></div>
+  
   <script type="text/javascript">
    var debug = new debug_msgs();
 
    var viewerObject = new viewer({
-    parent: document.getElementById('parentElement'),
-    status: document.getElementById('status'),
+    parent: document.getElementById('viewer'),
     imageName: 'IMAGE',
     framesTotal: 'FRAMES',
     originalW: 'WIDTH',
