@@ -1,7 +1,7 @@
 /**
  *  Simple Javascript Image Viewer
-    Copyright (C) 2010  Munawwar Firoz
-    		  2012  Andrzej Oles
+    Copyright (C)	2010  Munawwar Firoz
+					2012  Andrzej Oles
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -147,6 +147,20 @@ function debug_msgs() {
 	}
 }
 
+/*---------------------------*/
+// function buttons() //argument array
+// {
+// 	this.first = "f"
+// 	this.prev  = "p"
+// 	this.next  = "n"
+// 
+// 	this.init = function(){
+// 		document.getElementById("first").style.color='';
+// 		document.getElementById("first").disabled=true;
+// 		
+// 	}
+// 
+// }
 
 /*-------------The image viewer--------------*/
 function viewer(arguments) //argument array
@@ -161,7 +175,7 @@ function viewer(arguments) //argument array
 	var image=null,imageSource=null,parent=null,replace=null,preLoader=null;
 	var borderClass=null;	
 	var originalW, originalH;
-	var status = null;
+	var toolbar=null, statusbar = null, buttons = [], status = [];
 	var framesTotal = 1;
 	var currentFrame = 1;
 	var imageName = null;
@@ -206,9 +220,9 @@ function viewer(arguments) //argument array
 		return [self.frameElement.clientWidth,self.frameElement.clientHeight];
 	}				
 	self.setFrameDimension =  function(width, height) {
-		debug.println("setFrameDimension: "+width+" "+height);
-		self.frameElement.style.width = (Math.round(width)+'px');
-		self.frameElement.style.height = (Math.round(height)+'px');
+		var frameStyle = self.frameElement.style;
+		frameStyle.width = (Math.round(width)+'px');
+		frameStyle.height = (Math.round(height)+'px');
 	}
 	self.setDimension = function(width, height) { //width and height of image
 		image.width=Math.round(width);
@@ -270,7 +284,7 @@ function viewer(arguments) //argument array
 		if(zoomLevel==null){
 			zoomLevel = 0;
 			var currentZoomFactor = self.getDimension()[0]/originalW;
-			debug.println("CurrentZoomFactor = "+self.getDimension()[0]+" "+originalW+ " "+currentZoomFactor);
+			//debug.println("CurrentZoomFactor = "+self.getDimension()[0]+" "+originalW+ " "+currentZoomFactor);
 			// find from above			
 			if(currentZoomFactor > 1)
 				while(self.zoomFactor(zoomLevel)<currentZoomFactor) zoomLevel++;
@@ -282,7 +296,7 @@ function viewer(arguments) //argument array
 		self.zoomTo(zoomLevel+dir, x, y);
 	}
 	self.zoomTo = function(newZoomLevel, x, y) {
-		debug.println("Current zoom = "+zoomLevel+", newZoomLevel = "+newZoomLevel);
+		//debug.println("Current zoom = "+zoomLevel+", newZoomLevel = "+newZoomLevel);
 		// valid range?
 		if( newZoomLevel<minZoomLevel || newZoomLevel>maxZoomLevel )
 			return false;
@@ -333,6 +347,13 @@ function viewer(arguments) //argument array
 // 		zoomLevel = newZoomLevel;
 // 		self.updateStatus();
 
+
+		// button locking		
+		buttons['in'].disable(newZoomLevel==maxZoomLevel);
+		buttons['out'].disable(newZoomLevel==minZoomLevel);
+		buttons['org'].disable(newZoomLevel==0);
+		buttons['fit'].disable(false);
+		
 		return true;
 	}
 	self.updateImage = function(w, h, x, y, newZoomLevel) {
@@ -341,14 +362,9 @@ function viewer(arguments) //argument array
 		zoomLevel = newZoomLevel;
 		self.setMouseCursor();
 		baseMouseSpeed = currentMouseSpeed = (self.zoomFactor() > minMouseSpeed) ? Math.round(self.zoomFactor()) : minMouseSpeed;
-		self.updateStatus();
+		self.updateStatus("Zoom", Math.round( 100 * self.zoomFactor() )+'%');
 	}
-	self.updateStatus = function(x ,y){
-		status.innerHTML  = 'zoom: '+Math.round( 100 * self.zoomFactor() )+'% ';
-		status.innerHTML += 'frame: '+currentFrame+'/'+framesTotal;
-		if(typeof x!='undefined' && typeof y!='undefined')
-			status.innerHTML += ' [X='+x+', Y='+y+']';
-	}
+
 	self.centerImage = function(width,height, x,y) { //width and height of image and (x,y) is the (left,top) of the image
 		
 		if(typeof width=='undefined' || typeof height=='undefined') {
@@ -392,23 +408,47 @@ function viewer(arguments) //argument array
 			return null;
 		return [x-retInt(image.style.left,'px'),y-retInt(image.style.top,'px')];
 	}
-	self.resetZoom = function() {
-		var dimension = self.fitToFrame(originalW,originalH);
+	self.resetZoom = function(zoomLevel) {
+		if(typeof zoomLevel=='undefined')
+			zoomLevel = null;
+
+		var frameDimension = self.getFrameDimension();
+		
+		// automatically scale image down when its dimensions exceed frame size
+		var dimension = (zoomLevel==null) ? ( ( frameDimension[0]>originalW && frameDimension[1]>originalH ) ? [originalW, originalH] : self.fitToFrame(originalW,originalH) ) : [originalW, originalH];
+		
 		var position = self.centerImage(dimension[0],dimension[1], 0,0);
-		self.updateImage(dimension[0], dimension[1], position[0], position[1], null);
+
+		self.updateImage(dimension[0], dimension[1], position[0], position[1], zoomLevel);
+	}
+	self.originalSize = function(){
+		self.resetZoom(0);
+	}
+	self.fitImage = function(){
+		self.resetZoom();
+		// lock button
+		var button = buttons['fit'];
+		button.disabled=true;
+		button.style.color='#FF0000';
+		button.blur();
 	}
 	self.moveBy = function(x,y) {
 		var position = self.getPosition();
 		position = self.centerImage(image.width,image.height, position[0]+x,position[1]+y);
 		self.setPosition(position[0],position[1]);
 	}
-	self.hide = function() {
-		if(self.outerFrame)
-			self.outerFrame.style.display='none';
-		else
-			self.frameElement.style.display = 'none';
+	self.showHelp = function() {
+		// hide image
+			image.style.display='none';
+		//onkeydown = 
+		//event = event || window.event;
+		//var keyCode = event.which || event.keyCode;
+		
+		//if(event.preventDefault) // Netscape/Firefox/Opera
+		//	event.preventDefault();
+		//event.returnValue = false;
 	}
-	self.show = function() {
+	self.hideHelp = function() {
 		if(self.outerFrame)
 			self.outerFrame.style.display='block';
 		else
@@ -437,6 +477,19 @@ function viewer(arguments) //argument array
 			event=window.event, event.returnValue = false;
 		else if (event.preventDefault)
 			event.preventDefault();
+
+		var mousePos = getMouseXY(event);
+		var imagePos = getObjectXY(image);
+		var zoomFactor = self.zoomFactor();
+		var pixelPos = [Math.floor((mousePos[0]-imagePos[0])/zoomFactor), Math.floor((mousePos[1]-imagePos[1])/zoomFactor)]
+ 
+		self.updateStatus("Position", '('+pixelPos+')');
+	}
+	self.imagemove = function(event) {
+		if (!event) //For IE
+			event=window.event, event.returnValue = false;
+		else if (event.preventDefault)
+			event.preventDefault();
 		
 		var mousePosition=getMouseXY(event);
 		var position = self.getPosition();
@@ -453,8 +506,13 @@ function viewer(arguments) //argument array
 		if (event.preventDefault)
 			event.preventDefault();
 		
-		image.onmousemove=image.onmouseup=image.onmouseout=null;
+		//image.onmousemove=self.onmousemove;image.onmouseup=image.onmouseout=null;
+		image.onmousemove=self.onmousemove;
+		image.onmouseup=null;
 		image.onmousedown=self.onmousedown;
+	}
+	self.onmouseout = function(event) {
+		status['Position'].innerHTML ='';
 	}
 	self.onmousedown =  function(event) {
 		self.frameElement.focus();
@@ -466,25 +524,54 @@ function viewer(arguments) //argument array
 	
 		var mousePos = lastMousePosition = getMouseXY(event);
 		var imagePos = getObjectXY(image);
-		self.updateStatus(mousePos[0]-imagePos[0], mousePos[1]-imagePos[1]);
-		image.onmousemove = self.onmousemove;
+
+ 		debug.clear();
+		debug.println("mouse: " + mousePos + " image: " + imagePos);
+
+		// pixel position
+
+		var zoomFactor = self.zoomFactor();
+		var pixelPos = [Math.floor((mousePos[0]-imagePos[0])/zoomFactor), Math.floor((mousePos[1]-imagePos[1])/zoomFactor)]
+ 
+		debug.println("pixel: " + pixelPos + " ZF: " + zoomFactor);
+
+		self.updateStatus("Position", '('+pixelPos+')');
+		image.onmousemove = self.imagemove;
 		image.onmouseup=image.onmouseout=self.onmouseup_or_out;
 	}
-	self.resetFrameSize = function(){
+	self.resetFrame = function(){
+		// set new frame size
 		var windowSize = getWindowSize();
-		var newFrameSize = [windowSize[0], windowSize[1] - 20];
+		var newFrameSize = [windowSize[0], windowSize[1] - (toolbar.offsetHeight+statusbar.offsetHeight)];
 		//debug stuff
 		var currentFrameSize = self.getFrameDimension();
-		debug.clear();
-		debug.println("Cuj: "+windowSize+" "+currentFrameSize+" "+newFrameSize+"; "+zoomLevel	);		
-		self.setFrameDimension(newFrameSize[0], newFrameSize[1]);		
-	}	
-	self.resetFrame = function(){
-		self.resetFrameSize();
+		
+		self.setFrameDimension(newFrameSize[0], newFrameSize[1]);
+		// image redraw
 		if(zoomLevel == null)
-			self.resetZoom();
+			self.fitImage();
 		else
 			self.zoomTo(zoomLevel, self.frameElement.clientWidth/2, self.frameElement.clientHeight/2);
+	}
+	// frame navigation
+	this.firstFrame = function(){
+		self.setFrame(1);
+	}
+	this.prevFrame = function(){
+		self.setFrame(currentFrame-1);
+	}
+	this.nextFrame = function(){
+		self.setFrame(currentFrame+1);
+	}
+	this.lastFrame = function(){
+		self.setFrame(framesTotal);
+	}
+	// zooming
+	this.zoomIn = function(){
+		self.zoom(+1, self.frameElement.clientWidth/2, self.frameElement.clientHeight/2);
+	}
+	this.zoomOut = function(){
+		self.zoom(-1, self.frameElement.clientWidth/2, self.frameElement.clientHeight/2);
 	}
 	self.onkeydown = function(event) {
 		event = event || window.event;
@@ -500,11 +587,6 @@ function viewer(arguments) //argument array
 
 		debug.println(event.which+" "+event.keyCode+" "+keyCode);
 
-
-
-		
-		
-		
 		debug.print(self.getDimension()+" "+self.getPosition()+" >>> ");
 
 		image.onload='null';
@@ -518,22 +600,22 @@ function viewer(arguments) //argument array
 			// next frame
 			case 33: // PageUp
 			case 190: // . >
-				self.setFrame(currentFrame+1); 
+				self.nextFrame();
 				break;
 			// previous frame
 			case 34: // PageDown
 			case 188: // , <
-				self.setFrame(currentFrame-1); 
+				self.prevFrame();
 				break;
 			// last frame
 			case 35: // End
 			case 191: // / ?
-				self.setFrame(framesTotal); 
+				self.lastFrame();
 				break;
 			// first frame
 			case 36: // Home
 			case 77: // m
-				self.setFrame(1); 
+				self.firstFrame();
 				break;		
 		// zooming
 			// zoom in
@@ -542,7 +624,7 @@ function viewer(arguments) //argument array
 			case 61:
 			case 107:
 			case 187:
-				self.zoom(+1, self.frameElement.clientWidth/2, self.frameElement.clientHeight/2);
+				self.zoomIn();
 				break;
 			// zoom out
 			case 90: // z
@@ -550,13 +632,18 @@ function viewer(arguments) //argument array
 			case 109: 
 			case 173:
 			case 189: 
-				self.zoom(-1, self.frameElement.clientWidth/2, self.frameElement.clientHeight/2);
+				self.zoomOut();
 				break;
+			// zoom to 100%
+			case 48: // 0
+				self.originalSize();
+				break
 		// reset zoom
 			case 82: // r
+			case 32: // Space bar
 		// center image
 			case 67: // c
-				self.resetZoom();
+				self.fitImage();
 				break;
 		// moving 
 			case 37: // Left arrow
@@ -580,48 +667,7 @@ function viewer(arguments) //argument array
 			currentMouseSpeed+=baseMouseSpeed;
 		}
 
-
-// 		keyCode = String.fromCharCode(keyCode);
-// 
-// 		if(keyCode=='1') {
-// 			//image.onload='null';
-// 			//image.src='img1.jpg';
-// 			self.setFrame(1);
-// 			}
-// 		if(keyCode=='2') {
-// 			//image.src='img2.jpg';
-// 			self.setFrame(2);
-// 			}
-// 		if(keyCode=='3'){ 
-// 			//image.src='img3.jpg';
-// 			self.setFrame(3);
-// 			}
-
-
-// 		//var position = self.getPosition();
-// 		var LEFT='a',UP='w',RIGHT='d',DOWN='s', CENTER_IMAGE='c', ZOOMIN='=', ZOOMOUT='-'; ///Keys a,w,d,s
-// 		if(keyCode==LEFT)
-// 			position[0]+=speed;
-// 		else if(keyCode==UP)
-// 			position[1]+=speed;
-// 		else if(keyCode==RIGHT)
-// 			position[0]-=speed;
-// 		else if(keyCode==DOWN)
-// 			position[1]-=speed;
-// 		else if(keyCode==CENTER_IMAGE || keyCode=='C')
-// 			self.resetZoom();
-// 		else if(keyCode==ZOOMIN || keyCode=='+' || keyCode=='x' || keyCode=='X')
-// 			self.zoom(1, self.frameElement.clientWidth/2, self.frameElement.clientHeight/2);
-// 		else if( (keyCode==ZOOMOUT || keyCode=='-' || keyCode=='z' || keyCode=='Z') && zoomLevel>0)
-// 			self.zoom(-1, self.frameElement.clientWidth/2, self.frameElement.clientHeight/2);
-// 		
-// 		if(keyCode==LEFT || keyCode==UP || keyCode==RIGHT || keyCode==DOWN) {
-// 			position = self.centerImage(image.width,image.height, position[0],position[1]);
-// 			self.setPosition(position[0],position[1]);
-// 			speed+=2;
-// 		}
-
-//		debug.println(self.getDimension()+" "+self.getPosition());
+	debug.println(self.getDimension()+" "+self.getPosition());
 	}
 	self.onkeyup = function(event) {
 		currentMouseSpeed = baseMouseSpeed;
@@ -645,20 +691,57 @@ function viewer(arguments) //argument array
 		if( frame<1 || frame>framesTotal )
 			return false;
 
+		// determine filename
 		var framename = imageName;
 		if(framesTotal>1){
 			filename = imageName.split('.');
   			extension = filename.pop();
 			framename = filename.join('.')+'-'+(frame-1)+'.'+extension;
 		}
-
 		image.src = framename;
 
-		//image.src = imageName+'-'+(frame-1)+".jpg";
 		currentFrame = frame;
-		self.updateStatus();
+		self.updateStatus("Frame", currentFrame+'/'+framesTotal);
+		
+		// button locking
+		buttons['first'].disable(currentFrame==1);
+		buttons['prev'].disable(currentFrame==1);
+		buttons['next'].disable(currentFrame==framesTotal);
+		buttons['last'].disable(currentFrame==framesTotal);
+		
 		return true;
 	}
+
+	////////////////// BUTTONS
+	createButton = function(name, value, title, onclick, group){
+		var button = document.createElement('button');
+		button.id = name;
+		button.innerHTML = value;
+		button.title = title;
+		button.onclick = onclick;
+		button.onmouseover = function(){this.style.color='#33CC00'};
+		button.onmouseout =  function(){this.style.color=''};
+		button.disable = function(disable){this.disabled=disable; this.style.color=''; this.blur();};
+		buttons[name] = button;
+		group.appendChild(button);
+		return(button);
+	}
+	createStatusElement = function(name){
+		var statusElement = document.createElement('div');
+		statusElement.id = name;
+		statusElement.className='status';
+		status[name] = statusElement;
+		statusbar.appendChild(statusElement);
+		return(statusElement);
+	}
+	this.updateStatus = function(name, value){
+		status[name].innerHTML = name+': '+value+'&nbsp;';
+	}
+	this.updatePosition = function(event){
+		this.updateStatus("Position", '('+getMouseXY(event)+')');
+	}
+	///////////////////////////
+
 	self.initImage = function() {
 		image.style.maxWidth=image.style.width=image.style.maxHeight=image.style.height=null;
 
@@ -677,10 +760,16 @@ function viewer(arguments) //argument array
 		mouseWheelObject = new mouseWheel();
 		mouseWheelObject.init(window, self.onmousewheel);
 		image.onmousedown = self.onmousedown;
+		image.onmousemove = self.onmousemove;
+		image.onmouseout = self.onmouseout;
+		//image.onmouseover = this.updatePosition;
 		
 		//Set keyboard handlers
  		self.frameElement.onkeydown = self.onkeydown;
 		self.frameElement.onkeyup = self.onkeyup;
+		onkeydown = self.onkeydown;
+		onkeyup = self.onkeyup;
+
 
 		//windowResize
 		window.onresize = self.resetFrame;
@@ -713,6 +802,9 @@ function viewer(arguments) //argument array
 		image.onload=self.initImage;
 		//image.src=imageSource;
 		self.setFrame();
+		
+			
+		this.updateStatus("Image", originalW+'x'+originalH);
 	}
 
 	
@@ -720,7 +812,7 @@ function viewer(arguments) //argument array
 	self.setZoom();
 	//Create self.frameElement - One time initialization
 	self.frameElement=document.createElement('div');
-	//self.resetFrameSize();
+	self.frameElement.style.display='block'
 	self.frameElement.style.border="0px solid #000";
 	self.frameElement.style.margin="0px";
 	self.frameElement.style.padding="0px";
@@ -755,8 +847,52 @@ function viewer(arguments) //argument array
 			self.initImage();
 	}
 	else {		
-		if(parent!=null)
+		if(parent!=null){
+			// create toolbar
+			toolbar = document.createElement('div');
+			toolbar.id = 'toolbar';
+			parent.appendChild(toolbar);
+			// create navbuttons container
+			navbuttons = document.createElement('div');
+			navbuttons.className='buttons';
+			navbuttons.id='navbuttons';
+			toolbar.appendChild(navbuttons);
+			// create zoombuttons container
+			zoombuttons = document.createElement('div');
+			zoombuttons.className='buttons';
+			zoombuttons.id='zoombuttons';
+			toolbar.appendChild(zoombuttons);
+
+			// create navigation buttons
+			createButton('first','&#171;<br/>&nbsp;','First frame [HOME] [M] ',this.firstFrame,navbuttons);
+			createButton('prev','&lt;','Previous frame [PAGE DOWN] [<]',this.prevFrame,navbuttons);
+			createButton('next','&gt;','Next frame [PAGE UP] [>]',this.nextFrame,navbuttons);
+			createButton('last','&#187;<br/>&nbsp;','Last frame [END] [?]',this.lastFrame,navbuttons);
+	
+			// create zoom buttons
+			createButton('in','+','Zoom in [+] [X]',this.zoomIn,zoombuttons);
+			createButton('out','&#8722;','Zoom out [-] [Z]',this.zoomOut,zoombuttons);
+			createButton('org','1:1','Original size [0]',this.originalSize,zoombuttons).style.fontSize='14px';
+			createButton('fit','&#8727;<br/>&nbsp;','Fit image [SPACEBAR] [C] [R]',this.fitImage,zoombuttons);
+			
+			
+			
+			
+			// frame
 			parent.appendChild(self.frameElement);
+
+			//create status
+			statusbar = document.createElement('div');
+			statusbar.id = 'statusbar';
+			parent.appendChild(statusbar);
+
+			// create status elements
+			createStatusElement("Image");
+			createStatusElement("Frame");
+			createStatusElement("Zoom");
+			createStatusElement("Position");
+
+		}
 		else if(replace!=null)
 			replace.parentNode.replaceChild(self.frameElement,replace);
 			
@@ -774,6 +910,10 @@ function viewer(arguments) //argument array
 		self.frameElement.parentNode.replaceChild(self.outerFrame,self.frameElement);
 		self.outerFrame.appendChild(self.frameElement);
 	}
+
+
+
 }
 //Static events
 viewer.onload = null;
+
