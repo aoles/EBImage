@@ -53,12 +53,13 @@ testEBImageFunctions=function(x) {
   if (interactive()) check('display',x,main='x')
   check('writeImage',x,'test.png')
 
-  ## resize, resample, rotate, flip, flop, translate
+  ## resize, resample, rotate, flip, flop, translate, transpose
   y=check('resize',x,277,139)
   y=check('rotate',x,20)
   y=check('flip',x)
   y=check('flop',x)
   y=check('translate',x,rep(1,2*getNumberOfFrames(x,'total')))
+  y=check('transpose',x)
 
   ## thresh
   y=check('thresh',x)

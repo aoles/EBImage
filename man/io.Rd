@@ -8,82 +8,74 @@
 \title{Image I/O}
 
 \description{
-  Functions to read and write images from/to files and URL's.
-  The supported image formats depend on the capabilities of ImageMagick.
+  Read and write images from/to files and URLs.
 }
 
 \usage{
   readImage(files, type, all = TRUE, ...)
-  writeImage(x, files, quality = 100, type, bits.per.sample, compression = "none", ...)
+  writeImage(x, files, type, quality = 100, bits.per.sample, compression = "none", ...)
 }
 
 \arguments{
-  \item{files}{A character vector of file names or URLs.}
-  \item{type}{Image type (string). Supported types are: 'jpeg', 'png', and 'tiff'.}
-  \item{all}{When 'all = TRUE' and the file contains more than one image then all frames are read, otherwise only the first frame}
-  \item{x}{An \code{\linkS4class{Image}} object or an array.} 
-  \item{bits.per.sample}{Only TIFF files: Bits per sample (numeric scalar). Supported values are: 8 and 16.}
-  \item{compression}{Only TIFF files: desired compression algorithm. Supported values are: "LZW", "none", "PackBits", "RLE", "JPEG", "deflate".}
-  \item{quality}{A numeric, ranging from 1 to 100. Default is 100.} 
-  \item{colormode}{Deprecated.}
+  \item{files}{a character vector of file names or URLs.}
+  \item{type}{an optional image type (string). Supported values are: \code{jpeg}, \code{png}, and \code{tiff}. If missing, file format is automatically deducted from filename extensions.}
+  \item{all}{when \code{all = TRUE} and the file contains more than one image all frames are read, otherwise only the first frame.}
+  \item{x}{an \code{Image} object or an array.} 
+  \item{bits.per.sample}{a numeric scalar specifying the number of bits per sample (only for \code{tiff} files). Supported values are 8 and 16.}
+  \item{compression}{the desired compression algorithm (only for \code{tiff} files). The supperted values depend on the capabilities of the \code{tiff} package.}
+  \item{quality}{a numeric ranging from 1 to 100 (default) controlling the quality of the JPEG output (only for \code{jpeg} files)}
+  \item{...}{arguments passed to the corresponding functions from the \code{jpeg}, \code{png}, and \code{tiff} packages.}
 }
 
 \value{
   \code{readImage} returns a new \code{Image} object.
-  \code{writeImage} returns \code{invisible(files)}.
+  \code{writeImage} returns an invisible vector of filenames.
 }
 
 \details{
-  When writing images in formats supporting lossy compression (like JPEG),
-  the quality can be specified used a \code{quality} value in the
-  range \code{[1,100]}. The best quality is obtained with 100.
+\code{readImage} loads all images from the \code{files} vector and returns them stacked into a single \code{Image} object. All images need to be of the same \code{type} and have the same dimensions and colormode. If \code{type} is missing, the appropriate file format is deducted from the file name extension. The \code{colormode} is determined automatically. When the function fails to read an image it skips to the next item issuing a warning message. Non local files can be read directly by specifying a valid URL address. The output of \code{readImage} is an \code{Image} object, containing an array of doubles ranging from 0 (black) to 1 (white).
 
-  The file format is deduced from the file name extension.
+  \code{writeImage} writes images into the files specified in \code{files}. The number of files need to be equal 1 or the number of frames. When the image contains multiple frames and only a single filename is specified either the whole stack is written into a single TIFF file, or each frame is saved to an individual JPEG/PNG file \code{frame-X}, where \code{X} is the frame number less one (note that for an image containing \code{n} frame this results in filenames numbered from 0 to \code{n-1}. 
 
-  \code{ImageMagick} is used to perform all image I/O operations. Therefore,
-  the package supports all the file types supported by \code{ImageMagick}.
-
-  When reading images, files of different formats can be mixed in any
-  sequence, including mixing single 2D images with TIFF image stacks.
-  The result will contain a stack with all images and stacks,
-  at the size of the first image read. Subsequent images are cropped (if
-  larger) or filled with background (if smaller).
-
-  \code{readImage} returns an \code{Image} object, containing an array of
-  double values ranging from 0 (black) to 1 (white). Image formats have
-  a limited dynamic range (e.g. JPEG: 8 bit, TIFF: 16 bit) and
-  \code{writeImage} may cause some loss of accuracy.
+  When writing images to JPEG file format the compression quality can be specified using \code{quality}. Valid values range from 100 (highest quality) to 1 (lowest quality). For \code{tiff} images additional information about the desired number of bits per sample (\code{bits.per.sample}) and the compression algorithm \code{compression} can be provided. For the complete list of supported values please refer to the documentation of the \code{tiff} package.
 }
 
+\note{
+  Image formats have a limited dynamic range (e.g. JPEG: 8 bit, TIFF: 16 bit) and \code{writeImage} may cause some loss of accuracy. In specific, writing 16 bit image data to formats other than TIFF will strip the 8 LSB.
+}
 
 \references{
-    ImageMagick: \url{http://www.imagemagick.org}
+  jpeg package: \url{http://www.rforge.net/jpeg/}, png package: \url{http://www.rforge.net/png/}, tiff package: \url{http://www.rforge.net/tiff/}
 }
 
 \author{
-  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2005-2006
+  Andrzej Oles, \email{andrzej.oles@gmail.com}, 2012
 }
 
 \examples{
-   ## Reads and display images
-   f = system.file("images", "lena-color.png", package="EBImage")
-   x = readImage(f)
-   if (interactive()) display(x)
+  ## Read and display an image
+  f = system.file("images", "lena-color.png", package="EBImage")
+  x = readImage(f)
+  if (interactive()) display(x)
 
-   x = readImage(system.file("images", "nuclei.tif", package="EBImage"))
-   if (interactive()) display(x)
-   
-   try({
-     im = readImage("http://www.google.com/intl/en/images/logo.gif")
-     if (interactive()) display(im)
-   })
+  ## Read and display a multi-frame TIFF
+  y = readImage(system.file("images", "nuclei.tif", package="EBImage"))
+  if (interactive()) display(y)
 
-   ## Converts a TIFF file into JPEG
-   f1 = system.file("images", "lena-color.png", package="EBImage")
-   x1 = readImage(f1)
-   f2 = paste(tempfile(), "jpeg", sep=".")
-   writeImage(x1, f2)
-   cat("Converted '", f1, "' into '", f2, "'.\n", sep='')
+  ## Read an image directly from a remote location by specifying its URL
+  try({
+    im = readImage("http://www-huber.embl.de/EBImage/ExampleImages/berlin.tif")
+    if (interactive()) display(im, title = "Berlin Impressions")
+  })
+
+  ## Convert a PNG file into JPEG
+  tempfile = tempfile("", , ".jpeg")
+  writeImage(x, tempfile, quality = 85)
+  cat("Converted '", f, "' into '", tempfile, "'.\n", sep="")
+
+  ## Save a frame sequence
+  files = writeImage(y, tempfile("", , ".jpeg"), quality = 85)
+  cat("Files created: ", files, sep="\n")
 }
 
 

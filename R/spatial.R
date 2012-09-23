@@ -90,15 +90,14 @@ resize <- function(x, w, h, filter="bilinear", output.dim, output.origin=c(0, 0)
   affine(x, m, filter, output.dim=output.dim)
 }
 
-## swaps the XY dimensions
-## AO's note on performance: when a permutation of imageData rather than an Image object itself is needed it is much faster to issue the function directly on the Image object with 'keepClass = FALSE' than to extract the imageData first ond only then perform the swapping
+## transposes the XY dimensions
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-swapXY = function(x, keepClass = TRUE) {
+transpose = function(x, coerce = FALSE) {
   validImage(x)
   dims = 1:length(dim(x))
   dims[1:2] = c(2:1)
   y = aperm(x, dims)
-  if ( keepClass && is.Image(x) )
+  if ( (!coerce) && is.Image(x) )
     x@.Data = y
   else 
     x = y

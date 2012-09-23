@@ -1,67 +1,64 @@
 \name{display}
 
 \alias{display}
-\alias{animate}
 
 \concept{display}
 
-\title{Interactive image display}
+\title{Image Display}
 
 \description{
-  Display images.
+  Displays images using an interactive JavaScript image browser or the R build-in graphics capabilities.
 }
 
 \usage{
-display(x, title=paste(deparse(substitute(x))), useGTK=TRUE)
-animate(x)
+display(x, title = paste(deparse(substitute(x))), method = c("browser", "raster"), frame, all = FALSE)
 }
 
 \arguments{
-  \item{x}{An \code{Image} object or an array.} 
-  \item{useGTK}{A logical of length 1. See details.} 
-  \item{title}{Window title.}
+  \item{x}{an \code{Image} object or an array.}
+  \item{title}{a character string used as a window title.}
+  \item{method}{the method used to display images: either \code{browser} (default) for viewing images in a WWW browser, or \code{raster} for viewing them as raster graphics using R native functions.}
+  \item{frame}{a numeric indicating which frame to display. Works only when \code{method = raster} and \code{all = FALSE}.}
+  \item{all}{specifies whether to display all frames of a stacked image (\code{TRUE}), or only a single \code{frame} (\code{FALSE}).}
 }
 
 \value{
-  The functions are called for their side effect.
-  Return value is invisible \code{NULL}.
+  Invisible \code{NULL}.
 }
 
 \details{
-  By default (and if available), the \code{display} function uses GTK to
-  open a window and display the image. Multiple windows can be opened in
-  this way.
-  
-  If GTK is not available or if \code{useGTK} is \code{FALSE},
-  ImageMagick is used; only one window at a time can be open,
-  and it needs to be closed by the user interactively before
-  the next window can be opened. The ImageMagick display is not
-  available on MS-Windows.
-  
-  The \code{animate} function shows an animated sequence of images and uses \code{ImageMagick}. Similar limitations as for \code{display} apply
-  (only one window, not on MS-Windows.)
+  By default (\code{method = "browser"}) images are displayed in a WWW browser using a JavaScript based image browser. Multiple windows or tabs can be opened in this way. 
+
+If \code{method = "raster"} images are displayed using the R build-in \code{rasterImage} function. By default only the first frame of a stacked image is rendered; a different frame number to display can be specified using \code{frame}. When \code{all = TRUE} all frames are rendered side by side automatically positioned in a grid.
+}
+
+\note{For viewing images in a WWW browser a compatible browser with JavaScript enabled is required (e.g. Mozilla Firefox).}
+
+\author{
+  Andrzej Oles, \email{andrzej.oles@gmail.com}, 2012
 }
 
 \references{
-  ImageMagick: \url{http://www.imagemagick.org}
-  GTK: \url{http://www.gtk.org}, on MS-Windows \url{http://gladewin32.sf.net}
+  Mozilla Firefox: \url{http://www.firefox.com}
 }
 
 \examples{
-   ## single image
-   lena = readImage(system.file("images", "lena-color.png", package="EBImage"))
-   if (interactive()) display(lena)
+  ## Display a single image
+  x = readImage(system.file("images", "lena-color.png", package="EBImage"))
+  if (interactive()) display(x, method = "raster")
 
-   ## animated threshold
-   x = readImage(system.file("images", "lena-color.png", package="EBImage"))
-   x = resize(x, 128, 128)
-   xt = list()
-   for (t in seq(0.1, 5, len=9)) xt=c(xt, list(gblur(x, s=t)))
-   xt = combine(xt)
-   if (interactive()) display(xt, title='Blurred Lenas')
+  ## Display a thresholded sequence ...
+  y = readImage(system.file("images", "lena.png", package="EBImage"))
+  yt = list()
+  for (t in seq(0.1, 5, len=9)) yt=c(yt, list(gblur(y, s=t)))
+  yt = combine(yt)
+
+  ## ... using the browser viewer ...
+  if (interactive()) display(yt, "Blurred Lenas")
+
+  ## ... or using R build-in raster functions
+  if (interactive()) display(resize(yt, 256, 256), method = "raster", all = TRUE)
+
+  ## Display the last frame 
+  if (interactive()) display(yt, method = "raster", frame = getNumberOfFrames(yt, type = "render"))
 }
-
-\author{
-  Oleg Sklyar, \email{osklyar@ebi.ac.uk}
-}
-
