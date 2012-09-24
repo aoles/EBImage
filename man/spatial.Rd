@@ -74,7 +74,8 @@
   transformed to \code{cbind(px, 1)\%*\%m}.
 }
 
-\seealso{ \code{translate} 
+\seealso{ 
+  \code{\link{transpose}}, \code{\link{translate}} 
 }
 
 \references{
