@@ -107,11 +107,13 @@
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}, Copyright 2005-2007
 
   Gregoire Pau, \email{gpau@ebi.ac.uk}
-  
+
   Wolfgang Huber, \email{huber@ebi.ac.uk}
-  
+
+  Andrzej Oles, \email{andrzej.oles@gmail.com}
+
   Mike Smith, \email{msmith@ebi.ac.uk}
-  
+
   \preformatted{
   European Bioinformatics Institute
   European Molecular Biology Laboratory

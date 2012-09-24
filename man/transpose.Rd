@@ -2,7 +2,7 @@
 
 \alias{transpose}
 
-\title{Image Transpose}
+\title{Image Transposition}
 
 \description{
   Transposes an image by swapping its first two, i.e., spatial dimensions.
@@ -18,7 +18,7 @@
 }
 
 \value{
-  An \code{Image} object or an array, containing \code{x} with its XY dimensions transposed. When \code{coerce = TRUE} the output is always coerced to an array.
+  An \code{Image} object or an array, containing \code{x} with its XY dimensions transposed. When \code{coerce = TRUE} the output is coerced to an array.
 }
 
 \details{

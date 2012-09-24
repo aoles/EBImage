@@ -113,7 +113,7 @@
 }
 
 \seealso{
-  \code{\link{readImage}}, \code{\link{display}}
+  \code{\link{readImage}}, \code{\link{writeImage}}, \code{\link{display}}
 }
 
 \author{
