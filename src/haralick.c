@@ -1,4 +1,4 @@
-#include "features_haralick.h"
+#include "haralick.h"
 
 /* -------------------------------------------------------------------------
 Calculating Haralick image features
@@ -13,7 +13,7 @@ See: ../LICENSE for license, LGPL
 
 /* calculates haralick cooccurrence matrix ---------------------------------- */
 SEXP
-lib_co_occurrence (SEXP obj, SEXP ref, SEXP cgrades) {
+haralickMatrix(SEXP obj, SEXP ref, SEXP cgrades) {
   SEXP res, cm, dm;
   int nx, ny, nz, nprotect, im, x, y, nobj, index, i, nc, colthis, colthat, no_objects, * ncomp;
   double * data, * refdata, * cmdata;
@@ -121,7 +121,7 @@ lib_co_occurrence (SEXP obj, SEXP ref, SEXP cgrades) {
    one layer per object, this function returns a matrix of selected haralick
    features (rows - objects, columns - features) -----------------------------*/
 SEXP 
-lib_haralick ( SEXP cm ) {
+haralickFeatures ( SEXP cm ) {
   SEXP res, dm;
   int nprotect, nc, nobj, index, i, j, n, nonZeros, no_objects, nf=13;
   double mu, tmp;

@@ -1,5 +1,4 @@
 #include "objects.h"
-#include "features_hull.h"
 
 /* -------------------------------------------------------------------------
 Counting objects determined in segmentations like watershed

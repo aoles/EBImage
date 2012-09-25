@@ -32,11 +32,11 @@
   Image I/O, display
   \itemize{
     \item \code{readImage}, \code{writeImage}
-    \item \code{display}, \code{animate}
+    \item \code{display}
     \item \code{image}
   }
   
-  Spatial transform
+  Spatial transforms
   \itemize{
     \item \code{resize}, \code{flip}, \code{flop}
     \item \code{rotate}, \code{translate}, \code{affine}
@@ -53,8 +53,7 @@
   Image enhancement, filtering
   \itemize{
     \item \code{normalize}
-    \item \code{filter2}, \code{blur}, \code{gblur}, \code{medianFilter}
-    \item \code{equalize}
+    \item \code{filter2}, \code{gblur}, \code{medianFilter}
   }
   
   Morphological operations
@@ -81,7 +80,7 @@
   
   Drawing on images
   \itemize{
-    \item \code{drawfont}, \code{drawtext}, \code{drawCircle}
+    \item \code{drawCircle}
   }
     
   Features extraction
@@ -91,16 +90,16 @@
     \item \code{standardExpandRef}
   }
 
-  Obsolete
+  Deprecated 
   \itemize{
-    \item \code{getFeatures}
-    \item \code{hullFeatures}
-    \item \code{edgeProfile}, \code{edgeFeatures}
-    \item \code{moments}, \code{cmoments}, \code{smoments}, \code{rmoments}
+    \item \code{blur}, \code{equalize}
+    \item \code{drawtext}, \code{drawfont}
+    \item \code{getFeatures}, \code{hullFeatures}, \code{zernikeMoments}
+    \item \code{edgeProfile}, \code{edgeFeatures}, 
     \item \code{haralickFeatures}, \code{haralickMatrix}
-    \item \code{zernikeMoments}
+    \item \code{moments}, \code{cmoments}, \code{smoments}, \code{rmoments}
   }
-}
+}	
 
 \section{Authors}{
 

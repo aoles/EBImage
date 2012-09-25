@@ -332,26 +332,6 @@ writeImage(lenafhi, 'lenafhi.jpeg', quality=85)
 
 \pagebreak
 \newpage
-\section{Drawing on images}
-The function \Rpackage{drawtext} draws text labels on images.
-
-<<drawtext>>=
-font = drawfont(weight=600, size=28)
-lenatext = drawtext(lena, xy=c(250, 450), labels="Lena", font=font, col="white")
-@
-<<filterh,echo=FALSE>>=
-writeImage(lenatext, 'lenatext.jpeg', quality=85)
-@
-
-\begin{figure}[!h]
-\begin{center}
-\includegraphics[width=0.49\textwidth]{lenatext.jpeg}
-\caption{\code{lenatext}}
-\end{center}
-\end{figure}
-
-\pagebreak
-\newpage
 \section{Morphological operations}
 Binary images are images where the pixels of value 0 constitute the
 background and the other ones constitute the foreground. These images
