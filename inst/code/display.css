@@ -1,23 +1,24 @@
    body {  
     margin: 0px;
-	padding: 0px;
-	border: 0px; 
-	background-color:#dddddd;
+    padding: 0px;
+    border: 0px; 
+    background-color:#dddddd;
     overflow: hidden;
    }
    img {
-    image-rendering: optimizeSpeed;				// Opera
-    image-rendering: -moz-crisp-edges;			// FF
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: optimize-contrast;
-    -ms-interpolation-mode: nearest-neighbor;	// IE
+    image-rendering:optimizeSpeed;             /* Legal fallback                 */
+    image-rendering:-moz-crisp-edges;          /* Firefox                        */
+    image-rendering:-o-crisp-edges;            /* Opera                          */
+    image-rendering:-webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+    image-rendering:optimize-contrast;         /* CSS3 Proposed                  */
+    -ms-interpolation-mode:nearest-neighbor;   /* IE8+                           */
    }
    div {
     display:block;
     margin:0px;
-	padding:0px;
-	border:0px;
-	overflow:hidden;
+    padding:0px;
+    border:0px;
+    overflow:hidden;
    }
    button {
     font-size:20px;
@@ -28,58 +29,58 @@
     vertical-align:top;
    }
    .buttons{
-	float:left;
-	width:50%;
-	min-width:128px;
+    float:left;
+    width:50%;
+    min-width:128px;
    }
    #toolbar{
     overflow: inherit;
-	min-width:128px;
+    min-width:128px;
    }
    #zoombuttons{
     text-align:right;
-	margin-right:-1px;
+    margin-right:-1px;
    }
    #statusbar, .status{	
     font-size:14px;
     font-family:"Lucida Console", Monaco, monospace;
     margin-right:10px;
-	padding:1px;
-	overflow: show;
-	float:left;
+    padding:1px;
+    overflow: show;
+    float:left;
    }
    #help{
     position:relative;
-	margin:auto;
-	top:50px;
-	width:360px;
-	border-radius:10px;
-	overflow:auto;
-	border:1px solid #eeeeee;
-	z-index:4;
-	display:none;
+    margin:auto;
+    top:50px;
+    width:360px;
+    border-radius:10px;
+    overflow:auto;
+    border:1px solid #eeeeee;
+    z-index:4;
+    display:none;
    }
    .key{
     font-family:"Lucida Console", Monaco, monospace;
-	font-weight:bold;
+    font-weight:bold;
    }
    .topic{
     font-size:14px;
-	font-weight:bold;
-	padding-top:5px;
+    font-weight:bold;
+    padding-top:5px;
    }
    .close{
     text-align:center;
-	font-weight:bold;
-	padding:5px;
+    font-weight:bold;
+    padding:5px;
    }
    table{
     background-color:white;
-	opacity:0.8;
-	border-radius:8px;
-	overflow:hide;
-	padding-left:5px;
-	padding-right:5px;
-	font-size:12px;
-	font-family:Tahoma, Geneva, sans-serif;
+    opacity:0.8;
+    border-radius:8px;
+    overflow:hide;
+    padding-left:5px;
+    padding-right:5px;
+    font-size:12px;
+    font-family:Tahoma, Geneva, sans-serif;
    }
