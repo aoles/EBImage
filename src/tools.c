@@ -2,14 +2,6 @@
 #include <R.h>
 #include <Rdefines.h>
 
-/* -------------------------------------------------------------------------
-Package tools
-Copyright (c) 2006 Oleg Sklyar
-See: ../LICENSE for license, LGPL
-------------------------------------------------------------------------- */
-
-int GTK_OK = 0;
-
 /*----------------------------------------------------------------------- */
 double
 distanceXY (const PointXY pt1, const PointXY pt2) {

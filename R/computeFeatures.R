@@ -253,9 +253,9 @@ computeFeatures.haralick = function(x, ref, properties=FALSE, haralick.nbins=32,
         xscaled = x
         refscaled = ref
       }
-      hf = haralickFeatures(xscaled, refscaled, nc=haralick.nbins)
+      hf = .haralickFeatures(xscaled, refscaled, nc=haralick.nbins)
       ## after scaling, xscaled may not contain the original object labels
-      ## fortunately, haralickFeatures() leave 0-row for them, therefore, the data
+      ## fortunately, .haralickFeatures() leave 0-row for them, therefore, the data
       ## is kept synceda and it is enough to fill up hf with 0-row to level up to
       ## the original number of objects
       rbind(hf, matrix(0, nrow=max(x)-max(xscaled), ncol=ncol(hf)))
@@ -330,3 +330,32 @@ splitObjects = function(x) {
   z = which(as.integer(x)>=1)
   split(z, x[z])
 }
+
+.haralickMatrix <- function(x, ref, nc=32) {
+  checkCompatibleImages(x, ref)
+  rref <- range(ref)
+  if ( rref[1] < 0 || rref[2] > 1 ) {
+    ref[ref<0] = 0
+    ref[ref>1] = 1
+    warning( "Values in 'ref' have been limited to the range [0,1]" )
+  }
+  
+  res <- .Call( "haralickMatrix", castImage(x), castImage(ref), as.integer(nc), PACKAGE='EBImage')
+  return( res )
+}
+
+.haralickFeatures <- function(x, ref, nc=32) {
+  validImage(x)
+  hm <- .haralickMatrix(x=x, ref=ref, nc=nc)
+  if ( is.null(hm) || !(is.array(hm) || is.list(hm)) ) return( NULL )
+  do.features <- function(m) {
+    if (dim(m)[3]>0) res <- .Call("haralickFeatures", m, PACKAGE='EBImage')
+    else res = matrix(0, nrow=0, ncol=13) ## no objects
+    if ( is.matrix(res) )
+      colnames(res) <- c("h.asm", "h.con", "h.cor", "h.var", "h.idm", "h.sav", "h.sva", 
+                         "h.sen", "h.ent", "h.dva", "h.den", "h.f12", "h.f13")
+    res
+  }
+  if ( !is.list(hm) ) return( do.features(hm) )
+  lapply( hm, do.features )
+} 

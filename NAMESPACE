@@ -22,7 +22,7 @@ export(colorMode, "colorMode<-", imageData, "imageData<-")
 export(getFrame, getNumberOfFrames)
 
 ## image IO, display
-exportMethods('show')
+exportMethods("show")
 export(readImage, writeImage)
 export(display)
 
@@ -73,11 +73,8 @@ export(standardExpandRef)
 
 ## deprecated
 export(blur, equalize)
-
-## obsolete (still exported for backward compatibility reasons)
-export(getFeatures)
-export(hullFeatures)
+export(drawtext, drawfont)
+export(getFeatures, hullFeatures, zernikeMoments)
 export(edgeProfile, edgeFeatures)
-export(moments, cmoments, smoments, rmoments)
 export(haralickFeatures, haralickMatrix)
-export(zernikeMoments)
+export(moments, cmoments, smoments, rmoments)

@@ -1,5 +1,5 @@
-#ifndef EBIMAGE_DRAWABLE_H
-#define EBIMAGE_DRAWABLE_H
+#ifndef EBIMAGE_DRAWCIRCLE_H
+#define EBIMAGE_DRAWCIRCLE_H
 
 #include <R.h>
 #include <Rdefines.h>
@@ -8,7 +8,6 @@
 extern "C" {
 #endif
   
-  SEXP lib_drawText (SEXP, SEXP, SEXP, SEXP, SEXP);
   SEXP drawCircle (SEXP, SEXP, SEXP, SEXP);
   
 #ifdef __cplusplus

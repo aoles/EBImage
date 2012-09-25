@@ -7,13 +7,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-  
-#ifdef USE_GTK
-#   ifdef __cplusplus
-extern
-#   endif
-    int GTK_OK;
-#endif
 
 #define MODE_GRAYSCALE  0
 #define MODE_COLOR      2
