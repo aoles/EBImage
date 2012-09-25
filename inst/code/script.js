@@ -76,91 +76,8 @@ function getMouseXY(event) {
 		posy = event.clientY + document.body.scrollTop
 			+ document.documentElement.scrollTop;
 	}
-	debug.clear();
-	debug.println(posx+" "+posy)
 	return [posx,posy];
-}
-
-function mouseWheel() {
-	var self=this;
-	/*Event handlers*/
-	/*Mouse wheel functions*/
-
-	//Default mouse wheel callback function
-	//Variable local to 'this'
-	var wheelCallback = function(event,object,delta){
-		/*Override this function and write your code there*/
-		/*
-			delta=-1 when mouse wheel is rolled backwards (towards yourself)
-			delta=1 when mouse wheel is rolled forward (away from one's self)
-			Note: Here is where you can call the getMouseXY function using the 'event' argument
-		*/
-	}
-	//Mouse wheel event handler
-	self.wheelHandler = function (event){
-		var delta = 0;
-		if (!event) //For IE
-			event = window.event;
-		if (event.wheelDelta) 	//IE
-		{
-			delta = event.wheelDelta/120;
-			//if (window.opera) delta = -delta; //for Opera...hmm I read somewhere opera 9 need the delta sign inverted...tried in opera 10 and it doesnt require this!?
-		}
-		else if (event.detail) //firefox
-			delta = -event.detail/3;
-
-		if (event.preventDefault)
-			event.preventDefault();
-		event.returnValue = false;
-		if (delta)
-			wheelCallback(event,this,delta);	//callback function
-	}
-	//Mouse wheel initialization
-	self.init = function(object,callback) {
-		if (object.addEventListener) //For firefox
-			object.addEventListener('DOMMouseScroll', this.wheelHandler, false); //Mouse wheel initialization
-		//For IE
-		object.onmousewheel = this.wheelHandler; //Mouse wheel initialization
-		wheelCallback=callback;
-	}
-	this.setCallback = function(callback){
-		wheelCallback=callback;
-	}
-}
-
-//Debugging
-function debug_msgs() {
-	this.counter=0;
-	this.clear=function() {
-		var div=document.getElementById('debug');
-		div.innerHTML='';
-		this.counter=0;
-	}
-	this.print=function(string) {
-	var div=document.getElementById('debug');
-		div.innerHTML+=string;
-	}
-	this.println=function(string) {
-		var div=document.getElementById('debug');
-		div.innerHTML+=string+'<br>';
-		this.counter++;
-	}
-}
-
-/*---------------------------*/
-// function buttons() //argument array
-// {
-// 	this.first = "f"
-// 	this.prev  = "p"
-// 	this.next  = "n"
-// 
-// 	this.init = function(){
-// 		document.getElementById("first").style.color='';
-// 		document.getElementById("first").disabled=true;
-// 		
-// 	}
-// 
-// }
+}	
 
 /*-------------The image viewer--------------*/
 function viewer(arguments) //argument array
@@ -175,7 +92,7 @@ function viewer(arguments) //argument array
 	var image=null,imageSource=null,parent=null,replace=null,preLoader=null;
 	var borderClass=null;	
 	var originalW, originalH;
-	var toolbar=null, statusbar = null, buttons = [], status = [];
+	var toolbar=null, statusbar = null, buttons = [], status = [], help = null;
 	var framesTotal = 1;
 	var currentFrame = 1;
 	var imageName = null;
@@ -207,13 +124,26 @@ function viewer(arguments) //argument array
 		eval(key + '=temp;');
 	}
 
+	function Help(frame){
+		var help = document.createElement('div');
+		help.id = 'help';
+		frame.appendChild(help);
+		help.innerHTML = '<table><tr><td colspan="3" class="topic">Browsing</td></tr><tr><td colspan="3">Use the toolbar buttons or the following keyboard keys to change between the frames:</td></tr><tr><td>Next frame</td><td class="key">PAGE UP</td><td class="key">&gt</td></tr><tr><td>Previous frame</td><td class="key">PAGE DOWN</td><td class="key">&lt</td></tr><tr><td>First frame</td><td class="key">HOME</td><td class="key">M</td></tr><tr><td>Last frame</td><td class="key">END</td><td class="key">?</td></tr><tr><td colspan="3" class="topic">Zooming</td></tr><tr><td colspan="3">To zoom the image in/out use the mouse wheel, the toolbar buttons, or the following keyboard shortcuts:</td></tr><tr><td>Zoom in</td><td class="key">+</td><td class="key">x</td></tr><tr><td>Zoom out</td><td class="key">-</td><td class="key">z</td></tr><tr><td>Reset to 100%</td><td class="key">BACKSPACE</td><td class="key">R</td></tr><tr><td>Fit-in</td><td class="key">SPACE</td><td class="key">ENTER</td></tr><tr><td colspan="3" class="topic">Panning</td></tr><tr><td colspan="3">To pan the image click on it and drag it with your mouse. Alternatively, use the arrow keys on your keyboard.</td></tr><tr><td colspan="3" class="close">Press ESC to close this window.</td></tr></table>'
+
+		this.show = function(){
+			help.style.display = 'block';
+		}
+		this.hide = function(){
+			help.style.display = 'none';
+		}
+	}
+	
 	/*Internal states,HTML elements and properties*/
 	self.frameElement = null;
 	
 	var zoomLevel=null, minZoomLevel=-12, maxZoomLevel=6; // zoomLevel == 0 is 100%, zoomLevel == null for fit into frame
 	var lastMousePosition=null;
 	var baseMouseSpeed = currentMouseSpeed = minMouseSpeed = 2;
-	var mouseWheelObject=null;
 
 	/*Methods*/
 	self.getFrameDimension =  function() {
@@ -284,7 +214,7 @@ function viewer(arguments) //argument array
 		if(zoomLevel==null){
 			zoomLevel = 0;
 			var currentZoomFactor = self.getDimension()[0]/originalW;
-			//debug.println("CurrentZoomFactor = "+self.getDimension()[0]+" "+originalW+ " "+currentZoomFactor);
+			
 			// find from above			
 			if(currentZoomFactor > 1)
 				while(self.zoomFactor(zoomLevel)<currentZoomFactor) zoomLevel++;
@@ -296,7 +226,6 @@ function viewer(arguments) //argument array
 		self.zoomTo(zoomLevel+dir, x, y);
 	}
 	self.zoomTo = function(newZoomLevel, x, y) {
-		//debug.println("Current zoom = "+zoomLevel+", newZoomLevel = "+newZoomLevel);
 		// valid range?
 		if( newZoomLevel<minZoomLevel || newZoomLevel>maxZoomLevel )
 			return false;
@@ -308,10 +237,7 @@ function viewer(arguments) //argument array
 		
 		//var dimension = self.fitToFrame(originalW,originalH);
 		var zoomFactor = self.zoomFactor(newZoomLevel);
-		debug.println(newZoomLevel+" "+zoomFactor);
 		var dimension = [originalW * zoomFactor, originalH * zoomFactor];
-		
-	
 		
 		//Calculate percentage increase/decrease and fix the image over given x,y coordinate
 		var curWidth=image.width, curHeight=image.height;
@@ -340,18 +266,11 @@ function viewer(arguments) //argument array
 		
 		//Set dimension and position
 		self.updateImage(dimension[0], dimension[1], position[0], position[1], newZoomLevel);
-// 		self.setDimension(dimension[0],dimension[1]);
-// 		self.setPosition(position[0],position[1]);
-// 		self.setMouseCursor();
-// 
-// 		zoomLevel = newZoomLevel;
-// 		self.updateStatus();
-
 
 		// button locking		
 		buttons['in'].disable(newZoomLevel==maxZoomLevel);
 		buttons['out'].disable(newZoomLevel==minZoomLevel);
-		buttons['org'].disable(newZoomLevel==0);
+		buttons['org'].disable(this.zoomFactor()==1);
 		buttons['fit'].disable(false);
 		
 		return true;
@@ -377,8 +296,6 @@ function viewer(arguments) //argument array
 		}
 			
 		var frameDimension = self.getFrameDimension();
-		
-		debug.println("centering..."+width+" "+height+" "+x+" "+y+" "+frameDimension);
 
 		if(width<=frameDimension[0])
 			x = Math.round((frameDimension[0] - width)/2);
@@ -437,40 +354,35 @@ function viewer(arguments) //argument array
 		position = self.centerImage(image.width,image.height, position[0]+x,position[1]+y);
 		self.setPosition(position[0],position[1]);
 	}
-	self.showHelp = function() {
-		// hide image
-			image.style.display='none';
-		//onkeydown = 
-		//event = event || window.event;
-		//var keyCode = event.which || event.keyCode;
-		
-		//if(event.preventDefault) // Netscape/Firefox/Opera
-		//	event.preventDefault();
-		//event.returnValue = false;
-	}
-	self.hideHelp = function() {
-		if(self.outerFrame)
-			self.outerFrame.style.display='block';
-		else
-			self.frameElement.style.display = 'block';
-	}
 
 	/*User defined events*/
 	//Non-static events
 	self.onload = null;
 	
 	/*Event handlers*/
-	self.onmousewheel = function(event,object,direction) {
-		self.frameElement.focus();
+	setUpMouseWheelAction = function(action){
+			if (window.addEventListener) //For firefox
+				window.addEventListener('DOMMouseScroll', action, false);
+			//For IE			
+			document.onmousewheel = action;
+	}
+
+	self.onmousewheel = function(event) {
 		if (!event) //For IE
 			event=window.event, event.returnValue = false;
-		else
-		if (event.preventDefault)
+		else if (event.preventDefault)
 			event.preventDefault();
 		
-			var mousePos = getMouseXY(event);
-			var framePos = getObjectXY(self.frameElement);
-			self.zoom(direction, mousePos[0]-framePos[0], mousePos[1]-framePos[1]);
+		var direction = 0; // up is +, down is -
+		
+		if (event.wheelDelta) 	// IE & Chrome
+			direction = (event.wheelDelta > 1) ? 1 : -1;
+		else if (event.detail) // FF & Opera
+			direction = (event.detail < 1) ? 1 : -1;
+
+		var mousePos = getMouseXY(event);
+		var framePos = getObjectXY(self.frameElement);
+		self.zoom(direction, mousePos[0]-framePos[0], mousePos[1]-framePos[1]);
 	}
 	self.onmousemove = function(event) {
 		if (!event) //For IE
@@ -515,7 +427,7 @@ function viewer(arguments) //argument array
 		status['Position'].innerHTML ='';
 	}
 	self.onmousedown =  function(event) {
-		self.frameElement.focus();
+		//self.frameElement.focus();
 		if (!event) //For IE
 			event=window.event, event.returnValue = false;
 		else
@@ -525,16 +437,11 @@ function viewer(arguments) //argument array
 		var mousePos = lastMousePosition = getMouseXY(event);
 		var imagePos = getObjectXY(image);
 
- 		debug.clear();
-		debug.println("mouse: " + mousePos + " image: " + imagePos);
-
 		// pixel position
 
 		var zoomFactor = self.zoomFactor();
 		var pixelPos = [Math.floor((mousePos[0]-imagePos[0])/zoomFactor), Math.floor((mousePos[1]-imagePos[1])/zoomFactor)]
  
-		debug.println("pixel: " + pixelPos + " ZF: " + zoomFactor);
-
 		self.updateStatus("Position", '('+pixelPos+')');
 		image.onmousemove = self.imagemove;
 		image.onmouseup=image.onmouseout=self.onmouseup_or_out;
@@ -543,7 +450,6 @@ function viewer(arguments) //argument array
 		// set new frame size
 		var windowSize = getWindowSize();
 		var newFrameSize = [windowSize[0], windowSize[1] - (toolbar.offsetHeight+statusbar.offsetHeight)];
-		//debug stuff
 		var currentFrameSize = self.getFrameDimension();
 		
 		self.setFrameDimension(newFrameSize[0], newFrameSize[1]);
@@ -581,22 +487,13 @@ function viewer(arguments) //argument array
 			event.preventDefault();
 		event.returnValue = false;
 
-		debug.clear();
-
-		
-
-		debug.println(event.which+" "+event.keyCode+" "+keyCode);
-
-		debug.print(self.getDimension()+" "+self.getPosition()+" >>> ");
-
 		image.onload='null';
-
 
 		var position = self.getPosition();
 	
 		switch(keyCode){
 			
-		// navigating frames
+		// browsing
 			// next frame
 			case 33: // PageUp
 			case 190: // . >
@@ -634,15 +531,14 @@ function viewer(arguments) //argument array
 			case 189: 
 				self.zoomOut();
 				break;
-			// zoom to 100%
-			case 48: // 0
-				self.originalSize();
-				break
-		// reset zoom
+			// reset zoom to 100%
 			case 82: // r
-			case 32: // Space bar
-		// center image
-			case 67: // c
+			case 8: // Backspace
+				self.originalSize();
+				break;
+			// fit-in
+			case 32: // Space
+			case 13: // Enter
 				self.fitImage();
 				break;
 		// moving 
@@ -658,7 +554,15 @@ function viewer(arguments) //argument array
 			case 40: // Down arrow
 				position[1] -= currentMouseSpeed;
 				break;
-		
+		// help
+			// show
+			case 72: // h
+				help.show();
+				break;
+			// hide
+			case 27: // Esc
+				help.hide();
+				break;
 		}
 
 		if( keyCode>=37 && keyCode<=40){ // when moving
@@ -667,7 +571,6 @@ function viewer(arguments) //argument array
 			currentMouseSpeed+=baseMouseSpeed;
 		}
 
-	debug.println(self.getDimension()+" "+self.getPosition());
 	}
 	self.onkeyup = function(event) {
 		currentMouseSpeed = baseMouseSpeed;
@@ -719,9 +622,7 @@ function viewer(arguments) //argument array
 		button.innerHTML = value;
 		button.title = title;
 		button.onclick = onclick;
-		button.onmouseover = function(){this.style.color='#33CC00'};
-		button.onmouseout =  function(){this.style.color=''};
-		button.disable = function(disable){this.disabled=disable; this.style.color=''; this.blur();};
+		button.disable = function(disable){this.disabled=disable; this.blur(); return(this)};
 		buttons[name] = button;
 		group.appendChild(button);
 		return(button);
@@ -745,31 +646,16 @@ function viewer(arguments) //argument array
 	self.initImage = function() {
 		image.style.maxWidth=image.style.width=image.style.maxHeight=image.style.height=null;
 
-		
-// 		var dimension=self.fitToFrame(originalW, originalH);
-// 		self.setDimension(dimension[0],dimension[1]);
-// 		
-// 		var pos = self.centerImage(dimension[0],dimension[1], 0,0);
-// 		self.setPosition(pos[0],pos[1]);
- 		
-
 		self.resetFrame();
-		//self.setMouseCursor();
 
-		//Set mouse handlers
-		mouseWheelObject = new mouseWheel();
-		mouseWheelObject.init(window, self.onmousewheel);
+		//Set mouse handler		
+		setUpMouseWheelAction(self.onmousewheel);
+
 		image.onmousedown = self.onmousedown;
 		image.onmousemove = self.onmousemove;
 		image.onmouseout = self.onmouseout;
-		//image.onmouseover = this.updatePosition;
-		
-		//Set keyboard handlers
- 		self.frameElement.onkeydown = self.onkeydown;
-		self.frameElement.onkeyup = self.onkeyup;
-		onkeydown = self.onkeydown;
-		onkeyup = self.onkeyup;
-
+		document.onkeydown = self.onkeydown;
+		document.onkeyup = self.onkeyup;
 
 		//windowResize
 		window.onresize = self.resetFrame;
@@ -872,11 +758,8 @@ function viewer(arguments) //argument array
 			// create zoom buttons
 			createButton('in','+','Zoom in [+] [X]',this.zoomIn,zoombuttons);
 			createButton('out','&#8722;','Zoom out [-] [Z]',this.zoomOut,zoombuttons);
-			createButton('org','1:1','Original size [0]',this.originalSize,zoombuttons).style.fontSize='14px';
-			createButton('fit','&#8727;<br/>&nbsp;','Fit image [SPACEBAR] [C] [R]',this.fitImage,zoombuttons);
-			
-			
-			
+			createButton('org','1:1','Original size [BACKSAPCE] [R]',this.originalSize,zoombuttons).style.fontSize='14px';
+			createButton('fit','&#8727;<br/>&nbsp;','Fit image [SPACE] [ENTER]',this.fitImage,zoombuttons);
 			
 			// frame
 			parent.appendChild(self.frameElement);
@@ -892,6 +775,8 @@ function viewer(arguments) //argument array
 			createStatusElement("Zoom");
 			createStatusElement("Position");
 
+			// create help
+			help = new Help(this.frameElement);
 		}
 		else if(replace!=null)
 			replace.parentNode.replaceChild(self.frameElement,replace);

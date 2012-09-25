@@ -27,7 +27,7 @@ display(x, title = paste(deparse(substitute(x))), method = c("browser", "raster"
 }
 
 \details{
-  By default (\code{method = "browser"}) images are displayed in a WWW browser using a JavaScript based image browser. Multiple windows or tabs can be opened in this way. 
+  By default (\code{method = "browser"}) images are displayed in a WWW browser using a JavaScript based image browser. Multiple windows or tabs can be opened in this way. For a list of available features press H.
 
 If \code{method = "raster"} images are displayed using the R built-in \code{rasterImage} function. By default only the first frame of a stacked image is rendered; a different frame can be specified using \code{frame}. When \code{all = TRUE} all frames are rendered side by side and automatically positioned in a grid.
 }
