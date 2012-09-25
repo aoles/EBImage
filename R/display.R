@@ -73,6 +73,7 @@ displayRaster = function(image, frame, all = FALSE){
 displayInBrowser = function(x, title){
   ## template and script files
   templateFile = system.file("code","display.template", package = "EBImage")
+  cssFile = system.file("code","display.css", package = "EBImage")
   scriptFile = system.file("code","script.js", package = "EBImage")
   tempDir = tempfile("",,"")
   htmlFile = "display.html"
@@ -98,6 +99,7 @@ displayInBrowser = function(x, title){
   writeImage(x, imageFile)
   cat(a, file=htmlFile, sep="\n")
   file.copy(scriptFile, tempDir)
+  file.copy(cssFile, tempDir)
   setwd(wd)
 
   ## create browser query
