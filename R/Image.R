@@ -622,7 +622,6 @@ parseColorMode = function(colormode) {
   icolormode=NA
 
   if (is.numeric(colormode)) {
-    ## warning('deprecated: colormode should be specified through a character string: \'grayscale\' or \'color\'')
     icolormode=colormode
   } else if (is.character(colormode)) {
     icolormode=pmatch(tolower(colormode),c('grayscale', NA, 'color'), duplicates.ok=TRUE,nomatch=NA)-1

@@ -31,7 +31,7 @@ standardExpandRef(ref, refnames)
     intensity values of the reference objects.}
   \item{methods.noref}{A character vector containing the function names
     to be called to compute features without reference intensities. Default is
-    \code{computeFeatures.moment} and \code{computeFeatures.shape}}.
+    \code{computeFeatures.moment} and \code{computeFeatures.shape}.}
  \item{methods.ref}{A character vector containing the function names
    to be called to compute features with reference intensities. Default is
    \code{computeFeatures.basic}, \code{computeFeatures.moment} and
@@ -77,10 +77,10 @@ standardExpandRef(ref, refnames)
   \code{nucleus.tubulin.cx}, indicating the x center of mass of tubulin
   computed in the nucleus region.
 
-  The function \code{computeFeatures} computes a set of
-  features. Features are organized in 4 classes, each computed by a
+  The function \code{computeFeatures} computes sets of
+  features. Features are organized in 4 sets, each computed by a
   different function. The function \code{computeFeatures.basic}
-  computes spatial-independent statistics about pixel intensities:
+  computes spatial-independent statistics on pixel intensities:
   \itemize{
     \item b.mean: mean intensity
     \item b.sd: standard deviation intensity
@@ -99,7 +99,7 @@ standardExpandRef(ref, refnames)
   }
   
   The function \code{computeFeatures.moment} computes features
-  related to object moments, with can be computed with or without
+  related to object image moments, which can be computed with or without
   reference intensities:
   \itemize{
     \item m.cx: center of mass x (in pixels)

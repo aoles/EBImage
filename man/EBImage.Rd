@@ -11,10 +11,6 @@
   goal is to enable automated analysis of large sets of images such as those
   obtained in high throughput automated microscopy.
 
-  The package uses the \code{ImageMagick} library for image I/O operations and
-  some image processing methods. The \code{GTK} library is used for displaying images
-  using \code{display}.
-
   \code{EBImage} relies on the \code{Image} object to store and process images
   but also works on multi-dimensional arrays.
 }
@@ -127,9 +123,7 @@
   corresponding copyright (Jones, Carpenter) applies.
 
   The source code is released under \code{LGPL} (see the \code{LICENSE} 
-  file in the package root for the complete license wording). \code{ImageMagick} 
-  and \code{GTK} used from the package are distributed separately by the 
-  respective copyright holders.
+  file in the package root for the complete license wording).
 
   This library is free software; you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the

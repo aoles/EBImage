@@ -19,7 +19,7 @@ Algorithm and implementation are from Jones et al. [1].
 }
 
 \usage{
-  propagate(x, seeds, mask=NULL, lambda=1e-4, ext, seed.centers)
+  propagate(x, seeds, mask=NULL, lambda=1e-4)
 }
 
 \arguments{
@@ -35,10 +35,6 @@ Algorithm and implementation are from Jones et al. [1].
    \item{lambda}{A numeric value. The regularisation parameter used in the
    metric, determining the trade-off between the Euclidian distance in the
    image plane and the contribution of the gradient of \code{x}. See details.}
-
-  \item{ext}{Deprecated.}
-
-  \item{seed.centers}{Deprecated.}
 }
 
 \value{

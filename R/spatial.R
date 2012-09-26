@@ -1,39 +1,11 @@
-# Filter methods for class Image
-
-# Copyright (c) 2005 Oleg Sklyar
-
-# This library is free software; you can redistribute it and/or
-# modify it under the terms of the GNU Lesser General Public License
-# as published by the Free Software Foundation; either version 2.1
-# of the License, or (at your option) any later version.
-
-# This library is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
-# See the GNU Lesser General Public License for more details.
-# LGPL license wording: http://www.gnu.org/licenses/lgpl.html
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-normalize = function (x, separate=TRUE, ft=c(0,1)) {
-  validImage(x)
-  ft <- as.numeric (ft)
-  if ( diff(ft) == 0 ) stop("normalization range is 0")
-  separate <- as.integer(separate)
-  x = .Call("normalize", castImage(x), separate, ft, PACKAGE='EBImage')
-  return(x)
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-flip = function (x) {
+flip <- function (x) {
   validImage(x)
   nd=as.list(rep(T, length(dim(x))))
   nd[[2]]=dim(x)[2]:1
   do.call('[', c(list(x),nd))
 }
 
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-flop = function (x) {
+flop <- function (x) {
   validImage(x)
   nd=as.list(rep(T, length(dim(x))))
   nd[[1]]=dim(x)[1]:1
@@ -49,7 +21,8 @@ affine <- function (x, m, filter=c("bilinear", "none"), output.dim) {
   m <- cbind(m, c(0, 0, 1))
   filter <- match.arg(filter)
   filter <- as.integer(c(none=0, bilinear=1)[filter])
-
+  if (!missing(output.dim) && (length(output.dim)!=2 || !is.numeric(output.dim))) stop("'output.dim' must be a numeric vector of length 2")
+  
   ## backtransform
   m <- solve(m)
 
@@ -63,7 +36,11 @@ affine <- function (x, m, filter=c("bilinear", "none"), output.dim) {
   return (.Call("affine", castImage(x), castImage(y), m, filter, PACKAGE='EBImage'))
 }
 
-rotate <- function(x, angle, filter="bilinear", output.origin=c(0, 0), output.dim) {
+rotate <- function(x, angle, filter="bilinear", output.dim, output.origin=c(0, 0)) {
+  ## check arguments
+  if (length(angle)!=1 || !is.numeric(angle)) stop("'angle' must be a number")
+  if (length(output.origin)!=2 || !is.numeric(output.origin)) stop("'output.origin' must be a numeric vector of length 2")
+  
   theta <- angle*pi/180
   cx <- nrow(x)/2+nrow(x)*sqrt(2)*cos(theta-pi/4-pi/2)/2 + output.origin[1]
   cy <- ncol(x)/2+ncol(x)*sqrt(2)*sin(theta-pi/4-pi/2)/2 + output.origin[2]
@@ -73,17 +50,19 @@ rotate <- function(x, angle, filter="bilinear", output.origin=c(0, 0), output.di
 }
 
 translate <- function(x, v, filter="none", output.dim) {
-  cx <- -v[1]
-  cy <- -v[2]
-  m <- matrix(c(1, 0, cx, 0, 1, cy), nrow=3)
+  ## check arguments
+  if (length(v)!=2 || !is.numeric(v)) stop("'v' must be a numeric vector of length 2")
+  m <- matrix(c(1, 0, -v[1], 0, 1, -v[2]), nrow=3)
   affine(x, m, filter=filter, output.dim=output.dim)
 }
 
 resize <- function(x, w, h, filter="bilinear", output.dim, output.origin=c(0, 0)) {
-  ## checks
-  if (missing(h)) h = round(w*dim(x)[2]/dim(x)[1])
+  ## check arguments
+  if (missing(h) && missing(w))  stop("'w' or 'h' must be specified")
+  if (missing(w)) w <- round(h*dim(x)[2]/dim(x)[1])
+  if (missing(h)) h <- round(w*dim(x)[2]/dim(x)[1])
   if (missing(output.dim)) output.dim <- c(w, h)
-  else output.dim <- output.dim [1:2]
+  if (length(output.origin)!=2 || !is.numeric(output.origin)) stop("'output.origin' must be a numeric vector of length 2")
   
   ratio <- c(w, h)/dim(x)[1:2]
   m <-  matrix(c(ratio[1], 0, output.origin[1], 0, ratio[2], output.origin[2]), nrow=3)
@@ -91,8 +70,7 @@ resize <- function(x, w, h, filter="bilinear", output.dim, output.origin=c(0, 0)
 }
 
 ## transposes the XY dimensions
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-transpose = function(x, coerce = FALSE) {
+transpose <- function(x, coerce = FALSE) {
   validImage(x)
   dims = 1:length(dim(x))
   dims[1:2] = c(2:1)

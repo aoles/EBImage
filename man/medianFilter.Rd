@@ -34,7 +34,7 @@
 }
 
 \seealso{
-  \code{\link{makeBrush}}, \code{\link{fft}}, \code{\link{blur}}
+  \code{\link{makeBrush}}, \code{\link{fft}}, \code{\link{gblur}}
 }
 
 \author{Joseph Barry, \email{joseph.barry@embl.de}, 2012}

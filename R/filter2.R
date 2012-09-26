@@ -43,7 +43,7 @@ filter2 = function(x, filter) {
   pdx = prod(dim(x)[1:2])
   y = apply(x, 3, function(xx) {
     dim(xx) = dx[1:2]
-    Re(fft(fft(xx)*wf, inverse=T)/pdx)[index1,index2]
+    Re(fft(fft(xx)*wf, inverse=TRUE)/pdx)[index1, index2]
   })
   dim(y) = dx
 

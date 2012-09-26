@@ -33,6 +33,10 @@
   Gregoire Pau, 2009
 }
 
+\seealso{
+  \code{link{computeFeatures}}, \code{link{propagate}}, \code{link{watershed}}, \code{link{paintObjects	}}
+}
+
 \examples{
   ## simple example
   x = readImage(system.file('images', 'shapes.png', package='EBImage'))
