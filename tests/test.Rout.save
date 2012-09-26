@@ -1,5 +1,5 @@
 
-R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+R version 2.15.0 (2012-03-30)
 Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-unknown-linux-gnu (64-bit)
@@ -19,426 +19,306 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > ## cat tests/test.R | R --vanilla &>tests/test.Rout.save
-> library(EBImage)
+> library("EBImage")
 > 
 > ## returns a hashcode given an object
-> hash=function(x) {
+> hash <- function(x) {
 +   if (is.list(x)) hash(sapply(x,hash))
 +   else {
-+     xd=as.numeric(x)
-+     xd=xd[!is.nan(xd)]
-+     sum(xd*(1:length(xd)))
++     xd <- as.numeric(x)
++     xd <- xd[!is.nan(xd)]
++     if (is.matrix(xd)) sum(xd*(1:length(xd))) + 0.7*hash(dim(xd))
++     else sum(xd*(1:length(xd))) - 0.1
 +   }
 + }
 > 
 > ## try to evaluate fun(x,...) 
-> check=function(fun,x,...) {
-+   passed = TRUE
+> check <- function(fun, x, ...) {
++   passed <- TRUE
 +   
-+   cat('checking \'',fun,'\' ... ',sep='')
-+   y=try(do.call(fun,c(list(x),list(...))),silent=T)
-+   if (class(y)=='try-error' || ( is.Image(y) && !validObject(y)) ) {
-+     y=NULL
-+     passed=F
++   cat("checking \'", fun, "\' ... ", sep="")
++   y=try(do.call(fun,c(list(x),list(...))), silent=TRUE)
++   if (class(y)=="try-error" || ( is.Image(y) && !validObject(y)) ) {
++     y <- NULL
++     passed <- FALSE
 +   }
 +   
-+   if (passed) cat('OK (hash=',hash(y),')\n',sep='') 
-+   else cat('FAILED\n')
++   if (passed) cat("OK (hash=", hash(y), ")\n", sep="") 
++   else cat("FAILED\n")
 +    
 +   y
 + }
 > 
-> ## test a subset of EBImage functions on x
-> testEBImageFunctions=function(x) {  
-+   ## Image, is.image, Ops, as.Image
-+   ## imageData, imageData, colorMode, colorMode<-, print
-+   ## [, getNumberOfFrames
-+   cat('new test (hash=',hash(x),')\n',sep='')
-+   if (class(x)=='Image') check('print',x)
-+   y=Image(x,colormode=Color)
-+   a=is.Image(y)
-+   y=check('>',x,0.5)
-+   y=check('+',x,y)
-+   y=check('/',x,2)
-+   z=as.Image(imageData(y))
-+   imageData(z)=y
-+   colorMode(z)=Grayscale
-+   pat=as.list(rep(T,length(dim(x))))
-+   pat[[1]]=1:100
-+   pat[[2]]=1:100
-+   b=check('getNumberOfFrames',y,type='render')
-+   y=do.call('[',c(list(x),pat))
+> testEBImageFunctions <- function(x) {
++   cat("new test (hash=", hash(x), ")\n", sep="")
 + 
-+   ## display
-+   if (interactive()) check('display',x,main='x')
-+   check('writeImage',x,'test.png')
-+ 
-+   ## resize, resample, rotate, flip, flop, translate, transpose
-+   y=check('resize',x,277,139)
-+   y=check('rotate',x,20)
-+   y=check('flip',x)
-+   y=check('flop',x)
-+   y=check('translate',x,rep(1,2*getNumberOfFrames(x,'total')))
-+   y=check('transpose',x)
-+ 
-+   ## thresh
-+   y=check('thresh',x)
++   ## pixel arithmetic
++   z <- check(">", x, 0.5)
++   z <- check("+", x, x)
++   z <- check("/", x, 2)
++   z <- check("transpose", x)
++   if (mode(x)!="logical") z <- check("median", x)
 +   
-+   ## median, hist
-+   if (mode(x)!='logical') b=check('median',x)
-+   if (mode(x)!='logical' & interactive()) check('hist',x) 
-+ 
-+   ## blur, gblur, normalize
-+   y=check('gblur',x,r=10,s=5)
-+   y=check('normalize',x)
-+ 
-+   ## filter2
-+   z=matrix(1,nc=5,nr=5)
-+   z[3,3]=-24
-+   y=check('filter2',x,z)
-+ 
-+   ## erode, dilate, opening, closing, distmap, watershed
-+   w=x>0.5
-+   y=check('erode',w)
-+   y=check('dilate',w)
-+   y=check('opening',w)
-+   y=check('closing',w)
-+   y=check('distmap',w)
-+   ws=check('watershed', y)
-+   y=check('floodFill', w, c(10,10), 0.5)
-+   y=check('fillHull', w)
-+   y=check('bwlabel', w)
++   ## image methods
++   z <- check("Image", x, colormode=Color)
++   z <- check("as.Image", x)
++   z <- check("is.Image", x)
++   z <- check("imageData", x)
++   z <- check("imageData<-", x, z)
++   z <- check("colorMode<-", x, Grayscale)
++   z <- check("getNumberOfFrames", x, type="render")
 +   
-+   ## rgbImage, channel
-+   if (colorMode(x)==Grayscale) {
-+     y=rgbImage(x,flip(x),flop(x))
-+     w=check('channel',x,'asblue')
-+     w=check('channel',x,'rgb')
-+   } else y=x
-+   w=check('channel',y,'gray')
-+   w=check('channel',y,'green')
-+   w=check('channel',y,'x11')
-+   
-+   ## combine, tile, untile
-+   y=check('combine',x,x,x)
-+   y=check('tile',y,nx=2)
-+   y=check('untile',y,c(2,2))
++   ## subset
++   sub <- list(x, 1:10, 1:7)
++   if (length(dim(x))>2) sub <- c(sub, rep(TRUE, length(dim(x))-2))
++   z <- do.call("check", c("[", sub))
 + 
-+   ## hullFeatures, rmObjects, reenumerate, getFeatures (contains hullFeatures, edgeFeatures, haralickFeatures, zernikeMoments, moments)
-+   ## paintObjects
-+   w=ws
-+   w[w@.Data==1]=2
-+   w[w@.Data==3]=2117
-+   y=check('reenumerate',w)
-+   w=ws
-+   hf=check('hullFeatures', w)
-+   if (!is.list(hf)) hf=list(hf)
-+   rmindex = lapply(hf, function(c) which(c[,'g.s']<6))
-+   w=check('rmObjects', w, rmindex)
-+   y=check('getFeatures', w, x)
-+   if (colorMode(w)==Color) w = channel(w, 'red')
-+   y=check('paintObjects', w, x)
-+   cat('\n')
++   ## statial transform
++   z <- check("resize", x, 137, 22)
++   z <- check("rotate", x, 20)
++   z <- check("flip", x)
++   z <- check("flop", x)
++   z <- check("translate", x, c(-7, 5))
++   z <- check("affine", x, matrix(c(-7, 5, 0.1, -0.2, 0.3, 1), ncol=2))
++ 
++   ## segmentation
++   z <- check("thresh", x)
++   z <- check("ocontour", x>0.5)
++   y <- check("bwlabel", x>0.5)
++   z <- check("rmObjects", getFrame(y, 1), 3)
++   z <- check("reenumerate", y)
++   z <- paintObjects(channel(y, "gray"), x)
++   
++   ## filtering
++   z <- check("normalize", x)
++   z <- check("gblur", x, sigma=2)
++   z <- check("filter2", x, array(1, dim=c(5, 5)))
++   if (length(dim(x))<=3) z <- check("medianFilter", x, 3)
++   
++   ## morphological operations
++   y <- x>0.5
++   z <- check("erode", y)
++   z <- check("dilate", y)
++   z <- check("distmap", y)
++   z <- check("watershed", y)
++   z <- check('floodFill', y, c(10, 10), 0.5)
++   z <- check('fillHull', y)
++   z <- check("erodeGreyScale", x)
++   z <- check("dilateGreyScale", x)
++   z <- check("whiteTopHatGreyScale", x)
++   z <- check("selfcomplementaryTopHatGreyScale", x)
++   
++   ## colorspace
++   z <- check("channel", x, "rgb")
++   z <- check("rgbImage", x, x>0.5)
++   
++   ## image stacking, combining, tiling
++   z <- check("combine", x, x)
++   y <- check("tile", x, nx=2)
++   z <- check("untile", y, c(2,2))
++   
++   ## features
++   y <- getFrame(x, 1)
++   z <- check("computeFeatures", bwlabel(y>0.5), y, expandRef=NULL)
++   cat("\n")
 + }
 > 
-> ## Testing procedure
-> lena=readImage(system.file("images","lena.png", package="EBImage"))
-> lenacolor=readImage(system.file("images","lena-color.png",package="EBImage"))
-> 
-> ## Resizing images, for speeding up testing
-> lena=resize(lena, 128, 128)
-> lenacolor=resize(lenacolor, 128, 128)
-> 
-> ## Image - Grayscale - 1 image  - 2 dim - numeric
-> testEBImageFunctions(lena)
-new test (hash=50335501)
-checking 'print' ... Image
-  colormode: Grayscale 
-  storage.mode: double 
-  dim: 128 128 
-  nb.total.frames: 1 
-  nb.render.frames: 1 
-
-imageData(object)[1:5,1:6]:
-          [,1]      [,2]      [,3]      [,4]      [,5]      [,6]
-[1,] 0.5372549 0.5372549 0.5058824 0.5137255 0.5058824 0.5176471
-[2,] 0.5411765 0.5411765 0.5254902 0.5137255 0.5137255 0.5019608
-[3,] 0.5490196 0.5490196 0.5450980 0.5333333 0.5019608 0.5176471
-[4,] 0.5098039 0.5098039 0.5333333 0.5058824 0.5176471 0.5176471
-[5,] 0.5254902 0.5254902 0.5019608 0.5098039 0.4901961 0.5137255
-
-OK (hash=0)
-checking '>' ... OK (hash=39171428)
-checking '+' ... OK (hash=89506929)
-checking '/' ... OK (hash=25167750)
-checking 'getNumberOfFrames' ... OK (hash=1)
-checking 'writeImage' ... OK (hash=NA)
-checking 'resize' ... OK (hash=277296103)
-checking 'rotate' ... OK (hash=45925639)
-checking 'flip' ... OK (hash=53915623)
-checking 'flop' ... OK (hash=50278455)
-checking 'translate' ... OK (hash=49327041)
-checking 'transpose' ... OK (hash=55733970)
-checking 'thresh' ... OK (hash=58099799)
-checking 'median' ... OK (hash=0.3803922)
-checking 'gblur' ... FAILED
-checking 'normalize' ... OK (hash=54530153)
-checking 'filter2' ... OK (hash=2104930)
-checking 'erode' ... OK (hash=19874718)
-checking 'dilate' ... OK (hash=65605139)
-checking 'opening' ... OK (hash=32358128)
-checking 'closing' ... OK (hash=43302337)
-checking 'distmap' ... OK (hash=105751790)
-checking 'watershed' ... OK (hash=350934323)
-checking 'floodFill' ... OK (hash=36055081)
-checking 'fillHull' ... OK (hash=39615366)
-checking 'bwlabel' ... OK (hash=1992660245)
-checking 'channel' ... OK (hash=258710939)
-checking 'channel' ... OK (hash=463569659)
-checking 'channel' ... OK (hash=51509860)
-checking 'channel' ... OK (hash=53915623)
-checking 'channel' ... OK (hash=NA)
-checking 'combine' ... OK (hash=463569659)
-checking 'tile' ... OK (hash=1166842895)
-checking 'untile' ... OK (hash=1163613325)
-checking 'reenumerate' ... OK (hash=718366481)
-checking 'hullFeatures' ... OK (hash=6524854)
-checking 'rmObjects' ... OK (hash=284644560)
-checking 'getFeatures' ... OK (hash=141850638)
-checking 'paintObjects' ... OK (hash=42775865)
-
-Warning messages:
-1: In hash(y) : NAs introduced by coercion
-2: In hash(y) : NAs introduced by coercion
-> 
-> ## Image - Grayscale - 1 image  - 2 dim - logical
-> x=lena>0.5
+> ## test: grayscale 2D 
+> x <- readImage(system.file("images","lena.png", package="EBImage"))[1:32, 1:50]
 > testEBImageFunctions(x)
-new test (hash=39171428)
-checking 'print' ... Image
-  colormode: Grayscale 
-  storage.mode: logical 
-  dim: 128 128 
-  nb.total.frames: 1 
-  nb.render.frames: 1 
+new test (hash=677933.5)
+checking '>' ... OK (hash=1138592)
+checking '+' ... OK (hash=1355867)
+checking '/' ... OK (hash=338966.7)
+checking 'transpose' ... OK (hash=672316.3)
+checking 'median' ... OK (hash=0.4215686)
+checking 'Image' ... OK (hash=677933.5)
+checking 'as.Image' ... OK (hash=677933.5)
+checking 'is.Image' ... OK (hash=0.9)
+checking 'imageData' ... OK (hash=677933.5)
+checking 'imageData<-' ... OK (hash=677933.5)
+checking 'colorMode<-' ... OK (hash=677933.5)
+checking 'getNumberOfFrames' ... OK (hash=0.9)
+checking '[' ... OK (hash=1318.59)
+checking 'resize' ... OK (hash=2376180)
+checking 'rotate' ... OK (hash=498041.8)
+checking 'flip' ... OK (hash=664660.3)
+checking 'flop' ... OK (hash=677900.4)
+checking 'translate' ... OK (hash=432339.5)
+checking 'affine' ... OK (hash=22143.49)
+checking 'thresh' ... OK (hash=318475.9)
+checking 'ocontour' ... OK (hash=2110077)
+checking 'bwlabel' ... OK (hash=1236120)
+checking 'rmObjects' ... OK (hash=1215179)
+checking 'reenumerate' ... OK (hash=1236120)
+checking 'normalize' ... OK (hash=762286.7)
+checking 'gblur' ... OK (hash=677963.2)
+checking 'filter2' ... OK (hash=16949548)
+checking 'medianFilter' ... OK (hash=677933.5)
+checking 'erode' ... OK (hash=842776.9)
+checking 'dilate' ... OK (hash=1255542)
+checking 'distmap' ... OK (hash=5976133)
+checking 'watershed' ... OK (hash=1138592)
+checking 'floodFill' ... OK (hash=580201.4)
+checking 'fillHull' ... OK (hash=1192750)
+checking 'erodeGreyScale' ... OK (hash=627634.7)
+checking 'dilateGreyScale' ... OK (hash=708558.7)
+checking 'whiteTopHatGreyScale' ... OK (hash=13588.63)
+checking 'selfcomplementaryTopHatGreyScale' ... OK (hash=5314.178)
+checking 'channel' ... OK (hash=6058968)
+checking 'rgbImage' ... OK (hash=4035726)
+checking 'combine' ... OK (hash=2697590)
+checking 'tile' ... OK (hash=3846811)
+checking 'untile' ... OK (hash=3139255)
+checking 'computeFeatures' ... OK (hash=3632398)
 
-imageData(object)[1:5,1:6]:
-     [,1] [,2] [,3] [,4]  [,5] [,6]
-[1,] TRUE TRUE TRUE TRUE  TRUE TRUE
-[2,] TRUE TRUE TRUE TRUE  TRUE TRUE
-[3,] TRUE TRUE TRUE TRUE  TRUE TRUE
-[4,] TRUE TRUE TRUE TRUE  TRUE TRUE
-[5,] TRUE TRUE TRUE TRUE FALSE TRUE
-
-OK (hash=0)
-checking '>' ... OK (hash=39171428)
-checking '+' ... OK (hash=78342856)
-checking '/' ... OK (hash=19585714)
-checking 'getNumberOfFrames' ... OK (hash=1)
-checking 'writeImage' ... OK (hash=NA)
-checking 'resize' ... OK (hash=215965530)
-checking 'rotate' ... OK (hash=36960233)
-checking 'flip' ... OK (hash=42791268)
-checking 'flop' ... OK (hash=39068192)
-checking 'translate' ... OK (hash=38504713)
-checking 'transpose' ... OK (hash=47522694)
-checking 'thresh' ... OK (hash=35967569)
-checking 'gblur' ... FAILED
-checking 'normalize' ... OK (hash=39171428)
-checking 'filter2' ... OK (hash=1882880)
-checking 'erode' ... OK (hash=19874718)
-checking 'dilate' ... OK (hash=65605139)
-checking 'opening' ... OK (hash=32358128)
-checking 'closing' ... OK (hash=43302337)
-checking 'distmap' ... OK (hash=105751790)
-checking 'watershed' ... OK (hash=350934323)
-checking 'floodFill' ... OK (hash=36055081)
-checking 'fillHull' ... OK (hash=39615366)
-checking 'bwlabel' ... OK (hash=1992660245)
-checking 'channel' ... OK (hash=202880356)
-checking 'channel' ... OK (hash=363077676)
-checking 'channel' ... OK (hash=40343629)
-checking 'channel' ... OK (hash=42791268)
-checking 'channel' ... OK (hash=NA)
-checking 'combine' ... OK (hash=363077676)
-checking 'tile' ... OK (hash=1052490457)
-checking 'untile' ... OK (hash=1063121342)
-checking 'reenumerate' ... OK (hash=718366481)
-checking 'hullFeatures' ... OK (hash=6524854)
-checking 'rmObjects' ... OK (hash=284644560)
-checking 'getFeatures' ... OK (hash=314221321)
-checking 'paintObjects' ... OK (hash=26467155)
-
-Warning messages:
-1: In hash(y) : NAs introduced by coercion
-2: In hash(y) : NAs introduced by coercion
 > 
-> ## Image - Color - 1 image  - 3 dim - numeric
-> testEBImageFunctions(lenacolor)
-new test (hash=522787501)
-checking 'print' ... Image
-  colormode: Color 
-  storage.mode: double 
-  dim: 128 128 3 
-  nb.total.frames: 3 
-  nb.render.frames: 1 
-
-imageData(object)[1:5,1:6,1]:
-          [,1]      [,2]      [,3]      [,4]      [,5]      [,6]
-[1,] 0.8862745 0.8862745 0.8823529 0.8901961 0.8941176 0.8784314
-[2,] 0.8862745 0.8862745 0.8823529 0.8901961 0.8823529 0.8823529
-[3,] 0.8901961 0.8901961 0.8862745 0.8784314 0.8823529 0.8823529
-[4,] 0.8745098 0.8745098 0.8745098 0.8941176 0.8823529 0.8941176
-[5,] 0.8666667 0.8666667 0.8901961 0.8862745 0.8823529 0.9058824
-
-OK (hash=0)
-checking '>' ... OK (hash=372312531)
-checking '+' ... OK (hash=895100032)
-checking '/' ... OK (hash=261393751)
-checking 'getNumberOfFrames' ... OK (hash=1)
-checking 'writeImage' ... OK (hash=NA)
-checking 'resize' ... OK (hash=2880089815)
-checking 'rotate' ... OK (hash=466319655)
-checking 'flip' ... OK (hash=533942992)
-checking 'flop' ... OK (hash=522671866)
-checking 'translate' ... OK (hash=514169866)
-checking 'transpose' ... OK (hash=535664493)
-checking 'thresh' ... OK (hash=502612080)
-checking 'median' ... OK (hash=0.4666667)
-checking 'gblur' ... FAILED
-checking 'normalize' ... OK (hash=559369020)
-checking 'filter2' ... OK (hash=6139264)
-checking 'erode' ... OK (hash=199682385)
-checking 'dilate' ... OK (hash=625914875)
-checking 'opening' ... OK (hash=288039479)
-checking 'closing' ... OK (hash=428956439)
-checking 'distmap' ... OK (hash=1477468218)
-checking 'watershed' ... OK (hash=3742266665)
-checking 'floodFill' ... OK (hash=567708450)
-checking 'fillHull' ... OK (hash=392578365)
-checking 'bwlabel' ... OK (hash=22609023965)
-checking 'channel' ... OK (hash=65626043)
-checking 'channel' ... OK (hash=50335501)
-checking 'channel' ... OK (hash=NA)
-checking 'combine' ... OK (hash=5211305197)
-checking 'tile' ... OK (hash=10695516194)
-checking 'untile' ... OK (hash=11511661564)
-checking 'reenumerate' ... OK (hash=11261019240)
-checking 'hullFeatures' ... OK (hash=49754029)
-checking 'rmObjects' ... OK (hash=2473184949)
-checking 'getFeatures' ... OK (hash=1000316559)
-checking 'paintObjects' ... OK (hash=479640327)
-
-Warning messages:
-1: In hash(y) : NAs introduced by coercion
-2: In hash(y) : NAs introduced by coercion
-> 
-> ## Image - Color - 2 images - 4 dim - numeric
-> x=combine(lenacolor, lenacolor)
+> ## test: color 2D
+> x <- readImage(system.file("images","lena-color.png", package="EBImage"))[1:67, 1:17,]
 > testEBImageFunctions(x)
-new test (hash=2259889233)
-checking 'print' ... Image
-  colormode: Color 
-  storage.mode: double 
-  dim: 128 128 3 2 
-  nb.total.frames: 6 
-  nb.render.frames: 2 
+new test (hash=2906472)
+checking '>' ... OK (hash=2057460)
+checking '+' ... OK (hash=5812943)
+checking '/' ... OK (hash=1453236)
+checking 'transpose' ... OK (hash=2884426)
+checking 'median' ... OK (hash=0.4176471)
+checking 'Image' ... OK (hash=2906472)
+checking 'as.Image' ... OK (hash=2906472)
+checking 'is.Image' ... OK (hash=0.9)
+checking 'imageData' ... OK (hash=2906472)
+checking 'imageData<-' ... OK (hash=2906472)
+checking 'colorMode<-' ... OK (hash=2906472)
+checking 'getNumberOfFrames' ... OK (hash=0.9)
+checking '[' ... OK (hash=11981.28)
+checking 'resize' ... OK (hash=19974971)
+checking 'rotate' ... OK (hash=1624704)
+checking 'flip' ... OK (hash=2918634)
+checking 'flop' ... OK (hash=2909976)
+checking 'translate' ... OK (hash=1660361)
+checking 'affine' ... OK (hash=229401.6)
+checking 'thresh' ... OK (hash=1773976)
+checking 'ocontour' ... OK (hash=773259.8)
+checking 'bwlabel' ... OK (hash=3722843)
+checking 'rmObjects' ... OK (hash=649229.9)
+checking 'reenumerate' ... OK (hash=3073613)
+checking 'normalize' ... OK (hash=3806553)
+checking 'gblur' ... OK (hash=2909484)
+checking 'filter2' ... OK (hash=72720322)
+checking 'medianFilter' ... OK (hash=2906472)
+checking 'erode' ... OK (hash=1453403)
+checking 'dilate' ... OK (hash=2448154)
+checking 'distmap' ... OK (hash=Inf)
+checking 'watershed' ... OK (hash=2894076)
+checking 'floodFill' ... OK (hash=3060333)
+checking 'fillHull' ... OK (hash=2191791)
+checking 'erodeGreyScale' ... OK (hash=2693268)
+checking 'dilateGreyScale' ... OK (hash=3097664)
+checking 'whiteTopHatGreyScale' ... OK (hash=91389.01)
+checking 'selfcomplementaryTopHatGreyScale' ... OK (hash=148854.6)
+checking 'channel' ... OK (hash=2906472)
+checking 'rgbImage' ... OK (hash=12609190)
+checking 'combine' ... OK (hash=12798162)
+checking 'tile' ... OK (hash=19503786)
+checking 'untile' ... OK (hash=13989412)
+checking 'computeFeatures' ... OK (hash=233118.9)
 
-imageData(object)[1:5,1:6,1,1]:
-          [,1]      [,2]      [,3]      [,4]      [,5]      [,6]
-[1,] 0.8862745 0.8862745 0.8823529 0.8901961 0.8941176 0.8784314
-[2,] 0.8862745 0.8862745 0.8823529 0.8901961 0.8823529 0.8823529
-[3,] 0.8901961 0.8901961 0.8862745 0.8784314 0.8823529 0.8823529
-[4,] 0.8745098 0.8745098 0.8745098 0.8941176 0.8823529 0.8941176
-[5,] 0.8666667 0.8666667 0.8901961 0.8862745 0.8823529 0.9058824
-
-OK (hash=0)
-checking '>' ... OK (hash=1814025126)
-checking '+' ... OK (hash=4073914359)
-checking '/' ... OK (hash=1129944617)
-checking 'getNumberOfFrames' ... OK (hash=2)
-checking 'writeImage' ... OK (hash=NA)
-checking 'resize' ... OK (hash=12450507153)
-checking 'rotate' ... OK (hash=2006935518)
-checking 'flip' ... OK (hash=2282200216)
-checking 'flop' ... OK (hash=2259657963)
-checking 'translate' ... OK (hash=2224982373)
-checking 'transpose' ... OK (hash=2285643218)
-checking 'thresh' ... OK (hash=2035056864)
-checking 'median' ... OK (hash=0.4666667)
-checking 'gblur' ... FAILED
-checking 'normalize' ... OK (hash=2330989943)
-checking 'filter2' ... OK (hash=12278528)
-checking 'erode' ... OK (hash=1140724386)
-checking 'dilate' ... OK (hash=2749982710)
-checking 'opening' ... OK (hash=1510212718)
-checking 'closing' ... OK (hash=2035496494)
-checking 'distmap' ... OK (hash=12461113647)
-checking 'watershed' ... OK (hash=14181100114)
-checking 'floodFill' ... OK (hash=2174785091)
-checking 'fillHull' ... OK (hash=1922140794)
-checking 'bwlabel' ... OK (hash=74249136058)
-checking 'channel' ... OK (hash=266175890)
-checking 'channel' ... OK (hash=204858720)
-checking 'channel' ... OK (hash=NA)
-checking 'combine' ... OK (hash=21351438472)
-checking 'tile' ... OK (hash=20128251731)
-checking 'untile' ... OK (hash=21045916887)
-checking 'reenumerate' ... OK (hash=42197534928)
-checking 'hullFeatures' ... OK (hash=165465537)
-checking 'rmObjects' ... OK (hash=9958792554)
-checking 'getFeatures' ... OK (hash=3310273425)
-checking 'paintObjects' ... OK (hash=2132035037)
-
-Warning messages:
-1: In hash(y) : NAs introduced by coercion
-2: In hash(y) : NAs introduced by coercion
 > 
-> ## matrix - 2 images - 3 dim - numeric
-> x=imageData(lena)
-> x=combine(x, x)
+> ## test: color 3D
+> x <- readImage(system.file("images","lena-color.png", package="EBImage"))[1:41, 1:18,]
+> x <- combine(x, x)
 > testEBImageFunctions(x)
-new test (hash=204858720)
-checking '>' ... OK (hash=160197320)
-checking '+' ... OK (hash=365056040)
-checking '/' ... OK (hash=102429360)
-checking 'getNumberOfFrames' ... OK (hash=2)
-checking 'writeImage' ... OK (hash=NA)
-checking 'resize' ... OK (hash=1128761234)
-checking 'rotate' ... OK (hash=184305774)
-checking 'flip' ... OK (hash=212018966)
-checking 'flop' ... OK (hash=204744629)
-checking 'translate' ... OK (hash=201415687)
-checking 'transpose' ... OK (hash=215655660)
-checking 'thresh' ... OK (hash=231755950)
-checking 'median' ... OK (hash=0.3803922)
-checking 'gblur' ... FAILED
-checking 'normalize' ... OK (hash=222053999)
-checking 'filter2' ... OK (hash=4209860)
-checking 'erode' ... OK (hash=82380604)
-checking 'dilate' ... OK (hash=262478886)
-checking 'opening' ... OK (hash=133922272)
-checking 'closing' ... OK (hash=176552834)
-checking 'distmap' ... OK (hash=435332184)
-checking 'watershed' ... OK (hash=1386572390)
-checking 'floodFill' ... OK (hash=146993234)
-checking 'fillHull' ... OK (hash=162592524)
-checking 'bwlabel' ... OK (hash=6809791018)
-checking 'channel' ... OK (hash=829985036)
-checking 'channel' ... OK (hash=1864828792)
-checking 'channel' ... OK (hash=207207439)
-checking 'channel' ... OK (hash=212018966)
-checking 'channel' ... OK (hash=NA)
-checking 'combine' ... OK (hash=1864828792)
-checking 'tile' ... OK (hash=1959673274)
-checking 'untile' ... OK (hash=1861083829)
-checking 'reenumerate' ... OK (hash=3691187746)
-checking 'hullFeatures' ... OK (hash=19574563)
-checking 'rmObjects' ... OK (hash=1141074336)
-checking 'getFeatures' ... OK (hash=425551915)
-checking 'paintObjects' ... OK (hash=174324161)
+new test (hash=5506686)
+checking '>' ... OK (hash=4890280)
+checking '+' ... OK (hash=11013373)
+checking '/' ... OK (hash=2753343)
+checking 'transpose' ... OK (hash=5510074)
+checking 'median' ... OK (hash=0.4137255)
+checking 'Image' ... OK (hash=5506686)
+checking 'as.Image' ... OK (hash=5506686)
+checking 'is.Image' ... OK (hash=0.9)
+checking 'imageData' ... OK (hash=5506686)
+checking 'imageData<-' ... OK (hash=5506686)
+checking 'colorMode<-' ... OK (hash=5506686)
+checking 'getNumberOfFrames' ... OK (hash=1.9)
+checking '[' ... OK (hash=51835.01)
+checking 'resize' ... OK (hash=90110193)
+checking 'rotate' ... OK (hash=3999057)
+checking 'flip' ... OK (hash=5512107)
+checking 'flop' ... OK (hash=5506599)
+checking 'translate' ... OK (hash=3094953)
+checking 'affine' ... OK (hash=589294.3)
+checking 'thresh' ... OK (hash=2900466)
+checking 'ocontour' ... OK (hash=298907.8)
+checking 'bwlabel' ... OK (hash=7264428)
+checking 'rmObjects' ... OK (hash=272690.9)
+checking 'reenumerate' ... OK (hash=5085114)
+checking 'normalize' ... OK (hash=4207650)
+checking 'gblur' ... OK (hash=5507715)
+checking 'filter2' ... OK (hash=137686941)
+checking 'erode' ... OK (hash=3391888)
+checking 'dilate' ... OK (hash=5615028)
+checking 'distmap' ... OK (hash=Inf)
+checking 'watershed' ... OK (hash=5974596)
+checking 'floodFill' ... OK (hash=5188430)
+checking 'fillHull' ... OK (hash=5253376)
+checking 'erodeGreyScale' ... OK (hash=5123645)
+checking 'dilateGreyScale' ... OK (hash=5764578)
+checking 'whiteTopHatGreyScale' ... OK (hash=140101.3)
+checking 'selfcomplementaryTopHatGreyScale' ... OK (hash=144311.9)
+checking 'channel' ... OK (hash=5506686)
+checking 'rgbImage' ... OK (hash=29219740)
+checking 'combine' ... OK (hash=23011968)
+checking 'tile' ... OK (hash=7079260)
+checking 'untile' ... OK (hash=4536552)
+checking 'computeFeatures' ... OK (hash=235567)
 
-Warning messages:
-1: In hash(y) : NAs introduced by coercion
-2: In hash(y) : NAs introduced by coercion
+> 
+> ## test: logical 2D
+> x <- readImage(system.file("images","lena.png", package="EBImage"))[1:32, 1:50]>0.5
+> testEBImageFunctions(x)
+new test (hash=1138592)
+checking '>' ... OK (hash=1138592)
+checking '+' ... OK (hash=2277184)
+checking '/' ... OK (hash=569295.9)
+checking 'transpose' ... OK (hash=1064532)
+checking 'Image' ... OK (hash=1138592)
+checking 'as.Image' ... OK (hash=1138592)
+checking 'is.Image' ... OK (hash=0.9)
+checking 'imageData' ... OK (hash=1138592)
+checking 'imageData<-' ... OK (hash=1138592)
+checking 'colorMode<-' ... OK (hash=1138592)
+checking 'getNumberOfFrames' ... OK (hash=0.9)
+checking '[' ... OK (hash=2484.9)
+checking 'resize' ... OK (hash=4003708)
+checking 'rotate' ... OK (hash=814130.9)
+checking 'flip' ... OK (hash=1080128)
+checking 'flop' ... OK (hash=1140459)
+checking 'translate' ... OK (hash=755568.9)
+checking 'affine' ... OK (hash=35786.4)
+checking 'thresh' ... OK (hash=659965.9)
+checking 'ocontour' ... OK (hash=2110077)
+checking 'bwlabel' ... OK (hash=1236120)
+checking 'rmObjects' ... OK (hash=1215179)
+checking 'reenumerate' ... OK (hash=1236120)
+checking 'normalize' ... OK (hash=1138592)
+checking 'gblur' ... OK (hash=1147556)
+checking 'filter2' ... OK (hash=28644160)
+checking 'medianFilter' ... OK (hash=1138592)
+checking 'erode' ... OK (hash=842776.9)
+checking 'dilate' ... OK (hash=1255542)
+checking 'distmap' ... OK (hash=5976133)
+checking 'watershed' ... OK (hash=1138592)
+checking 'floodFill' ... OK (hash=580201.4)
+checking 'fillHull' ... OK (hash=1192750)
+checking 'erodeGreyScale' ... OK (hash=763447.9)
+checking 'dilateGreyScale' ... OK (hash=1255542)
+checking 'whiteTopHatGreyScale' ... OK (hash=142227.9)
+checking 'selfcomplementaryTopHatGreyScale' ... OK (hash=189465.9)
+checking 'channel' ... OK (hash=10073376)
+checking 'rgbImage' ... OK (hash=4496384)
+checking 'combine' ... OK (hash=4496384)
+checking 'tile' ... OK (hash=4839749)
+checking 'untile' ... OK (hash=3809740)
+checking 'computeFeatures' ... OK (hash=13376840)
+
 > 

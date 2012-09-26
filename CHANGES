@@ -1,12 +1,11 @@
-version 3.99.14:
+version 3.99.17:
 - removed all dependencies towards GTK+ and ImageMagick
+- deprecated: blur, equalize,
 - deprecated: drawtext, drawfont
 - deprecated: getFeatures, hullFeatures, zernikeMoments, edgeProfile, edgeFeatures
 - deprecated: haralickFeatures, haralickMatrix
 - deprecated: moments, smoments, rmoments, cmoments
-- overhauled: tests.R
-- todo: rewrite spatial man pages
-- todo: remove last warnings
+- overhauled the testing procedure in tests/test.R
 
 3.99.2
 - bumped version from 4.0.1 to 3.99.2 to prepare the future 4.0.0 version

@@ -61,8 +61,7 @@ display = function(...) if (interactive()) EBImage::display(...)
 @
 
 The function \Rfunction{readImage} is able to read images from files
-or URLs. The supported image formats depend on the capabilities of the
-underlying \Rpackage{ImageMagick} library.
+or URLs. Current supported image formats are JPEG, PNG and TIFF.
 
 <<readImage1>>=
 f = system.file("images", "lena.png", package="EBImage")
@@ -464,27 +463,13 @@ writeImage(nuch2, 'nuch2.jpeg', quality=85)
 \end{center}
 \end{figure}
 
-Objects features like hull features, shape descriptors, moments, centers,
-texture descriptors are extracted using \code{hullFeatures}, \code{moments}
-and \code{getFeatures} for more complex features. Nucleus centers
-are here extracted to obtain nuclei coordinates, which are used to
-draw the nucleus indexes.
+A broad variety of objects features (basic, image moments, shape, Haralick features) can
+be computed using \code{computeFeatures}. In particular, object
+coordinates are computed with the function \code{computeFeatures.moment}.
 << manip2 >>=
-xy = hullFeatures(nuclabel3)[, c('g.x', 'g.y')]
-font = drawfont(weight=600, size=16)
-nuctext = drawtext(nuch2, xy=xy, labels=as.character(1:nrow(xy)), font=font, col="yellow")
+xy = computeFeatures.moment(nuclabel3)[, c("m.cx", "m.cy")]
+xy[1:4,]
 @
-<<manip2h,echo=FALSE>>=
-writeImage(nuctext, 'nuctext.jpeg', quality=85)
-@
-
-\begin{figure}[!h]
-\begin{center}
-\includegraphics[width=0.49\textwidth]{nuc-0.jpeg}
-\includegraphics[width=0.49\textwidth]{nuctext.jpeg}
-\caption{Original \code{nuc}, segmented \code{nuctext}}
-\end{center}
-\end{figure}
 
 \pagebreak
 \newpage
@@ -577,16 +562,11 @@ writeImage(cmask/max(cmask), 'cmask.png')
 \end{center}
 \end{figure}
 
-Cells are outlined using \code{paintObjects} and labels are printed
-using \code{hullFeatures} and \code{drawtext}.
+Cells are outlined using \code{paintObjects}.
 
 << cs4 >>=
 res = paintObjects(cmask, img, col='#ff00ff')
 res = paintObjects(nmask, res, col='#ffff00')
-xy = lapply(hullFeatures(cmask), function(hf) hf[, c('g.x', 'g.y')])
-labels = lapply(xy, function(z) as.character(1:nrow(z)))
-font = drawfont(weight=600, size=16)
-res = drawtext(res, xy=xy, labels=labels , font=font, col="white")
 @
 <<cs4h, echo=FALSE>>=
 writeImage(res, 'res.jpeg', quality=85)

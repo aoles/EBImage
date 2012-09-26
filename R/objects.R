@@ -32,25 +32,20 @@ paintObjects = function (x, tgt, opac=c(1, 1), col=c('red', NA)) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-stackObjects = function (x, ref, index, combine=TRUE, rotate, bg.col='black', ext, centerby, rotateby) {
+stackObjects = function (x, ref, combine=TRUE, bg.col='black', ext) {
+  ## check arguments
   checkCompatibleImages(x, ref, 'render')
   nz = getNumberOfFrames(x, 0)
-  
   if (colorMode(x) != Grayscale) stop("'x' must be an image in 'Grayscale' color mode or an array")
-  if (!missing(centerby)) warning("'centerby' is deprecated and ignored") 
-  if (!missing(rotateby)) warning("'rotateby' is deprecated and ignored")
-  if (!missing(rotate)) warning("'rotate' is deprecated and ignored. Please use 'rotate' objects after 'stackObjects'.")
-  if (!missing(index)) warning("'index' is deprecated and ignored")
     
-  ## uses 'hullFeatures' to get centers and theta
-  hf = hullFeatures(x)
-  if (nz==1) hf = list(hf)
+  ## uses 'computeFeatures.moment' to get centers and theta
+  hf = lapply(seq_len(nz), function(i) computeFeatures.moment(getFrame(x, i)))
 
   if (missing(ext)) {
-    extx = unlist(sapply(hf, function(h) h[, 'g.l1']))
-    ext = 2.0*sqrt(quantile(extx, 0.98, na.rm=TRUE))
+    ext = unlist(sapply(hf, function(h) h[, 'm.majoraxis']))/2
+    ext = quantile(ext, 0.98, na.rm=TRUE)
   }
-  xy = lapply(hf, function(h) h[,c('g.x', 'g.y'), drop=FALSE])
+  xy = lapply(hf, function(h) h[,c('m.cx', 'm.cy'), drop=FALSE])
   if (nz==1) xy = xy[[1]]
   bg.col = Image(bg.col, colormode=colorMode(ref))
     

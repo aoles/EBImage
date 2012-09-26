@@ -50,11 +50,8 @@ testEBImageFunctions <- function(x) {
   
   ## subset
   sub <- list(x, 1:10, 1:7)
-  if (length(dim(x))>2) sub <- c(sub, length(dim(x))-2)
+  if (length(dim(x))>2) sub <- c(sub, rep(TRUE, length(dim(x))-2))
   z <- do.call("check", c("[", sub))
-
-  ## I/O
-  check("writeImage", x, "test.png")
 
   ## statial transform
   z <- check("resize", x, 137, 22)
@@ -68,15 +65,15 @@ testEBImageFunctions <- function(x) {
   z <- check("thresh", x)
   z <- check("ocontour", x>0.5)
   y <- check("bwlabel", x>0.5)
-  ## z <- check("rmObjects", y, 3)
+  z <- check("rmObjects", getFrame(y, 1), 3)
   z <- check("reenumerate", y)
-  z <- check("paintObjects", y, x)
+  z <- paintObjects(channel(y, "gray"), x)
   
   ## filtering
   z <- check("normalize", x)
   z <- check("gblur", x, sigma=2)
   z <- check("filter2", x, array(1, dim=c(5, 5)))
-  z <- check("medianFilter", x, 3)
+  if (length(dim(x))<=3) z <- check("medianFilter", x, 3)
   
   ## morphological operations
   y <- x>0.5
@@ -101,7 +98,8 @@ testEBImageFunctions <- function(x) {
   z <- check("untile", y, c(2,2))
   
   ## features
-  z <- check("computeFeatures", bwlabel(x>0.5), x, expandRef=NULL)
+  y <- getFrame(x, 1)
+  z <- check("computeFeatures", bwlabel(y>0.5), y, expandRef=NULL)
   cat("\n")
 }
 
@@ -110,14 +108,14 @@ x <- readImage(system.file("images","lena.png", package="EBImage"))[1:32, 1:50]
 testEBImageFunctions(x)
 
 ## test: color 2D
-x <- readImage(system.file("images","lena-color.png", package="EBImage"))[1:32, 1:50,]
+x <- readImage(system.file("images","lena-color.png", package="EBImage"))[1:67, 1:17,]
 testEBImageFunctions(x)
 
 ## test: color 3D
-x <- readImage(system.file("images","lena-color.png", package="EBImage"))[1:32, 1:50,]
+x <- readImage(system.file("images","lena-color.png", package="EBImage"))[1:41, 1:18,]
 x <- combine(x, x)
 testEBImageFunctions(x)
 
 ## test: logical 2D
-x <- readImage(system.file("images","lena-color.png", package="EBImage"))[1:32, 1:50,]
-testEBImageFunctions(x>0.5)
+x <- readImage(system.file("images","lena.png", package="EBImage"))[1:32, 1:50]>0.5
+testEBImageFunctions(x)

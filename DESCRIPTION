@@ -1,10 +1,9 @@
 Package: EBImage
-Version: 3.99.16
+Version: 3.99.17
 Date: 2012-09-25
 Title: Image processing toolbox for R
 Author: Gregoire Pau, Andrzej Oles, Mike Smith, Oleg Sklyar, Wolfgang Huber
 Maintainer: Gregoire Pau <paug@gene.com>
-SystemRequirements: ImageMagick (>= 6.3.7), GTK+ (> 2.6)
 Depends:
 Imports: methods, graphics, stats, abind, utils, tiff, jpeg, png
 Description: EBImage is an R package which provides general purpose functionality for the reading, writing, processing and analysis of images. Furthermore, in the context of microscopy based cellular assays, EBImage offers tools to transform the images, segment cells and extract quantitative cellular descriptors.

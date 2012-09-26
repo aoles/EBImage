@@ -11,7 +11,7 @@
 }
 
 \usage{
-  stackObjects(x, ref, index, combine=TRUE, rotate, bg.col='black', ext, centerby, rotateby)
+  stackObjects(x, ref, combine=TRUE, bg.col='black', ext)
 }
 
 \arguments{
@@ -27,10 +27,8 @@
 
   \item{bg.col}{Background pixel color.}
 
-  \item{ext}{A numeric controlling the size of the output simage.
-    If missing, \code{ext} is estimated from data. See details.}
- 
-   \item{index, rotate, centerby, rotateby}{Deprecated.}
+  \item{ext}{A numeric controlling the size of the output simage. 
+   If missing, \code{ext} is estimated from data. See details.}
 }
 
 \value{
@@ -47,11 +45,11 @@
   
   If not specified, \code{ext} is estimated using the 95\% quantile of
   2*sqrt(\code{g.l1}), where \code{g.l1} is the semi-major axis
-  descriptor extracted from \code{hullFeatures}, taken over
+  descriptor extracted from \code{computeFeatures.moment}, taken over
   all the objects of the image \code{x}.
 }
 
-\seealso{ \code{\link{combine}}, \code{\link{tile}}, \code{\link{hullFeatures}} 
+\seealso{ \code{\link{combine}}, \code{\link{tile}}, \code{\link{computeFeatures.moment}} 
 }
 
 \examples{
