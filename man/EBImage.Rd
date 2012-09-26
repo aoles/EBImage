@@ -24,20 +24,20 @@
     \item \code{colorMode}, \code{imageData}
     \item \code{getFrame}, \code{getNumberOfFrames}
   }
-  
+
   Image I/O, display
   \itemize{
     \item \code{readImage}, \code{writeImage}
     \item \code{display}
     \item \code{image}
   }
-  
+
   Spatial transforms
   \itemize{
-    \item \code{resize}, \code{flip}, \code{flop}
+    \item \code{resize}, \code{flip}, \code{flop}, \code{transpose}
     \item \code{rotate}, \code{translate}, \code{affine}
   }
-  
+
   Image segmentation, objects manipulation
   \itemize{
     \item \code{thresh}, \code{bwlabel}
@@ -45,13 +45,13 @@
     \item \code{ocontour}
     \item \code{paintObjects}, \code{rmObjects}, \code{reenumerate}
   }
-  
+
   Image enhancement, filtering
   \itemize{
     \item \code{normalize}
     \item \code{filter2}, \code{gblur}, \code{medianFilter}
   }
-  
+
   Morphological operations
   \itemize{
     \item \code{makeBrush}
@@ -61,24 +61,24 @@
     \item \code{distmap}
     \item \code{floodFill}, \code{fillHull}
   }
-  
+
   Colorspace manipulation
   \itemize{  
     \item \code{rgbImage}, \code{channel}
   }
-  
+
   Image stacking, combining, tiling
   \itemize{ 
     \item \code{stackObjects}
     \item \code{combine}
     \item \code{tile}, \code{untile}
   }
-  
+
   Drawing on images
   \itemize{
     \item \code{drawCircle}
   }
-    
+
   Features extraction
   \itemize{
     \item \code{computeFeatures}
@@ -95,7 +95,7 @@
     \item \code{haralickFeatures}, \code{haralickMatrix}
     \item \code{moments}, \code{cmoments}, \code{smoments}, \code{rmoments}
   }
-}	
+}
 
 \section{Authors}{
 
@@ -130,7 +130,7 @@
   License, or (at your option) any later version. This library is distributed
   in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
   the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- 
+
   See the GNU Lesser General Public License for more details. For LGPL license 
   wording see \url{http://www.gnu.org/licenses/lgpl.html}
 }

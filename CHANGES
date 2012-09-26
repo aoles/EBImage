@@ -1,3 +1,8 @@
+version 3.99.18:
+- re-added 'transpose' to unit tests
+- JavaScript viewer: cleaner and improved code, exit help using either ESC or Q
+- documentation: some corrections to style and typos, added a note on 'colormode = Color' for GA images
+
 version 3.99.17:
 - removed all dependencies towards GTK+ and ImageMagick
 - deprecated: blur, equalize,

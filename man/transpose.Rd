@@ -26,7 +26,7 @@ The transposition of an image is performed by swapping the X and Y indices of it
 }
 
 \note{
-\code{transpose} is particularly useful when converting between different representation of image data in which the X and Y dimensions are swapped. Typically, in such context only the actual pixel data matters. For performance reasons it is best practice to issue the function directly on an \code{Image} object with \code{coerce = TRUE} rather than to extract its image data first and only then perform the transposition, or to transpose the \code{Image} object and coerce it to an array afterwards.
+\code{transpose} is particularly useful when converting between different representations of image data in which the X and Y dimensions are swapped. Typically, in such context only the actual pixel data matters. For performance reasons it is best practice to issue the function directly on an \code{Image} object with \code{coerce = TRUE} rather than to extract its image data first and only then perform the transposition, or to transpose the \code{Image} object and coerce it to an array afterwards.
 }
 
 \author{

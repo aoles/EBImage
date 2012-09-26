@@ -18,8 +18,8 @@
 
 \arguments{
   \item{files}{a character vector of file names or URLs.}
-  \item{type}{image type (optional). Supported values are: \code{jpeg}, \code{png}, and \code{tiff}. If missing, file format is automatically deducted from filename extensions.}
-  \item{all}{logical: when the file contains more than one image should all frames be read, or only the first frame?}
+  \item{type}{image type (optional). Supported values are: \code{jpeg}, \code{png}, and \code{tiff}. If missing, file format is automatically determined by filename extension.}
+  \item{all}{logical: when the file contains more than one image should all frames be read, or only the first one?}
   \item{x}{an \code{Image} object or an array.} 
   \item{bits.per.sample}{a numeric scalar specifying the number of bits per sample (only for \code{tiff} files). Supported values are 8 and 16.}
   \item{compression}{the desired compression algorithm (only for \code{tiff} files). For a list of supported values refer to the \code{\link{writeTIFF}} function from the \pkg{tiff} package.}
@@ -34,11 +34,11 @@
 }
 
 \details{
-\code{readImage} loads all images from the \code{files} vector and returns them stacked into a single \code{Image} object containing an array of doubles ranging from 0 (black) to 1 (white). All images need to be of the same \code{type} and have the same dimensions and colormode. If \code{type} is missing, the appropriate file format is deducted from the file name extension. The \code{colormode} is determined automatically. When the function fails to read an image it skips to the next item issuing a warning message. Non-local files can be read directly from a valid URL.
+\code{readImage} loads all images from the \code{files} vector and returns them stacked into a single \code{Image} object containing an array of doubles ranging from 0 (black) to 1 (white). All images need to be of the same \code{type} and have the same dimensions and color mode. If \code{type} is missing, the appropriate file format is determined from filename extension. Color mode is determined automatically based on the number of channels. When the function fails to read an image it skips to the next element of the \code{files} vector issuing a warning message. Non-local files can be read directly from a valid URL.
 
-  \code{writeImage} writes images into the files specified in \code{files}. The number of \code{files} need to be equal 1 or the number of frames. When the image contains multiple frames and only a single filename is specified either the whole stack is written into a single TIFF file, or each frame is saved to an individual JPEG/PNG file named \code{frame-X}, where \code{X} is the frame number less one (note that for an image containing \code{n} frame this results in filenames numbered from 0 to \code{n-1}). 
+  \code{writeImage} writes images into files specified in \code{files}, were the number of \code{files} need to be equal 1 or the number of frames. Given an image containing multiple frames and a single filename either the whole stack is written into a single TIFF file, or each frame is saved to an individual JPEG/PNG file (for \code{files = "image.*"} frames are saved into \code{image-X.*} files, where \code{X} is the frame number less one; for an image containing \code{n} frames this results in filenames numbered from 0 to \code{n-1}). 
 
-  When writing saving JPEG files the compression quality can be specified using \code{quality}. Valid values range from 100 (highest quality) to 1 (lowest quality). For TIFF images additional information on the desired number of bits per sample (\code{bits.per.sample}) and the compression algorithm (\code{compression}) can be provided. For a complete list of supported values please refer to the documentation of the \pkg{tiff} package.
+  When writing JPEG files the compression quality can be specified using \code{quality}. Valid values range from 100 (highest quality) to 1 (lowest quality). For TIFF files additional information about the desired number of bits per sample (\code{bits.per.sample}) and the compression algorithm (\code{compression}) can be provided. For a complete list of supported values please refer to the documentation of the \pkg{tiff} package.
 }
 
 \note{
@@ -46,11 +46,7 @@
 }
 
 \seealso{
-  \code{\link{Image}}, \code{\link{display}}
-}
-
-\references{
-  \code{\link{writeJPEG}}, \code{\link{writePNG}}, \code{\link{writeTIFF}}
+  \code{\link{Image}}, \code{\link{display}}, \code{\link{readJPEG}}/\code{\link{writeJPEG}},  \code{\link{readPNG}}/\code{\link{writePNG}}, \code{\link{readTIFF}}/\code{\link{writeTIFF}}
 }
 
 \author{

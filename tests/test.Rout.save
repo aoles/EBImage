@@ -1,5 +1,5 @@
 
-R version 2.15.0 (2012-03-30)
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
 Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-unknown-linux-gnu (64-bit)
@@ -35,17 +35,17 @@ Type 'q()' to quit R.
 > ## try to evaluate fun(x,...) 
 > check <- function(fun, x, ...) {
 +   passed <- TRUE
-+   
++ 
 +   cat("checking \'", fun, "\' ... ", sep="")
 +   y=try(do.call(fun,c(list(x),list(...))), silent=TRUE)
 +   if (class(y)=="try-error" || ( is.Image(y) && !validObject(y)) ) {
 +     y <- NULL
 +     passed <- FALSE
 +   }
-+   
++ 
 +   if (passed) cat("OK (hash=", hash(y), ")\n", sep="") 
 +   else cat("FAILED\n")
-+    
++ 
 +   y
 + }
 > 
@@ -58,7 +58,7 @@ Type 'q()' to quit R.
 +   z <- check("/", x, 2)
 +   z <- check("transpose", x)
 +   if (mode(x)!="logical") z <- check("median", x)
-+   
++ 
 +   ## image methods
 +   z <- check("Image", x, colormode=Color)
 +   z <- check("as.Image", x)
@@ -67,19 +67,20 @@ Type 'q()' to quit R.
 +   z <- check("imageData<-", x, z)
 +   z <- check("colorMode<-", x, Grayscale)
 +   z <- check("getNumberOfFrames", x, type="render")
-+   
++ 
 +   ## subset
 +   sub <- list(x, 1:10, 1:7)
 +   if (length(dim(x))>2) sub <- c(sub, rep(TRUE, length(dim(x))-2))
 +   z <- do.call("check", c("[", sub))
 + 
-+   ## statial transform
++   ## spatial transform
 +   z <- check("resize", x, 137, 22)
 +   z <- check("rotate", x, 20)
 +   z <- check("flip", x)
 +   z <- check("flop", x)
 +   z <- check("translate", x, c(-7, 5))
 +   z <- check("affine", x, matrix(c(-7, 5, 0.1, -0.2, 0.3, 1), ncol=2))
++   z <- check("transpose", x)
 + 
 +   ## segmentation
 +   z <- check("thresh", x)
@@ -88,13 +89,13 @@ Type 'q()' to quit R.
 +   z <- check("rmObjects", getFrame(y, 1), 3)
 +   z <- check("reenumerate", y)
 +   z <- paintObjects(channel(y, "gray"), x)
-+   
++ 
 +   ## filtering
 +   z <- check("normalize", x)
 +   z <- check("gblur", x, sigma=2)
 +   z <- check("filter2", x, array(1, dim=c(5, 5)))
 +   if (length(dim(x))<=3) z <- check("medianFilter", x, 3)
-+   
++ 
 +   ## morphological operations
 +   y <- x>0.5
 +   z <- check("erode", y)
@@ -107,16 +108,16 @@ Type 'q()' to quit R.
 +   z <- check("dilateGreyScale", x)
 +   z <- check("whiteTopHatGreyScale", x)
 +   z <- check("selfcomplementaryTopHatGreyScale", x)
-+   
++ 
 +   ## colorspace
 +   z <- check("channel", x, "rgb")
 +   z <- check("rgbImage", x, x>0.5)
-+   
++ 
 +   ## image stacking, combining, tiling
 +   z <- check("combine", x, x)
 +   y <- check("tile", x, nx=2)
 +   z <- check("untile", y, c(2,2))
-+   
++ 
 +   ## features
 +   y <- getFrame(x, 1)
 +   z <- check("computeFeatures", bwlabel(y>0.5), y, expandRef=NULL)
@@ -146,6 +147,7 @@ checking 'flip' ... OK (hash=664660.3)
 checking 'flop' ... OK (hash=677900.4)
 checking 'translate' ... OK (hash=432339.5)
 checking 'affine' ... OK (hash=22143.49)
+checking 'transpose' ... OK (hash=672316.3)
 checking 'thresh' ... OK (hash=318475.9)
 checking 'ocontour' ... OK (hash=2110077)
 checking 'bwlabel' ... OK (hash=1236120)
@@ -196,6 +198,7 @@ checking 'flip' ... OK (hash=2918634)
 checking 'flop' ... OK (hash=2909976)
 checking 'translate' ... OK (hash=1660361)
 checking 'affine' ... OK (hash=229401.6)
+checking 'transpose' ... OK (hash=2884426)
 checking 'thresh' ... OK (hash=1773976)
 checking 'ocontour' ... OK (hash=773259.8)
 checking 'bwlabel' ... OK (hash=3722843)
@@ -247,6 +250,7 @@ checking 'flip' ... OK (hash=5512107)
 checking 'flop' ... OK (hash=5506599)
 checking 'translate' ... OK (hash=3094953)
 checking 'affine' ... OK (hash=589294.3)
+checking 'transpose' ... OK (hash=5510074)
 checking 'thresh' ... OK (hash=2900466)
 checking 'ocontour' ... OK (hash=298907.8)
 checking 'bwlabel' ... OK (hash=7264428)
@@ -295,6 +299,7 @@ checking 'flip' ... OK (hash=1080128)
 checking 'flop' ... OK (hash=1140459)
 checking 'translate' ... OK (hash=755568.9)
 checking 'affine' ... OK (hash=35786.4)
+checking 'transpose' ... OK (hash=1064532)
 checking 'thresh' ... OK (hash=659965.9)
 checking 'ocontour' ... OK (hash=2110077)
 checking 'bwlabel' ... OK (hash=1236120)

@@ -72,9 +72,9 @@ displayRaster = function(image, frame, all = FALSE){
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 displayInBrowser = function(x, title){
   ## template and script files
-  templateFile = system.file("code","display.template", package = "EBImage")
-  cssFile = system.file("code","display.css", package = "EBImage")
-  scriptFile = system.file("code","script.js", package = "EBImage")
+  templateFile = system.file("viewer","display.template", package = "EBImage")
+  cssFile = system.file("viewer","display.css", package = "EBImage")
+  scriptFile = system.file("viewer","viewer.js", package = "EBImage")
   tempDir = tempfile("",,"")
   htmlFile = "display.html"
   imageFile = tempfile("",tempDir,".png")

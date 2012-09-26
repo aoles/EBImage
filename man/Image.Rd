@@ -35,14 +35,13 @@
   uses the \code{colormode} slot to store how the color information of
   the multi-dimensional data is handled.
 
-  The \code{colormode} slot could be either \code{Grayscale} or \code{Color}. In both modes, the
-  two first dimensions of the underlying array are understood to be the spatial
+  The \code{colormode} slot could be either \code{Grayscale} or \code{Color}. Greyscale images containing an alpha channel are stored with \code{colormode = Color}. In both modes, the first two dimensions of the underlying array are understood to be the spatial
   dimensions of the image. In the \code{Grayscale} mode, the remaining dimensions
-  contain other images. In the the \code{Color} mode, the third dimension contains
-  the red, green and blue channels of the image and the remaining dimensions contain
+  contain other images. In the the \code{Color} mode, the third dimension contains color channels of the image: either
+  the red, green, blue and, possibly, alpha channel, or the grey and alpha channels; the remaining dimensions contain
   other images.
 
-  All methods of the package \code{EBImage} works either with \code{Image} objects or
+  All methods of the package \code{EBImage} work either with \code{Image} objects or
   multi-dimensional arrays but in the latter case, the color mode is assumed to be
   \code{Grayscale}.
 }
