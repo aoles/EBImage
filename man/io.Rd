@@ -22,7 +22,7 @@
   \item{all}{logical: when the file contains more than one image should all frames be read, or only the first one?}
   \item{x}{an \code{Image} object or an array.} 
   \item{bits.per.sample}{a numeric scalar specifying the number of bits per sample (only for \code{tiff} files). Supported values are 8 and 16.}
-  \item{compression}{the desired compression algorithm (only for \code{tiff} files). For a list of supported values refer to the \code{\link{writeTIFF}} function from the \pkg{tiff} package.}
+  \item{compression}{the desired compression algorithm (only for \code{tiff} files). For a list of supported values consult the documentation of the \code{\link{writeTIFF}} function from the \pkg{tiff} package.}
   \item{quality}{a numeric ranging from 1 to 100 (default) controlling the quality of the JPEG output.}
   \item{\dots}{arguments passed to the corresponding functions from the \pkg{jpeg}, \pkg{png}, and \pkg{tiff} packages.}
 }
@@ -38,7 +38,7 @@
 
   \code{writeImage} writes images into files specified in \code{files}, were the number of \code{files} need to be equal 1 or the number of frames. Given an image containing multiple frames and a single filename either the whole stack is written into a single TIFF file, or each frame is saved to an individual JPEG/PNG file (for \code{files = "image.*"} frames are saved into \code{image-X.*} files, where \code{X} is the frame number less one; for an image containing \code{n} frames this results in filenames numbered from 0 to \code{n-1}). 
 
-  When writing JPEG files the compression quality can be specified using \code{quality}. Valid values range from 100 (highest quality) to 1 (lowest quality). For TIFF files additional information about the desired number of bits per sample (\code{bits.per.sample}) and the compression algorithm (\code{compression}) can be provided. For a complete list of supported values please refer to the documentation of the \pkg{tiff} package.
+  When writing JPEG files the compression quality can be specified using \code{quality}. Valid values range from 100 (highest quality) to 1 (lowest quality). For TIFF files additional information about the desired number of bits per sample (\code{bits.per.sample}) and the compression algorithm (\code{compression}) can be provided. For a complete list of supported values please consult the documentation of the \pkg{tiff} package.
 }
 
 \note{

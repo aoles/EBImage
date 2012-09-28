@@ -45,7 +45,10 @@ If \code{method = "raster"} images are displayed using R's built-in \code{raster
 \examples{
   ## Display a single image
   x = readImage(system.file("images", "lena-color.png", package="EBImage"))
-  if (interactive()) display(x, method = "raster")
+  if (interactive()) {
+    display(x, "Lena")
+    display(x, method = "raster")
+  }
 
   ## Display a thresholded sequence ...
   y = readImage(system.file("images", "lena.png", package="EBImage"))

@@ -6,7 +6,5 @@
   <link rel="stylesheet" type="text/css" href="./display.css">
   <script type="text/javascript" src="./viewer.js"></script>
  </head>
- <body onload="new Viewer('IMAGE', FRAMES, WIDTH, HEIGHT);">
-  <div id="viewer"></div>
- </body>
+ <body onload="new Viewer('IMAGE', FRAMES, WIDTH, HEIGHT);"></body>
 </html>

@@ -1,3 +1,7 @@
+version 3.99.19:
+- JavaScript viewer: cleaner code with some bugs fixed
+- removed unused files from 'scripts/'
+
 version 3.99.18:
 - re-added 'transpose' to unit tests
 - JavaScript viewer: cleaner and improved code, exit help using either ESC or Q
