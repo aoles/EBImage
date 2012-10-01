@@ -5,8 +5,9 @@
 \section{Changes in version 3.99.19}{
   \subsection{SIGNIFICANT USER-VISIBLE CHANGES}{
     \itemize{
-      \item improved JavaScript image viewer with some bugs fixed
+      \item improved JavaScript image viewer with some minor bugs fixed
       \item removed unused files from 'scripts/'
+      \item added 'NEWS.Rd'
     }
   }
 }
@@ -14,8 +15,8 @@
 \section{Changes in version 3.99.18}{
   \subsection{SIGNIFICANT USER-VISIBLE CHANGES}{
     \itemize{
+      \item further improvements to the JavaScript image viewer; exit on-screen help using either 'ESC' or 'Q'
       \item added 'transpose' to unit tests
-      \item some improvements to the JavaScript image viewer; exit on-screen help using either 'ESC' or 'Q'
     }
   }
 }
@@ -37,7 +38,7 @@
 \section{Changes in version 3.99.16}{
   \subsection{BUG FIXES}{
     \itemize{
-      \item JavaScript image viewer: CSS fix disabling bilinear filtering of rescaled images
+      \item CSS fix disabling bilinear filtering of rescaled images in the JavaScript image viewer
     }
   }
 }
@@ -53,7 +54,7 @@
 \section{Changes in version 3.99.13}{
   \subsection{SIGNIFICANT USER-VISIBLE CHANGES}{
     \itemize{
-      \item Improved JavaScript image viewer with upgraded user interface
+      \item improved JavaScript image viewer with upgraded user interface
     }
   }
 }
@@ -61,7 +62,7 @@
 \section{Changes in version 3.99.12}{
   \subsection{SIGNIFICANT USER-VISIBLE CHANGES}{
     \itemize{
-      \item renamed 'swapXY' function to 'transpose'
+      \item renamed 'swapXY' to 'transpose'
       \item updated documentation on 'transpose', 'readImage', writeImage', and 'display'
     }
   }
@@ -107,7 +108,7 @@
   }
   \subsection{BUG FIXES}{
     \itemize{
-      \item JavaScript image viewer: disabled bilinear filtering of rescaled images
+      \item disabled bilinear filtering of rescaled images in the JavaScript image viewer
       \item a warning message in the 'displayRaster' function was triggered for single-frame images
     }
   }
@@ -139,7 +140,7 @@
 \section{Changes in version 3.99.4}{
   \subsection{SIGNIFICANT USER-VISIBLE CHANGES}{
     \itemize{
-      \item the new 'readImage' function can now read directly from URLs
+      \item 'readImage' can now read directly from URLs
       \item some fixes and improvements to 'displayRaster'
     }
   }
@@ -166,9 +167,9 @@
       \item bumped version from 4.0.1 to 3.99.2 to prepare the future 4.0.0 version
       \item refactored the functions, not using ImageMagick any longer: 'translate', 'affine', 'rotate', 'resize'
       \item removed 'animate'
-      \item deprecated: 'blur', 'equalize'
-      \item modified 'getFrame' function: improved performance
-      \item modified 'as.raster' function
+      \item deprecated 'blur' and 'equalize'
+      \item modified 'getFrame': improved performance
+      \item modified 'as.raster'
       \item 'inst/images/lena.gif' is now 'inst/images/lena.png' (preparing for dropping GIF support)
     }
   }
@@ -187,7 +188,7 @@
   }
   \subsection{BUG FIXES}{
     \itemize{
-      \item occurences of partial argument matching that 'R CMD check' had complained about
+      \item occurrences of partial argument matching that 'R CMD check' had complained about
     }
   }
 }
