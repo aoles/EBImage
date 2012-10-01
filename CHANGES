@@ -1,11 +1,11 @@
-version 3.99.19:
-- JavaScript viewer: cleaner code with some bugs fixed
+version 3.99.19
+- improved JavaScript image viewer with some minor bugs fixed
 - removed unused files from 'scripts/'
+- added 'NEWS.Rd'
 
-version 3.99.18:
-- re-added 'transpose' to unit tests
-- JavaScript viewer: cleaner and improved code, exit help using either ESC or Q
-- documentation: some corrections to style and typos, added a note on 'colormode = Color' for GA images
+version 3.99.18
+- further improvements to the JavaScript image viewer; exit on-screen help using either 'ESC' or 'Q'
+- added 'transpose' to unit tests
 
 version 3.99.17:
 - removed all dependencies towards GTK+ and ImageMagick
@@ -16,7 +16,57 @@ version 3.99.17:
 - deprecated: moments, smoments, rmoments, cmoments
 - overhauled the testing procedure in tests/test.R
 
-3.99.2
+version 3.99.16
+- CSS fix disabling bilinear filtering of rescaled images in the JavaScript image viewer
+
+version 3.99.15
+- numerous improvements and bug fixes to the JavaScript image viewer, including: on-screen help displayed by pressing 'H', and fixed mouse wheel action (now consistent behavior across browsers and platforms)
+
+version 3.99.14
+- minor documentation updates
+
+version 3.99.13
+- improved JavaScript image viewer with upgraded user interface
+
+version 3.99.12
+- renamed 'swapXY' to 'transpose'
+- updated documentation on 'transpose', 'readImage', writeImage', and 'display'
+
+version 3.99.11
+- better argument handling in the 'display' function
+- a message rather than a warning is now issued when displaying multiframe images using the 'raster' method
+- range clipping to [0:1] in 'writeImage'
+
+version 3.99.10
+- improved 'getFrame' function: better performance by reassigning array dimension only when needed
+
+version 3.99.9
+- 'font-face' misspelling in 'display.template'
+- restored the original 'getFrame' function
+
+version 3.99.8
+- substituted the former GTK+ based 'display' function by the new one relying on 'displayInBrowser' and 'displayRaster' functions
+- substituted all calls to 'paste0' by 'paste'
+- disabled bilinear filtering of rescaled images in the JavaScript image viewer
+- fixed a minor bug in the 'displayRaster' function: a warning message was triggered for single-frame images
+
+version 3.99.7
+- changed handling of greyscale images containing an alpha channel (aka. GA): instead of discarding the second channel and reading pixel data into a 'Greyscale' Image both channels are now stored in a 'Color' Image
+- removed 'readImageOld' and 'writeImageOld'
+- removed 'inst/scripts/newAgainstOld.R'
+- updated 'inst/scripts/readWriteTest.R'
+
+version 3.99.5
+- new 'displayInBrowser' function: preview of the new JavaScript based image viewer
+
+version 3.99.4
+- readImage' can now read directly from URLs
+- some fixes and improvements to 'displayRaster'
+
+version 3.99.3
+- replaced 'readImage' and 'writeImage' by the new 'readImage2' and 'writeImage2' functions; moved the previous ones to 'readImageOld' and 'writeImageOld'
+
+version 3.99.2
 - bumped version from 4.0.1 to 3.99.2 to prepare the future 4.0.0 version
 - refactored the functions, not using ImageMagick any longer: translate, affine, rotate, resize
 - removed: animate
@@ -25,11 +75,23 @@ version 3.99.17:
 - todo: overhaul the unit tests
 - todo: remove the old moment generating functions: hullFeatures...
 - todo: remove last dependencies to IM
+- fixed a bug in 'erode'/'dilate' functions: incorrect range of loop indices caused memory reads from outside the kernel vector
+- added 'readImage2' and 'writeImage2' functions: candidates for replacing the original ImageMagick based I/O functions
+- added 'swapXY' function swapping the first two indices of an image array during I/O operations
+- added 'displayRaster' function displaying images using R graphics
+- modified 'getFrame': improved performance
+- modified 'as.raster'
+- 'inst/images/lena.gif' is now 'inst/images/lena.png' (preparing for dropping GIF support)
+- in '/inst/scripts/': scripts for testing the new read/write functions against the former ones using test images from the on-line EBImage Test Images repository (http://www-huber.embl.de/EBImage/ExampleImages/)
 
-3.13.1
+version 3.13.2
+- deprecated 'equalize'
+- fixed occurences of partial argument matching that 'R CMD check' had complained about
+
+version 3.13.1
 - fixed a bug in ImageMagickCall that cause some matrices not to be normalized to [0;1] before IM calls
 
-3.13.0
+version 3.13.0
 - addition of greyscale functions for computation of the self-complementary top-hat (I. Kats)
 - a median filter based on Perreault's constant time median filter (J. Barry)
 
