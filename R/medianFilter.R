@@ -17,7 +17,7 @@ medianFilter = function(x, size, cacheSize=512) {
   x=as.Image(x)
  }
  else {
-  z=as.Image(.Call('medianFilter', x, size, colorMode(x)+1, cacheSize))
+  x=as.Image(.Call('medianFilter', x, size, colorMode(x)+1, cacheSize))
  }
  colorMode(x)=colMode
  # map back to [0,1] and add offset
