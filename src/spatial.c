@@ -3,7 +3,7 @@
 #include "spatial.h"
 #include "tools.h"
 
-inline double peekpixel(int tx, int ty, int z, int width, int height, double *a) {
+static inline double peekpixel(int tx, int ty, int z, int width, int height, double *a) {
   double v;
   if (tx<0) v=0;
   else if (ty<0) v=0;
