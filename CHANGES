@@ -1,3 +1,6 @@
+version 4.1.1
+- "inline double peekpixel" has been changed to "static inline double peekpixel", to be C99 compatible (thanks to Nathan Coulter)
+
 version 3.99.19
 - improved JavaScript image viewer with some minor bugs fixed
 - removed unused files from 'scripts/'
