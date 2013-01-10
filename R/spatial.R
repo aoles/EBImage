@@ -59,7 +59,7 @@ translate <- function(x, v, filter="none", output.dim) {
 resize <- function(x, w, h, filter="bilinear", output.dim, output.origin=c(0, 0)) {
   ## check arguments
   if (missing(h) && missing(w))  stop("'w' or 'h' must be specified")
-  if (missing(w)) w <- round(h*dim(x)[2]/dim(x)[1])
+  if (missing(w)) w <- round(h*dim(x)[1]/dim(x)[2])
   if (missing(h)) h <- round(w*dim(x)[2]/dim(x)[1])
   if (missing(output.dim)) output.dim <- c(w, h)
   if (length(output.origin)!=2 || !is.numeric(output.origin)) stop("'output.origin' must be a numeric vector of length 2")

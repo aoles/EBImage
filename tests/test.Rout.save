@@ -1,5 +1,5 @@
 
-R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+R version 2.15.2 (2012-10-26) -- "Trick or Treat"
 Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-unknown-linux-gnu (64-bit)
@@ -156,7 +156,7 @@ checking 'reenumerate' ... OK (hash=1236120)
 checking 'normalize' ... OK (hash=762286.7)
 checking 'gblur' ... OK (hash=677963.2)
 checking 'filter2' ... OK (hash=16949548)
-checking 'medianFilter' ... OK (hash=677933.5)
+checking 'medianFilter' ... OK (hash=677813)
 checking 'erode' ... OK (hash=842776.9)
 checking 'dilate' ... OK (hash=1255542)
 checking 'distmap' ... OK (hash=5976133)
@@ -207,7 +207,7 @@ checking 'reenumerate' ... OK (hash=3073613)
 checking 'normalize' ... OK (hash=3806553)
 checking 'gblur' ... OK (hash=2909484)
 checking 'filter2' ... OK (hash=72720322)
-checking 'medianFilter' ... OK (hash=2906472)
+checking 'medianFilter' ... OK (hash=2934638)
 checking 'erode' ... OK (hash=1453403)
 checking 'dilate' ... OK (hash=2448154)
 checking 'distmap' ... OK (hash=Inf)
@@ -308,7 +308,7 @@ checking 'reenumerate' ... OK (hash=1236120)
 checking 'normalize' ... OK (hash=1138592)
 checking 'gblur' ... OK (hash=1147556)
 checking 'filter2' ... OK (hash=28644160)
-checking 'medianFilter' ... OK (hash=1138592)
+checking 'medianFilter' ... OK (hash=1280800)
 checking 'erode' ... OK (hash=842776.9)
 checking 'dilate' ... OK (hash=1255542)
 checking 'distmap' ... OK (hash=5976133)
