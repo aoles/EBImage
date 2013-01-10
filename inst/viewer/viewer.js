@@ -215,14 +215,14 @@ function Viewer(image, frames, width, height){
 		var mousePos = getMouseXY(event);
 		var imagePos = getObjectXY(image);
 		var zoomFactor = getZoomFactor();
-		return [Math.floor((mousePos[0]-imagePos[0])/zoomFactor), Math.floor((mousePos[1]-imagePos[1])/zoomFactor)];
+		return [Math.floor((mousePos[0]-imagePos[0])/zoomFactor) + 1, Math.floor((mousePos[1]-imagePos[1])/zoomFactor) + 1];
 	}
 
 	updatePixelPosition = function(event) {
 		event = preProcessEvent(event);
 
 		var pixelPos = getPixelPosition(event);
-		(pixelPos[0]<0 || pixelPos[1]<0 || pixelPos[0]>=originalWidth || pixelPos[1]>=originalHeight) ? clearStatusField("Position") : updateStatusField("Position", '('+pixelPos+')');
+		(pixelPos[0]<1 || pixelPos[1]<1 || pixelPos[0]>originalWidth || pixelPos[1]>originalHeight) ? clearStatusField("Position") : updateStatusField("Position", '('+pixelPos+')');
 	}
 
 	clearPixelPosition = function(event) {

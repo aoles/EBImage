@@ -1,3 +1,7 @@
+version 4.1.2
+- fixed a bug in the 'resize' function causing the new image width to be calculated incorrectly when only height was provided (reported by Bernd Fischer)
+- the range of pixel coordinates displayed in the Javascript viewer is now (1,1):(w,h) rather than (0,0):(w-1,h-1) and matches the indices of the corresponding Image array
+
 version 4.1.1
 - "inline double peekpixel" has been changed to "static inline double peekpixel", to be C99 compatible (thanks to Nathan Coulter)
 
