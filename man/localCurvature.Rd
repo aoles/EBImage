@@ -5,7 +5,7 @@
 \title{Local Curvature}
 
 \description{
-  Computes signed curvature along a connected line segment.
+  Computes signed curvature along a line.
 }
 
 \usage{
@@ -14,8 +14,9 @@
 
 \arguments{
   \item{x}{A data frame or matrix of dimensions N x 2 containing the coordinates 
-    of the connected line segment, where N is the number of points. The first column 
-    should give the x coordinates and the second column the y coordinates.
+    of the line, where N is the number of points. The points should be ordered according 
+    to their position on the line. The columns should contain the x and y coordinates. 
+    The curvature calculation is unaffected by any permutation of the columns.
     Directly accepts a list element from \code{ocontour}.}
   \item{h}{Specifies the length of the smoothing window. See \code{locfit::lp} for more details.}
   \item{maxk}{See \code{locfit::locfit.raw} for details.}
