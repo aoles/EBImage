@@ -10,6 +10,7 @@ importFrom("abind", "abind")
 importFrom("tiff", "readTIFF", "writeTIFF")
 importFrom("jpeg", "readJPEG", "writeJPEG")
 importFrom("png", "readPNG", "writePNG")
+importFrom("locfit", "lp", "locfit")
 
 ## classes
 exportClasses(Image)
@@ -70,6 +71,7 @@ export(drawCircle)
 export(computeFeatures)
 export(computeFeatures.basic, computeFeatures.shape, computeFeatures.moment, computeFeatures.haralick)
 export(standardExpandRef)
+export(localCurvature)
 
 ## deprecated
 export(blur, equalize)
