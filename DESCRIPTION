@@ -1,5 +1,5 @@
 Package: EBImage
-Version: 4.1.3
+Version: 4.1.4
 Title: Image processing toolbox for R
 Author: Gregoire Pau, Andrzej Oles, Mike Smith, Oleg Sklyar, Wolfgang Huber
 Maintainer: Gregoire Pau <paug@gene.com>

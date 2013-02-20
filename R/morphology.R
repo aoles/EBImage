@@ -13,8 +13,13 @@ distmap = function (x, metric=c('euclidean', 'manhattan')) {
 }
 
 makeBrush = function(size, shape=c('box', 'disc', 'diamond', 'gaussian', 'line'), step=TRUE, sigma=0.3, angle=45) {
-  if(! (is.numeric(size) && (length(size)==1L) && (size>=1)) ) stop("'size' must be a numeric of length 1 with value >=1.")
+  if(! (is.numeric(size) && (length(size)==1L) && (size>=1)) ) stop("'size' must be an odd integer.")
   shape=match.arg(shape)
+  
+  if(size %% 2 == 0){
+    size = size + 1
+    warning(paste("'size' was rounded to the next odd number: ", size))
+  }
   
   if (shape=='box') z = array(1,dim=c(size,size))
   else if (shape == 'line') {
