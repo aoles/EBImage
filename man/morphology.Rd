@@ -47,7 +47,8 @@
     pixels of value 0 are considered as background ones and other pixels as
     foreground ones.}
   
-  \item{size}{A numeric containing the size of the brush, in pixels. If shape is \code{line}, this represents the length of the line.}
+  \item{size}{A numeric containing the size of the brush in pixels. This should be an odd number; even numbers are rounded to the next odd one, i.e., \code{size = 4} has the same effect as  \code{size = 5}. If shape is \code{line}, \code{size} represents the length of the line.}
+  
   \item{shape}{A character vector indicating the shape of the brush. Can
     be \code{box}, \code{disc}, \code{diamond}, \code{gaussian} or \code{line}. Default is
     \code{box}.}
