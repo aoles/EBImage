@@ -64,11 +64,12 @@ testEBImageFunctions <- function(x) {
 
   ## segmentation
   z <- check("thresh", x)
-  z <- check("ocontour", x>0.5)
   y <- check("bwlabel", x>0.5)
   z <- check("rmObjects", getFrame(y, 1), 3)
   z <- check("reenumerate", y)
   z <- paintObjects(channel(y, "gray"), x)
+  y <- check("ocontour", x>0.5)
+  z <- check("localCurvature", y[[1]])
 
   ## filtering
   z <- check("normalize", x)
