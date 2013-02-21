@@ -37,7 +37,7 @@
 }
 
 \seealso{
-  \code{link{ocontour}}
+  \code{\link{ocontour}}
 }
 
 \examples{
