@@ -316,8 +316,7 @@ writeImage = function (x, files, type, quality=100, bits.per.sample, compression
   
   else {
     x = castImage(x) ## if needed change storage mode to double 
-    x[x>1] = 1
-    x[x<0] = 0
+    x = clipImage(x)
 
     if ( lf==1 && nf>1 ) {
       ## store all frames into a single TIFF file
@@ -634,8 +633,7 @@ parseColorMode = function(colormode) {
 ## returns the raster representation of an image (by default the first frame)
 as.raster.Image = function(y, i=1) {
   f = getFrame(y, i, type='render')
-  f[f<0] = 0	
-  f[f>1] = 1  
+  f = clipImage(f)
   ## get image data with swapped XY dimensions
   a = transpose(f, coerce = TRUE)
   ## the actual raster representation

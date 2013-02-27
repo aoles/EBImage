@@ -27,6 +27,13 @@ castImage=function(x) {
   x
 }
 
+## clip pixel data to the [0,1] range
+clipImage = function(x) {
+  x[x<0] = 0
+  x[x>1] = 1
+  x
+}
+
 ## check if x (indexing image) and ref (image) are compatible
 checkCompatibleImages=function(x, ref, type='total') {
   xn = paste(deparse(substitute(x)))

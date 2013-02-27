@@ -1,3 +1,6 @@
+version 4.1.5
+- fixed a bug int the 'medianFilter' function caused by incorrect [0:1] <> integer range conversion
+
 version 4.1.4
 - fixed a bug in the 'erode'/'dilate' functions introduced by the previous fix in version 3.99.2
 

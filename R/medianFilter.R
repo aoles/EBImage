@@ -4,9 +4,9 @@ medianFilter = function(x, size, cacheSize=512) {
  if (any(is.na(x))) stop("'x' shouldn't contain any NAs")
  validImage(x)
  colMode=colorMode(x)
- # convert from [0,1] to integer range
- # offset subtraction prevents problems with saturated pixels
- x=x*2**16-1
+ # clip image data to [0,1] range and covert to integer range
+ x = clipImage(x)
+ x=x*(2^16-1)
  x=castImage(x)
  trueDim=dim(x)
  effDimLength=length(dim(x))-ifelse(colorMode(x)==2,1,0)
@@ -20,6 +20,6 @@ medianFilter = function(x, size, cacheSize=512) {
   x=as.Image(.Call('medianFilter', x, size, colorMode(x)+1, cacheSize))
  }
  colorMode(x)=colMode
- # map back to [0,1] and add offset
- return((x+1)/2**16)
+ # map back to [0,1] range
+ return(x/(2^16-1))
 }
