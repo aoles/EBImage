@@ -36,8 +36,8 @@ clipImage = function(x) {
 
 ## check if x (indexing image) and ref (image) are compatible
 checkCompatibleImages=function(x, ref, type='total') {
-  xn = paste(deparse(substitute(x)))
-  refn = paste(deparse(substitute(ref)))
+  xn = deparse(substitute(x), width.cutoff = 500L, nlines = 1)
+  refn = deparse(substitute(ref), width.cutoff = 500L, nlines = 1)
   validImage(x)
   if (!missing(ref)) {
     validImage(ref)
