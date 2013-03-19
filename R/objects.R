@@ -15,7 +15,7 @@
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 paintObjects = function (x, tgt, opac=c(1, 1), col=c('red', NA)) {
   validImage(x)
-  if (colorMode(x)!=Grayscale)  stop("'", paste(deparse(substitute(x))), "' must be in 'Grayscale' color mode")
+  if (colorMode(x)!=Grayscale)  stop("'", deparse(substitute(x), width.cutoff = 500L, nlines = 1), "' must be in 'Grayscale' color mode")
   if (any(dim(x)[1:2] != dim(tgt)[1:2])) stop( "'x' and 'tgt' must have the same size" )
   if (getNumberOfFrames(x,'render') != getNumberOfFrames(tgt,'render')) stop( "'x' and 'tgt' must have the same number of render frames" )                           
 

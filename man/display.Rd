@@ -11,7 +11,7 @@
 }
 
 \usage{
-display(x, title = paste(deparse(substitute(x))), method = c("browser", "raster"), frame, all = FALSE)
+display(x, title = deparse(substitute(x), width.cutoff = 500L, nlines = 1), method = c("browser", "raster"), frame, all = FALSE)
 }
 
 \arguments{

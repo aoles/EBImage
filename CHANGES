@@ -1,5 +1,10 @@
+version 4.1.6
+- fixed long argument handling in 'deparse()' by adding 'width.cutoff' and 'nlines'
+- changed brush size in the 'morphology.Rd' from 100 to 99
+- maintainer changed
+
 version 4.1.5
-- fixed a bug int the 'medianFilter' function caused by incorrect [0:1] <> integer range conversion
+- fixed a bug in the 'medianFilter' function caused by incorrect [0:1] <> integer range conversion
 
 version 4.1.4
 - fixed a bug in the 'erode'/'dilate' functions introduced by the previous fix in version 3.99.2

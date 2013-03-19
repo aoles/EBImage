@@ -122,12 +122,12 @@
     if (interactive()) display(dilate(x, kern), title='Dilatation of x')
 
     ## makeBrush 
-    x = makeBrush(100, shape='diamond')
-    if (interactive()) display(x, title="makeBrush(100, shape='diamond')")
-    x = makeBrush(100, shape='disc', step=FALSE)
-    if (interactive()) display(x, title="makeBrush(100, shape='disc', step=FALSE)")
-    x = makeBrush(100, shape='gaussian', sigma=10)
-    if (interactive()) display(2000*x, title="makeBrush(100, shape='gaussian', sigma=10)")
+    x = makeBrush(99, shape='diamond')
+    if (interactive()) display(x, title="makeBrush(99, shape='diamond')")
+    x = makeBrush(99, shape='disc', step=FALSE)
+    if (interactive()) display(x, title="makeBrush(99, shape='disc', step=FALSE)")
+    x = makeBrush(99, shape='gaussian', sigma=10)
+    if (interactive()) display(2000*x, title="makeBrush(99, shape='gaussian', sigma=10)")
 }
 
 \references{
