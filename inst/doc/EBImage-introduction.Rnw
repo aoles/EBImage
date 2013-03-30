@@ -1,5 +1,4 @@
-
-% \VignetteIndexEntry{Introduction to EBImage}
+%\VignetteIndexEntry{Introduction to EBImage}
 %\VignetteKeywords{image processing, visualization}
 %\VignettePackage{EBImage}
 
@@ -12,11 +11,7 @@
 \usepackage{color}
 \definecolor{darkblue}{rgb}{0.2,0.0,0.4}
 
-\topmargin -1.5cm
-\oddsidemargin -0cm   % read Lamport p.163
-\evensidemargin -0cm  % same as oddsidemargin but for left-hand pages
-\textwidth 17cm
-\textheight 24.5cm
+\usepackage[a4paper,left=2.2cm,top=2.2cm,bottom=2.8cm,right=2.2cm,ignoreheadfoot]{geometry}
 
 \newcommand{\lib}[1]{{\mbox{\normalfont\textsf{#1}}}}
 \newcommand{\file}[1]{{\mbox{\normalfont\textsf{'#1'}}}}

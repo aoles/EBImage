@@ -1,3 +1,6 @@
+version 4.1.7
+- updated 'NEWS.Rd' and vignette papersize
+
 version 4.1.6
 - fixed long argument handling in 'deparse()' by adding 'width.cutoff' and 'nlines'
 - changed brush size in the 'morphology.Rd' from 100 to 99
