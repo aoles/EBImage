@@ -1,3 +1,6 @@
+version 4.3.1
+- fixed the redefinition of default arguments in C function templates which triggered errors in the clang compiler
+
 version 4.1.7
 - updated 'NEWS.Rd' and vignette papersize
 
