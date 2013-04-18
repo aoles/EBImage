@@ -18,7 +18,7 @@ struct XYPoint {
   int x, y;
 };
 
-template <class T> void _floodFill(T*, XYPoint, XYPoint, T, double tol=1e-3);
+template <class T> void _floodFill(T*, XYPoint, XYPoint, T, double tol = 1e-3);
 // void fillHull(int *, const XYPoint &);
 template <class T> void _fillHullT(T *, const XYPoint &);
 
@@ -171,7 +171,7 @@ typedef PopCheckStack<XYPoint> XYStack;
 */
 
 template <class T>void 
-_floodFill(T *m, XYPoint size, XYPoint xy, T rc, double tol=1e-3) {
+_floodFill(T *m, XYPoint size, XYPoint xy, T rc, double tol) {
   XYStack s, offsets;
   XYPoint pt = xy;
   bool spanLeft,spanRight,offset=false;
