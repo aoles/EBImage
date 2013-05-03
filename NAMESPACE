@@ -1,5 +1,6 @@
 useDynLib("EBImage")
 
+importFrom("BiocGenerics", "normalize")
 importFrom("methods", "Ops")
 importFrom("methods", "show")
 importFrom("graphics", "image")
@@ -45,7 +46,6 @@ export(median.Image, quantile.Image)
 exportMethods(hist)
 
 ## image enhancement, filtering
-export(normalize)
 export(filter2)
 export(gblur)
 export(medianFilter)
@@ -80,3 +80,6 @@ export(getFeatures, hullFeatures, zernikeMoments)
 export(edgeProfile, edgeFeatures)
 export(haralickFeatures, haralickMatrix)
 export(moments, cmoments, smoments, rmoments)
+
+## methods extending S4 generics from the BiocGenerics package
+exportMethods(normalize)
