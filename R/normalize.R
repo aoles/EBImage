@@ -2,8 +2,7 @@ normalize.Image = function(object, separate = TRUE, ft = c(0, 1)) {
   validImage(object)
   ft <- as.numeric (ft)
   if ( diff(ft) == 0 ) stop("normalization range is 0")
-  separate <- as.integer(separate)
-  object = .Call("normalize", castImage(object), separate, ft, PACKAGE='EBImage')
+  object = .Call("normalize", castImage(object), as.integer(separate), ft, PACKAGE='EBImage')
   return(object)
 }
 

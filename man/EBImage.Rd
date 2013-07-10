@@ -105,7 +105,7 @@
 
   Wolfgang Huber, \email{huber@ebi.ac.uk}
 
-  Andrzej Oles, \email{andrzej.oles@gmail.com}
+  Andrzej Oles, \email{andrzej.oles@embl.de}
 
   Mike Smith, \email{msmith@ebi.ac.uk}
 

@@ -35,11 +35,11 @@ If \code{method = "raster"} images are displayed using R's built-in \code{raster
 \note{For viewing images in a WWW browser a compatible browser with JavaScript enabled is required (e.g. Mozilla Firefox).}
 
 \author{
-  Andrzej Oles, \email{andrzej.oles@gmail.com}, 2012
+  Andrzej Oles, \email{andrzej.oles@embl.de}, 2012
 }
 
 \references{
-  Mozilla Firefox: \url{http://www.firefox.com}
+  \href{http://www.firefox.com}{Mozilla Firefox}
 }
 
 \examples{
