@@ -50,7 +50,7 @@
 }
 
 \author{
-  Andrzej Oles, \email{andrzej.oles@gmail.com}, 2012
+  Andrzej Oles, \email{andrzej.oles@embl.de}, 2012
 }
 
 \examples{

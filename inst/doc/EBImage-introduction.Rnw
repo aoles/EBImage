@@ -4,30 +4,25 @@
 
 \documentclass[10pt,a4paper]{article}
 
+<<style, echo=FALSE, results=tex>>=
+BiocStyle::latex()
+@ 
+
 \RequirePackage{amsfonts,amsmath,amstext,amssymb,amscd}
-\usepackage{graphicx}
-\usepackage{verbatim}
-\usepackage{hyperref}
-\usepackage{color}
-\definecolor{darkblue}{rgb}{0.2,0.0,0.4}
+\RequirePackage{graphicx}
+\RequirePackage{verbatim}
+\RequirePackage{hyperref}
 
-\usepackage[a4paper,left=2.2cm,top=2.2cm,bottom=2.8cm,right=2.2cm,ignoreheadfoot]{geometry}
+\newcommand{\code}[1]{\Rcode{#1}} % mapping to BiocStyle
 
-\newcommand{\lib}[1]{{\mbox{\normalfont\textsf{#1}}}}
-\newcommand{\file}[1]{{\mbox{\normalfont\textsf{'#1'}}}}
-\newcommand{\R}{{\mbox{\normalfont\textsf{R}}}}
-\newcommand{\Rfunction}[1]{{\mbox{\normalfont\texttt{#1}}}}
-\newcommand{\Robject}[1]{{\mbox{\normalfont\texttt{#1}}}}
-\newcommand{\Rpackage}[1]{{\mbox{\normalfont\textsf{#1}}}}
-\newcommand{\Rclass}[1]{{\mbox{\normalfont\textit{#1}}}}
-\newcommand{\code}[1]{{\mbox{\normalfont\texttt{#1}}}}
-
-\newcommand{\email}[1]{\mbox{\href{mailto:#1}{\textcolor{darkblue}{\normalfont{#1}}}}}
-\newcommand{\web}[2]{\mbox{\href{#2}{\textcolor{darkblue}{\normalfont{#1}}}}}
-
-%\usepackage[baseurl={http://www.bioconductor.org/packages/release/bioc/html/EBImage.html},pdftitle={EBImage - Image Processing Toolkit For R},pdfauthor={Oleg Sklyar},pdfsubject={EBImage},pdfkeywords={image processing},pagebackref,bookmarks,colorlinks,linkcolor=darkblue,citecolor=darkblue,pagecolor=darkblue,raiselinks,plainpages,pdftex]{hyperref}
+\hypersetup{
+ baseurl={http://www.bioconductor.org/packages/release/bioc/html/EBImage.html},%
+ pdfsubject={EBImage},%
+ pdfkeywords={image processing}%
+}
 
 \SweaveOpts{keep.source=TRUE,eps=FALSE}
+
 
 \begin{document}
 
@@ -39,7 +34,9 @@
 
 \title{Introduction to \Rpackage{EBImage},\\
 an image processing and analysis toolkit for R}
+\renewcommand{\thetitle}{Introduction to \Rpackage{EBImage}} % short title used in headers
 \author{Gregoire Pau, Oleg Sklyar, Wolfgang Huber\\\email{gpau@ebi.ac.uk}}
+
 \maketitle
 
 \tableofcontents
@@ -47,7 +44,7 @@ an image processing and analysis toolkit for R}
 
 \section{Reading/displaying/writing images}
 
-The package \Rpackage{EBImage} is loaded by the following command.
+The package \Biocpkg{EBImage} is loaded by the following command.
 <<library,results=hide>>=
 library("EBImage")
 @
@@ -71,8 +68,8 @@ display(lena)
 
 \begin{figure}[!h]
 \begin{center}
-\includegraphics[width=0.49\textwidth]{lena.jpeg}
-\includegraphics[width=0.49\textwidth]{lenac.jpeg}
+\includegraphics[width=0.48\textwidth]{lena.jpeg}
+\includegraphics[width=0.48\textwidth]{lenac.jpeg}
 \caption{\code{lena}, \code{lenac}}
 \end{center}
 \end{figure}
@@ -286,8 +283,8 @@ writeImage(lenab, 'lenab.jpeg', quality=85)
 
 \begin{figure}[!h]
 \begin{center}
-\includegraphics[width=0.49\textwidth]{lenak.jpeg}
-\includegraphics[width=0.49\textwidth]{lenab.jpeg}
+\includegraphics[width=0.48\textwidth]{lenak.jpeg}
+\includegraphics[width=0.48\textwidth]{lenab.jpeg}
 \caption{\code{lenak}, \code{lenab}}
 \end{center}
 \end{figure}
@@ -318,8 +315,8 @@ writeImage(lenafhi, 'lenafhi.jpeg', quality=85)
 
 \begin{figure}[!h]
 \begin{center}
-\includegraphics[width=0.49\textwidth]{lenaflo.jpeg}
-\includegraphics[width=0.49\textwidth]{lenafhi.jpeg}
+\includegraphics[width=0.48\textwidth]{lenaflo.jpeg}
+\includegraphics[width=0.48\textwidth]{lenafhi.jpeg}
 \caption{Low-pass filtered \code{lenaflo} and high-pass filtered \code{lenafhi}}
 \end{center}
 \end{figure}
@@ -349,9 +346,9 @@ writeImage(eidilat, 'eidilat.png')
 @
 \begin{figure}[!h]
 \begin{center}
-\includegraphics[width=0.49\textwidth]{ei.png}\\{\tiny $ $}\\
-\includegraphics[width=0.49\textwidth]{eierode.png}\\{\tiny $ $}\\
-\includegraphics[width=0.49\textwidth]{eidilat.png}
+\includegraphics[width=0.48\textwidth]{ei.png}\\{\tiny $ $}\\
+\includegraphics[width=0.48\textwidth]{eierode.png}\\{\tiny $ $}\\
+\includegraphics[width=0.48\textwidth]{eidilat.png}
 \caption{\code{ei} ; \code{eierode} ; \code{eidilat}}
 \end{center}
 \end{figure}
@@ -381,16 +378,16 @@ writeImage(nuclabel/max(nuclabel), 'nuclabel.png')
 
 \begin{figure}[!h]
 \begin{center}
-\includegraphics[width=0.49\textwidth]{ei.png}
-\includegraphics[width=0.49\textwidth]{eilabel.png}
+\includegraphics[width=0.48\textwidth]{ei.png}
+\includegraphics[width=0.48\textwidth]{eilabel.png}
 \end{center}
 \caption{\code{ei}, \code{eilabel/max(eilabel)}}
 \end{figure}
 
 \begin{figure}[!h]
 \begin{center}
-\includegraphics[width=0.49\textwidth]{nuc-0.jpeg}
-\includegraphics[width=0.49\textwidth]{nuclabel.png}
+\includegraphics[width=0.48\textwidth]{nuc-0.jpeg}
+\includegraphics[width=0.48\textwidth]{nuclabel.png}
 \caption{\code{nuc[ , ,1]}, \code{nuclabel/max(nuclabel)}}
 \end{center}
 \end{figure}
@@ -424,8 +421,8 @@ writeImage(nuclabel2/max(nuclabel2), 'nuclabel2.png')
 
 \begin{figure}[!h]
 \begin{center}
-\includegraphics[width=0.49\textwidth]{nuc-0.jpeg}
-\includegraphics[width=0.49\textwidth]{nuclabel2.png}
+\includegraphics[width=0.48\textwidth]{nuc-0.jpeg}
+\includegraphics[width=0.48\textwidth]{nuclabel2.png}
 \caption{\code{nuc[ , ,1]}, \code{nuclabel2/max(nuclabel)} }
 \end{center}
 \end{figure}
@@ -452,8 +449,8 @@ writeImage(nuch2, 'nuch2.jpeg', quality=85)
 
 \begin{figure}[!h]
 \begin{center}
-\includegraphics[width=0.49\textwidth]{nuch1.jpeg}
-\includegraphics[width=0.49\textwidth]{nuch2.jpeg}
+\includegraphics[width=0.48\textwidth]{nuch1.jpeg}
+\includegraphics[width=0.48\textwidth]{nuch2.jpeg}
 \caption{\code{nuch1}, \code{nuch2} }
 \end{center}
 \end{figure}
@@ -570,10 +567,10 @@ writeImage(res, 'res.jpeg', quality=85)
 
 \begin{figure}[!h]
 \begin{center}
-\includegraphics[width=0.49\textwidth]{res-0.jpeg}
-\includegraphics[width=0.49\textwidth]{res-1.jpeg}\\{\tiny$ $}\\
-\includegraphics[width=0.49\textwidth]{res-2.jpeg}
-\includegraphics[width=0.49\textwidth]{res-3.jpeg}
+\includegraphics[width=0.48\textwidth]{res-0.jpeg}
+\includegraphics[width=0.48\textwidth]{res-1.jpeg}\\{\tiny$ $}\\
+\includegraphics[width=0.48\textwidth]{res-2.jpeg}
+\includegraphics[width=0.48\textwidth]{res-3.jpeg}
 \caption{Final segmentation \code{res}}
 \end{center}
 \end{figure}
