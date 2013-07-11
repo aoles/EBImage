@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-SEXP normalize (SEXP, SEXP, SEXP);
+SEXP normalize (SEXP, SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus
 };
