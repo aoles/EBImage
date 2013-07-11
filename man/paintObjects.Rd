@@ -35,7 +35,7 @@
 }
 
 \seealso{
-  \code{\link{bwlabel}}, \code{\link{watershed}}, \code{link{computeFeatures}}
+  \code{\link{bwlabel}}, \code{\link{watershed}}, \code{\link{computeFeatures}}, \code{\link{colorLabels}}
 }
 
 \examples{

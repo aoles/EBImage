@@ -19,7 +19,7 @@
 }
 
 \value{
-  An \code{Grayscale} \code{Image} object or an array, containing the
+  A \code{Grayscale} \code{Image} object or an array, containing the
   labelled version of \code{x}.
 }
 
@@ -34,7 +34,7 @@
 }
 
 \seealso{
-  \code{link{computeFeatures}}, \code{link{propagate}}, \code{link{watershed}}, \code{link{paintObjects	}}
+  \code{\link{computeFeatures}}, \code{\link{propagate}}, \code{\link{watershed}}, \code{\link{paintObjects}}, \code{\link{colorLabels}}
 }
 
 \examples{

@@ -39,7 +39,7 @@ export(transpose)
 export(thresh, bwlabel)
 export(watershed, propagate)
 export(ocontour)
-export(paintObjects, rmObjects, reenumerate)
+export(paintObjects, rmObjects, reenumerate, colorLabels)
 
 ## statistics
 export(median.Image, quantile.Image)

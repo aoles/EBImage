@@ -1,3 +1,10 @@
+version 4.3.4
+- modified the 'normalize' function to accept presetting the input intensity range (requested by Bernd Fischer)
+- added 'colorLabels' function by Bernd Fischer
+
+version 4.3.3
+- vignette uses now the 'BiocStyle' formatting
+
 version 4.3.2
 - 'normalize' now uses the generic from BiocGenerics
 
