@@ -1,3 +1,6 @@
+version 4.3.5
+- minor documentation fixes
+
 version 4.3.4
 - modified the 'normalize' function to accept presetting the input intensity range (requested by Bernd Fischer)
 - added 'colorLabels' function by Bernd Fischer

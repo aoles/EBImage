@@ -26,11 +26,11 @@ Performs color coding of object masks, which are typically obtained using the \c
 }
 
 \author{
-  Bernd Fiscsher, 2013
+  Bernd Fischer, 2013
 }
 
 \seealso{
-  \code{\link{bwlabel}}
+  \code{\link{bwlabel}},  \code{\link{normalize}}
 }
 
 \examples{
