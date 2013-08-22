@@ -32,7 +32,7 @@
 
   Data is reflected around borders.
   
-  If \code{x} contains multiple franes, the filter will be applied one each frame.
+  If \code{x} contains multiple frames, the filter will be applied one each frame.
   
 }
 
