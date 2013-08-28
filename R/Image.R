@@ -372,19 +372,30 @@ setMethod ("[", signature(x="Image", i="ANY", j="ANY", drop="ANY"),
 getFrame = function(y, i, type='total') {
   n = getNumberOfFrames(y, type=type)
   if (i<1 || i>n) stop("'i' must belong between 1 and ", n)
-  d = dim(y)
-  if (type=='render' && colorMode(y)==Color) {
-    if (length(d)==2) nchannels = 1
-    else nchannels = d[3]
-    if (!identical(d, (nd=as.integer(c(d[1:2], nchannels, n))) ))
-      dim(y) = nd
-    return(y[,,,i])
+  
+  ld = length( (d = dim(y)) ) 
+  
+  ## multiple G frames or a single GA/RGB/RGBA
+  if (ld==3) {
+    if(type=='total' || colorMode(y)==Grayscale) {
+      y = y[,,i,drop=FALSE]
+      dim(y) = d[1:2]
+    }
   }
-  else {
-    if (!identical(d, (nd=as.integer(c(d[1:2], n))) ))
-      dim(y) = nd
-    return(y[,,i])
+  
+  ## multiple GA/RGB/RGBA frames
+  else if (ld==4) {  
+    if(type=='render') {
+      y = y[,,,i,drop=FALSE]
+      dim(y) = d[1:3]
+    }
+    else {
+      y = y[,, i - d[3]*( (frame = ceiling(i/d[3])) - 1), frame, drop=FALSE]
+      dim(y) = d[1:2]
+    }
   }
+  
+  return(y)
 }
 
 ## getNumberOfFrames

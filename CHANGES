@@ -1,3 +1,6 @@
+version 4.3.7
+- fixed a bug in 'getFrame' function: XY dimensions equal 1 were dropped
+
 version 4.3.5
 - minor documentation fixes
 
