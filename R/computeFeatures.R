@@ -171,15 +171,18 @@ computeFeatures.shape = function(x, properties=FALSE, xs, ...) {
     features = do.call(rbind, lapply(contours, function(z) {
       cz = apply(z, 2, mean)
       radius = sqrt(rowSums((z - rep(cz, each=nrow(z)))^2))
-      c(s.perimeter=nrow(z), s.radius.mean=mean(radius), s.radius.min=min(radius),
+      radius.mean = mean(radius)
+      radius.sd = sqrt(mean((radius - radius.mean)^2))
+      
+      c(s.perimeter=nrow(z), s.radius.mean=radius.mean, s.radius.sd=radius.sd, s.radius.min=min(radius),
         s.radius.max=max(radius))
     }))
     cbind(s.area=sapply(xs, length), features)
   } else {
     ## feature properties
-    data.frame(name=c("s.area", "s.perimeter", "s.radius.mean", "s.radius.min", "s.radius.max"),
-               translation.invariant = c(TRUE, TRUE, TRUE, TRUE, TRUE),
-               rotation.invariant = c(TRUE, TRUE, TRUE, TRUE, TRUE))
+    data.frame(name=c("s.area", "s.perimeter", "s.radius.mean", "s.radius.sd", "s.radius.min", "s.radius.max"),
+               translation.invariant = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE),
+               rotation.invariant = c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE))
   }
 }
 

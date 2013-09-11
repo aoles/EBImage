@@ -86,7 +86,7 @@
     \item \code{standardExpandRef}
   }
 
-  Deprecated 
+  Defunct
   \itemize{
     \item \code{blur}, \code{equalize}
     \item \code{drawtext}, \code{drawfont}

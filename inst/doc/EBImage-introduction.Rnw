@@ -25,6 +25,7 @@ BiocStyle::latex()
 
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 
 \begin{figure}
 \begin{center}
