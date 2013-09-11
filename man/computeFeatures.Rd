@@ -106,7 +106,7 @@ standardExpandRef(ref, refnames)
     \item m.cy: center of mass y (in pixels)
     \item m.majoraxis: elliptical fit major axis (in pixels)
     \item m.eccentricity: elliptical eccentricity defined by
-    sqrt(1-majoraxis^2/minoraxis^2). Circle eccentricity is 0 and straight
+    sqrt(1-minoraxis^2/majoraxis^2). Circle eccentricity is 0 and straight
     line eccentricity is 1.
     \item m.theta: object angle (in radians)
   }

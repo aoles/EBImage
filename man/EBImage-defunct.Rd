@@ -1,6 +1,6 @@
-\name{EBImage-deprecated}
+\name{EBImage-defunct}
 
-\alias{EBImage-deprecated}
+\alias{EBImage-defunct}
 \alias{blur}
 \alias{equalize}
 \alias{drawtext}
@@ -19,10 +19,10 @@
 
 \docType{package}
 
-\title{EBImage deprecated functions}
+\title{EBImage defunct functions}
 
 \description{
-  These following functions are deprecated and will be defunct in the next
+  These following functions are defunct and will be removed in the next
   Bioconductor release.
 }
 
@@ -45,7 +45,7 @@ cmoments(...)
 }
 
 \arguments{
-\item{...}{Deprecated arguments.}
+\item{...}{Defunct arguments.}
 }
 
 \keyword{package}

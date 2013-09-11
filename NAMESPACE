@@ -73,7 +73,7 @@ export(computeFeatures.basic, computeFeatures.shape, computeFeatures.moment, com
 export(standardExpandRef)
 export(localCurvature)
 
-## deprecated
+## defunct
 export(blur, equalize)
 export(drawtext, drawfont)
 export(getFeatures, hullFeatures, zernikeMoments)

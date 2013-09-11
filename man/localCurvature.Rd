@@ -66,5 +66,5 @@
   I=Image(0, dim=dim(x))
   imageData(I)[contours[[2]]+1]=abs(curv)
   x2[x2!=2]=0
-  if (interactive()) display(combine(x2, I), title = 'Curvature of Lena')
+  if (interactive()) display(combine(x2, 10*I), title = 'Curvature of Lena')
 }
