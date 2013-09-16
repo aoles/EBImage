@@ -94,6 +94,7 @@ standardExpandRef(ref, refnames)
     \item s.area: area size (in pixels)
     \item s.perimeter: perimeter (in pixels)
     \item s.radius.mean: mean radius (in pixels)
+    \item s.radius.sd: standard deviation of the mean radius (in pixels)
     \item s.radius.max: max radius (in pixels)
     \item s.radius.min: min radius (in pixels)
   }
