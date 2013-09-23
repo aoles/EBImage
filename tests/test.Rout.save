@@ -1,14 +1,11 @@
 
-R version 2.15.2 (2012-10-26) -- "Trick or Treat"
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
+R version 3.0.1 (2013-05-16) -- "Good Sport"
+Copyright (C) 2013 The R Foundation for Statistical Computing
 Platform: x86_64-redhat-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
-
-  Natural language support but running in an English locale
 
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
@@ -174,7 +171,7 @@ checking 'rgbImage' ... OK (hash=4035726)
 checking 'combine' ... OK (hash=2697590)
 checking 'tile' ... OK (hash=3846811)
 checking 'untile' ... OK (hash=3139255)
-checking 'computeFeatures' ... OK (hash=3632398)
+checking 'computeFeatures' ... OK (hash=3736511)
 
 > 
 > ## test: color 2D
@@ -226,7 +223,7 @@ checking 'rgbImage' ... OK (hash=12609190)
 checking 'combine' ... OK (hash=12798162)
 checking 'tile' ... OK (hash=19503786)
 checking 'untile' ... OK (hash=13989412)
-checking 'computeFeatures' ... OK (hash=233118.9)
+checking 'computeFeatures' ... OK (hash=239444.9)
 
 > 
 > ## test: color 3D
@@ -278,7 +275,7 @@ checking 'rgbImage' ... OK (hash=29219740)
 checking 'combine' ... OK (hash=23011968)
 checking 'tile' ... OK (hash=7079260)
 checking 'untile' ... OK (hash=4536552)
-checking 'computeFeatures' ... OK (hash=235567)
+checking 'computeFeatures' ... OK (hash=241975.8)
 
 > 
 > ## test: logical 2D
@@ -329,6 +326,9 @@ checking 'rgbImage' ... OK (hash=4496384)
 checking 'combine' ... OK (hash=4496384)
 checking 'tile' ... OK (hash=4839749)
 checking 'untile' ... OK (hash=3809740)
-checking 'computeFeatures' ... OK (hash=13376840)
+checking 'computeFeatures' ... OK (hash=13758086)
 
 > 
+> proc.time()
+   user  system elapsed 
+  2.068   0.052   2.112 

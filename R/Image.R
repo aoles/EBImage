@@ -596,35 +596,71 @@ quantile.Image <- function(x, ...) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-rgbImage = function(red=NULL, green=NULL, blue=NULL) {
-  d=NULL
+# rgbImage = function(red=NULL, green=NULL, blue=NULL) {
+#   d=NULL
+#   
+#   if (!is.null(red)) {
+#     red = Image(red, colormode=Grayscale)
+#     d = dim(red)
+#   }
+#   if (!is.null(green)) {
+#     green = Image(green, colormode=Grayscale)
+#     d=dim(green)
+#   }
+#   if (!is.null(blue)) {
+#     blue = Image(blue, colormode=Grayscale)
+#     d=dim(blue)
+#   }
+#   
+#   if (is.null(red)) red=Image(0, dim=d)
+#   if (is.null(green)) green=Image(0, dim=d)
+#   if (is.null(blue)) blue=Image(0, dim=d)
+#   
+#   if (is.null(d)) stop('at least one non-null Image object must be specified')
+#   
+#   x=combine(red, green, blue, along=2.5)
+#   
+#   ## Cast to Color Image if x is an array
+#   if (class(x)=='array') x=Image(x)
+#   
+#   colorMode(x)=Color
+#   x
+# }
 
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+rgbImage = function(red=NULL, green=NULL, blue=NULL) {
+  compareDims = function(x, y) {
+    if (!identical(x, y)) stop('images must have the same 2D frame size and number of frames to be combined')
+  }
+ 
+  d = NULL
+  
   if (!is.null(red)) {
-    red = Image(red, colormode=Grayscale)
     d = dim(red)
   }
   if (!is.null(green)) {
-    green = Image(green, colormode=Grayscale)
-    d=dim(green)
+    if (is.null(d))
+      d = dim(green)
+    else
+      compareDims(d, dim(green))
   }
   if (!is.null(blue)) {
-    blue = Image(blue, colormode=Grayscale)
-    d=dim(blue)
+    if (is.null(d))
+      d = dim(blue)
+    else
+      compareDims(d, dim(blue))
   }
 
-  if (is.null(red)) red=Image(0, dim=d)
-  if (is.null(green)) green=Image(0, dim=d)
-  if (is.null(blue)) blue=Image(0, dim=d)
-
   if (is.null(d)) stop('at least one non-null Image object must be specified')
+  
+  if (is.null(red)) red = array(0, dim=d)
+  if (is.null(green)) green = array(0, dim=d)
+  if (is.null(blue)) blue = array(0, dim=d)
 
-  x=combine(red, green, blue, along=2.5)
-
-  ## Cast to Color Image if x is an array
-  if (class(x)=='array') x=Image(x)
-
-  colorMode(x)=Color
-  x
+  x = abind(red, green, blue, along=2.5)
+  dimnames(x) = NULL
+  
+  Image(x, colormode=Color)
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
