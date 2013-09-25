@@ -11,7 +11,7 @@
 }
 
 \usage{
-  stackObjects(x, ref, combine=TRUE, bg.col='black', ext)
+stackObjects(x, ref, combine=TRUE, bg.col='black', ext)
 }
 
 \arguments{

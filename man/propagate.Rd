@@ -19,7 +19,7 @@ Algorithm and implementation are from Jones et al. [1].
 }
 
 \usage{
-  propagate(x, seeds, mask=NULL, lambda=1e-4)
+propagate(x, seeds, mask=NULL, lambda=1e-4)
 }
 
 \arguments{
@@ -68,35 +68,34 @@ Algorithm and implementation are from Jones et al. [1].
 }
 
 \examples{
-## a paraboloid mountain in a plane
-n = 400
-x = (n/4)^2 - matrix(
-       (rep(1:n, times=n) - n/2)^2 + (rep(1:n, each=n) - n/2)^2,
-       nrow=n, ncol=n)
-x = normalize(x)
+  ## a paraboloid mountain in a plane
+  n = 400
+  x = (n/4)^2 - matrix(
+	(rep(1:n, times=n) - n/2)^2 + (rep(1:n, each=n) - n/2)^2,
+	nrow=n, ncol=n)
+  x = normalize(x)
 
-## 4 seeds
-seeds = array(0, dim=c(n,n))
-seeds[51:55, 301:305] = 1
-seeds[301:305, 101:105] = 2
-seeds[201:205, 141:145] = 3
-seeds[331:335, 351:355] = 4
+  ## 4 seeds
+  seeds = array(0, dim=c(n,n))
+  seeds[51:55, 301:305] = 1
+  seeds[301:305, 101:105] = 2
+  seeds[201:205, 141:145] = 3
+  seeds[331:335, 351:355] = 4
 
-lambda = 10^seq(-8, -1, by=1)
-segmented = Image(dim=c(dim(x), length(lambda)))
+  lambda = 10^seq(-8, -1, by=1)
+  segmented = Image(dim=c(dim(x), length(lambda)))
 
-for(i in seq(along=lambda)) {
-  prop = propagate(x, seeds, lambda=lambda[i])
-  prop = prop/max(prop)
-  segmented[,,i] = prop
-}
+  for(i in seq(along=lambda)) {
+    prop = propagate(x, seeds, lambda=lambda[i])
+    prop = prop/max(prop)
+    segmented[,,i] = prop
+  }
 
-if(interactive()){
-  display(x, title='Image')
-  display(seeds/max(seeds), title='Seeds')
-  display(segmented, title="Voronoi regions")
-}
-
+  if(interactive()){
+    display(x, title='Image')
+    display(seeds/max(seeds), title='Seeds')
+    display(segmented, title="Voronoi regions")
+  }
 }
 
 \author{

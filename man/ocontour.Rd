@@ -8,7 +8,7 @@
 }
 
 \usage{
-  ocontour(x)
+ocontour(x)
 }
 
 \arguments{

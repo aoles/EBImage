@@ -9,7 +9,7 @@
 }
 
 \usage{
-  localCurvature(x, h, maxk)
+localCurvature(x, h, maxk)
 }
 
 \arguments{
@@ -33,7 +33,7 @@
 }
 
 \author{
-  Joseph Barry, Wolfgang Huber 2013
+  Joseph Barry, Wolfgang Huber, 2013
 }
 
 \seealso{

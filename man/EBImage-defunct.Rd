@@ -45,7 +45,7 @@ cmoments(...)
 }
 
 \arguments{
-\item{...}{Defunct arguments.}
+  \item{...}{Defunct arguments.}
 }
 
 \keyword{package}

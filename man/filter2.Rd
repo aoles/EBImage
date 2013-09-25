@@ -9,7 +9,7 @@
 }
 
 \usage{
-  filter2(x, filter)
+filter2(x, filter)
 }
 
 \arguments{
@@ -40,7 +40,9 @@
   \code{\link{makeBrush}}, \code{\link{convolve}}, \code{\link{fft}}, \code{\link{blur}}
 }
 
-\author{Gregoire Pau, \email{gpau@ebi.ac.uk}}
+\author{
+  Gregoire Pau, \email{gpau@ebi.ac.uk}
+}
 
 \examples{
   x = readImage(system.file("images", "lena-color.png", package="EBImage"))

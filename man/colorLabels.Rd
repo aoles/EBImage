@@ -9,7 +9,7 @@
 }
 
 \usage{
-  colorLabels(x, normalize = TRUE)
+colorLabels(x, normalize = TRUE)
 }
 
 \arguments{

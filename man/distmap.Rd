@@ -11,7 +11,7 @@
 }
 
 \usage{
-  distmap(x, metric=c('euclidean', 'manhattan'))
+distmap(x, metric=c('euclidean', 'manhattan'))
 }
 
 \arguments{
@@ -42,10 +42,10 @@
 }
 
 \examples{
-   x = readImage(system.file("images", "shapes.png", package="EBImage"))
-   if (interactive()) display(x)
-   dx = distmap(x)
-   if (interactive()) display(dx/10, title='Distance map of x')
+  x = readImage(system.file("images", "shapes.png", package="EBImage"))
+  if (interactive()) display(x)
+  dx = distmap(x)
+  if (interactive()) display(dx/10, title='Distance map of x')
 }
 
 

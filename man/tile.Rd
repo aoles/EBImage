@@ -11,10 +11,8 @@
 }
 
 \usage{
-
-  tile(x, nx=10, lwd=1, fg.col="#E4AF2B", bg.col="gray")
-  untile(x, nim, lwd=1)
-
+tile(x, nx=10, lwd=1, fg.col="#E4AF2B", bg.col="gray")
+untile(x, nim, lwd=1)
 }
 
 \arguments{

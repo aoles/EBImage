@@ -9,7 +9,7 @@
 }
 
 \usage{
-  gblur(x, sigma, radius = 2 * ceiling(3 * sigma) + 1)
+gblur(x, sigma, radius = 2 * ceiling(3 * sigma) + 1)
 }
 
 \arguments{
@@ -39,10 +39,10 @@ The Gaussian filter is created with the function \code{makeBrush}.
 }
 
 \examples{
-   x = readImage(system.file("images", "lena.png", package="EBImage"))
-   if (interactive()) display(x)
+  x = readImage(system.file("images", "lena.png", package="EBImage"))
+  if (interactive()) display(x)
 
-   y = gblur(x, sigma=8)
-   if (interactive()) display(y, title='gblur(x, sigma=8)')
+  y = gblur(x, sigma=8)
+  if (interactive()) display(y, title='gblur(x, sigma=8)')
 }
 

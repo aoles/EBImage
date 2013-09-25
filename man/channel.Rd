@@ -14,8 +14,8 @@
 }
 
 \usage{ 
-  channel(x, mode)
-  rgbImage(red, green, blue)
+channel(x, mode)
+rgbImage(red, green, blue)
 }
 
 \arguments{

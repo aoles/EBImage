@@ -21,7 +21,6 @@
 }
 
 \arguments{
-
  \item{x}{An \code{Image} object in \code{Grayscale} color mode or an
     array containing object masks. Object masks are sets of pixels
     with the same unique integer value.}
@@ -32,11 +31,11 @@
 
 \value{
  An \code{Image} object or an array, containing the new objects.
-
 }
 
 \seealso{ 
-  \code{\link{bwlabel}}, \code{\link{watershed}}}
+  \code{\link{bwlabel}}, \code{\link{watershed}}
+}
 
 \examples{
   ## make objects

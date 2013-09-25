@@ -551,40 +551,37 @@ setMethod ("hist", signature(x="Image"),
 )
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-combine = function (x,...,along) {
-  if (is.list(x)) {
+combineImages = function (x, y, ...) {
+  if (!all(dim(x)[1:2]==dim(y)[1:2])) stop("images must have the same 2D frame size to be combined")
+  
+  ## merging along position guided by colorMode
+  if (colorMode(x)==Color) {
+    if (colorMode(y)==Color) along=4
+    else along=3
+  } else along=3
+    
+  z = abind(x, y, along=along)
+  dimnames(z) = NULL
+  imageData(x) = z
+    
+  validObject(x)
+  return (x)
+}
+
+## general method for the superclass of 'Image' and 'matrix'
+setMethod("combine", signature("array", "array"), combineImages)
+## explicit methods for subclasses of 'array'
+setMethod("combine", signature("matrix", "matrix"), combineImages)
+setMethod("combine", signature("Image", "Image"), combineImages)
+
+## special case of combining a list of images
+setMethod("combine", signature("list", "missing"), 
+  function(x, y, ...) {
     names(x) <- NULL
     do.call(combine, x)
   }
-  else {
-    args=c(list(x),list(...))
-    if (length(args)==1) return(x)
-
-    ## check dim[1:2]
-    dm=sapply(args,function(z) dim(z)[1:2])
-    dmx=dm[1,]==dm[1,1]
-    dmy=dm[2,]==dm[2,1]
-    if (!all(dmx) || !all(dmy)) stop("images must have the same 2D frame size to be combined")
-
-    ## merging along position guided by colorMode
-    ## if along is rationnal, a new dimension is created
-    if (missing(along)) {
-      y=args[[2]]
-      if (colorMode(x)==Color) {
-        if (colorMode(y)==Color) along=4
-        else along=3
-      } else along=3
-    }
-
-    z=abind(args,along=along)
-    dimnames(z)=NULL
-    imageData(x)=z
-
-    validObject(x)
-    return (x)
-  }
-}
-
+)
+          
 ## Median & quantile redefinition
 ## needed to overcome an isObject() test in median() which greatly slows down median()
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -594,38 +591,6 @@ median.Image <- function(x, na.rm = FALSE) {
 quantile.Image <- function(x, ...) {
   quantile(imageData(x), ...)
 }
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# rgbImage = function(red=NULL, green=NULL, blue=NULL) {
-#   d=NULL
-#   
-#   if (!is.null(red)) {
-#     red = Image(red, colormode=Grayscale)
-#     d = dim(red)
-#   }
-#   if (!is.null(green)) {
-#     green = Image(green, colormode=Grayscale)
-#     d=dim(green)
-#   }
-#   if (!is.null(blue)) {
-#     blue = Image(blue, colormode=Grayscale)
-#     d=dim(blue)
-#   }
-#   
-#   if (is.null(red)) red=Image(0, dim=d)
-#   if (is.null(green)) green=Image(0, dim=d)
-#   if (is.null(blue)) blue=Image(0, dim=d)
-#   
-#   if (is.null(d)) stop('at least one non-null Image object must be specified')
-#   
-#   x=combine(red, green, blue, along=2.5)
-#   
-#   ## Cast to Color Image if x is an array
-#   if (class(x)=='array') x=Image(x)
-#   
-#   colorMode(x)=Color
-#   x
-# }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 rgbImage = function(red=NULL, green=NULL, blue=NULL) {

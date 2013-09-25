@@ -9,7 +9,7 @@
 }
 
 \usage{
-  floodFill(x, pt, col, tolerance=0)
+floodFill(x, pt, col, tolerance=0)
 }
 
 \arguments{
