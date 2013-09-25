@@ -21,19 +21,19 @@
 }
 
 \usage{
-  dilate(x, kern)
-  erode(x, kern)
-  opening(x, kern)
-  closing(x, kern)
-  dilateGreyScale(x, kern)
-  erodeGreyScale(x, kern)
-  openingGreyScale(x, kern)
-  closingGreyScale(x, kern)
-  whiteTopHatGreyScale(x, kern)
-  blackTopHatGreyScale(x, kern)
-  selfcomplementaryTopHatGreyScale(x, kern)
+dilate(x, kern)
+erode(x, kern)
+opening(x, kern)
+closing(x, kern)
+dilateGreyScale(x, kern)
+erodeGreyScale(x, kern)
+openingGreyScale(x, kern)
+closingGreyScale(x, kern)
+whiteTopHatGreyScale(x, kern)
+blackTopHatGreyScale(x, kern)
+selfcomplementaryTopHatGreyScale(x, kern)
 
-  makeBrush(size, shape=c('box', 'disc', 'diamond', 'gaussian', 'line'), step=TRUE, sigma=0.3, angle=45)
+makeBrush(size, shape=c('box', 'disc', 'diamond', 'gaussian', 'line'), step=TRUE, sigma=0.3, angle=45)
 }
 
 \arguments{
@@ -114,23 +114,24 @@
 }
 
 \examples{	
-    x = readImage(system.file("images", "shapes.png", package="EBImage"))
-    if (interactive()) display(x)
-    kern = makeBrush(5, shape='diamond')
-    if (interactive()) display(kern, title='Structuring element')
-    if (interactive()) display(erode(x, kern), title='Erosion of x')
-    if (interactive()) display(dilate(x, kern), title='Dilatation of x')
+  x = readImage(system.file("images", "shapes.png", package="EBImage"))
+  kern = makeBrush(5, shape='diamond')  
+  if (interactive()) {
+    display(x)
+    display(kern, title='Structuring element')
+    display(erode(x, kern), title='Erosion of x')
+    display(dilate(x, kern), title='Dilatation of x')
+  }
 
-    ## makeBrush 
-    x = makeBrush(99, shape='diamond')
-    if (interactive()) display(x, title="makeBrush(99, shape='diamond')")
-    x = makeBrush(99, shape='disc', step=FALSE)
-    if (interactive()) display(x, title="makeBrush(99, shape='disc', step=FALSE)")
-    x = makeBrush(99, shape='gaussian', sigma=10)
-    if (interactive()) display(2000*x, title="makeBrush(99, shape='gaussian', sigma=10)")
+  ## makeBrush
+  if (interactive()) {
+    display(makeBrush(99, shape='diamond'))
+    display(makeBrush(99, shape='disc', step=FALSE))
+    display(2000*makeBrush(99, shape='gaussian', sigma=10))
+  }
 }
 
 \references{
-    [1] E. R. Urbach and M.H.F. Wilkinson, "Efficient 2-D grayscale morphological transformations with arbitrary flat structuring elements", IEEE Trans Image Process 17(1), 1-8, 2008
+  [1] E. R. Urbach and M.H.F. Wilkinson, "Efficient 2-D grayscale morphological transformations with arbitrary flat structuring elements", IEEE Trans Image Process 17(1), 1-8, 2008
 }
 

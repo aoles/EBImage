@@ -47,19 +47,19 @@
 }
 
 \usage{
-  Image(data, dim, colormode)
-  as.Image(x)
-  is.Image(x)
-  as.raster.Image(y, i)
+Image(data, dim, colormode)
+as.Image(x)
+is.Image(x)
+as.raster.Image(y, i)
 
-  colorMode(y)
-  colorMode(y) <- value
+colorMode(y)
+colorMode(y) <- value
 
-  imageData(y)
-  imageData(y) <- value
+imageData(y)
+imageData(y) <- value
 
-  getFrame(y, i, type='total')
-  getNumberOfFrames(y, type='total')
+getFrame(y, i, type='total')
+getNumberOfFrames(y, type='total')
 }
 
 
@@ -139,7 +139,7 @@
   x = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
   x = x[,,1:3]
   if (interactive()) display(x, title='Cell nuclei')
-  colorMode(x)=Color
+  colorMode(x) = Color
   if (interactive()) display(x, title='Cell nuclei in RGB')
 }
 

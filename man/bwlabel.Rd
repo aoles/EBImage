@@ -9,7 +9,7 @@
 }
 
 \usage{
-  bwlabel(x)
+bwlabel(x)
 }
 
 \arguments{

@@ -20,12 +20,12 @@
 }
 
 \usage{
-  flip(x)
-  flop(x)
-  rotate(x, angle, filter="bilinear", output.dim, output.origin=c(0, 0))
-  translate(x, v, filter="none", output.dim)
-  resize(x, w, h, filter="bilinear", output.dim, output.origin=c(0, 0))
-  affine(x, m, filter=c("bilinear", "none"), output.dim)
+flip(x)
+flop(x)
+rotate(x, angle, filter="bilinear", output.dim, output.origin=c(0, 0))
+translate(x, v, filter="none", output.dim)
+resize(x, w, h, filter="bilinear", output.dim, output.origin=c(0, 0))
+affine(x, m, filter=c("bilinear", "none"), output.dim)
 }
 
 \arguments{
@@ -86,24 +86,24 @@
 }
 
 \examples{
-   x <-	readImage(system.file("images", "lena.png", package="EBImage"))
-   if (interactive()) display(x)
+  x <- readImage(system.file("images", "lena.png", package="EBImage"))
+  if (interactive()) display(x)
 
-   y <- flip(x)
-   if (interactive()) display(y, title='flip(x)')
+  y <- flip(x)
+  if (interactive()) display(y, title='flip(x)')
 
-   y = flop(x) 
-   if (interactive()) display(y, title='flop(x)')
+  y = flop(x) 
+  if (interactive()) display(y, title='flop(x)')
 
-   y <- resize(x, 128) 
-   if (interactive()) display(y, title='resize(x, 128)')
+  y <- resize(x, 128) 
+  if (interactive()) display(y, title='resize(x, 128)')
 
-   y <- rotate(x, 30) 
-   if (interactive()) display(y, title='rotate(x, 30)')
+  y <- rotate(x, 30) 
+  if (interactive()) display(y, title='rotate(x, 30)')
 
-   y <- translate(x, c(120, -20)) 
-   if (interactive()) display(y, title='translate(x, c(120, -20))')
+  y <- translate(x, c(120, -20)) 
+  if (interactive()) display(y, title='translate(x, c(120, -20))')
 
-   m <- matrix(c(0.6, 0.2, 0, -0.2, 0.3, 300), nrow=3)
-   if (interactive()) display(affine(x, m), title='affine transform')
+  m <- matrix(c(0.6, 0.2, 0, -0.2, 0.3, 300), nrow=3)
+  if (interactive()) display(affine(x, m), title='affine transform')
 }

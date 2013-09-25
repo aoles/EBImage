@@ -9,7 +9,7 @@
 }
 
 \usage{
-  drawCircle(img, x, y, radius, col, fill=FALSE, z=1)
+drawCircle(img, x, y, radius, col, fill=FALSE, z=1)
 }
 
 \arguments{

@@ -1,9 +1,9 @@
 \name{normalize}
 
 \alias{normalize}
-\alias{normalize,Image-method}
 \alias{normalize,array-method}
 \alias{normalize,matrix-method}
+\alias{normalize,Image-method}
 
 \concept{normalization}
 
@@ -14,11 +14,9 @@
 }
 
 \usage{
-
-\S4method{normalize}{Image}(object, separate=TRUE, ft=c(0,1), inputRange)
+\S4method{normalize}{Image}(object, separate=TRUE, ft=c(0,1), inputRange)%
 
 \S4method{normalize}{array}(object, separate=TRUE, ft=c(0,1), inputRange)
-
 }
 
 \arguments{
@@ -48,14 +46,13 @@
 }
 
 \examples{
-x = readImage(system.file('images', 'shapes.png', package='EBImage'))
-x = x[110:512,1:130]
-y = bwlabel(x)
-if (interactive()) display(x, title='Original')
+  x = readImage(system.file('images', 'shapes.png', package='EBImage'))
+  x = x[110:512,1:130]
+  y = bwlabel(x)
+  if (interactive()) display(x, title='Original')
 
-print(range(y))
-y = normalize(y)
-print(range(y))
-
-if (interactive()) display(y, title='Segmented')
+  print(range(y))
+  y = normalize(y)
+  print(range(y))
+  if (interactive()) display(y, title='Segmented')
 }

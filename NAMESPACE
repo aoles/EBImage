@@ -1,6 +1,6 @@
 useDynLib("EBImage")
 
-importFrom("BiocGenerics", "normalize")
+importFrom("BiocGenerics", "normalize", "combine")
 importFrom("methods", "Ops")
 importFrom("methods", "show")
 importFrom("graphics", "image")
@@ -61,7 +61,7 @@ export(rgbImage, channel)
 
 ## image stacking, tiling
 export(stackObjects)
-export(combine, tile, untile)
+export(tile, untile)
 
 ## drawables
 export(drawfont, drawtext)
@@ -82,4 +82,4 @@ export(haralickFeatures, haralickMatrix)
 export(moments, cmoments, smoments, rmoments)
 
 ## methods extending S4 generics from the BiocGenerics package
-exportMethods(normalize)
+exportMethods(normalize, combine)

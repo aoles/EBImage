@@ -1,4 +1,4 @@
-normalize.Image = function(object, separate = TRUE, ft = c(0, 1), inputRange) {
+normalizeImage = function(object, separate = TRUE, ft = c(0, 1), inputRange) {
   validImage(object)
   ft <- as.numeric (ft)
   if ( diff(ft) == 0 ) stop("normalization range is 0")
@@ -13,6 +13,9 @@ normalize.Image = function(object, separate = TRUE, ft = c(0, 1), inputRange) {
   return(object)
 }
 
-setMethod("normalize", signature("Image"), normalize.Image)
-setMethod("normalize", signature("array"), normalize.Image)
-setMethod("normalize", signature("matrix"), normalize.Image)
+## general method for the superclass of 'Image' and 'matrix'
+setMethod("normalize", signature("array"), normalizeImage)
+
+## explicit methods for subclasses of 'array'
+setMethod("normalize", signature("matrix"), normalizeImage)
+setMethod("normalize", signature("Image"), normalizeImage)

@@ -12,7 +12,7 @@
 }
 
 \usage{
-  watershed(x, tolerance=1, ext=1)
+watershed(x, tolerance=1, ext=1)
 }
 
 \arguments{

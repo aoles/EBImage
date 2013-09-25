@@ -9,7 +9,7 @@
 }
 
 \usage{
-  medianFilter(x, size, cacheSize=512)
+medianFilter(x, size, cacheSize=512)
 }
 
 \arguments{
@@ -47,6 +47,6 @@
 }
 
 \references{
-    [1] S. Perreault and P. Hebert, "Median Filtering in Constant Time", IEEE Trans Image Process 16(9), 2389-2394, 2007
+  [1] S. Perreault and P. Hebert, "Median Filtering in Constant Time", IEEE Trans Image Process 16(9), 2389-2394, 2007
 }
 

@@ -9,7 +9,7 @@
 }
 
 \usage{
-  thresh(x, w=5, h=5, offset=0.01)
+thresh(x, w=5, h=5, offset=0.01)
 }
 
 \arguments{

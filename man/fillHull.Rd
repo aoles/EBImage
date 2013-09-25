@@ -9,7 +9,7 @@
 }
 
 \usage{
-  fillHull(x)
+fillHull(x)
 }
 
 \arguments{

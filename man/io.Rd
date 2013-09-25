@@ -12,8 +12,8 @@
 }
 
 \usage{
-  readImage(files, type, all = TRUE, \dots)
-  writeImage(x, files, type, quality = 100, bits.per.sample, compression = "none", \dots)
+readImage(files, type, all = TRUE, \dots)
+writeImage(x, files, type, quality = 100, bits.per.sample, compression = "none", \dots)
 }
 
 \arguments{

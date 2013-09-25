@@ -9,7 +9,7 @@
 }
 
 \usage{
-  transpose(x, coerce = FALSE)
+transpose(x, coerce = FALSE)
 }
 
 \arguments{
