@@ -9,7 +9,7 @@
 }
 
 \usage{
-paintObjects(x, tgt, opac=c(1, 1), col=c('red', NA))
+paintObjects(x, tgt, opac=c(1, 1), col=c('red', NA), thick=FALSE)
 }
 
 \arguments{
@@ -27,11 +27,12 @@ paintObjects(x, tgt, opac=c(1, 1), col=c('red', NA))
   \item{col}{A character vector of two R colors for drawing object
     boundaries and object bodies. By default, object boundaries are
     painted in \code{red} while object bodies are not painted.}
+    
+  \item{thick}{A logical indicating whether to use thick boundary contours. Default is \code{FALSE}.}
 }
 
 \value{
-  An \code{Image} object or an array, containing the painted version
-  of \code{tgt}.
+  An \code{Image} object or an array, containing the painted version of \code{tgt}.
 }
 
 \seealso{

@@ -8,8 +8,7 @@
 extern "C" {
 #endif
 
-SEXP paintObjects (SEXP, SEXP, SEXP, SEXP);
-SEXP paintObjects2 (SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP paintObjects (SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP rmObjects (SEXP, SEXP);
 SEXP stackObjects (SEXP, SEXP, SEXP, SEXP, SEXP);
 

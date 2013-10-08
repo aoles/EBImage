@@ -12,6 +12,7 @@ See: ../LICENSE for license, LGPL
 
 /*----------------------------------------------------------------------- */
 /* paints features on the target image with given colors and opacs    */
+/*
 SEXP
 paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col) {
     SEXP res;
@@ -44,12 +45,12 @@ paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col) {
       
       for ( j = 0; j < ny; j++ ) {
 	for ( i = 0; i < nx; i++ ) {	    
-	  /* pixel is contact */
+
 	  index = 1;
 	  if ( dx[j*nx + i]<=0 ) continue;
 	  if ( dx[j*nx + i] < 1.0 || i < 1 || i > nx - 2 || j < 1 || j > ny - 2 ) index = 2;
 	  else {
-	    /* check if pixel is border, edge is same as contact */
+
 	    if ( dx[j*nx + i-1] != dx[j*nx + i] ||  dx[j*nx + i+1] != dx[j*nx + i] ||
 		 dx[(j-1)*nx + i] != dx[j*nx + i] || dx[(j+1)*nx + i] != dx[j*nx + i]) index = 0;
 	  }	  
@@ -73,81 +74,9 @@ paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col) {
     UNPROTECT (nprotect);
     return res;
 }
-
-/*
-SEXP
-paintObjects2 (SEXP x, SEXP tgt, SEXP _opac, SEXP _col, SEXP _thick) {
-    SEXP res;
-    int nprotect, nx, ny, nz, im, i, j, index, thick;
-    double *opac, *col;
-    double *dx, *dres, dp;
-    int redstride, greenstride, bluestride;
-    int xcolormode;
-
-    validImage(x,0);
-    validImage(tgt,0);
-
-    nx = INTEGER(GET_DIM(x))[0];
-    ny = INTEGER(GET_DIM(x))[1];
-    nz = getNumberOfFrames(x, 0);
-    nprotect = 0;
-    xcolormode = getColorMode(x);
-    if (xcolormode != MODE_GRAYSCALE) error("'x' must be in 'Grayscale' color mode");
-
-    PROTECT ( res = Rf_duplicate(tgt) );
-    nprotect++;
-
-    opac = REAL (_opac);
-    col = REAL(_col);
-    thick = INTEGER(_thick)[0];
-    
-
-    for (im = 0; im < nz; im++) {
-      dx = &( REAL(x)[ im * nx * ny ] );
-      dres = REAL(res);
-      getColorStrides(tgt, im, &redstride, &greenstride, &bluestride);
-      
-      for ( j = 0; j < ny; j++ ) {
-        for ( i = 0; i < nx; i++ ) {
-          
-          if(dx[j*nx + i] > 0 || thick){
-          
-            index = 1;
-          
-  	        if ( ( dx[j*nx + i] < 1.0 && dx[j*nx + i] > 0 ) || i < 1 || i > nx - 2 || j < 1 || j > ny - 2 ){
-              if ( dx[j*nx + i] > 0 ) index = 2;
-  	        }  
-            else { 
-  	          if ( dx[j*nx + i-1] != dx[j*nx + i] ||  dx[j*nx + i+1] != dx[j*nx + i] || dx[(j-1)*nx + i] != dx[j*nx + i] || dx[(j+1)*nx + i] != dx[j*nx + i]) index = 0;
-              else if ( dx[j*nx + i] <= 0 ) continue;
-  	        }	
-            
-      	   	if (redstride!=-1) {
-          	  dp=dres[redstride+j*nx + i]*(1-opac[index]) + col[index]*opac[index];		
-          	  dres[redstride+j*nx + i]=dp;
-          	}
-          	if (greenstride!=-1) {
-          	  dp=dres[greenstride+j*nx + i]*(1-opac[index]) + col[index+3]*opac[index];
-          	  dres[greenstride+j*nx + i]=dp;
-          	}
-          	if (bluestride!=-1) {
-          	  dp=dres[bluestride+j*nx + i]*(1-opac[index]) + col[index+3*2]*opac[index];	
-          	  dres[bluestride+j*nx + i]=dp;
-            }
-            
-      	  }
-        
-        }
-      }
-    }
-
-    UNPROTECT (nprotect);
-    return res;
-}
 */
-
 SEXP
-paintObjects2 (SEXP x, SEXP tgt, SEXP _opac, SEXP _col, SEXP _thick) {
+paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col, SEXP _thick) {
     SEXP res;
     int nprotect, nx, ny, nz, im, index, thick;
     int i, j;

@@ -13,12 +13,30 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-paintObjects = function (x, tgt, opac=c(1, 1), col=c('red', NA)) {
+# paintObjects = function (x, tgt, opac=c(1, 1), col=c('red', NA)) {
+#   validImage(x)
+#   if (colorMode(x)!=Grayscale)  stop("'", deparse(substitute(x), width.cutoff = 500L, nlines = 1), "' must be in 'Grayscale' color mode")
+#   if (any(dim(x)[1:2] != dim(tgt)[1:2])) stop( "'x' and 'tgt' must have the same size" )
+#   if (getNumberOfFrames(x,'render') != getNumberOfFrames(tgt,'render')) stop( "'x' and 'tgt' must have the same number of render frames" )                           
+# 
+#   col = c(col, rep(NA, 3-length(col)))
+#   opac = c(opac, rep(1, 3-length(opac)))
+#   zcol = which(is.na(col))
+#   col[zcol] = 'white'
+#   opac[zcol] = 0
+#   
+#   opac = as.numeric(opac)
+#   if (any(opac < 0) || any(opac > 1)) stop("all opacity values must be in the range [0,1]" )
+# 
+#   .Call("paintObjects", castImage(x), castImage(tgt), opac, Image(col), PACKAGE='EBImage')
+# }
+
+paintObjects = function (x, tgt, opac=c(1, 1), col=c('red', NA), thick=FALSE) {
   validImage(x)
   if (colorMode(x)!=Grayscale)  stop("'", deparse(substitute(x), width.cutoff = 500L, nlines = 1), "' must be in 'Grayscale' color mode")
   if (any(dim(x)[1:2] != dim(tgt)[1:2])) stop( "'x' and 'tgt' must have the same size" )
   if (getNumberOfFrames(x,'render') != getNumberOfFrames(tgt,'render')) stop( "'x' and 'tgt' must have the same number of render frames" )                           
-
+  
   col = c(col, rep(NA, 3-length(col)))
   opac = c(opac, rep(1, 3-length(opac)))
   zcol = which(is.na(col))
@@ -27,26 +45,8 @@ paintObjects = function (x, tgt, opac=c(1, 1), col=c('red', NA)) {
   
   opac = as.numeric(opac)
   if (any(opac < 0) || any(opac > 1)) stop("all opacity values must be in the range [0,1]" )
-
-  .Call("paintObjects", castImage(x), castImage(tgt), opac, Image(col), PACKAGE='EBImage')
-}
-
-paintObjects2 = function (x, tgt, opac=c(1, 1), col=c('red', NA), thick=FALSE) {
-  validImage(x)
-  if (colorMode(x)!=Grayscale)  stop("'", deparse(substitute(x), width.cutoff = 500L, nlines = 1), "' must be in 'Grayscale' color mode")
-  if (any(dim(x)[1:2] != dim(tgt)[1:2])) stop( "'x' and 'tgt' must have the same size" )
-  if (getNumberOfFrames(x,'render') != getNumberOfFrames(tgt,'render')) stop( "'x' and 'tgt' must have the same number of render frames" )                           
   
-  col = c(col, rep(NA, 3-length(col)))
-  opac = c(opac, rep(1, 3-length(opac)))
-  zcol = which(is.na(col))
-  col[zcol] = 'white'
-  opac[zcol] = 0
-  
-  opac = as.numeric(opac)
-  if (any(opac < 0) || any(opac > 1)) stop("all opacity values must be in the range [0,1]" )
-  
-  .Call("paintObjects2", castImage(x), castImage(tgt), opac, Image(col), as.integer(thick), PACKAGE='EBImage')
+  .Call("paintObjects", castImage(x), castImage(tgt), opac, Image(col), as.integer(thick), PACKAGE='EBImage')
 }
 
 
