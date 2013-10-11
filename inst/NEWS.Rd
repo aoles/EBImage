@@ -2,22 +2,24 @@
 
 \title{News for Package 'EBImage'}
 
-\section{Changes in version 4.2.0}{
+\section{Changes in version 4.4.0}{
   \subsection{NEW FEATURES}{
     \itemize{
-      \item 'localCurvature' function for computing local curvature along a line (J. Barry)
+      \item New \code{colorLabels} function color-coding labels of object masks by a random permutation (Bernd Fisher)
+      \item Additional argument \code{inputRange} to \code{normalize} allowing presetting a limited input intensity range
+      \item Additional argument \code{thick} to \code{paintObjects} controlling the thickness of boundary contours
     }
   }
   \subsection{SIGNIFICANT USER-VISIBLE CHANGES}{
     \itemize{
-      \item the range of pixel coordinates displayed in the JavaScript viewer is now (1,1):(w,h) rather than (0,0):(w-1,h-1) and matches the indices of the corresponding Image array
+      \item \code{normalize} and \code{combine} use the generics from BiocGenerics
+      \item removed the \code{along} argument from \code{combine}
+      \item Re-introduced calculation of 's.radius.sd' (standard deviation of the mean radius) in cell features
     }
   }
   \subsection{BUG FIXES}{
     \itemize{
-      \item 'erode'/'dilate': fixed a bug introduced in the previous version (4.0.0)
-      \item 'resize': new image width was calculated incorrectly when only height was provided (reported by B. Fischer)
-      \item 'medianFilter': incorrect [0:1] <-> integer range conversion (thanks to K. Johnson)
+      \item \code{getFrame}: XY dimensions equal 1 were dropped
     }
   }
 }
