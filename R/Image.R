@@ -38,7 +38,7 @@ Image = function(data=array(0, dim=c(1,1)), dim, colormode=NULL) {
     if (is.Image(data)) colormode=colorMode(data)
     else if (is.character(data)) colormode=NULL
     else colormode=Grayscale
-  } else colormode=EBImage:::parseColorMode(colormode)
+  } else colormode=parseColorMode(colormode)
 
   if (is.character(data)) {
     datac = col2rgb(data)/255
@@ -67,7 +67,7 @@ colorMode = function (y) {
 
 `colorMode<-` = function(y, value) {
   if (is(y, 'Image')) {
-    y@colormode = EBImage:::parseColorMode(value)
+    y@colormode = parseColorMode(value)
     validObject(y)
   } else warning('Color mode of an array cannot be changed, the array should be cast into an Image using \'Image\'')
   return(y)
@@ -510,13 +510,13 @@ channel = function (x, mode) {
     return(switch(mode,
                   rgb=x,
                   ## Color->Grayscale conversion is done using 1/3 uniform RGB weights
-                  grey=,gray=(EBImage:::selectChannel(x,1)+EBImage:::selectChannel(x,2)+EBImage:::selectChannel(x,3))/3,
-                  r=,red=EBImage:::selectChannel(x,1),
-                  g=,green=EBImage:::selectChannel(x,2),
-                  b=,blue=EBImage:::selectChannel(x,3),
-                  asred=EBImage:::selectChannel(x,1),
-                  asgreen=EBImage:::selectChannel(x,2),
-                  asblue=EBImage:::selectChannel(x,3),
+                  grey=,gray=(selectChannel(x,1)+selectChannel(x,2)+selectChannel(x,3))/3,
+                  r=,red=selectChannel(x,1),
+                  g=,green=selectChannel(x,2),
+                  b=,blue=selectChannel(x,3),
+                  asred=selectChannel(x,1),
+                  asgreen=selectChannel(x,2),
+                  asblue=selectChannel(x,3),
                   x11=array(rgb(selectChannel(x,1),selectChannel(x,2),selectChannel(x,3)),dim=dim(selectChannel(x,1))),
                   stop('invalid conversion mode')
                   ))
