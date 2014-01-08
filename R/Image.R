@@ -45,7 +45,7 @@ Image = function(data=array(0, dim=c(1,1)), dim, colormode=NULL) {
     res = rgbImage(Image(datac[1,,drop=FALSE], dim=dim[1:2]),  Image(datac[2,,drop=FALSE], dim=dim[1:2]),  Image(datac[3,,drop=FALSE], dim=dim[1:2]))
     if (!is.null(colormode)) if (colormode==Grayscale) res = channel(res, 'gray')
   } else {
-    res = new("Image", .Data = as.array(data,dim=dim), colormode=colormode)
+    res = new("Image", .Data = array(data, dim=dim), colormode=colormode)
   }
 
   validObject(res)

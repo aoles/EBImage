@@ -1,3 +1,7 @@
+version 4.5.4
+- fixed header title in the vignette
+- rolled back the change from 'array' to 'as.array' from previous commit
+
 version 4.5.3
 performance optimizations:
 - changed 'array' call to 'as.array' in Image constructor
