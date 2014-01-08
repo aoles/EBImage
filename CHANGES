@@ -1,3 +1,8 @@
+version 4.5.3
+performance optimizations:
+- changed 'array' call to 'as.array' in Image constructor
+- 'normalize' does not reassign returned value to the original object
+
 version 4.3.7
 - fixed a bug in 'getFrame' function: XY dimensions equal 1 were dropped
 
