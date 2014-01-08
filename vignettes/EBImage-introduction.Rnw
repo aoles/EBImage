@@ -33,9 +33,8 @@ BiocStyle::latex()
 \end{center}
 \end{figure}
 
-\title{Introduction to \Rpackage{EBImage},\\
+\bioctitle[Introduction to \Rpackage{EBImage}]{Introduction to \Rpackage{EBImage},\\
 an image processing and analysis toolkit for R}
-\renewcommand{\thetitle}{Introduction to \Rpackage{EBImage}} % short title used in headers
 \author{Gregoire Pau, Oleg Sklyar, Wolfgang Huber\\\email{gpau@ebi.ac.uk}}
 
 \maketitle

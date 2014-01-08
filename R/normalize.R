@@ -9,7 +9,6 @@ normalizeImage = function(object, separate = TRUE, ft = c(0, 1), inputRange) {
     inputRange <- as.numeric(inputRange)
     if ( diff(inputRange) == 0 ) stop("specified input range is 0")
   }
-  cat(paste(Sys.getpid(),"\n"))
   .Call("normalize", castImage(object), as.integer(separate), ft, inputRange, PACKAGE='EBImage')
 }
 
