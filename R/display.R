@@ -12,7 +12,7 @@ display = function(x, title = deparse(substitute(x), width.cutoff = 500L, nlines
 
 ## displays an image using R graphics
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-displayRaster = function(image, frame, all = FALSE){
+displayRaster = function(image, frame, all = FALSE, interpolate = TRUE){
 
   nf = getNumberOfFrames(image, type="render")
 
@@ -37,7 +37,7 @@ displayRaster = function(image, frame, all = FALSE){
       for(c in 1:ncol) {
         ## plot the figure as a raster image
         if (f<=nf) {
-          rasterImage(getFrame(image, f, type="render"), 1 + ((c-1)*xdim) , 1 + ((r-1)*ydim), c*xdim, r*ydim, interpolate=TRUE)
+          rasterImage(getFrame(image, f, type="render"), 1 + ((c-1)*xdim) , 1 + ((r-1)*ydim), c*xdim, r*ydim, interpolate = interpolate)
           f = f + 1
         }
         else break
