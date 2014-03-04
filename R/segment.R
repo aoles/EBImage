@@ -41,7 +41,23 @@ bwlabel = function(x) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-colorLabels <- function(x, normalize = TRUE) {
+colorLabels = function(x, normalize = TRUE){
+  f = function(x, m){
+    x[x > 0] <- sample(m)[x[x > 0]]
+    x
+  }
+  m = max(x)
+  
+  y = Image(data = replicate(3, f(x, m)), colormode = "Color")
+  
+  if (normalize) {
+    y <- normalize(y)
+  }
+  
+  y  
+}
+
+colorLabelsOld <- function(x, normalize = TRUE) {
   M <- max(x)
   R <- sample(M)
   G <- sample(M)
