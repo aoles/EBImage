@@ -54,7 +54,7 @@ paintObjects = function (x, tgt, opac=c(1, 1), col=c('red', NA), thick=FALSE) {
 stackObjects = function (x, ref, combine=TRUE, bg.col='black', ext) {
   ## check arguments
   checkCompatibleImages(x, ref, 'render')
-  nz = getNumberOfFrames(x, 0)
+  nz = getNumberOfFrames(x)
   if (colorMode(x) != Grayscale) stop("'x' must be an image in 'Grayscale' color mode or an array")
     
   ## uses 'computeFeatures.moment' to get centers and theta
