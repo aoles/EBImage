@@ -58,8 +58,8 @@ colorMode(y) <- value
 imageData(y)
 imageData(y) <- value
 
-getFrame(y, i, type='total')
-getNumberOfFrames(y, type='total')
+getFrame(y, i, type = c('total', 'render'))
+getNumberOfFrames(y, type = c('total', 'render'))
 }
 
 

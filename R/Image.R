@@ -369,7 +369,43 @@ setMethod ("[", signature(x="Image", i="ANY", j="ANY", drop="ANY"),
            })
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-getFrame = function(y, i, type='total') {
+# convert linear index to array indices
+ind2sub = function(x, y) {
+  if(x > prod(y)) 
+    stop("Index out of bounds")
+  if ( (len=length(y)) == 0 )
+    return(NULL)
+  
+  res = div = 1
+  for(i in seq_len(len-1))
+    div[i+1] = div[i] * y[i] 
+  
+  for(i in rev(seq_len(len))){
+    res[i] = ceiling(x/div[i])
+    x = x - (res[i]-1) * div[i]
+  }
+  
+  stopifnot(length(res)==len)
+  res
+}
+
+getFrame = function(y, i, type = c('total', 'render')) {
+  type = match.arg(type)
+  
+  n = getNumberOfFrames(y, type = type)
+  if (i<1 || i>n) stop("'i' must belong between 1 and ", n)
+  
+  if( length( (d = dim(y)) ) == 2)
+    return(y)
+  
+  fdim = ifelse (type=='render' && colorMode(y)==Color, 3, 2)
+  x = eval(parse(text = paste0("y[", paste(c(character(fdim), ind2sub(i, d[-1:-fdim])), collapse = ","), ", drop=FALSE]")))
+  dim(x) = d[1:fdim]
+  
+  return(x)
+}
+
+getFrameOld = function(y, i, type='total') {
   n = getNumberOfFrames(y, type=type)
   if (i<1 || i>n) stop("'i' must belong between 1 and ", n)
   
@@ -402,7 +438,17 @@ getFrame = function(y, i, type='total') {
 ## If type='total', returns the total number of frames
 ## If type='render', return the number of frames to be rendered after color channel merging
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-getNumberOfFrames = function(y, type='total') {
+getNumberOfFrames = function(y, type = c('total', 'render')) {
+  type = match.arg(type)
+  d = dim(y)
+  if (type=='render' && colorMode(y)==Color) {
+    if (length(d)< 3) return(1)
+    else return(prod(d[-1:-3]))
+  }
+  else return(prod(d[-1:-2]))
+}
+
+getNumberOfFramesOld = function(y, type='total') {
   if (missing(type)) type='total'
   if (type=='render' && colorMode(y)==Color) {
     if (length(dim(y))< 3) return(1)
