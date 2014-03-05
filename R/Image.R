@@ -395,11 +395,9 @@ getFrame = function(y, i, type = c('total', 'render')) {
   n = getNumberOfFrames(y, type = type)
   if (i<1 || i>n) stop("'i' must belong between 1 and ", n)
   
-  if( length( (d = dim(y)) ) == 2)
-    return(y)
-  
   fdim = ifelse (type=='render' && colorMode(y)==Color, 3, 2)
-#   x = eval(parse(text = paste0("y[", paste(c(character(fdim), ind2sub(i, d[-1:-fdim])), collapse = ","), ", drop=FALSE]")))
+  if( (len = length( (d = dim(y)) )) == fdim) return(y)
+  
   x = asub(y, as.list(ind2sub(i, d[-1:-fdim])), (fdim+1):len)
   dim(x) = d[1:fdim]
   
