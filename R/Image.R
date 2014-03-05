@@ -399,7 +399,8 @@ getFrame = function(y, i, type = c('total', 'render')) {
     return(y)
   
   fdim = ifelse (type=='render' && colorMode(y)==Color, 3, 2)
-  x = eval(parse(text = paste0("y[", paste(c(character(fdim), ind2sub(i, d[-1:-fdim])), collapse = ","), ", drop=FALSE]")))
+#   x = eval(parse(text = paste0("y[", paste(c(character(fdim), ind2sub(i, d[-1:-fdim])), collapse = ","), ", drop=FALSE]")))
+  x = asub(y, as.list(ind2sub(i, d[-1:-fdim])), (fdim+1):len)
   dim(x) = d[1:fdim]
   
   return(x)
