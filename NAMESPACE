@@ -6,7 +6,7 @@ importFrom("methods", "show")
 importFrom("graphics", "image")
 importFrom("graphics", "hist")
 importFrom("stats", "median")
-importFrom("abind", "abind")
+importFrom("abind", "abind", "asub")
 
 importFrom("tiff", "readTIFF", "writeTIFF")
 importFrom("jpeg", "readJPEG", "writeJPEG")
