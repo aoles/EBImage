@@ -174,6 +174,97 @@ determineFileType = function(files, type) {
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 readImage = function(files, type, all=TRUE, ...) {
+  
+  readURL = function(url, buffer=2^24){
+    f = try(file(url, "rb"), silent=TRUE)
+    if (inherits(f,"try-error")) 
+      stop(attr(f,"condition")$message)
+    
+    rawData = bufData = NULL;
+    
+    while( length(bufData <- readBin(f, 'raw', buffer))>0 )
+      rawData = c(rawData, bufData)
+    
+    try(close(f), silent=TRUE)
+    
+    rawData
+  }
+  
+  type = try (EBImage:::determineFileType(files, type), silent=TRUE)
+  if (inherits(type,"try-error")) 
+    stop(attr(type,"condition")$message)
+  
+  readFun = switch(type,
+                   tiff = function(x, ...) {
+                     y = readTIFF(x, all=all, ...)
+                     # make sure all frames have the same dimensions
+                     if(length(y)>1)
+                       if(!all(duplicated(lapply(y, dim))[-1]))
+                         stop("Frame dimensions of a TIFF file are not equal")
+                     y
+                   },
+                   jpeg = function(x, ...) readJPEG(x, ...),
+                   png  = function(x, ...) readPNG(x, ...),
+                   stop(sprintf("Invalid type: %s. Currently supported formats are JPEG, PNG, and TIFF.", type))
+  )
+  
+  # flatten nested image list and remove null elements
+  flatten <- function(x) {
+    while(any(vapply(x, is.list, logical(1)))) {
+      x <- lapply(x, function(x) if(is.list(x)) x else list(x))
+      x <- unlist(x, recursive=FALSE) 
+    }
+    x[!vapply(x, is.null, logical(1))]
+  }
+  
+  y = lapply(files, function(i) {
+    ## first look for local files
+    if(!file.exists(i)){
+      ## might still be a remote URL  
+      w = options(warn=2)
+      rawData = try(readURL(i), silent = TRUE)
+      options(w) 
+      if (inherits(rawData,"try-error")) {
+        warning( paste(unlist(strsplit(attr(rawData,"condition")$message, "(converted from warning) ", fixed=TRUE)), sep="", collapse=""))
+        return (NULL)
+      }
+      else
+        ## is url
+        img = readFun(rawData)
+    }
+    ## ensure that the file is not a directory
+    else if (file.info(i)$isdir){
+      warning(sprintf("Cannot open %s: Is directory.", i))
+      return (NULL)
+    }
+    else
+      ## appears to be a legit file
+      img = readFun(i)
+    
+    img
+  })
+  
+  y = flatten(y)
+  
+  l = length(y)
+  if(l==0)
+    stop("Empty image stack.")
+  
+  channels = EBImage:::channelLayout((y1 = y[[1]]))
+  if(l>1) {
+    if(!all(duplicated(lapply(y, dim))[-1]))
+      stop("Images have different dimensions")
+    
+    y <- abind(y, along = length(dim(y1))+1)
+  }
+  else
+    y = y1
+  
+  Image(transpose(y), colormode = if(isTRUE(charmatch(channels,'G') == 1)) Grayscale else Color )
+}
+
+
+readImageOld = function(files, type, all=TRUE, ...) {
 
   readURL = function(url, buffer=2^24){
     f = try(file(url, "rb"), silent=TRUE)
