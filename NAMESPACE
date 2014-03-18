@@ -57,7 +57,7 @@ export(distmap)
 export(floodFill, fillHull)
 
 ## colorspace
-export(rgbImage, channel)
+export(rgbImage, channel, toRGB)
 
 ## image stacking, tiling
 export(stackObjects)

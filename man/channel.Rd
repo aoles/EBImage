@@ -2,6 +2,7 @@
 
 \alias{channel}
 \alias{rgbImage}
+\alias{toRGB}
 
 \concept{color conversion}
 \concept{color mode}
@@ -11,11 +12,13 @@
 \description{
   \code{channel} handles color space conversions between image modes.
   \code{rgbImage} combines \code{Grayscale} images into a \code{Color} one.
+  \code{toRGB} is just a wrapper function for convenient greyscale to RGB color space conversion; the call \code{toRGB(x)} returns the result of \code{channel(x, 'rgb')}.
 }
 
 \usage{ 
 channel(x, mode)
 rgbImage(red, green, blue)
+toRGB(x)
 }
 
 \arguments{

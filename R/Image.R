@@ -190,7 +190,7 @@ readImage = function(files, type, all=TRUE, ...) {
     rawData
   }
   
-  type = try (EBImage:::determineFileType(files, type), silent=TRUE)
+  type = try (determineFileType(files, type), silent=TRUE)
   if (inherits(type,"try-error")) 
     stop(attr(type,"condition")$message)
   
@@ -250,7 +250,7 @@ readImage = function(files, type, all=TRUE, ...) {
   if(l==0)
     stop("Empty image stack.")
   
-  channels = EBImage:::channelLayout((y1 = y[[1]]))
+  channels = channelLayout((y1 = y[[1]]))
   if(l>1) {
     if(!all(duplicated(lapply(y, dim))[-1]))
       stop("Images have different dimensions")
@@ -486,8 +486,10 @@ getFrame = function(y, i, type = c('total', 'render')) {
   n = getNumberOfFrames(y, type = type)
   if (i<1 || i>n) stop("'i' must belong between 1 and ", n)
   
-  fdim = ifelse (type=='render' && colorMode(y)==Color, 3, 2)
-  if( (len = length( (d = dim(y)) )) == fdim) return(y)
+  ## frame dimensions
+  len = length( (d = dim(y)) )
+  fdim = ifelse (colorMode(y)==Color && type=='render' &&  len>2, 3, 2)
+  if (len==fdim) return(y)
   
   x = asub(y, as.list(ind2sub(i, d[-1:-fdim])), (fdim+1):len)
   dim(x) = d[1:fdim]
@@ -659,6 +661,10 @@ channel = function (x, mode) {
   }
 }
 
+toRGB = function(x) {
+  channel(x, "rgb")
+}
+
 ## GP: Useful ?
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("hist", signature(x="Image"),
@@ -691,11 +697,13 @@ combineImages = function (x, y, ...) {
   if (!all(dim(x)[1:2]==dim(y)[1:2])) stop("images must have the same 2D frame size to be combined")
   
   ## merging along position guided by colorMode
-  if (colorMode(x)==Color) {
-    if (colorMode(y)==Color) along=4
-    else along=3
-  } else along=3
-    
+  along = ifelse (colorMode(x)==Color && colorMode(y)==Color, 4, 3)
+  
+  ## add extra dimension in case of single frame Color Images
+  if(along == 4) {
+    if(colorMode(x)==Color && length((d = dim(x)))==2) dim(x) = c(d, 1)
+    if(colorMode(y)==Color && length((d = dim(y)))==2) dim(y) = c(d, 1)
+  }
   z = abind(x, y, along=along)
   dimnames(z) = NULL
   imageData(x) = z
