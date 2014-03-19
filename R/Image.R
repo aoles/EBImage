@@ -88,9 +88,13 @@ imageData = function (y) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-is.Image <- function (x) {
+is.Image.old <- function (x) {
   if (!is(x, "Image")) return(FALSE)
   else return (TRUE)
+}
+
+is.Image <- function (x) {
+  is(x, "Image")
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
