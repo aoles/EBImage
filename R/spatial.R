@@ -70,9 +70,21 @@ resize <- function(x, w, h, filter="bilinear", output.dim, output.origin=c(0, 0)
 }
 
 ## transposes the XY dimensions
-transpose <- function(x, coerce = FALSE) {
+transpose.old <- function(x, coerce = FALSE) {
   validImage(x)
   dims = 1:length(dim(x))
+  dims[1:2] = c(2:1)
+  y = aperm(x, dims)
+  if ( (!coerce) && is.Image(x) )
+    x@.Data = y
+  else 
+    x = y
+  x
+}
+
+transpose <- function(x, coerce = FALSE) {
+  validImage(x)
+  dims = seq_along(dim(x))
   dims[1:2] = c(2:1)
   y = aperm(x, dims)
   if ( (!coerce) && is.Image(x) )
