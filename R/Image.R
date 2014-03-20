@@ -234,7 +234,7 @@ readImage = function(files, type, all=TRUE, ...) {
       }
       else
         ## is url
-        img = readFun(rawData)
+        return(readFun(rawData))
     }
     ## ensure that the file is not a directory
     else if (file.info(i)$isdir){
@@ -243,9 +243,7 @@ readImage = function(files, type, all=TRUE, ...) {
     }
     else
       ## appears to be a legit file
-      img = readFun(i)
-    
-    img
+      return(readFun(i))
   })
   
   y = flatten(y)
@@ -264,7 +262,9 @@ readImage = function(files, type, all=TRUE, ...) {
   else
     y = y1
   
-  Image(transpose(y), colormode = if(isTRUE(charmatch(channels,'G') == 1)) Grayscale else Color )
+  y = transpose(y)
+  
+  Image(y, colormode = if(isTRUE(charmatch(channels,'G') == 1)) Grayscale else Color )
 }
 
 
