@@ -1,15 +1,11 @@
 flip <- function (x) {
   validImage(x)
-  nd=as.list(rep(T, length(dim(x))))
-  nd[[2]]=dim(x)[2]:1
-  do.call('[', c(list(x),nd))
+  asub(x, seq.int(dim(x)[2],1), 2)
 }
 
 flop <- function (x) {
   validImage(x)
-  nd=as.list(rep(T, length(dim(x))))
-  nd[[1]]=dim(x)[1]:1
-  do.call('[', c(list(x),nd))
+  asub(x, seq.int(dim(x)[1],1), 1)
 }
 
 ## performs an affine transform on a set of images
@@ -21,19 +17,21 @@ affine <- function (x, m, filter=c("bilinear", "none"), output.dim) {
   m <- cbind(m, c(0, 0, 1))
   filter <- match.arg(filter)
   filter <- as.integer(c(none=0, bilinear=1)[filter])
-  if (!missing(output.dim) && (length(output.dim)!=2 || !is.numeric(output.dim))) stop("'output.dim' must be a numeric vector of length 2")
+  
+  # dimensions of output image
+  d = dim(x)  
+  if (!missing(output.dim)) {
+    if(length(output.dim)!=2 || !is.numeric(output.dim)) stop("'output.dim' must be a numeric vector of length 2")
+    d = c(output.dim[1:2], if((ld=length(d))>2) d[3:ld] else NULL)
+  }
   
   ## backtransform
   m <- solve(m)
-
-  ## output image
-  if (missing(output.dim)) {
-    y <- Image(0, dim=dim(x), colormode=colorMode(x))
-  } else {
-    y <- Image(0, dim=c(output.dim[1], output.dim[2], tail(dim(x), -2)), colormode=colorMode(x))
-  }
   
-  return (.Call("affine", castImage(x), castImage(y), m, filter, PACKAGE='EBImage'))
+  ## create output image
+  y <- new("Image", .Data = array(0, dim = d), colormode = colorMode(x))
+
+  .Call("affine", castImage(x), castImage(y), m, filter, PACKAGE='EBImage')
 }
 
 rotate <- function(x, angle, filter="bilinear", output.dim, output.origin=c(0, 0)) {
@@ -65,31 +63,19 @@ resize <- function(x, w, h, filter="bilinear", output.dim, output.origin=c(0, 0)
   if (length(output.origin)!=2 || !is.numeric(output.origin)) stop("'output.origin' must be a numeric vector of length 2")
   
   ratio <- c(w, h)/dim(x)[1:2]
-  m <-  matrix(c(ratio[1], 0, output.origin[1], 0, ratio[2], output.origin[2]), nrow=3)
+  m <- matrix(c(ratio[1], 0, output.origin[1], 0, ratio[2], output.origin[2]), nrow=3)
   affine(x, m, filter, output.dim=output.dim)
 }
 
 ## transposes the XY dimensions
-transpose.old <- function(x, coerce = FALSE) {
-  validImage(x)
-  dims = 1:length(dim(x))
-  dims[1:2] = c(2:1)
-  y = aperm(x, dims)
-  if ( (!coerce) && is.Image(x) )
-    x@.Data = y
-  else 
-    x = y
-  x
-}
-
 transpose <- function(x, coerce = FALSE) {
   validImage(x)
   dims = seq_along(dim(x))
   dims[1:2] = c(2:1)
   y = aperm(x, dims)
-  if ( (!coerce) && is.Image(x) )
+  if ( (!coerce) && is.Image(x) ) {
     x@.Data = y
-  else 
-    x = y
-  x
+    x
+  }
+  else y
 }

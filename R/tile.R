@@ -18,10 +18,9 @@ tile = function (x, nx=10, lwd=1, fg.col="#E4AF2B", bg.col="gray") {
   else {
     validImage(x)
     if ( nx < 1 || lwd < 0 || lwd > 100 ) stop( "wrong range of arguments, see help for range details" )
-
-    hdr = Image(c(fg.col,bg.col), colormode=Color, dim=c(2,1))
-
-    if (colorMode(x)==Grayscale) hdr=channel(hdr, 'gray')
+    
+    hdr = Image(c(fg.col,bg.col), dim = c(2,1), colormode = colorMode(x))
+    
     .Call("tile", castImage(x), hdr, as.integer(c(nx, lwd)), PACKAGE='EBImage')
   }
 }
