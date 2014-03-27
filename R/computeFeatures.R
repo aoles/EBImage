@@ -1,7 +1,5 @@
 ## tests
 tests = function() {
-  library("EBImage")
-  source("R/computeFeatures.R")
 
   ## build labeled image x and reference y
   y = readImage(system.file("images", "nuclei.tif", package="EBImage"))[,,1]

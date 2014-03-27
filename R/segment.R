@@ -53,34 +53,18 @@ colorLabels = function(x, normalize = TRUE){
     y
   }
   
-  y = Image(data = apply(x, 2, function(y) {
-                          m = max(y)
-                          replicate(3, f(y, m))
-                        }), 
-            dim = c(d[1:2], 3, if(len>2) d[3:len] else NULL),
-            colormode = "Color")
+  y = apply(x, 2, function(y) {
+    m = max(y)
+    replicate(3, f(y, m))
+  })
+  
+  # restore proper dimensions
+  dim(y) = c(d[1:2], 3, if(len>2) d[3:len] else NULL)
+  
+  y = new("Image", .Data = y, colormode = Color)
   
   if (normalize) 
     y = normalize(y)
   
   y
-}
-
-
-colorLabelsOld <- function(x, normalize = TRUE) {
-  M <- max(x)
-  R <- sample(M)
-  G <- sample(M)
-  B <- sample(M)
-  ch1 = x
-  ch2 = x
-  ch3 = x
-  ch1[ch1 > 0] <- R[ch1[ch1>0]]
-  ch2[ch2 > 0] <- G[ch2[ch2>0]]
-  ch3[ch3 > 0] <- B[ch3[ch3>0]]
-  Img = Image(data = combine(ch1, ch2, ch3), colormode="Color")
-  if (normalize) {
-    Img <- normalize(Img)
-  }
-  Img
 }

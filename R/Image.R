@@ -26,37 +26,41 @@ setClass ("Image",
 )
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Image = function(data=array(0, dim=c(1,1)), dim, colormode=NULL) {
+Image = function(data = array(0, dim=c(1,1)), dim, colormode) {
   if (missing(dim)) {
-    if (is.array(data)) dim=base::dim(data)
-    else dim=c(1,length(data))
+    if (is.array(data)) dim = base::dim(data)
+    else dim = c(1, length(data))
   }
-  ld = length(dim)
-  if (ld<2) stop(sprintf("length(dim) must be at least 2 and is %d.", ld))
-
-  if (is.null(colormode)) {
-    if (is.Image(data)) colormode=colorMode(data)
-    else if (is.character(data)) colormode=NULL
-    else colormode=Grayscale
-  } else colormode=parseColorMode(colormode)
-
+  else if (length(dim)<2) stop("The number of dimensions dim must be at least 2")
+  
+  if (missing(colormode)) {
+    if (is.Image(data))
+      colormode = colorMode(data)
+    else 
+      if (!is.character(data))
+        colormode=Grayscale
+  }
+  else colormode = parseColorMode(colormode)
+  
   if (is.character(data)) {
     datac = col2rgb(data)/255
-    res = rgbImage(Image(datac[1,,drop=FALSE], dim=dim[1:2]),  Image(datac[2,,drop=FALSE], dim=dim[1:2]),  Image(datac[3,,drop=FALSE], dim=dim[1:2]))
-    if (!is.null(colormode)) if (colormode==Grayscale) res = channel(res, 'gray')
-  } else {
-    res = new("Image", .Data = array(data, dim=dim), colormode=colormode)
-  }
-
-  validObject(res)
+    res = rgbImage(array(datac[1,,drop=FALSE], dim), array(datac[2,,drop=FALSE], dim), array(datac[3,,drop=FALSE], dim))
+    if (!missing(colormode)) if (colormode==Grayscale) res = channel(res, 'gray')
+  } 
+  else res = new("Image", .Data = array(data, dim=dim), colormode=colormode)
+  
   return(res)
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+is.Image <- function (x) is(x, "Image")
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 as.Image = function(x) {
-  x = Image(x, colormode=Grayscale)
-  validImage(x)
-  return(x)
+  if(is.Image(x))
+    x
+  else
+    Image(x)
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -69,8 +73,9 @@ colorMode = function (y) {
   if (is(y, 'Image')) {
     y@colormode = parseColorMode(value)
     validObject(y)
-  } else warning('Color mode of an array cannot be changed, the array should be cast into an Image using \'Image\'')
-  return(y)
+    y
+  } 
+  else warning('Color mode of an array cannot be changed, the array should be cast into an Image using \'Image\'')
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -80,35 +85,25 @@ imageData = function (y) {
 }
 
 `imageData<-` = function (y, value) {
-    if (is(y, 'Image')) {
+  if (is(y, 'Image')) {
     y@.Data = value
     validObject(y)
-  } else return(value)
-  return (y)
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-is.Image.old <- function (x) {
-  if (!is(x, "Image")) return(FALSE)
-  else return (TRUE)
-}
-
-is.Image <- function (x) {
-  is(x, "Image")
+    y
+  } 
+  else value
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 validImageObject = function(object) {
   ## check colormode
   if (!is.integer(colorMode(object))) return('colormode must be an integer')
-  if (colorMode(object)<0 | colorMode(object)>2) return('invalid colormode')
+  if (colorMode(object)!=0 && colorMode(object)!=2) return('invalid colormode')
 
   ## check array
   if (!is.array(object)) return('object must be an array')
 
   ## check dim
-  d=dim(object)
-  if (length(d)<2) return('object must have at least two dimensions')
+  if (length(dim(object))<2) return('object must have at least two dimensions')
   if (getNumberOfFrames(object,'total')<1) return('Image must contain at least one frame')
 
   TRUE
@@ -120,7 +115,7 @@ setValidity("Image", validImageObject)
 setMethod("Ops", signature(e1="Image", e2="Image"),
 	function(e1, e2) {
           e1@.Data=callGeneric(imageData(e1), imageData(e2))
-           validObject(e1)
+          validObject(e1)
           return(e1)
 	}
 )
@@ -212,16 +207,7 @@ readImage = function(files, type, all=TRUE, ...) {
                    stop(sprintf("Invalid type: %s. Currently supported formats are JPEG, PNG, and TIFF.", type))
   )
   
-  # flatten nested image list and remove null elements
-  flatten <- function(x) {
-    while(any(vapply(x, is.list, logical(1)))) {
-      x <- lapply(x, function(x) if(is.list(x)) x else list(x))
-      x <- unlist(x, recursive=FALSE) 
-    }
-    x[!vapply(x, is.null, logical(1))]
-  }
-  
-  y = lapply(files, function(i) {
+  loadFun = function(i) {
     ## first look for local files
     if(!file.exists(i)){
       ## might still be a remote URL  
@@ -244,120 +230,54 @@ readImage = function(files, type, all=TRUE, ...) {
     else
       ## appears to be a legit file
       return(readFun(i))
-  })
+  }
   
-  y = flatten(y)
+  # flatten nested image list and remove null elements
+  flatten <- function(x) {
+    while(any(vapply(x, is.list, logical(1)))) {
+      x <- lapply(x, function(x) if(is.list(x)) x else list(x))
+      x <- unlist(x, recursive=FALSE) 
+    }
+    x[!vapply(x, is.null, logical(1))]
+  }
   
-  l = length(y)
-  if(l==0)
-    stop("Empty image stack.")
+  # stratify processing for single and multiple files to increase performance
   
-  channels = channelLayout((y1 = y[[1]]))
-  if(l>1) {
+  # single file
+  if(length(files) == 1){
+    y = loadFun(files)
+  }
+  
+  #  multiple files
+  else {
+    y = lapply(files, loadFun)
+    y = flatten(y)   
+  }
+  
+  if(is.list(y)){
+    if(length(y)==0) stop("Empty image stack.")
+    
+    # check whether image dimensions match
     if(!all(duplicated(lapply(y, dim))[-1]))
       stop("Images have different dimensions")
     
-    y <- abind(y, along = length(dim(y1))+1)
+    y1 = y[[1]]
+    channels = channelLayout(y1)
+    if(length(y) == 1)
+      y = y1
+    else {
+      y <- abind(y, along = length(dim(y1))+1)
+      dimnames(y) = NULL
+    }
+    rm(y1)
   }
-  else
-    y = y1
+  else{
+    channels = channelLayout(y)
+  }
   
   y = transpose(y)
   
-  Image(y, colormode = if(isTRUE(charmatch(channels,'G') == 1)) Grayscale else Color )
-}
-
-
-readImageOld = function(files, type, all=TRUE, ...) {
-
-  readURL = function(url, buffer=2^24){
-    f = try(file(url, "rb"), silent=TRUE)
-    if (inherits(f,"try-error")) 
-      stop(attr(f,"condition")$message)
-
-    rawData = bufData = NULL;
-
-    while( length(bufData <- readBin(f, 'raw', buffer))>0 )
-      rawData = c(rawData, bufData)
-
-    try(close(f), silent=TRUE)
-
-    rawData
-  }
-
-  type = try (determineFileType(files, type), silent=TRUE)
-  if (inherits(type,"try-error")) 
-      stop(attr(type,"condition")$message)
-
-  readFun = switch(type,
-    tiff = function(x, ...) readTIFF(x, all=all, ...),
-    jpeg = function(x, ...) readJPEG(x, ...),
-    png  = function(x, ...) readPNG(x, ...),
-    stop(sprintf("Invalid type: %s. Currently supported formats are JPEG, PNG, and TIFF.", type))
-    )
-
-  stack = NULL
-
-  for(i in seq_along(files)) {
-    ## first look for local files
-    if(!file.exists(files[i])){
-      ## might still be a remote URL  
-      w = options(warn=2)
-      rawData = try(readURL(files[i]), silent = TRUE)
-      options(w) 
-      if (inherits(rawData,"try-error")) {
-        warning( paste(unlist(strsplit(attr(rawData,"condition")$message, "(converted from warning) ", fixed=TRUE)), sep="", collapse=""))
-        next
-      }
-      else
-      ## is url
-        img = readFun(rawData)
-    }
-    ## ensure that the file is not a directory
-    else if (file.info(files[i])$isdir){
-      warning(sprintf("Cannot open %s: Is directory.", files[i]))
-      next
-    }
-    else
-    ## appears to be a legit file
-      img = readFun(files[i])
-
-    ## readTIFF returns a list for stacked images.
-    nf = if(is.list(img)) length(img) else 1
-
-    for(j in seq_len(nf)) {
-      frame = if(is.list(img)) img[[j]] else img
-
-      ## AO: Discard alpha channel in Greyscale images to maintain compatibility with the previous version
-#       if (channelLayout(frame) == 'GA')
-#         frame = frame[,,1]
-
-      ## fix image layout based on the first file (& frame)
-      if (is.null(stack)) {
-        refName = if (nf>1) paste(files[i], j, sep=",") else files[i]
-        dim = dim(frame)
-        channels = channelLayout(frame)
-#         if (channels == 'unknown')
-#           stop(sprintf("%s: Unsupported channel layout,", refName))
-
-        stack = frame
-      }
-      else {
-        if ( identical(dim, dim(frame)) )
-          stack = abind(stack, frame, along=length(dim)+1)
-        else if (!identical(dim[1:2], dim(frame)[1:2]))
-          stop(sprintf("%s: Image size (%s) does not match reference size (%s) of %s. All images need to have the same width and height.", if (nf>1) paste(files[i], j, sep=",") else files[i], paste(dim(frame)[1:2], collapse=" x "), paste(dim[1:2], collapse=" x "), refName ))
-        else
-          stop(sprintf("%s: Channel layout (%s) does not match reference channel layout (%s) of %s. All images need to have the same number of channels.", if (nf>1) paste(files[i], j, sep=",") else files[i], channelLayout(frame), channels, refName ))
-      }
-    }
-  }
-
-  if (is.null(stack))
-    stop("Empty image stack.")
-  else
-  ## perform image transposition by swapping the XY dimensions
-  Image(transpose(stack), colormode = if(isTRUE(charmatch(channels,'G') == 1)) 'Grayscale' else 'Color' )
+  new("Image", .Data = y, colormode = if(isTRUE(charmatch(channels,'G') == 1)) Grayscale else Color )
 }
 
 ## private
@@ -372,14 +292,21 @@ channelLayout = function(x){
 ## helper function used to check whether image data can be written on X bits without accuracy loss
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 isXbitImage = function(x, bits) {
-        y = (2^bits - 1) * as.numeric(x)[1] ## fast termination if not
-        if (trunc(y)==y)
-          y = (2^bits - 1) * x
-	all(trunc(y)==y)
+  b = 2^bits - 1
+  x = as.numeric(x)
+  
+  ## fast termination if not
+  y = b * x[1] 
+  if (trunc(y)!=y)
+    FALSE
+  else  {
+    y = b * x
+    all(trunc(y)==y)
+  }
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-writeImage = function (x, files, type, quality=100, bits.per.sample, compression='none', ...) {
+writeImageOld = function (x, files, type, quality=100, bits.per.sample, compression='none', ...) {
   validImage(x)
 
   type = try (determineFileType(files, type), silent=TRUE)
@@ -448,6 +375,86 @@ writeImage = function (x, files, type, quality=100, bits.per.sample, compression
   }
 }
 
+writeImage = function (x, files, type, quality=100L, bits.per.sample, compression='none', ...) {
+  ## internal copy of getFrame which can operate on Images coerced to arrays, which is faster in combination with transpose(... coerce=TRUE)
+  getFrameInternal = function(y, i, colormode) {
+    ## frame dimensions
+    len = length( (d = dim(y)) )
+    fdim = ifelse (colormode==Color && len>2, 3, 2)
+    if (len==fdim) return(y)
+    
+    x = asub(y, as.list(ind2sub(i, d[-1:-fdim])), (fdim+1):len)
+    dim(x) = d[1:fdim]
+    
+    return(x)
+  }
+  
+  validImage(x)
+  
+  type = try (determineFileType(files, type), silent=TRUE)
+  if (inherits(type,"try-error")) 
+    stop(attr(type,"condition")$message)
+  
+  ## automatic bits.per.sample guess
+  if ( (type=='tiff') && missing(bits.per.sample) ) {
+    if (isXbitImage(x, 8L)) 
+      bits.per.sample = 8L 
+    else 
+      bits.per.sample = 16L
+  }
+  
+  writeFun = switch(type,
+                    tiff = function(x, file, ...) writeTIFF(x, file, bits.per.sample=bits.per.sample, compression=compression, ...),
+                    jpeg = function(x, file, ...) writeJPEG(x, file, quality=quality/100, ...),
+                    png  = function(x, file, ...) writePNG(x, file, ...),
+                    stop(sprintf("Invalid type: %s. Currently supported formats are JPEG, PNG, and TIFF.", type))
+  )
+  
+  if ((quality<1L) || (quality>100L))
+    stop("'quality' must be a value between 1 and 100.")
+  
+  nf = getNumberOfFrames(x, type='render')
+  lf = length(files)
+  colormode = colorMode(x)
+  
+  if ( (lf!=1) && (lf!=nf) )
+    stop(sprintf("Image contains %g frame(s) which is different from the length of the file name list: %g. The number of files must be 1 or equal to the size of the image stack.", nf, lf))
+  
+  else {
+    frames = seq_len(nf)
+    
+    x = clipImage(x) ## clip the image and change storage mode to double
+    x = transpose(x, coerce=TRUE)    
+    
+    if ( lf==1 && nf>1 ) {
+      ## store all frames into a single TIFF file
+      if (type=='tiff') {
+        
+        ## create list of image frames
+        la = lapply(frames, function(i) getFrameInternal(x, i, colormode))
+        
+        if (nf==writeFun(la, files, ...))
+          return(invisible(files))
+        else
+          stop(sprintf("Error writing file sequence to TIFF."))
+      }
+      ## generate file names for frames
+      else {
+        basename = unlist(strsplit(files, split=".", fixed=TRUE))
+        prefix   = basename[-length(basename)]
+        suffix   = basename[length(basename)]
+        
+        files = vapply(frames, function(i) paste0(paste0(prefix, collapse='.'), '-', i-1, '.', suffix), character(1))
+      }
+    }
+    
+    ## store image frames into individual files
+    for (i in frames)
+      writeFun(getFrameInternal(x, i, colormode), files[i], ...)
+    return(invisible(files))
+  }
+}
+
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("[", signature(x="Image", i="ANY", j="ANY", drop="ANY"),
            function(x,i,j,...,drop) {
@@ -492,42 +499,13 @@ getFrame = function(y, i, type = c('total', 'render')) {
   
   ## frame dimensions
   len = length( (d = dim(y)) )
-  fdim = ifelse (colorMode(y)==Color && type=='render' &&  len>2, 3, 2)
+  fdim = ifelse (colorMode(y)==Color && type=='render' && len>2, 3, 2)
   if (len==fdim) return(y)
   
   x = asub(y, as.list(ind2sub(i, d[-1:-fdim])), (fdim+1):len)
   dim(x) = d[1:fdim]
   
   return(x)
-}
-
-getFrameOld = function(y, i, type='total') {
-  n = getNumberOfFrames(y, type=type)
-  if (i<1 || i>n) stop("'i' must belong between 1 and ", n)
-  
-  ld = length( (d = dim(y)) ) 
-  
-  ## multiple G frames or a single GA/RGB/RGBA
-  if (ld==3) {
-    if(type=='total' || colorMode(y)==Grayscale) {
-      y = y[,,i,drop=FALSE]
-      dim(y) = d[1:2]
-    }
-  }
-  
-  ## multiple GA/RGB/RGBA frames
-  else if (ld==4) {  
-    if(type=='render') {
-      y = y[,,,i,drop=FALSE]
-      dim(y) = d[1:3]
-    }
-    else {
-      y = y[,, i - d[3]*( (frame = ceiling(i/d[3])) - 1), frame, drop=FALSE]
-      dim(y) = d[1:2]
-    }
-  }
-  
-  return(y)
 }
 
 ## getNumberOfFrames
@@ -544,42 +522,33 @@ getNumberOfFrames = function(y, type = c('total', 'render')) {
   else return(prod(d[-1:-2]))
 }
 
-getNumberOfFramesOld = function(y, type='total') {
-  if (missing(type)) type='total'
-  if (type=='render' && colorMode(y)==Color) {
-    if (length(dim(y))< 3) return(1)
-    else return(prod(dim(y)[-1:-3]))
-  }
-  else return(prod(dim(y)[-1:-2]))
-}
-
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("show", signature(object="Image"),
   function (object) {
+    nd = dim(object)
+    ld = length(nd)
+    
     cat('Image\n')
-
-    valid=validObject(object,test=TRUE)
-    if (!is.logical(valid)) valid=paste(FALSE,', ',valid,sep='')
-
+    
     cat('  colormode:',c('Grayscale', NA, 'Color')[1+colorMode(object)],'\n')
     cat('  storage.mode:',storage.mode(object),'\n')
-    cat('  dim:',dim(object),'\n')
+    cat('  dim:',nd,'\n')
     cat('  nb.total.frames:',getNumberOfFrames(object,'total'),'\n')
     cat('  nb.render.frames:',getNumberOfFrames(object,'render'),'\n')
-
-    nd=dim(object)
-    if (nd[1]>5) nd[1]=5
-    if (nd[2]>6) nd[2]=6
-    if (length(nd)>2) nd[3:length(nd)]=1
-    ndl=lapply(nd,function(x) 1:x)
-    nds=paste('[1:',nd[1],',1:',nd[2],paste(rep(',1',length(nd)-2),collapse=''),']',sep='')
-
-    cat('\nimageData(object)',nds,':\n',sep='')
-    print(do.call('[',c(list(object@.Data),ndl)))
+    
+    if (nd[1]>5) nd[1] = 5
+    if (nd[2]>6) nd[2] = 6
+    if (ld>2) nd[3:ld] = 1
+    
+    ndl = lapply(nd, seq_len)
+    
+    nds = paste0('[1:',nd[1],',1:',nd[2],paste(rep(',1',ld-2),collapse=''),']')
+    
+    cat('\nimageData(object)', nds, ':\n', sep='')
+    print(asub(object@.Data, ndl))
     cat('\n')
-
-    invisible(NULL)
-  }
+    
+    invisible(NULL)}
 )
 
 print.Image <- function(x,...) show(x)
@@ -608,25 +577,27 @@ setMethod ("image", signature(x="Image"),
 
 ## private function to select a channel from a Color image
 ## failsafe, will return a black image if the channel doesn't exist
-selectChannel=function(x,i) {
+selectChannel = function(x, i) {
   if (colorMode(x)==Grayscale) stop("in 'selectChannel', color mode must be 'Color'")
-  n=getNumberOfFrames(x,'render')
-  d=dim(x)[1:2]
-  if (n>1) d=c(d,n)
-  black=Image(0,dim=d)
-  if (length(dim(x))<3) {
-    if (i==1) y=x
-    else y=black
-  } else {
-    if (i<=dim(x)[3]) {
-       nd=as.list(rep(T,length(dim(x))))
-       nd[[3]]=i
-       y=do.call('[',c(list(x),nd))
-     }
-    else y=black
+  n = getNumberOfFrames(x, 'render')
+  dim = dim(x)
+  d = dim[1:2]
+  if (n>1) d = c(d,n)
+  y = NULL 
+  
+  if (length(dim)<3) {
+    if (i==1) y = x
+  } 
+  else {
+    if (i<=dim[3]) y = asub(x, i, 3)
   }
-  colorMode(y)=Grayscale
-  return(y)
+  
+  if(is.null(y)) 
+    y = new("Image", .Data = array(0, dim = d), colormode = Grayscale)
+  else
+    colorMode(y) = Grayscale
+  
+  y
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -736,6 +707,7 @@ setMethod("combine", signature("list", "missing"),
 median.Image <- function(x, na.rm = FALSE) {
   median(imageData(x), na.rm=na.rm)
 }
+
 quantile.Image <- function(x, ...) {
   quantile(imageData(x), ...)
 }
@@ -764,7 +736,7 @@ rgbImage = function(red=NULL, green=NULL, blue=NULL) {
       compareDims(d, dim(blue))
   }
 
-  if (is.null(d)) stop('at least one non-null Image object must be specified')
+  if (is.null(d)) stop('at least one non-null array must be supplied')
   
   if (is.null(red)) red = array(0, dim=d)
   if (is.null(green)) green = array(0, dim=d)
@@ -773,7 +745,7 @@ rgbImage = function(red=NULL, green=NULL, blue=NULL) {
   x = abind(red, green, blue, along=2.5)
   dimnames(x) = NULL
   
-  Image(x, colormode=Color)
+  new("Image", .Data = x, colormode = Color)
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -791,11 +763,11 @@ parseColorMode = function(colormode) {
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## returns the raster representation of an image (by default the first frame)
-as.raster.Image = function(y, i=1) {
-  f = getFrame(y, i, type='render')
-  f = clipImage(f)
+as.raster.Image = function(y, i = 1) {
+  x = getFrame(y, i, type='render')
+  x = clipImage(x)
   ## get image data with swapped XY dimensions
-  a = transpose(f, coerce = TRUE)
+  x = transpose(x, coerce = TRUE)
   ## the actual raster representation
-  as.raster(a)
+  as.raster(x)
 }

@@ -23,4 +23,3 @@ localCurvature = function(x, h=100, maxk=10000) {
 
  return(list(contour=x, curvature=curvature(derivatives), length=max(px, na.rm=TRUE)))
 }
-

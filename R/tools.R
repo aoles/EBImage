@@ -17,8 +17,10 @@
 ## checks whether 'x' is a suitable image
 validImage=function(x) {
   z = validImageObject(x)
-  if (z!=TRUE) stop(z)
-  else TRUE
+  if (isTRUE(z))
+    TRUE
+  else 
+    stop(z)
 }
 
 ## changes the storage.mode of 'x' to 'double' if required
@@ -27,11 +29,9 @@ castImage=function(x) {
   x
 }
 
-## clip pixel data to the [0,1] range
-clipImage = function(x) {
-  x[x<0] = 0
-  x[x>1] = 1
-  x
+## clip pixel data to the specified range
+clipImage = function(x, range = c(0, 1)) {
+  normalize(x, ft = NULL, inputRange = range)
 }
 
 ## check if x (indexing image) and ref (image) are compatible

@@ -57,25 +57,28 @@ normalize (SEXP x, SEXP separate, SEXP outrange, SEXP inrange) {
       }
   }
   
-  for ( im = 0; im < nz; im++ ) {
-    data = &( REAL(res)[ im * nx * ny ] );
-    if ( sep ) {
-      min = DBL_MAX;
-      max = -DBL_MAX;
-      for ( i = 0; i < nx * ny; i++ ) {
-        if ( data[i] < min ) min = data[i];
-        if ( data[i] > max ) max = data[i];
+  // normalize only if normalization range is avlid
+  if ( (to-from) != 0 ) {  
+    for ( im = 0; im < nz; im++ ) {
+      data = &( REAL(res)[ im * nx * ny ] );
+      if ( sep ) {
+        min = DBL_MAX;
+        max = -DBL_MAX;
+        for ( i = 0; i < nx * ny; i++ ) {
+          if ( data[i] < min ) min = data[i];
+          if ( data[i] > max ) max = data[i];
+        }
+        diff = max - min;
+        if ( diff == 0 ) {
+          warning( "frame can not be normalized, its diff(range) is 0" );
+          continue;
+        }        
       }
-      diff = max - min;
-      if ( diff == 0 ) {
-        warning( "frame can not be normalized, its diff(range) is 0" );
-        continue;
-      }        
+      for ( i = 0; i < nx * ny; i++ )
+        data[i] = ( data[i] - min ) / diff * (to - from) + from;
     }
-    for ( i = 0; i < nx * ny; i++ )
-      data[i] = ( data[i] - min ) / diff * (to - from) + from;
   }
-
+  
   UNPROTECT (nprotect);
   return res;
 }
