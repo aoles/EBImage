@@ -1,3 +1,65 @@
+version 4.5.17
+- added 'luminance' conversion mode to 'channel'
+- removed old code of 'writeImage'
+- added package news from previous versions to 'NEWS.Rd'
+- updated CHANGES
+
+version 4.5.16
+- further memory and performance improvements to 'readImage'
+- 'clipImage' now relies on the C coded 'normalize' function (up to 5x faster!)
+- significant performance improvements (up to 2x faster):
+  'Image'
+  'is.Image'
+  'selectChannel'
+  'show'
+  'flip'/'flop'
+- minor performance improvements (i.e. by using call to 'new' instead of 'Image'):
+  'validImage'
+  'filter2'
+  'colorLabels'
+  'rgbImage'
+  'affine'
+  'tile'
+  'isXbitImage'
+  'writeImage'
+- when called on an Image object 'as.Image' returns now it's argument rather than the Grayscale-coerced copy
+- Image constructor handles now properly multi-dimensional character arrays
+- fixed color mode check in 'validImageObject'
+- removed unnecessary calls to 'validObject'
+  NOTE: there is no need to check for object validity after creating it with 'new' (this is done automatically by R)
+- added some missing imports from 'methods' to the NAMESPACE file
+
+version 4.5.15
+- memory improvement to 'readImage'
+
+version 4.5.14
+- minor improvements to 'is.Image' and 'transpose'
+
+version 4.5.12
+- updated man page of 'flip', 'flop', and 'rotate'
+
+version 4.5.11
+- fix to 'getFrame' and 'combine' for single channel Color Images
+- added convenience function 'toRGB'
+
+version 4.5.10
+- fixed performance of 'readImage', especially on big image stacks
+
+version 4.5.9
+- 'colorLabels' now supports multidimensional images
+
+version 4.5.8
+- 'getFrame' now uses 'asub' from the abind package
+
+version 4.5.7
+- improved code and performance of 'colorLabels'
+
+version 4.5.6
+- updated 'getNumberOfFrames' and 'getFrame' functions to support multi-dimensional images
+
+version 4.5.5
+- added 'interpolate' parameter to the internal 'displayRaster' function
+
 version 4.5.4
 - fixed header title in the vignette
 - rolled back the change from 'array' to 'as.array' from previous commit
@@ -6,6 +68,12 @@ version 4.5.3
 performance optimizations:
 - changed 'array' call to 'as.array' in Image constructor
 - 'normalize' does not reassign returned value to the original object
+
+version 4.5.2
+- minor modifications to code and documentation
+
+version 4.5.1
+- moved vignette from 'inst/doc/' to 'vignettes/'
 
 version 4.3.7
 - fixed a bug in 'getFrame' function: XY dimensions equal 1 were dropped

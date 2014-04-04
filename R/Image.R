@@ -306,75 +306,6 @@ isXbitImage = function(x, bits) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-writeImageOld = function (x, files, type, quality=100, bits.per.sample, compression='none', ...) {
-  validImage(x)
-
-  type = try (determineFileType(files, type), silent=TRUE)
-  if (inherits(type,"try-error")) 
-      stop(attr(type,"condition")$message)
-
-  ## automatic bits.per.sample guess
-  if ( (type=='tiff') && missing(bits.per.sample) )
-    if (isXbitImage(x, 8L)) 
-      bits.per.sample = 8L 
-    else 
-      bits.per.sample = 16L
-
-  writeFun = switch(type,
-    tiff = function(x, file, ...) writeTIFF(x, file, bits.per.sample=bits.per.sample, compression=compression, ...),
-    jpeg = function(x, file, ...) writeJPEG(x, file, quality=quality/100, ...),
-    png  = function(x, file, ...) writePNG(x, file, ...),
-    stop(sprintf("Invalid type: %s. Currently supported formats are JPEG, PNG, and TIFF.", type))
-    )
-
-  if ((quality<1L) || (quality>100L))
-    stop("'quality' must be a value between 1 and 100.")
-  
-  nf = getNumberOfFrames(x, type='render')
-  lf = length(files)
-
-  if ( (lf!=1) && (lf!=nf) )
-    stop(sprintf("Image contains %g frame(s) which is different from the length of the file name list: %g. The number of files must be 1 or equal to the size of the image stack.", nf, lf))
-  
-  else {
-    x = castImage(x) ## if needed change storage mode to double 
-    x = clipImage(x)
-
-    if ( lf==1 && nf>1 ) {
-      ## store all frames into a single TIFF file
-      if (type=='tiff') {
-	x = transpose(x, coerce = TRUE)
-        dims = dim(x)
-        ndim = length(dims)
-
-        ## create list of image frames
-        if (ndim==3)
-          la = lapply(seq_len(dims[ndim]), function(y) x[,,y])
-        else
-          la = lapply(seq_len(dims[ndim]), function(y) x[,,,y])
-
-        if (nf==writeFun(la, files, ...))
-          return(invisible(files))
-        else
-          stop(sprintf("Error writing file sequence to TIFF."))
-      }
-      ## generate frame file names
-      else {
-        basename = unlist(strsplit(files, split=".", fixed=TRUE))
-        prefix   = basename[-length(basename)]
-        suffix    = basename[length(basename)]
-        for(i in seq_len(nf))
-          files[i] = paste(paste(prefix, collapse='.'), '-', i-1, '.',suffix, sep='')
-      }
-    }
-
-    ## store image frames into individual files
-    for (i in seq_len(nf))
-      writeFun(transpose(getFrame(x, i, type='render'), coerce = TRUE), files[i], ...)
-    return(invisible(files))
-  }
-}
-
 writeImage = function (x, files, type, quality=100L, bits.per.sample, compression='none', ...) {
   ## internal copy of getFrame which can operate on Images coerced to arrays, which is faster in combination with transpose(... coerce=TRUE)
   getFrameInternal = function(y, i, colormode) {
@@ -609,7 +540,7 @@ channel = function (x, mode) {
   if (colorMode(x)==Grayscale) {
     return(switch(mode,
                   rgb=rgbImage(red=x,green=x,blue=x),
-                  grey=,gray=x,
+                  grey=,gray=,luminance=x,
                   r=,red=stop('invalid conversion mode, can\'t extract the red channel from a \'Grayscale\' image'),
                   g=,green=stop('invalid conversion mode, can\'t extract the green channel from a \'Grayscale\' image'),
                   b=,blue=stop('invalid conversion mode, can\'t extract the blue channel from a \'Grayscale\' image'),
@@ -624,6 +555,7 @@ channel = function (x, mode) {
                   rgb=x,
                   ## Color->Grayscale conversion is done using 1/3 uniform RGB weights
                   grey=,gray=(selectChannel(x,1)+selectChannel(x,2)+selectChannel(x,3))/3,
+                  luminance=0.2126*selectChannel(x,1)+0.7152*selectChannel(x,2)+0.0722*selectChannel(x,3),
                   r=,red=selectChannel(x,1),
                   g=,green=selectChannel(x,2),
                   b=,blue=selectChannel(x,3),

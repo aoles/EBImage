@@ -44,6 +44,9 @@ toRGB(x)
 
   \item{\code{gray, grey}}{Converts a \code{Color} image into a
     \code{Grayscale} image, using uniform 1/3 RGB weights.}
+    
+  \item{\code{luminance}}{Luminance-preserving \code{Color} to \code{Grayscale} conversion
+  using CIE 1931 luminance weights: 0.2126 * R + 0.7152 * G + 0.0722 * B.}
 
   \item{\code{red, green, blue}}{Extracts the \code{red}, \code{green} or
     \code{blue} channel from a \code{Color} image. Returns a
