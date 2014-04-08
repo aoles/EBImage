@@ -1,3 +1,7 @@
+version 4.5.19
+- 'displayRaster' does not restore 'par' graphical parameters on exit
+- fixed 'interpolate' argument passing in 'displayRaster'
+
 version 4.5.18
 - improvements to documentation
 
