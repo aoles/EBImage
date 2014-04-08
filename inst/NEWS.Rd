@@ -14,6 +14,7 @@
       'getFrame', 'selectChannel', 'rgbImage', 'colorLabels', 'flip'/'flop'
       \item Reduced memory footprint of 'readImage'
       \item When called on an 'Image' object, 'as.Image' returns its argument rather than the Grayscale-coerced copy  
+      \item 'displayRaster' sets 'par$usr' coordinates to image pixel coordinates easing up plot annotation
     }
   }
   \subsection{BUG FIXES}{
