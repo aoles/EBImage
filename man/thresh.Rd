@@ -30,7 +30,7 @@ thresh(x, w=5, h=5, offset=0.01)
   between an image and its filtered version with a rectangular window.
   It is equivalent of doing \code{\{f = matrix(1, nc=2*w+1, nr=2*h+1) ; f=f/sum(f) ; x>(filter2(x, f)+offset)\}} 
   but slightly faster. The function \code{filter2} provides hence more 
-  flexbility than \code{thresh}.
+  flexibility than \code{thresh}.
 }
 
 \seealso{

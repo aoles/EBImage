@@ -62,7 +62,7 @@
     \item \code{floodFill}, \code{fillHull}
   }
 
-  Colorspace manipulation
+  Color space manipulation
   \itemize{  
     \item \code{rgbImage}, \code{channel}
   }

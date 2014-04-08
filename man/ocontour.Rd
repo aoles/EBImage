@@ -15,7 +15,7 @@ ocontour(x)
   \item{x}{An \code{Image} object or an array, containing objects.
     Only integer values are considered. Pixels of value 0 constitute
     the background. Each object is a set of pixels with the same unique
-    integer value. Objets are assumed connected.
+    integer value. Objects are assumed connected.
   }
 }
 

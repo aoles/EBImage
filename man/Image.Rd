@@ -29,21 +29,21 @@
 \title{Image class}
 
 \description{
-  The package \code{EBImage} uses the class \code{Image} to store and process
+  \code{EBImage} uses the \code{Image} class to store and process
   images. Images are stored as multi-dimensional arrays containing the pixel
-  intensities. The class \code{Image} extends the base class \code{array} and
+  intensities. \code{Image} extends the base class \code{array} and
   uses the \code{colormode} slot to store how the color information of
   the multi-dimensional data is handled.
 
-  The \code{colormode} slot could be either \code{Grayscale} or \code{Color}. Greyscale images containing an alpha channel are stored with \code{colormode = Color}. In both modes, the first two dimensions of the underlying array are understood to be the spatial
-  dimensions of the image. In the \code{Grayscale} mode, the remaining dimensions
-  contain other images. In the the \code{Color} mode, the third dimension contains color channels of the image: either
-  the red, green, blue and, possibly, alpha channel, or the grey and alpha channels; the remaining dimensions contain
-  other images.
-
-  All methods of the package \code{EBImage} work either with \code{Image} objects or
-  multi-dimensional arrays but in the latter case, the color mode is assumed to be
-  \code{Grayscale}.
+  The \code{colormode} slot can be either \code{Grayscale} or \code{Color}.
+  In either mode, the first two dimensions of the underlying array are understood to be the spatial dimensions of the image.
+  In the \code{Grayscale} mode the remaining dimensions contain other image frames.
+  In the \code{Color} mode, the third dimension contains color channels of the image, while higher dimensions contain  image frames.
+  The number of channels is not limited and can be any number >= 1; these can be, for instance, the red, green, blue and, possibly, alpha channel.
+  Note that grayscale images containing an alpha channel are stored with \code{colormode=Color}.
+  
+  All methods from the \code{EBImage} package work either with \code{Image} objects or
+  multi-dimensional arrays. In the latter case, the color mode is assumed to be \code{Grayscale}.
 }
 
 \usage{
@@ -64,15 +64,14 @@ getNumberOfFrames(y, type = c('total', 'render'))
 
 
 \arguments{
-  \item{data}{A vector or array containing the pixel intensities of an image. If missing, a default 1x1
-  null array is used.}
+  \item{data}{A vector or array containing the pixel intensities of an image. If missing, the default 1x1
+  zero-filled array is used.}
 
   \item{dim}{A vector containing the final dimensions of an \code{Image} object. If missing, equals to
   \code{dim(data)}.}
 
-  \item{colormode}{A numeric or a character string containing the color mode which could be
-  either \code{Grayscale} or \code{Color}. If missing, equals to
-  \code{Grayscale}.}
+  \item{colormode}{A numeric or a character string containing the color mode which can be
+  either \code{Grayscale} or \code{Color}. If missing, equals to \code{Grayscale}.}
 
   \item{x}{An R object.}
 
@@ -81,7 +80,7 @@ getNumberOfFrames(y, type = c('total', 'render'))
   \item{i}{A numeric.}
 
   \item{value}{For \code{colorMode}, a numeric or a character string containing the color mode which
-    could be either \code{Grayscale} or \code{Color}. For \code{imageData}, an \code{Image} object or an array.}
+    can be either \code{Grayscale} or \code{Color}. For \code{imageData}, an \code{Image} object or an array.}
 
   \item{type}{A character string containing \code{total} or \code{render}. Default is \code{total}.}
 }
@@ -91,7 +90,7 @@ getNumberOfFrames(y, type = c('total', 'render'))
 
   \code{is.Image} returns TRUE if \code{x} is an \code{Image} object and FALSE otherwise.
 
-  \code{as.raster.Image} coerces an Image object to a raster object. For stacked images the \code{i}th frame is returned (by default the first one).
+  \code{as.raster.Image} coerces an Image object to a raster object. For stacked images the \code{i}-th frame is returned (by default the first one).
 
   \code{colorMode} returns the color mode of \code{y} and \code{colorMode<-} changes the color mode
   of \code{y}.
@@ -100,14 +99,14 @@ getNumberOfFrames(y, type = c('total', 'render'))
 }
 
 \details{
-  Depending of \code{type}, \code{getNumberOfFrames} returns the total number of frames contained
-  in the object \code{y} or the number of renderable frames. The total number of frames is independent
-  of the color mode and is equal to the product of all the dimensions except the two first ones. The
-  number of renderable frames is equal to the total number of frames in the \code{Grayscale} color mode
-  and is equal to the product of all the dimensions except the three first ones in the \code{Color} color mode.
+  Depending on \code{type}, \code{getNumberOfFrames} returns the total number of frames contained
+  in the object \code{y} or the number of rendered frames. The total number of frames is independent
+  of the color mode and equals to the product of all the dimensions except the two first ones. The
+  number of rendered frames is equal to the total number of frames in the \code{Grayscale} color mode, or
+  to the product of all the dimensions except the three first ones in the \code{Color} color mode.
 
   \code{getFrame} returns the i-th frame contained in the image \code{y}. If \code{type} is \code{total}, the
-  function is unaware of the color mode and returns an xy-plane. If \code{render}, the function returns the
+  function is unaware of the color mode and returns an xy-plane. For \code{type=render}, the function returns the
   i-th image as shown by the \code{display} function.
 }
 

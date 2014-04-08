@@ -28,7 +28,7 @@ combine(x, y, ...)
 }
 
 \details{
-  The function \code{combine} uses \code{abind} to merge multi-dimensionnal
+  The function \code{combine} uses \code{abind} to merge multi-dimensional
   arrays along the dimension depending on the
   color mode of \code{x}. If \code{x} is a \code{Grayscale} image or an array,
   image objects are combined along the third dimension, whereas when

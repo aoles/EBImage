@@ -28,7 +28,7 @@ watershed(x, tolerance=1, ext=1)
     is a reasonable value if \code{x} comes from \code{distmap}.}
 
   \item{ext}{Radius of the neighborhood in pixels for the detection
-    of neighboring objects. Higher value smoothes out small objects. }
+    of neighboring objects. Higher value smooths out small objects. }
 }
 
 \value{
