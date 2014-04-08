@@ -76,26 +76,26 @@ makeBrush(size, shape=c('box', 'disc', 'diamond', 'gaussian', 'line'), step=TRUE
 }
 
 \details{
-  \code{dilate} applies the mask positioning its centre over every background pixel
+  \code{dilate} applies the mask positioning its center over every background pixel
   (0), every pixel which is not covered by the mask is reset to foreground (1).
   
-  \code{erode} applies the mask positioning its centre over every foreground pixel
+  \code{erode} applies the mask positioning its center over every foreground pixel
   (!=0), every pixel which is not covered by the mask is reset to background (0).
 
   \code{opening} is an erosion followed by a dilation and \code{closing} is a dilation
-  followed by an erosion. The same goes for the greyscale versions.
+  followed by an erosion. The same goes for the grayscale versions.
 
-  \code{dilateGreyScale} applies the mask positioning its centre over every pixel of the
+  \code{dilateGreyScale} applies the mask positioning its center over every pixel of the
   \code{Image}, the output value of the pixel is the maximum value of the \code{Image}
   covered by the mask.
 
-  \code{erodeGreyScale} applies the mask positioning its centre over every pixel of the
+  \code{erodeGreyScale} applies the mask positioning its center over every pixel of the
   \code{Image}, the output value of the pixel is the minimum value of the \code{Image}
   covered by the mask.
 
-  \code{whiteTopHatGreyScale} substracts the opening of the \code{Image} from the \code{Image}
+  \code{whiteTopHatGreyScale} subtracts the opening of the \code{Image} from the \code{Image}
 
-  \code{blackTopHatGreyScale} substracts the \code{Image} from the closing of the \code{Image}
+  \code{blackTopHatGreyScale} subtracts the \code{Image} from the closing of the \code{Image}
 
   \code{selfcomplementaryTopHatGreyScale} is the sum of a white top-hat and a black top-hat, simplified
   the difference between closing and opening of the \code{Image}
@@ -103,7 +103,7 @@ makeBrush(size, shape=c('box', 'disc', 'diamond', 'gaussian', 'line'), step=TRUE
   \code{makeBrush} generates brushes of various sizes and shapes that can be used
   as structuring elements.
 
-  Operations on greyscale images use an implementation of the Urbach-Wilkinson algorithm[1] and can
+  Operations on grayscale images use an implementation of the Urbach-Wilkinson algorithm[1] and can
   only handle flat (i.e. binary) brushes.
 }
 

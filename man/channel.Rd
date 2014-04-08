@@ -12,7 +12,7 @@
 \description{
   \code{channel} handles color space conversions between image modes.
   \code{rgbImage} combines \code{Grayscale} images into a \code{Color} one.
-  \code{toRGB} is just a wrapper function for convenient greyscale to RGB color space conversion; the call \code{toRGB(x)} returns the result of \code{channel(x, 'rgb')}.
+  \code{toRGB} is a wrapper function for convenient grayscale to RGB color space conversion; the call \code{toRGB(x)} returns the result of \code{channel(x, 'rgb')}.
 }
 
 \usage{ 
@@ -56,8 +56,8 @@ toRGB(x)
     image or an array into a \code{Color} image of the specified hue.}
 }
 
-\code{channel} changes the pixel intensities, unlike \code{colorMode}
-which just changes the way that EBImage should render an image,
+NOTE: \code{channel} changes the pixel intensities, unlike \code{colorMode}
+which just changes the way that EBImage renders an image.
 }
 
 \seealso{

@@ -27,7 +27,7 @@ stackObjects(x, ref, combine=TRUE, bg.col='black', ext)
 
   \item{bg.col}{Background pixel color.}
 
-  \item{ext}{A numeric controlling the size of the output simage. 
+  \item{ext}{A numeric controlling the size of the output image. 
    If missing, \code{ext} is estimated from data. See details.}
 }
 

@@ -32,8 +32,8 @@ propagate(x, seeds, mask=NULL, lambda=1e-4)
    the binary image mask of the regions that can be segmented. If missing, 
    the whole image is segmented.}
 
-   \item{lambda}{A numeric value. The regularisation parameter used in the
-   metric, determining the trade-off between the Euclidian distance in the
+   \item{lambda}{A numeric value. The regularization parameter used in the
+   metric, determining the trade-off between the Euclidean distance in the
    image plane and the contribution of the gradient of \code{x}. See details.}
 }
 
@@ -51,8 +51,8 @@ propagate(x, seeds, mask=NULL, lambda=1e-4)
   \preformatted{d^2 = ( (t(dv)*g)^2 + lambda*t(dv)*dv )/(lambda + 1) },
   where g is the gradient of image \code{x} at point v.
 
-  \code{lambda} controls the weight of the Euclidian distance term. 
-  When \code{lambda} tends to infinity, d tends to the Euclidian
+  \code{lambda} controls the weight of the Euclidean distance term. 
+  When \code{lambda} tends to infinity, d tends to the Euclidean
   distance. When \code{lambda} tends to 0, d tends to the intensity
   gradient of the image.
 
@@ -61,7 +61,7 @@ propagate(x, seeds, mask=NULL, lambda=1e-4)
 
   Segmentation of the Voronoi regions in the vicinity of flat areas
   (having a null gradient) with small values of \code{lambda} can
-  suffer from artefacts coming from the metric approximation.
+  suffer from artifacts coming from the metric approximation.
 }
 
 \seealso{ \code{\link{bwlabel}}, \code{\link{watershed}}

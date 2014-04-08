@@ -50,11 +50,9 @@ affine(x, m, filter=c("bilinear", "none"), output.dim)
 }
 
 \details{
-  \code{flip} transforms \code{x} in its vertical mirror image by
-  reflecting the pixels around the central y-axis.
+  \code{flip} mirrors \code{x} across the central horizontal (x-)axis.
   
-  \code{flop} transforms \code{x} in its horizontal mirror image by
-  reflecting the pixels around the central x-axis.
+  \code{flop} mirrors \code{x} across the central vertical (y-)axis.
 
   \code{rotate} rotates the image clockwise by the specified
   angle around the origin. The rotation origin defaults to the center of the input image and can by changed by modifying 

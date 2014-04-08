@@ -5,7 +5,7 @@
 
 \concept{delete objects}
 
-\title{Object removal and reindexation}
+\title{Object removal and re-indexation}
 
 \description{
   The \code{rmObjects} functions deletes objects from an image
