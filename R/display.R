@@ -61,7 +61,7 @@ displayRaster = function(image, frame, all = FALSE, drawGrid = TRUE, ...){
   ## draw grid lines in case of multiple frames
   if( all && isTRUE(drawGrid) && nf>1 ) {
     clip(xran[1], xran[2], yran[1], yran[2])
-    abline(h = seq_len(ncol-1)*xdim + .5, v = seq_len(ncol-1)*xdim + .5, col = par()$bg)
+    abline(h = seq_len(ncol-1)*xdim + .5, v = seq_len(ncol-1)*xdim + .5, col = "white")
   }
 }
 
