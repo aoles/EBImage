@@ -12,14 +12,14 @@ See: ../LICENSE for license, LGPL
 
 /*----------------------------------------------------------------------- */
 SEXP
-tile (SEXP obj, SEXP hdr, SEXP params) {
+tile (SEXP obj, SEXP _hdr, SEXP params) {
   SEXP res, dm, ims;
   int mode =  getColorMode(obj);
   int ndy, ndx  = INTEGER(params)[0];
   int lwd = INTEGER(params)[1];
   int nc= getNumberOfChannels(obj);
   int nprotect, nx, ny, nz, ifg, ibg, nxr, nyr, * iim, i, j, index, x, y;
-  double dfg, dbg, * dim, onetondx;
+  double *hdr, * dim, onetondx;
   int rredstride,rgreenstride,rbluestride;
   int oredstride,ogreenstride,obluestride;
 
@@ -30,8 +30,7 @@ tile (SEXP obj, SEXP hdr, SEXP params) {
 
   if ( nz < 1 ) error("no images in stack to tile");
   /* get FG and BG colors from supplied header */
-  dfg = REAL(hdr)[0]; ifg = 0.0;
-  dbg = REAL(hdr)[1]; ibg = 0.0;
+  hdr = REAL(_hdr);
 
   /* calculate size of the resulting image */
   onetondx = 1.0 / (double)ndx;
@@ -39,11 +38,10 @@ tile (SEXP obj, SEXP hdr, SEXP params) {
   nxr = lwd + (nx + lwd) * ndx;
   nyr = lwd + (ny + lwd) * ndy;
 
-  /* allocate memory for the image, reset to BG */
+  /* allocate memory for the image */
   PROTECT( ims = allocVector(REALSXP, nc*nxr * nyr) );
   nprotect++;
   dim = REAL(ims); iim = NULL;
-  for ( i = 0; i < nc*nxr * nyr; i++ ) dim[i] = dbg;
   
   // make res final object
   if (mode!=MODE_COLOR) {
@@ -67,11 +65,17 @@ tile (SEXP obj, SEXP hdr, SEXP params) {
     res = SET_SLOT( res, install(".Data"), ims );
   } else res=ims;
   
-
-  /* loop through stack image and copy them to ims */
+  /* reset to BG */
+  getColorStrides(res,0,&rredstride,&rgreenstride,&rbluestride);
+  for ( i = 0; i < nxr * nyr; i++ ){
+    if (rredstride!=-1) dim[rredstride + i] = hdr[1];
+    if (rgreenstride!=-1) dim[rgreenstride + i] = hdr[3];
+    if (rbluestride!=-1) dim[rbluestride + i] = hdr[5];
+  }
+  
+  /* loop through stack image and copy them to ims */  
   for ( index = 0; index < nz; index++ ) {
     getColorStrides(obj,index,&oredstride,&ogreenstride,&obluestride);
-    getColorStrides(res,0,&rredstride,&rgreenstride,&rbluestride);
   
     /* loop through lines and copy by line */
     for ( j = 0; j < ny; j++ ) {
@@ -87,18 +91,27 @@ tile (SEXP obj, SEXP hdr, SEXP params) {
       if (obluestride!=-1)  memcpy( &(dim[i+rbluestride]), &(REAL(obj)[j* nx+obluestride]), nx * sizeof(double));
     }
   }
-  /* draw grid if required */
-  if ( lwd > 0 && (dfg != dbg || ifg != dbg) ) {
+  
+  /* draw grid if required */  
+  if ( lwd > 0 ) {
     /* vertical stripes */
     for (i = 0; i <= ndx; i++ ) {
       for ( x = i * (nx + lwd); x < lwd + i * (nx + lwd); x++ ) {
-	for ( y = 0; y < nyr; y++ ) dim[x + y * nxr] = dfg;
+	      for ( y = 0; y < nyr; y++ ) {
+          if (rredstride!=-1) dim[rredstride + x + y * nxr] = hdr[0];
+          if (rgreenstride!=-1) dim[rgreenstride + x + y * nxr] = hdr[2];
+          if (rbluestride!=-1) dim[rbluestride + x + y * nxr] = hdr[4];
+	      }        
       }
     }
     /* horizontal stripes */
     for (j = 0; j <= ndy; j++ ) {
       for ( y = j * (ny + lwd); y < lwd + j * (ny + lwd); y++ ) {
-	for ( x = 0; x < nxr; x++ ) dim[x + y * nxr] = dfg;
+	      for ( x = 0; x < nxr; x++ ) {
+          if (rredstride!=-1) dim[rredstride + x + y * nxr] = hdr[0];
+          if (rgreenstride!=-1) dim[rgreenstride + x + y * nxr] = hdr[2];
+          if (rbluestride!=-1) dim[rbluestride + x + y * nxr] = hdr[4];
+	      }
       }
     }
   }
@@ -192,9 +205,3 @@ untile(SEXP img, SEXP nim, SEXP linewd) {
   UNPROTECT(nprotect);
   return res;
 }
-
-
-
-
-
-

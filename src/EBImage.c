@@ -66,4 +66,3 @@ void R_init_EBImage (DllInfo * winDll) {
 void R_unload_EBImage (DllInfo * winDll) {
   UNUSED(winDll);
 }
-
