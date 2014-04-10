@@ -27,12 +27,12 @@ display(x, title = deparse(substitute(x), width.cutoff = 500L, nlines = 1), meth
 }
 
 \details{
-  By default (\code{method = "browser"}) images are displayed in a WWW browser using a JavaScript based image browser. Multiple windows or tabs can be opened in this way. Pressing H displays a list of available features along with corresponding mouse and keyboard actions.
+  By default (\code{method = "browser"}) images are displayed in a web browser using a JavaScript based image browser. Multiple windows or tabs can be opened in this way. Pressing 'h' displays a list of available features along with corresponding mouse and keyboard actions.
 
-If \code{method = "raster"} images are displayed using R's built-in \code{rasterImage} function. By default only the first frame of a stacked image is rendered; a different frame can be specified using \code{frame}. When \code{all = TRUE} all frames are rendered side by side and automatically positioned in a grid.
+If \code{method = "raster"} images are displayed using R's built-in \code{rasterImage} function. By default only the first frame of a stacked image is rendered; a different frame can be specified using \code{frame}. When \code{all = TRUE} all frames are rendered side by side and automatically positioned in a grid. The user coordinates of the plotting region are set to the image pixel coordinates with the origin \code{(0, 0)} in the upper left corner.
 }
 
-\note{For viewing images in a WWW browser a compatible browser with JavaScript enabled is required (e.g. Mozilla Firefox).}
+\note{For viewing images in a web browser a compatible browser with JavaScript enabled is required (e.g. Mozilla Firefox).}
 
 \author{
   Andrzej Oles, \email{andrzej.oles@embl.de}, 2012

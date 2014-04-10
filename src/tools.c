@@ -118,18 +118,12 @@ void getColorStrides(SEXP x,int index,int *redstride,int *greenstride,int *blues
 
   width=INTEGER(GET_DIM(x))[0];
   height=INTEGER(GET_DIM(x))[1];
-  colorMode=getColorMode(x);
+  nbChannels=getNumberOfChannels(x);
   
-  *redstride=index*width*height;
-  *greenstride=index*width*height;
-  *bluestride=index*width*height;
-
-  if (colorMode==MODE_COLOR) {
-    nbChannels=getNumberOfChannels(x);
-    *redstride=index*nbChannels*width*height;
-    *greenstride=-1;
-    *bluestride=-1;
-    if (nbChannels>1) *greenstride=index*nbChannels*width*height+width*height;
-    if (nbChannels>2) *bluestride=index*nbChannels*width*height+2*width*height;
-  }
+  *redstride=index*nbChannels*width*height;
+  *greenstride=-1;
+  *bluestride=-1;
+  
+  if (nbChannels>1) *greenstride=index*nbChannels*width*height+width*height;
+  if (nbChannels>2) *bluestride=index*nbChannels*width*height+2*width*height;
 }

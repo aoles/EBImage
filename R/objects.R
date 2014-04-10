@@ -28,7 +28,7 @@ paintObjects = function (x, tgt, opac=c(1, 1), col=c('red', NA), thick=FALSE) {
   opac = as.numeric(opac)
   if (any(opac < 0) || any(opac > 1)) stop("all opacity values must be in the range [0,1]" )
   
-  .Call("paintObjects", castImage(x), castImage(tgt), opac, Image(col), as.integer(thick), PACKAGE='EBImage')
+  .Call("paintObjects", castImage(x), castImage(tgt), opac, Image(col, colormode = colorMode(tgt)), as.integer(thick), PACKAGE='EBImage')
 }
 
 

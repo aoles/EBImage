@@ -1,3 +1,6 @@
+version 4.5.22
+- fixed 'fg.col' and 'bg.col' handling in 'tile'
+
 version 4.5.21
 - set 'col = "white"' for grid lines in 'displayRaster'
 

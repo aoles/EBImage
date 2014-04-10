@@ -23,6 +23,7 @@
       \item Proper handling of multi-dimensional character arrays by the 'Image' constructor
       \item Fixed 'getFrame' and 'combine' in case of single-channel Color Images
       \item Fixed color mode check in 'validImageObject'
+      \item Proper 'fg.col' and 'bg.col' color handling in 'tile'
       \item Updates to documentation
     }
   }
