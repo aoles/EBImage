@@ -33,7 +33,7 @@ whiteTopHatGreyScale(x, kern)
 blackTopHatGreyScale(x, kern)
 selfcomplementaryTopHatGreyScale(x, kern)
 
-makeBrush(size, shape=c('box', 'disc', 'diamond', 'gaussian', 'line'), step=TRUE, sigma=0.3, angle=45)
+makeBrush(size, shape=c('box', 'disc', 'diamond', 'Gaussian', 'line'), step=TRUE, sigma=0.3, angle=45)
 }
 
 \arguments{
@@ -50,7 +50,7 @@ makeBrush(size, shape=c('box', 'disc', 'diamond', 'gaussian', 'line'), step=TRUE
   \item{size}{A numeric containing the size of the brush in pixels. This should be an odd number; even numbers are rounded to the next odd one, i.e., \code{size = 4} has the same effect as  \code{size = 5}. If shape is \code{line}, \code{size} represents the length of the line.}
   
   \item{shape}{A character vector indicating the shape of the brush. Can
-    be \code{box}, \code{disc}, \code{diamond}, \code{gaussian} or \code{line}. Default is
+    be \code{box}, \code{disc}, \code{diamond}, \code{Gaussian} or \code{line}. Default is
     \code{box}.}
   
   \item{step}{a logical indicating if the brush is binary. Default is
@@ -127,7 +127,7 @@ makeBrush(size, shape=c('box', 'disc', 'diamond', 'gaussian', 'line'), step=TRUE
   if (interactive()) {
     display(makeBrush(99, shape='diamond'))
     display(makeBrush(99, shape='disc', step=FALSE))
-    display(2000*makeBrush(99, shape='gaussian', sigma=10))
+    display(2000*makeBrush(99, shape='Gaussian', sigma=10))
   }
 }
 
