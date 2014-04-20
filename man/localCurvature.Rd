@@ -57,7 +57,7 @@ localCurvature(x, h, maxk)
   ## curvature of Lena
   f=system.file("images", "lena.png", package="EBImage")
   x=readImage(f)
-  mk=makeBrush(size=21, shape='gaussian', sigma=9)
+  mk=makeBrush(size=21, shape="Gaussian", sigma=9)
   x2=filter2(x, filter=mk)
   x2=thresh(x2, w=50, h=50)
   x2=bwlabel(x2)
@@ -66,5 +66,5 @@ localCurvature(x, h, maxk)
   I=Image(0, dim=dim(x))
   imageData(I)[contours[[2]]+1]=abs(curv)
   x2[x2!=2]=0
-  if (interactive()) display(combine(x2, 10*I), title = 'Curvature of Lena')
+  if (interactive()) display(combine(x2, 10*I), title = "Lena's curvature")
 }
