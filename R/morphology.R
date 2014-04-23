@@ -14,7 +14,7 @@ distmap = function (x, metric=c('euclidean', 'manhattan')) {
 
 makeBrush = function(size, shape=c('box', 'disc', 'diamond', 'Gaussian', 'line'), step=TRUE, sigma=0.3, angle=45) {
   if(! (is.numeric(size) && (length(size)==1L) && (size>=1)) ) stop("'size' must be an odd integer.")
-  shape = tolower(match.arg(shape))
+  shape = match.arg(tolower(shape))
   
   if(size %% 2 == 0){
     size = size + 1
