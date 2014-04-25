@@ -26,7 +26,7 @@ Performs color coding of object masks, which are typically obtained using the \c
 }
 
 \author{
-  Bernd Fischer, 2013
+  Bernd Fischer, Andrzej Oles, 2013-2014
 }
 
 \seealso{
