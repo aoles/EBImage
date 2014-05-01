@@ -47,7 +47,7 @@ Image = function(data = array(0, dim=c(1,1)), dim, colormode) {
     res = rgbImage(array(datac[1,,drop=FALSE], dim), array(datac[2,,drop=FALSE], dim), array(datac[3,,drop=FALSE], dim))
     if (!missing(colormode)) if (colormode==Grayscale) res = channel(res, 'gray')
   } 
-  else res = new("Image", .Data = array(data, dim=dim), colormode=colormode)
+  else res = new("Image", .Data = array(data, dim=dim, dimnames=dimnames(data)), colormode=colormode)
   
   return(res)
 }
@@ -215,7 +215,7 @@ readImage = function(files, type, all=TRUE, ...) {
       rawData = try(readURL(i), silent = TRUE)
       options(w) 
       if (inherits(rawData,"try-error")) {
-        warning( paste(unlist(strsplit(attr(rawData,"condition")$message, "(converted from warning) ", fixed=TRUE)), sep="", collapse=""))
+        warning( paste0(unlist(strsplit(attr(rawData,"condition")$message, "(converted from warning) ", fixed=TRUE)), collapse=""))
         return (NULL)
       }
       else
@@ -387,18 +387,40 @@ writeImage = function (x, files, type, quality=100L, bits.per.sample, compressio
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("[", signature(x="Image", i="ANY", j="ANY", drop="ANY"),
-           function(x,i,j,...,drop) {
+setMethod ("[", "Image",
+           function(x, i , j, ..., drop = TRUE) {
              ## list(...) doesn't work in this S4 method dispatch framework
              ## we are using the following trick:
              ## the current call is evaluated, but using x@.Data instead of x in the previous calling frame
-             sc=sys.call()
-             sc[[2]]=call('slot',sc[[2]],'.Data')
-             z=eval.parent(sc)
-             if (!is.array(z)) z=array(z,dim=c(length(z),1))
-             x@.Data=z
-             validObject(x)
-             x
+             sc = sys.call()
+             args = as.list(sc[-c(1L, 2L)])
+             numIndices = length(args) - !is.null(args$drop)
+             
+             # when subsetting with single index treat as array
+             if (numIndices == 1L) {
+               callNextMethod()
+             }
+             else {
+               # subset image array without dropping dimensions
+               sc$drop = FALSE
+               sc[[2L]] = call('slot', sc[[2L]], '.Data')
+               z = eval.parent(sc)
+               
+               # drop dims higher than 2 unless 'drop' explicitly set to FALSE
+               if(!isTRUE(args$drop==FALSE) && length(dim(x)) > 2L){
+                 # select arguments corresponding to indices
+                 dims = as.list(sc[-c(1L, 2L)])
+                 dims = dims[names(dims) != "drop"]
+                 # numeric or character indices of length 1 (note: logical indices are recycled!)
+                 dims = which(mapply(function(x, y) ( length(x)==1L && (is.numeric(x) || is.character(x)) ) || y==1L, dims, dim(x)) == TRUE)
+                 # drop dims higher than 2
+                 z = adrop(z, drop = dims[dims>2L]) 
+               }
+               
+               x@.Data = z
+               validObject(x)
+               x
+             }
            })
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

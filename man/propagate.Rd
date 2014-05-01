@@ -85,7 +85,7 @@ propagate(x, seeds, mask=NULL, lambda=1e-4)
   lambda = 10^seq(-8, -1, by=1)
   segmented = Image(dim=c(dim(x), length(lambda)))
 
-  for(i in seq(along=lambda)) {
+  for(i in seq_along(lambda)) {
     prop = propagate(x, seeds, lambda=lambda[i])
     prop = prop/max(prop)
     segmented[,,i] = prop

@@ -112,7 +112,7 @@ standardExpandRef = function(ref, refnames) {
         refi = ref[[i]]
         refj = ref[[j]]
         jref0 = list( (refi - mean(refi)) * (refj - mean(refj)) )
-        names(jref0) = paste(refnames[i], refnames[j], sep="")
+        names(jref0) = paste0(refnames[i], refnames[j])
         ref = c(ref, jref0)
       }
     }
@@ -121,13 +121,13 @@ standardExpandRef = function(ref, refnames) {
   ## adding granulometry by blob transform
   blob = gblob(x0=15, n=49, alpha=0.8, beta=1.2)
   bref = lapply(ref, function(r) filter2(r, blob)/2)
-  names(bref) = paste("B", names(ref), sep="")
+  names(bref) = paste0("B", names(ref))
   c(ref, bref)
 }
 
 ## basic pixel-independant statistics
 computeFeatures.basic = function(x, ref, properties=FALSE, basic.quantiles=c(0.01, 0.05, 0.5, 0.95, 0.99), xs, ...) {
-  qnames = paste('b.q', gsub('\\.', '', as.character(basic.quantiles)), sep='')
+  qnames = paste0('b.q', gsub('\\.', '', as.character(basic.quantiles)))
   if (!properties) {
     ## check arguments
     x = checkx(x)
@@ -233,7 +233,7 @@ computeFeatures.moment = function(x, ref, properties=FALSE, xs, ...) {
 ## haralick features
 ## h.*: haralick features
 computeFeatures.haralick = function(x, ref, properties=FALSE, haralick.nbins=32, haralick.scales=c(1, 2), xs, ...) {
-  snames = paste("s", haralick.scales, sep="")
+  snames = paste0("s", haralick.scales)
   if (!properties) {
     ## check arguments
     x = checkx(x)

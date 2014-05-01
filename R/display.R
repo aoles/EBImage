@@ -100,7 +100,7 @@ displayInBrowser = function(x, title){
   setwd(wd)
 
   ## create browser query
-  query = paste("file://", normalizePath(file.path(tempDir,"display.html")), sep="")
+  query = paste0("file://", normalizePath(file.path(tempDir,"display.html")))
 
   browseURL(query)
 }
