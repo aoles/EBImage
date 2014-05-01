@@ -57,5 +57,3 @@ combine(x, y, ...)
   xt = combine(xt)
   if (interactive()) display(xt, title='Blurred Lenas')
 }
-
-

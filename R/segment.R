@@ -30,7 +30,7 @@ ocontour = function(x) {
   storage.mode(x)='integer'
   y = .Call('ocontour', x, PACKAGE='EBImage')[-1]
   y = lapply(y, function(z) matrix(z, ncol=2, byrow=TRUE))
-  names(y) = seq(along=y)
+  names(y) = seq_along(y)
   y[sapply(y, nrow)>0]
 }
 
