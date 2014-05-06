@@ -195,15 +195,9 @@ readImage = function(files, type, all=TRUE, ...) {
   
   .readFun = switch(type,
                    tiff = function(x, ...) {
-                     # chop of anything behind the last single dot including the dot
-                     name = unlist(strsplit(x, split="\\.[^.]*$", fixed = FALSE, perl = FALSE)[[1L]])
-                     y = readTIFF(x, all=all, ...)
-                     
-                     if ((l=length(y)) == 1L) {
-                       names(y) = name
-                     }                     
-                     else if (l > 1L) {
-                       names(y) = paste(name, seq_len(l), sep = ".")
+                     y = readTIFF(x, all = all, ...)
+                     if ( (l=length(y)) > 1L){
+                       names(y) = seq_len(l)
                        # make sure all frames have the same dimensions
                        if(!all(duplicated(lapply(y, dim))[-1L]))
                          stop(sprintf("Frame dimensions of the '%s' file are not equal.", x))
@@ -241,7 +235,7 @@ readImage = function(files, type, all=TRUE, ...) {
   .flatten <- function(x) {
     while(any(vapply(x, is.list, logical(1L)))) {
       x <- lapply(x, function(x) if(is.list(x)) x else list(x))
-      x <- unlist(x, recursive=FALSE) 
+      x <- unlist(x, recursive = FALSE) 
     }
     x[!vapply(x, is.null, logical(1L))]
   }
@@ -256,6 +250,8 @@ readImage = function(files, type, all=TRUE, ...) {
   #  multiple files
   else {
     y = lapply(files, .loadFun, ...)
+    # chop of anything behind the last single dot including the dot itself
+    names(y) = unlist(strsplit(files, split="\\.[^.]*$", fixed = FALSE, perl = FALSE))
     y = .flatten(y)   
   }
   
