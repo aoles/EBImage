@@ -306,20 +306,7 @@ isXbitImage = function(x, bits) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-writeImage = function (x, files, type, quality=100L, bits.per.sample, compression='none', ...) {
-  ## internal copy of getFrame which can operate on Images coerced to arrays, which is faster in combination with transpose(... coerce=TRUE)
-  getFrameInternal = function(y, i, colormode) {
-    ## frame dimensions
-    len = length( (d = dim(y)) )
-    fdim = ifelse (colormode==Color && len>2, 3, 2)
-    if (len==fdim) return(y)
-    
-    x = asub(y, as.list(ind2sub(i, d[-1:-fdim])), (fdim+1):len)
-    dim(x) = d[1:fdim]
-    
-    return(x)
-  }
-  
+writeImage = function (x, files, type, quality=100L, bits.per.sample, compression='none', ...) {  
   validImage(x)
   
   type = try (determineFileType(files, type), silent=TRUE)
@@ -362,7 +349,7 @@ writeImage = function (x, files, type, quality=100L, bits.per.sample, compressio
       if (type=='tiff') {
         
         ## create list of image frames
-        la = lapply(frames, function(i) getFrameInternal(x, i, colormode))
+        la = lapply(frames, function(i) .getFrame(x, i, 'render', colormode))
         
         if (nf==writeFun(la, files, ...))
           return(invisible(files))
@@ -381,7 +368,7 @@ writeImage = function (x, files, type, quality=100L, bits.per.sample, compressio
     
     ## store image frames into individual files
     for (i in frames)
-      writeFun(getFrameInternal(x, i, colormode), files[i], ...)
+      writeFun(.getFrame(x, i, 'render', colormode), files[i], ...)
     return(invisible(files))
   }
 }
@@ -401,23 +388,18 @@ setMethod ("[", "Image",
                callNextMethod()
              }
              else {
-               # subset image array without dropping dimensions
+               # subset image array without dropping dimensions in order to preserve spatial dimensions
                sc$drop = FALSE
                sc[[2L]] = call('slot', sc[[2L]], '.Data')
-               z = eval.parent(sc)
-               
+               y = eval.parent(sc)
+                              
                # drop dims higher than 2 unless 'drop' explicitly set to FALSE
-               if(!isTRUE(args$drop==FALSE) && length(dim(x)) > 2L){
-                 # select arguments corresponding to indices
-                 dims = as.list(sc[-c(1L, 2L)])
-                 dims = dims[names(dims) != "drop"]
-                 # numeric or character indices of length 1 (note: logical indices are recycled!)
-                 dims = which(mapply(function(x, y) ( length(x)==1L && (is.numeric(x) || is.character(x)) ) || y==1L, dims, dim(x)) == TRUE)
-                 # drop dims higher than 2
-                 z = adrop(z, drop = dims[dims>2L]) 
+               if(!isTRUE(args$drop==FALSE) && length( (d = dim(y)) ) > 2L){
+                 dims = which(d==1L)
+                 y = adrop(y, drop = dims[dims>2L]) 
                }
                
-               x@.Data = z
+               x@.Data = y
                validObject(x)
                x
              }
@@ -440,23 +422,37 @@ ind2sub = function(x, y) {
     x = x - (res[i]-1) * div[i]
   }
   
-  stopifnot(length(res)==len)
   res
 }
 
-getFrame = function(y, i, type = c('total', 'render')) {
-  type = match.arg(type)
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+getFrame = function(y, i, type = c('total', 'render')) .getFrame(y, i, match.arg(type))
+
+## It is useful to have the internal copy of getFrame which can be called on arrays directly
+## by specifying the apriopriate colormode. In combination with transpose(..., coerce=TRUE)
+## this approach is significantly faster compared to doing these operations on Image objects
+## and is exloited by the writeImage function
+
+.getFrame = function(y, i, type, colormode) {
+  if(missing(colormode)) colormode = colorMode(y)
   
   n = getNumberOfFrames(y, type = type)
   if (i<1 || i>n) stop("'i' must belong between 1 and ", n)
   
   ## frame dimensions
   len = length( (d = dim(y)) )
-  fdim = ifelse (colorMode(y)==Color && type=='render' && len>2, 3, 2)
+  fdim = ifelse (colormode==Color && type=='render' && len>2L, 3L, 2L)
   if (len==fdim) return(y)
   
-  x = asub(y, as.list(ind2sub(i, d[-1:-fdim])), (fdim+1):len)
-  dim(x) = d[1:fdim]
+  # preserve spatial dimensions
+  # for Image class this is already taken care by the "]" method itself ..
+  x = asub(y, as.list(ind2sub(i, d[-seq_len(fdim)])), (fdim+1):len, drop = is(y, 'Image'))
+  
+  # .. we only need to take care of plain arrays
+  if(length( (d = dim(x)) ) > fdim){
+    dims = which(d==1L)
+    x = adrop(x, drop = dims[dims>fdim]) 
+  }
   
   return(x)
 }
@@ -469,10 +465,10 @@ getNumberOfFrames = function(y, type = c('total', 'render')) {
   type = match.arg(type)
   d = dim(y)
   if (type=='render' && colorMode(y)==Color) {
-    if (length(d)< 3) return(1)
-    else return(prod(d[-1:-3]))
+    if (length(d)< 3L) return(1L)
+    else return(prod(d[-seq_len(3)]))
   }
-  else return(prod(d[-1:-2]))
+  else return(prod(d[-seq_len(2)]))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
