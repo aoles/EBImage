@@ -174,14 +174,14 @@ determineFileType = function(files, type) {
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 readImage = function(files, type, all=TRUE, ...) {
   
-  readURL = function(url, buffer=2^24){
+  .readURL = function(url, buffer=2^24){
     f = try(file(url, "rb"), silent=TRUE)
     if (inherits(f,"try-error")) 
       stop(attr(f,"condition")$message)
     
     rawData = bufData = NULL;
     
-    while( length(bufData <- readBin(f, 'raw', buffer))>0 )
+    while( length(bufData <- readBin(f, 'raw', buffer)) > 0L )
       rawData = c(rawData, bufData)
     
     try(close(f), silent=TRUE)
@@ -193,13 +193,21 @@ readImage = function(files, type, all=TRUE, ...) {
   if (inherits(type,"try-error")) 
     stop(attr(type,"condition")$message)
   
-  readFun = switch(type,
+  .readFun = switch(type,
                    tiff = function(x, ...) {
+                     # chop of anything behind the last single dot including the dot
+                     name = unlist(strsplit(x, split="\\.[^.]*$", fixed = FALSE, perl = FALSE)[[1L]])
                      y = readTIFF(x, all=all, ...)
-                     # make sure all frames have the same dimensions
-                     if(length(y)>1)
-                       if(!all(duplicated(lapply(y, dim))[-1]))
-                         stop("Frame dimensions of a TIFF file are not equal")
+                     
+                     if ((l=length(y)) == 1L) {
+                       names(y) = name
+                     }                     
+                     else if (l > 1L) {
+                       names(y) = paste(name, seq_len(l), sep = ".")
+                       # make sure all frames have the same dimensions
+                       if(!all(duplicated(lapply(y, dim))[-1L]))
+                         stop(sprintf("Frame dimensions of the '%s' file are not equal.", x))
+                     }
                      y
                    },
                    jpeg = function(x, ...) readJPEG(x, ...),
@@ -207,68 +215,63 @@ readImage = function(files, type, all=TRUE, ...) {
                    stop(sprintf("Invalid type: %s. Currently supported formats are JPEG, PNG, and TIFF.", type))
   )
   
-  loadFun = function(i) {
+  .loadFun = function(i, ...) {
     ## first look for local files
     if(!file.exists(i)){
       ## might still be a remote URL  
       w = options(warn=2)
-      rawData = try(readURL(i), silent = TRUE)
-      options(w) 
-      if (inherits(rawData,"try-error")) {
-        warning( paste0(unlist(strsplit(attr(rawData,"condition")$message, "(converted from warning) ", fixed=TRUE)), collapse=""))
-        return (NULL)
+      i = try(.readURL(i), silent = TRUE)
+      options(w)
+      ## is not URL
+      if (inherits(i,"try-error")) {
+        warning( paste0(unlist(strsplit(attr(i,"condition")$message, "(converted from warning) ", fixed=TRUE)), collapse=""))
+        return(NULL)
       }
-      else
-        ## is url
-        return(readFun(rawData))
     }
     ## ensure that the file is not a directory
     else if (file.info(i)$isdir){
       warning(sprintf("Cannot open %s: Is directory.", i))
-      return (NULL)
+      return(NULL)
     }
-    else
-      ## appears to be a legit file
-      return(readFun(i))
+    
+    return(.readFun(i, ...))
   }
   
   # flatten nested image list and remove null elements
-  flatten <- function(x) {
-    while(any(vapply(x, is.list, logical(1)))) {
+  .flatten <- function(x) {
+    while(any(vapply(x, is.list, logical(1L)))) {
       x <- lapply(x, function(x) if(is.list(x)) x else list(x))
       x <- unlist(x, recursive=FALSE) 
     }
-    x[!vapply(x, is.null, logical(1))]
+    x[!vapply(x, is.null, logical(1L))]
   }
   
   # stratify processing for single and multiple files to increase performance
   
   # single file
-  if(length(files) == 1){
-    y = loadFun(files)
+  if(length(files) == 1L){
+    y = .loadFun(files, ...)
   }
   
   #  multiple files
   else {
-    y = lapply(files, loadFun)
-    y = flatten(y)   
+    y = lapply(files, .loadFun, ...)
+    y = .flatten(y)   
   }
   
   if(is.list(y)){
-    if(length(y)==0) stop("Empty image stack.")
+    if(length(y)==0L) stop("Empty image stack.")
     
     # check whether image dimensions match
-    if(!all(duplicated(lapply(y, dim))[-1]))
+    if(!all(duplicated(lapply(y, dim))[-1L]))
       stop("Images have different dimensions")
     
-    y1 = y[[1]]
+    y1 = y[[1L]]
     channels = channelLayout(y1)
-    if(length(y) == 1)
+    if(length(y) == 1L)
       y = y1
-    else {
-      y <- abind(y, along = length(dim(y1))+1)
-      dimnames(y) = NULL
-    }
+    else
+      y = abind(y, along = length(dim(y1))+1L)
     rm(y1)
   }
   else{
