@@ -251,7 +251,7 @@ readImage = function(files, type, all=TRUE, ...) {
   else {
     y = lapply(files, .loadFun, ...)
     # chop of anything behind the last single dot including the dot itself
-    names(y) = unlist(strsplit(files, split="\\.[^.]*$", fixed = FALSE, perl = FALSE))
+    names(y) = unlist(strsplit(basename(files), split="\\.[^.]*$", fixed = FALSE, perl = FALSE))
     y = .flatten(y)   
   }
   
