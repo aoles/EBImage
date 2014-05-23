@@ -1,0 +1,23 @@
+citEntry(entry="article",
+  title = "EBImage---an R package for image processing with applications to cellular phenotypes",
+  author = personList( 
+            as.person("Gregoire Pau"),
+		        as.person("Florian Fuchs"),
+            as.person("Oleg Sklyar"),
+            as.person("Michael Boutros"),
+		        as.person("Wolfgang Huber") ),
+  journal = "Bioinformatics",
+  volume = "26",
+  number = "7",
+  pages = "979--981",
+  year = "2010",
+  doi = "10.1093/bioinformatics/btq046",
+  textVersion = paste(
+    paste("Gregoire Pau, Florian Fuchs, Oleg Sklyar, Michael Boutros, and Wolfgang Huber (2010):",
+          "EBImage - an R package for image processing with applications to cellular phenotypes.",
+          "Bioinformatics"),
+    "26(7)",
+    "pp. 979-981",
+    "10.1093/bioinformatics/btq046",
+    sep = ", ")
+)
