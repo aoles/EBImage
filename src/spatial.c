@@ -3,14 +3,8 @@
 #include "spatial.h"
 #include "tools.h"
 
-static inline double peekpixel(int tx, int ty, int z, int width, int height, double *a) {
-  double v;
-  if (tx<0) v=0;
-  else if (ty<0) v=0;
-  else if (tx>=width) v=0;
-  else if (ty>=height) v=0;
-  else v = a[tx+ty*width+z*width*height];
-  return(v);
+static inline double peekpixel(int x, int y, int z, int w, int h, double *a, double bg) {
+  return ((x<0 || x>=w || y<0 || y>=h) ? bg : a[x + y*w + z*w*h]);
 }
 
 SEXP affine(SEXP _a, SEXP _b, SEXP _m, SEXP _filter) {
@@ -41,21 +35,23 @@ SEXP affine(SEXP _a, SEXP _b, SEXP _m, SEXP _filter) {
   for (int z=0; z<nz; z++) {
     for (int y=0; y<oheight; y++) { 
       for (int x=0; x<owidth; x++) {
-	double tx = m[0]*x + m[1]*y + m[2];
-	double ty = m[3]*x + m[4]*y + m[5];
-	int ftx = floor(tx);
-	int fty = floor(ty);
-	double dx = tx-ftx;
-	double dy = ty-fty;
-	double pa = peekpixel(ftx, fty, z, width, height, a);
-	// bilinear filter?
-	if (filter==1) {
-	  double pb = peekpixel(ftx+1, fty, z, width, height, a);
-	  double pc = peekpixel(ftx, fty+1, z, width, height, a);
-	  double pd = peekpixel(ftx+1, fty+1, z, width, height, a);
-	  pa = (1-dy)*(pa*(1-dx) + pb*dx) + dy*(pc*(1-dx) + pd*dx);
-	}
-	b[x + y*owidth + z*owidth*oheight] = pa;
+        int idx = x + y*owidth + z*owidth*oheight;
+        double bg = b[idx];
+      	double tx = m[0]*x + m[1]*y + m[2];
+      	double ty = m[3]*x + m[4]*y + m[5];
+      	int ftx = floor(tx);
+      	int fty = floor(ty);
+      	double dx = tx-ftx;
+      	double dy = ty-fty;
+      	double pa = peekpixel(ftx, fty, z, width, height, a, bg);
+      	// bilinear filter?
+      	if (filter==1) {
+      	  double pb = peekpixel(ftx+1, fty, z, width, height, a, bg);
+      	  double pc = peekpixel(ftx, fty+1, z, width, height, a, bg);
+      	  double pd = peekpixel(ftx+1, fty+1, z, width, height, a, bg);
+      	  pa = (1-dy)*(pa*(1-dx) + pb*dx) + dy*(pc*(1-dx) + pd*dx);
+      	}
+      	b[idx] = pa;
       }
     }
   }

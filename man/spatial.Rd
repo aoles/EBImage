@@ -22,15 +22,19 @@
 \usage{
 flip(x)
 flop(x)
-rotate(x, angle, filter="bilinear", output.dim, output.origin=c(0, 0))
-translate(x, v, filter="none", output.dim)
-resize(x, w, h, filter="bilinear", output.dim, output.origin=c(0, 0))
-affine(x, m, filter=c("bilinear", "none"), output.dim)
+rotate(x, angle, filter = "bilinear", output.origin = c(0, 0), ...)
+translate(x, v, filter = "none", ...)
+resize(x, w, h, filter = "bilinear", output.dim = c(w, h), output.origin = c(0, 0), ...)
+
+affine(x, m, filter = c("bilinear", "none"), output.dim, bg.col = "black")
 }
 
 \arguments{
   \item{x}{An \code{Image} object or an array.}
   \item{angle}{A numeric specifying the image rotation angle in degrees.}
+  \item{v}{A vector of 2 numbers denoting the translation vector in pixels.}
+  \item{w, h}{Width and height of the resized image. One of these arguments
+    can be missing to enable proportional resizing.}  
   \item{filter}{A character string indicating the interpolating sampling filter.
                 Valid values are 'none' or 'bilinear'. See Details.}
   \item{output.dim}{A vector of 2 numbers indicating the dimension of the output image. 
@@ -38,10 +42,10 @@ affine(x, m, filter=c("bilinear", "none"), output.dim)
                     it is \code{c(w, h)}.}
   \item{output.origin}{A vector of 2 numbers indicating the output coordinates of the origin in pixels. 
                        Default is \code{c(0, 0)}. }
-  \item{v}{A vector of 2 numbers denoting the translation vector in pixels.}
-  \item{w, h}{Width and height of the resized image. One of these arguments
-    can be missing to enable proportional resizing. }
+  
   \item{m}{A 3x2 matrix describing the affine transformation. See Details.}
+  \item{bg.col}{Color used to fill the background pixels. The default is "black".}
+  \item{...}{Arguments to be passed to the \code{affine} function, such as \code{output.dim} or \code{bg.col}}  
 }
  
 \value{
@@ -67,12 +71,12 @@ affine(x, m, filter=c("bilinear", "none"), output.dim)
   pixels coordinates, denoted by the matrix \code{px}, are
   transformed to \code{cbind(px, 1)\%*\%m}. 
 
-  All spatial transforms excepted \code{flip} and \code{flop} are based on the 
-  general \code{affine} transformation. Spatial interpolation could be of two type:
-  \code{none}, also called nearest neighbor, where interpolated pixel value is
-  computed by taking the closest pixel, or \code{bilinear}, where interpolated 
-  pixel is computed by bilinear approximation of the 4 neighboring pixels. The
-  \code{bilinear} filter gives the smoother results.
+  All spatial transformations except \code{flip} and \code{flop} are based on the 
+  general \code{affine} transformation. Spatial interpolation can be one of the following types:
+  \code{none}, also called nearest neighbor, where the interpolated pixel value equals to
+  the closest pixel value, or \code{bilinear}, where the interpolated 
+  pixel value is computed by bilinear approximation of the 4 neighboring pixels. The
+  \code{bilinear} filter gives smoother results.
 }
 
 \seealso{ 
