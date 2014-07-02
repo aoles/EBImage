@@ -9,7 +9,7 @@ flop <- function (x) {
 }
 
 ## performs an affine transform on a set of images
-affine <- function (x, m, filter=c("bilinear", "none"), output.dim) {
+affine <- function (x, m, filter = c("bilinear", "none"), output.dim, bg.col = "black") {
   ## check arguments
   validImage(x)
   if (!is.matrix(m) || nrow(m)!=3 || ncol(m)!=2) stop("'m' must be a 3x2 matrix")
@@ -29,12 +29,12 @@ affine <- function (x, m, filter=c("bilinear", "none"), output.dim) {
   m <- solve(m)
   
   ## create output image
-  y <- new("Image", .Data = array(0, dim = d), colormode = colorMode(x))
+  y <- Image(data = bg.col, dim = d[-3], colormode = colorMode(x))
 
   .Call("affine", castImage(x), castImage(y), m, filter, PACKAGE='EBImage')
 }
 
-rotate <- function(x, angle, filter="bilinear", output.dim, output.origin=c(0, 0)) {
+rotate <- function(x, angle, filter = "bilinear", output.origin = c(0, 0), ...) {
   ## check arguments
   if (length(angle)!=1 || !is.numeric(angle)) stop("'angle' must be a number")
   if (length(output.origin)!=2 || !is.numeric(output.origin)) stop("'output.origin' must be a numeric vector of length 2")
@@ -44,17 +44,17 @@ rotate <- function(x, angle, filter="bilinear", output.dim, output.origin=c(0, 0
   cy <- ncol(x)/2+ncol(x)*sqrt(2)*sin(theta-pi/4-pi/2)/2 + output.origin[2]
   m <- matrix(c(cos(theta), -sin(theta), cx,
                 sin(theta), cos(theta), cy), nrow=3)
-  affine(x, m, filter, output.dim=output.dim)
+  affine(x, m, filter, ...)
 }
 
-translate <- function(x, v, filter="none", output.dim) {
+translate <- function(x, v, filter = "none", ...) {
   ## check arguments
   if (length(v)!=2 || !is.numeric(v)) stop("'v' must be a numeric vector of length 2")
   m <- matrix(c(1, 0, -v[1], 0, 1, -v[2]), nrow=3)
-  affine(x, m, filter=filter, output.dim=output.dim)
+  affine(x, m, filter = filter, ...)
 }
 
-resize <- function(x, w, h, filter="bilinear", output.dim, output.origin=c(0, 0)) {
+resize <- function(x, w, h, filter = "bilinear", output.dim = c(w, h), output.origin = c(0, 0), ...) {
   ## check arguments
   if (missing(h) && missing(w))  stop("'w' or 'h' must be specified")
   if (missing(w)) w <- round(h*dim(x)[1]/dim(x)[2])
@@ -64,7 +64,7 @@ resize <- function(x, w, h, filter="bilinear", output.dim, output.origin=c(0, 0)
   
   ratio <- c(w, h)/dim(x)[1:2]
   m <- matrix(c(ratio[1], 0, output.origin[1], 0, ratio[2], output.origin[2]), nrow=3)
-  affine(x, m, filter, output.dim=output.dim)
+  affine(x, m, filter, output.dim = output.dim, ...)
 }
 
 ## transposes the XY dimensions
