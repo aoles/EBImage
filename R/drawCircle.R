@@ -19,5 +19,5 @@ drawCircle <- function(img, x, y, radius, col, fill=FALSE, z=1) {
     if (length(rgb)!=3 || any(is.na(rgb))) stop("In Grayscale mode, 'col' must be a scalar value")
   }
   
-  invisible(.Call("drawCircle", castImage(img), xyzr, rgb, fill, PACKAGE='EBImage'))
+  invisible(.Call(C_drawCircle, castImage(img), xyzr, rgb, fill))
 }

@@ -1,7 +1,7 @@
 thresh = function (x, w=5, h=5, offset=0.01) {
   validImage(x)
   if (w<2 || h<2) stop ("width 'w' and height 'h' must be larger than 1")
-  return ( .Call("thresh", castImage(x), as.numeric( c(w, h, offset) ), PACKAGE='EBImage') )
+  return ( .Call(C_thresh, castImage(x), as.numeric( c(w, h, offset) )) )
 }
 
 distmap = function (x, metric=c('euclidean', 'manhattan')) {
@@ -9,7 +9,7 @@ distmap = function (x, metric=c('euclidean', 'manhattan')) {
   if (any(is.na(x))) stop("'x' shouldn't contain any NAs")
   metric = match.arg(metric)
   imetric = switch(metric,euclidean=0,manhattan=1)
-  return (.Call("distmap", castImage(x), as.integer(imetric), PACKAGE='EBImage'))
+  return (.Call(C_distmap, castImage(x), as.integer(imetric)))
 }
 
 makeBrush = function(size, shape=c('box', 'disc', 'diamond', 'Gaussian', 'line'), step=TRUE, sigma=0.3, angle=45) {
@@ -75,12 +75,12 @@ makeBrush = function(size, shape=c('box', 'disc', 'diamond', 'Gaussian', 'line')
 
 erode = function (x, kern=makeBrush(5, shape='diamond')) {
   validImage(x)
-  return (.Call("lib_erode_dilate", castImage(x), kern, as.integer(0), PACKAGE='EBImage') )
+  return (.Call(C_lib_erode_dilate, castImage(x), kern, as.integer(0)) )
 }
 
 dilate = function (x, kern=makeBrush(5, shape='diamond')) {
   validImage(x)
-  return (.Call("lib_erode_dilate", castImage(x), kern, as.integer(1), PACKAGE='EBImage') )
+  return (.Call(C_lib_erode_dilate, castImage(x), kern, as.integer(1)) )
 }
 
 opening = function (x, kern=makeBrush(5, shape='diamond')) {
@@ -95,35 +95,35 @@ closing = function (x, kern=makeBrush(5, shape='diamond')) {
 
 erodeGreyScale = function (x, kern=makeBrush(5, shape='diamond')) {
     validImage(x)
-    return (.Call("lib_erode_dilate_greyscale", castImage(x), kern, as.integer(0), PACKAGE='EBImage') )
+    return (.Call(C_lib_erode_dilate_greyscale, castImage(x), kern, as.integer(0)) )
 }
 
 dilateGreyScale = function (x, kern=makeBrush(5, shape='diamond')) {
     validImage(x)
-    return (.Call("lib_erode_dilate_greyscale", castImage(x), kern, as.integer(1), PACKAGE='EBImage') )
+    return (.Call(C_lib_erode_dilate_greyscale, castImage(x), kern, as.integer(1)) )
 }
 
 openingGreyScale = function (x, kern=makeBrush(5, shape='diamond')) {
     validImage(x)
-    return (.Call("lib_opening_closing_greyscale", castImage(x), kern, as.integer(0), PACKAGE='EBImage') )
+    return (.Call(C_lib_opening_closing_greyscale, castImage(x), kern, as.integer(0)) )
 }
 
 closingGreyScale = function (x, kern=makeBrush(5, shape='diamond')) {
     validImage(x)
-    return (.Call("lib_opening_closing_greyscale", castImage(x), kern, as.integer(1), PACKAGE='EBImage') )
+    return (.Call(C_lib_opening_closing_greyscale, castImage(x), kern, as.integer(1)) )
 }
 
 whiteTopHatGreyScale = function (x, kern=makeBrush(5, shape='diamond')) {
     validImage(x)
-    return (.Call("lib_tophat_greyscale", castImage(x), kern, as.integer(0), PACKAGE='EBImage') )
+    return (.Call(C_lib_tophat_greyscale, castImage(x), kern, as.integer(0)) )
 }
 
 blackTopHatGreyScale = function (x, kern=makeBrush(5, shape='diamond')) {
     validImage(x)
-    return (.Call("lib_tophat_greyscale", castImage(x), kern, as.integer(1), PACKAGE='EBImage') )
+    return (.Call(C_lib_tophat_greyscale, castImage(x), kern, as.integer(1)) )
 }
 
 selfcomplementaryTopHatGreyScale = function (x, kern=makeBrush(5, shape='diamond')) {
     validImage(x)
-    return (.Call("lib_tophat_greyscale", castImage(x), kern, as.integer(2), PACKAGE='EBImage') )
+    return (.Call(C_lib_tophat_greyscale, castImage(x), kern, as.integer(2)) )
 }

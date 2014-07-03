@@ -5,7 +5,7 @@ watershed = function (x, tolerance=1, ext=1) {
   if (tolerance<0) stop( "'tolerance' must be non-negative" )
   ext = as.integer(ext)
   if (ext<1) stop( "'ext' must be a positive integer" )
-  .Call("watershed", castImage(x), tolerance, ext, PACKAGE='EBImage')
+  .Call(C_watershed, castImage(x), tolerance, ext)
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -21,14 +21,14 @@ propagate = function (x, seeds, mask=NULL, lambda=1e-4) {
   lambda = as.numeric(lambda)
   if (lambda<0.0) stop("'lambda' must be positive" )
 
-  return(.Call( "propagate", castImage(x), castImage(seeds), mask, lambda, PACKAGE='EBImage'))
+  return(.Call(C_propagate, castImage(x), castImage(seeds), mask, lambda))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ocontour = function(x) {
   validImage(x)
   storage.mode(x)='integer'
-  y = .Call('ocontour', x, PACKAGE='EBImage')[-1]
+  y = .Call(C_ocontour, x)[-1]
   y = lapply(y, function(z) matrix(z, ncol=2, byrow=TRUE))
   names(y) = seq_along(y)
   y[sapply(y, nrow)>0]
@@ -37,7 +37,7 @@ ocontour = function(x) {
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bwlabel = function(x) {
   validImage(x)
-  .Call("bwlabel", castImage(x), PACKAGE='EBImage')
+  .Call(C_bwlabel, castImage(x))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -18,7 +18,7 @@ normalizeImage = function(object, separate = TRUE, ft = c(0, 1), inputRange) {
     if ( diff(inputRange) == 0 ) stop("specified clipping range is 0")
   }
   
-  .Call("normalize", castImage(object), as.integer(separate), ft, inputRange, PACKAGE='EBImage')
+  .Call(C_normalize, castImage(object), as.integer(separate), ft, inputRange)
 }
 
 ## general method for the superclass of 'Image' and 'matrix'

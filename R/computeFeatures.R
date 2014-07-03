@@ -341,7 +341,7 @@ splitObjects = function(x) {
     warning( "Values in 'ref' have been limited to the range [0,1]" )
   }
   
-  res <- .Call( "haralickMatrix", castImage(x), castImage(ref), as.integer(nc), PACKAGE='EBImage')
+  res <- .Call(C_haralickMatrix, castImage(x), castImage(ref), as.integer(nc))
   return( res )
 }
 
@@ -350,7 +350,7 @@ splitObjects = function(x) {
   hm <- .haralickMatrix(x=x, ref=ref, nc=nc)
   if ( is.null(hm) || !(is.array(hm) || is.list(hm)) ) return( NULL )
   do.features <- function(m) {
-    if (dim(m)[3]>0) res <- .Call("haralickFeatures", m, PACKAGE='EBImage')
+    if (dim(m)[3]>0) res <- .Call(C_haralickFeatures, m)
     else res = matrix(0, nrow=0, ncol=13) ## no objects
     if ( is.matrix(res) )
       colnames(res) <- c("h.asm", "h.con", "h.cor", "h.var", "h.idm", "h.sav", "h.sva", 

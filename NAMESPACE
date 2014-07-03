@@ -1,4 +1,4 @@
-useDynLib("EBImage")
+useDynLib("EBImage", .registration = TRUE, .fixes = "C_")
 
 importFrom("BiocGenerics", "normalize", "combine")
 importFrom("methods", "Ops", "show", "new", "validObject", "is")
