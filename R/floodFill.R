@@ -25,11 +25,11 @@ floodFill = function(x, pt, col, tolerance=0) {
   if (any(pt[,1]<1) || any(pt[,1]>dim(x)[1]) ||
       any(pt[,2]<1) || any(pt[,2]>dim(x)[2])) stop("coordinates 'pt' of the starting point(s) must be inside the image boundaries")
 
-  return( .Call("floodFill", castImage(x), pt, col, as.numeric(tolerance), PACKAGE='EBImage'))
+  return( .Call(C_floodFill, castImage(x), pt, col, as.numeric(tolerance)))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 fillHull = function(x) {
   validImage(x)
-  return(.Call("fillHull", castImage(x), PACKAGE='EBImage'))
+  return(.Call(C_fillHull, castImage(x)))
 }

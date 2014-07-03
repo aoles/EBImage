@@ -12,12 +12,12 @@ medianFilter = function(x, size, cacheSize=512) {
  effDimLength=length(dim(x))-ifelse(colorMode(x)==2,1,0)
  if (effDimLength >3) {stop("'x' should have <=3 dimensions")}
  else if (effDimLength==3) {
-  x=apply(x, 3, function(y) {.Call('medianFilter', y, size, colorMode(x)+1, cacheSize)})
+  x=apply(x, 3, function(y) .Call(C_medianFilter, y, size, colorMode(x)+1, cacheSize))
   dim(x)=trueDim
   x=as.Image(x)
  }
  else {
-  x=as.Image(.Call('medianFilter', x, size, colorMode(x)+1, cacheSize))
+  x=as.Image(.Call(C_medianFilter, x, size, colorMode(x)+1, cacheSize))
  }
  colorMode(x)=colMode
  # map back to [0,1] range

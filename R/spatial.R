@@ -31,7 +31,7 @@ affine <- function (x, m, filter = c("bilinear", "none"), output.dim, bg.col = "
   ## create output image
   y <- Image(data = bg.col, dim = d[-3], colormode = colorMode(x))
 
-  .Call("affine", castImage(x), castImage(y), m, filter, PACKAGE='EBImage')
+  .Call(C_affine, castImage(x), castImage(y), m, filter)
 }
 
 rotate <- function(x, angle, filter = "bilinear", output.origin = c(0, 0), ...) {

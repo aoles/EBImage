@@ -21,7 +21,7 @@ tile = function (x, nx=10, lwd=1, fg.col="#E4AF2B", bg.col="gray") {
     
     hdr = Image(c(fg.col,bg.col), colormode = colorMode(x))
     
-    .Call("tile", castImage(x), hdr, as.integer(c(nx, lwd)), PACKAGE='EBImage')
+    .Call(C_tile, castImage(x), hdr, as.integer(c(nx, lwd)))
   }
 }
 
@@ -32,5 +32,5 @@ untile = function (x, nim, lwd=1) {
   lwd = as.integer(lwd)
   if (length(nim)<2) stop("'nim' must contain two values for the number of images in x and y directions")
   if (lwd<0) stop("wrong line width")
-  .Call("untile", castImage(x), nim, lwd, PACKAGE='EBImage')
+  .Call(C_untile, castImage(x), nim, lwd)
 }

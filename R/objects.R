@@ -28,7 +28,7 @@ paintObjects = function (x, tgt, opac=c(1, 1), col=c('red', NA), thick=FALSE) {
   opac = as.numeric(opac)
   if (any(opac < 0) || any(opac > 1)) stop("all opacity values must be in the range [0,1]" )
   
-  .Call("paintObjects", castImage(x), castImage(tgt), opac, Image(col, colormode = colorMode(tgt)), as.integer(thick), PACKAGE='EBImage')
+  .Call(C_paintObjects, castImage(x), castImage(tgt), opac, Image(col, colormode = colorMode(tgt)), as.integer(thick))
 }
 
 
@@ -50,7 +50,7 @@ stackObjects = function (x, ref, combine=TRUE, bg.col='black', ext) {
   if (nz==1) xy = xy[[1]]
   bg.col = Image(bg.col, colormode=colorMode(ref))
     
-  res = .Call ("stackObjects", castImage(x), castImage(ref), bg.col, xy, as.numeric(ext), PACKAGE='EBImage')
+  res = .Call(C_stackObjects, castImage(x), castImage(ref), bg.col, xy, as.numeric(ext))
   if (!combine || !is.list(res)) res
   else combine(res)
 }
@@ -60,7 +60,7 @@ rmObjects = function (x, index) {
   validImage(x)
   if (is.list(index)) index = lapply (index, as.integer)
   else index = list( as.integer(index) )
-  .Call ("rmObjects", castImage(x), index, PACKAGE='EBImage')
+  .Call(C_rmObjects, castImage(x), index)
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
