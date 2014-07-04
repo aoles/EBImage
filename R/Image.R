@@ -26,7 +26,7 @@ setClass ("Image",
 )
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Image = function(data = array(0, dim=c(1,1)), dim, colormode) {
+Image.old = function(data = array(0, dim=c(1,1)), dim, colormode) {
   if (missing(dim)) {
     if (is.array(data)) dim = base::dim(data)
     else dim = c(1, length(data))
@@ -50,6 +50,55 @@ Image = function(data = array(0, dim=c(1,1)), dim, colormode) {
   else res = new("Image", .Data = array(data, dim=dim, dimnames=dimnames(data)), colormode=colormode)
   
   return(res)
+}
+
+Image = function(data = array(0, dim=c(1,1)), dim, colormode) {
+  if (missing(dim)) {
+    if (is.array(data)) dim = base::dim(data)
+    else dim = c(1, length(data))
+  }
+  else if (length(dim)<2) stop("The number of dimensions dim must be at least 2")
+  
+  if (missing(colormode)) {
+    if (is.Image(data)) {
+      colormode = colorMode(data)
+    }
+    else {
+      if (is.character(data)) ## image converted using col2rgb
+        colormode = Color
+      else ## the default case
+        colormode = Grayscale
+    }
+  }
+  else colormode = parseColorMode(colormode)
+  
+  if (is.character(data)) {
+    dimnames = dimnames(data)
+    data = col2rgb(data)/255
+    
+    if ( colormode == Color ) {
+      data = abind(array(data[1,,drop=FALSE], dim, dimnames), array(data[2,,drop=FALSE], dim, dimnames), array(data[3,,drop=FALSE], dim, dimnames), along = 2.5)
+      dim = dim(data)
+      # replace a list of NULLs by the original NULL
+      if(is.null(dimnames)) dimnames(data) = NULL
+    }
+    else
+      data = array(data = (data[1,,drop=FALSE] + data[2,,drop=FALSE] + data[3,,drop=FALSE]) / 3, dim = dim, dimnames = dimnames)
+  } 
+     
+  return( new("Image", 
+    .Data = 
+    ## improve performance by not calling array constructor on well formed arrays
+    if( is.array(data) && prod(dim)==length(data) ) {
+      if(any(dim(data) != dim))
+        dim(data) = dim
+      data
+    }
+    else {
+      array(data, dim = dim)
+    },
+    colormode = colormode
+  ))    
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -440,7 +489,7 @@ getFrame = function(y, i, type = c('total', 'render')) .getFrame(y, i, match.arg
   
   ## frame dimensions
   len = length( (d = dim(y)) )
-  fdim = ifelse (colormode==Color && type=='render' && len>2L, 3L, 2L)
+  fdim = if (colormode==Color && type=='render' && len>2L) 3L else 2L
   if (len==fdim) return(y)
   
   # preserve spatial dimensions
@@ -527,21 +576,19 @@ setMethod ("image", signature(x="Image"),
 ## failsafe, will return a black image if the channel doesn't exist
 selectChannel = function(x, i) {
   if (colorMode(x)==Grayscale) stop("in 'selectChannel', color mode must be 'Color'")
-  n = getNumberOfFrames(x, 'render')
+  
   dim = dim(x)
-  d = dim[1:2]
-  if (n>1) d = c(d,n)
   y = NULL 
   
-  if (length(dim)<3) {
+  if (length(dim) < 3) {
     if (i==1) y = x
   } 
   else {
-    if (i<=dim[3]) y = asub(x, i, 3)
+    if (i <= dim[3]) y = asub(x, i, 3)
   }
   
-  if(is.null(y)) 
-    y = new("Image", .Data = array(0, dim = d), colormode = Grayscale)
+  if (is.null(y)) 
+    y = new("Image", .Data = array(0, dim[-3]), colormode = Grayscale)
   else
     colorMode(y) = Grayscale
   
@@ -621,7 +668,7 @@ combineImages = function (x, y, ...) {
   if (!all(dim(x)[1:2]==dim(y)[1:2])) stop("images must have the same 2D frame size to be combined")
   
   ## merging along position guided by colorMode
-  along = ifelse (colorMode(x)==Color && colorMode(y)==Color, 4, 3)
+  along = if (colorMode(x)==Color && colorMode(y)==Color) 4 else 3
   
   ## add extra dimension in case of single frame Color Images
   if(along == 4) {

@@ -9,7 +9,7 @@ medianFilter = function(x, size, cacheSize=512) {
  x=x*(2^16-1)
  x=castImage(x)
  trueDim=dim(x)
- effDimLength=length(dim(x))-ifelse(colorMode(x)==2,1,0)
+ effDimLength = length(dim(x)) - colorMode(x)/2
  if (effDimLength >3) {stop("'x' should have <=3 dimensions")}
  else if (effDimLength==3) {
   x=apply(x, 3, function(y) .Call(C_medianFilter, y, size, colorMode(x)+1, cacheSize))
