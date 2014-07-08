@@ -22,14 +22,14 @@ affine <- function (x, m, filter = c("bilinear", "none"), output.dim, bg.col = "
   d = dim(x)  
   if (!missing(output.dim)) {
     if(length(output.dim)!=2 || !is.numeric(output.dim)) stop("'output.dim' must be a numeric vector of length 2")
-    d = c(output.dim[1:2], if((ld=length(d))>2) d[3:ld] else NULL)
+    d[1:2] = output.dim
   }
   
   ## backtransform
   m <- solve(m)
   
   ## create output image
-  y <- Image(data = bg.col, dim = d[-3], colormode = colorMode(x))
+  y <- Image(data = bg.col, dim = d, colormode = colorMode(x))
 
   .Call(C_affine, castImage(x), castImage(y), m, filter)
 }
