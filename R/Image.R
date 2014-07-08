@@ -53,50 +53,68 @@ Image.old = function(data = array(0, dim=c(1,1)), dim, colormode) {
 }
 
 Image = function(data = array(0, dim=c(1,1)), dim, colormode) {
-  if (missing(dim)) {
-    if (is.array(data)) dim = base::dim(data)
-    else dim = c(1, length(data))
-  }
-  else if (length(dim)<2) stop("The number of dimensions dim must be at least 2")
+  if ( !missing(dim) && length(dim)<2 )
+    stop("The number of dimensions dim must be at least 2")
   
-  if (missing(colormode)) {
-    if (is.Image(data)) {
-      colormode = colorMode(data)
-    }
-    else {
-      if (is.character(data)) ## image converted using col2rgb
-        colormode = Color
-      else ## the default case
-        colormode = Grayscale
-    }
+  setdim = function(data) {
+    if (is.array(data))
+      base::dim(data)
+    else 
+      c(1, length(data))
   }
-  else colormode = parseColorMode(colormode)
   
+  ## special character case
   if (is.character(data)) {
+    colormode = 
+      if (missing(colormode)) 
+        Color
+      else
+        parseColorMode(colormode)
+    
+    if (missing(dim)){
+      dim = setdim(data)
+      
+      if ( colormode==Color )
+        dim = c(dim[1:2], 3, if((ld=length(dim))>2) dim[3:ld] else NULL)
+    }
+    
     dimnames = dimnames(data)
     data = col2rgb(data)/255
     
-    if ( colormode == Color ) {
-      data = abind(array(data[1,,drop=FALSE], dim, dimnames), array(data[2,,drop=FALSE], dim, dimnames), array(data[3,,drop=FALSE], dim, dimnames), along = 2.5)
-      dim = dim(data)
+    if ( colormode==Color ) {
+      data = abind(array(data[1,,drop=FALSE], dim[-3], dimnames), array(data[2,,drop=FALSE], dim[-3], dimnames), array(data[3,,drop=FALSE], dim[-3], dimnames), along = 2.5)
       # replace a list of NULLs by the original NULL
       if(is.null(dimnames)) dimnames(data) = NULL
     }
     else
       data = array(data = (data[1,,drop=FALSE] + data[2,,drop=FALSE] + data[3,,drop=FALSE]) / 3, dim = dim, dimnames = dimnames)
-  } 
+  }
+  ## default numeric case
+  else {
+    if (missing(dim))
+      dim = setdim(data)
+    
+    colormode = 
+      if (missing(colormode))
+        if (is.Image(data))
+          colorMode(data)
+        else
+          Grayscale
+      else 
+        parseColorMode(colormode)
+  }
      
   return( new("Image", 
     .Data = 
-    ## improve performance by not calling array constructor on well formed arrays
-    if( is.array(data) && prod(dim)==length(data) ) {
-      if(any(dim(data) != dim))
-        dim(data) = dim
-      data
-    }
-    else {
-      array(data, dim = dim)
-    },
+      ## improve performance by not calling array constructor on well formed arrays
+      if( is.array(data) && prod(dim)==length(data) ) {
+        if(any(dim(data) != dim))
+          dim(data) = dim
+        data
+      }
+      else {
+        array(data, dim = dim)
+      },
     colormode = colormode
   ))    
 }
