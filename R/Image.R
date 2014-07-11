@@ -26,32 +26,6 @@ setClass ("Image",
 )
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Image.old = function(data = array(0, dim=c(1,1)), dim, colormode) {
-  if (missing(dim)) {
-    if (is.array(data)) dim = base::dim(data)
-    else dim = c(1, length(data))
-  }
-  else if (length(dim)<2) stop("The number of dimensions dim must be at least 2")
-  
-  if (missing(colormode)) {
-    if (is.Image(data))
-      colormode = colorMode(data)
-    else 
-      if (!is.character(data))
-        colormode=Grayscale
-  }
-  else colormode = parseColorMode(colormode)
-  
-  if (is.character(data)) {
-    datac = col2rgb(data)/255
-    res = rgbImage(array(datac[1,,drop=FALSE], dim), array(datac[2,,drop=FALSE], dim), array(datac[3,,drop=FALSE], dim))
-    if (!missing(colormode)) if (colormode==Grayscale) res = channel(res, 'gray')
-  } 
-  else res = new("Image", .Data = array(data, dim=dim, dimnames=dimnames(data)), colormode=colormode)
-  
-  return(res)
-}
-
 Image = function(data = array(0, dim=c(1,1)), dim, colormode) {
   if ( !missing(dim) && length(dim)<2 )
     stop("The number of dimensions dim must be at least 2")
@@ -181,21 +155,21 @@ setValidity("Image", validImageObject)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod("Ops", signature(e1="Image", e2="Image"),
 	function(e1, e2) {
-          e1@.Data=callGeneric(imageData(e1), imageData(e2))
+          e1@.Data = callGeneric(e1@.Data, e2@.Data)
           validObject(e1)
           return(e1)
 	}
 )
 setMethod("Ops", signature(e1="Image", e2="numeric"),
 	function(e1, e2) {
-          e1@.Data=callGeneric(imageData(e1), e2)
+          e1@.Data = callGeneric(e1@.Data, e2)
           validObject(e1)
           return(e1)
 	}
 )
 setMethod("Ops", signature(e1="numeric", e2="Image"),
 	function(e1, e2) {
-          e2@.Data=callGeneric(e1, imageData(e2))
+          e2@.Data = callGeneric(e1, e2@.Data)
           validObject(e2)
           return(e2)
 	}
@@ -538,35 +512,36 @@ getNumberOfFrames = function(y, type = c('total', 'render')) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-setMethod ("show", signature(object="Image"),
-  function (object) {
-    nd = dim(object)
-    ld = length(nd)
-    
-    cat('Image\n')
-    
-    cat('  colormode:',c('Grayscale', NA, 'Color')[1+colorMode(object)],'\n')
-    cat('  storage.mode:',storage.mode(object),'\n')
-    cat('  dim:',nd,'\n')
-    cat('  nb.total.frames:',getNumberOfFrames(object,'total'),'\n')
-    cat('  nb.render.frames:',getNumberOfFrames(object,'render'),'\n')
-    
-    if (nd[1]>5) nd[1] = 5
-    if (nd[2]>6) nd[2] = 6
-    if (ld>2) nd[3:ld] = 1
-    
-    ndl = lapply(nd, seq_len)
-    
-    nds = paste0('[1:',nd[1],',1:',nd[2],paste(rep(',1',ld-2),collapse=''),']')
-    
-    cat('\nimageData(object)', nds, ':\n', sep='')
-    print(asub(object@.Data, ndl))
-    cat('\n')
-    
-    invisible(NULL)}
-)
+showImage = function (object) {
+  nd = dim(object)
+  ld = length(nd)
+  
+  cat('Image\n')
+  
+  cat('  colormode:',c('Grayscale', NA, 'Color')[1+colorMode(object)],'\n')
+  cat('  storage.mode:', typeof(object), '\n')
+  cat('  dim:',nd,'\n')
+  cat('  nb.total.frames:',getNumberOfFrames(object,'total'),'\n')
+  cat('  nb.render.frames:',getNumberOfFrames(object,'render'),'\n')
+  
+  if (nd[1]>5) nd[1] = 5
+  if (nd[2]>6) nd[2] = 6
+  if (ld>2) nd[3:ld] = 1
+  
+  ndl = lapply(nd, seq_len)
+  
+  nds = paste0('[1:',nd[1],',1:',nd[2],paste(rep(',1',ld-2),collapse=''),']')
+  
+  cat('\nimageData(object)', nds, ':\n', sep='')
+  print.default(asub(object@.Data, ndl))
+  cat('\n')
+  
+  invisible(NULL)
+}
 
-print.Image <- function(x,...) show(x)
+setMethod ("show", signature(object = "Image"), showImage)
+
+print.Image <- function(x, ...) show(x)
 
 ## GP: Useful ?
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -683,17 +658,20 @@ setMethod ("hist", signature(x="Image"),
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 combineImages = function (x, y, ...) {
-  if (!all(dim(x)[1:2]==dim(y)[1:2])) stop("images must have the same 2D frame size to be combined")
+  dx = dim(x)
+  dy = dim(y)
+  
+  if ( dx[1] != dy[1] || dx[2] != dy[2] ) stop("images must have the same 2D frame size to be combined")
   
   ## merging along position guided by colorMode
   along = if (colorMode(x)==Color && colorMode(y)==Color) 4 else 3
   
   ## add extra dimension in case of single frame Color Images
-  if(along == 4) {
-    if(colorMode(x)==Color && length((d = dim(x)))==2) dim(x) = c(d, 1)
-    if(colorMode(y)==Color && length((d = dim(y)))==2) dim(y) = c(d, 1)
+  if (along == 4) {
+    if(colorMode(x)==Color && length(dx)==2) dim(x) = c(dx, 1)
+    if(colorMode(y)==Color && length(dy)==2) dim(y) = c(dy, 1)
   }
-  z = abind(x, y, along=along)
+  z = abind(x, y, along = along)
   dimnames(z) = NULL
   imageData(x) = z
     
@@ -718,18 +696,19 @@ setMethod("combine", signature("list", "missing"),
 ## Median & quantile redefinition
 ## needed to overcome an isObject() test in median() which greatly slows down median()
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-median.Image <- function(x, na.rm = FALSE) {
-  median(imageData(x), na.rm=na.rm)
+median.Image <- function(x, ...) {
+  median(x@.Data, ...)
 }
 
 quantile.Image <- function(x, ...) {
-  quantile(imageData(x), ...)
+  quantile(x@.Data, ...)
 }
+
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 rgbImage = function(red=NULL, green=NULL, blue=NULL) {
   compareDims = function(x, y) {
-    if (!identical(x, y)) stop('images must have the same 2D frame size and number of frames to be combined')
+    if (any(x!=y)) stop('images must have the same 2D frame size and number of frames to be combined')
   }
  
   d = NULL

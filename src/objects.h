@@ -9,7 +9,7 @@ extern "C" {
 #endif
 
 SEXP paintObjects (SEXP, SEXP, SEXP, SEXP, SEXP);
-SEXP rmObjects (SEXP, SEXP);
+SEXP rmObjects (SEXP, SEXP, SEXP);
 SEXP stackObjects (SEXP, SEXP, SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus

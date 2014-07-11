@@ -56,29 +56,31 @@ stackObjects = function (x, ref, combine=TRUE, bg.col='black', ext) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-rmObjects = function (x, index) {
+rmObjects = function (x, index, reenumerate = TRUE) {
   validImage(x)
-  if (is.list(index)) index = lapply (index, as.integer)
-  else index = list( as.integer(index) )
-  .Call(C_rmObjects, castImage(x), index)
+  if (!is.list(index)) index = list(index)
+  index = lapply (index, as.integer)
+  .Call(C_rmObjects, castImage(x), index, as.integer(reenumerate))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 reenumerate = function(x) {
   validImage(x)
   if (any(max(x)<0)) stop("'x' contains negative values and is incorrectly formed")
-  .dim=dim(x)
+  .dim = dim(x)
   
-  storage.mode(x)='integer'
-  dim(x)=c(.dim[1:2],getNumberOfFrames(x,'total'))
+  if(!is.integer(x)) storage.mode(x) = 'integer'
   
-  imageData(x) = apply(imageData(x), 3, function(im) {
-    from = as.integer(names(table(im)))
-    to = seq_along(from)-1
-      to[match(im, from)]
+  dim(x) = c(.dim[seq_len(2)], getNumberOfFrames(x, 'total'))
+  
+  res = apply(x, 3, function(im) {
+    from = sort.int(unique.default(as.vector(im)))
+    to = seq_along(from) - 1L
+    to[match(im, from)]
   })
-  dim(x)=.dim
-  storage.mode(x)="numeric"
+  dim(res) = .dim
+  
+  imageData(x) = res
   
   x
 }
