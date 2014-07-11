@@ -1,7 +1,7 @@
 Package: EBImage
-Version: 4.7.12
+Version: 4.7.13
 Title: Image processing toolbox for R
-Author: Gregoire Pau, Andrzej Oles, Mike Smith, Oleg Sklyar, Wolfgang Huber
+Author: Andrzej Oles, Gregoire Pau, Mike Smith, Oleg Sklyar, Wolfgang Huber, with contributions from Joseph Barry and Philip A. Marais
 Maintainer: Andrzej Oles <andrzej.oles@embl.de>
 Depends:
 Imports: BiocGenerics (>= 0.7.1), methods, graphics, stats, abind, tiff, jpeg, png, locfit

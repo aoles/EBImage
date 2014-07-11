@@ -33,7 +33,7 @@ export(affine)
 export(transpose)
 
 ## image segmentation, objects manipulation
-export(thresh, bwlabel)
+export(thresh, bwlabel, otsu)
 export(watershed, propagate)
 export(ocontour)
 export(paintObjects, rmObjects, reenumerate, colorLabels)
