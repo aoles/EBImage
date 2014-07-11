@@ -23,9 +23,9 @@ validImage=function(x) {
     stop(z)
 }
 
-## changes the storage.mode of 'x' to 'double' if required
-castImage=function(x) {
-  if (storage.mode(imageData(x))!='double') storage.mode(imageData(x))='double'
+## if required changes the storage.mode of 'x' to 'double' 
+castImage = function(x) {
+  if (!is.double(x)) storage.mode(x) = 'double'
   x
 }
 

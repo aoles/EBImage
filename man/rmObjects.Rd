@@ -15,7 +15,7 @@
 }
 
 \usage{
-  rmObjects(x, index)
+  rmObjects(x, index, reenumerate = TRUE)
 
   reenumerate(x)
 }
@@ -27,6 +27,8 @@
 
   \item{index}{A numeric vector (or a list of vectors if \code{x} contains multiple frames) 
     containing the indexes of objects to remove in the frame.}
+    
+  \item{reenumerate}{Logical, should all the objects in the image be re-indexed afterwards (default).}
 }
 
 \value{
@@ -42,13 +44,33 @@
   x = readImage(system.file('images', 'shapes.png', package='EBImage'))
   x = x[110:512,1:130]
   y = bwlabel(x)
+  
+  ## number of objects found
+  max(y)
+  
   if (interactive()) display(normalize(y), title='Objects')
   
-  ## remove and reenumerate
-  y = rmObjects(y, 5)
-  if (interactive()) display(normalize(y), title='Removal')
-  y = reenumerate(y)
-  if (interactive()) display(normalize(y), title='Reenumerated')
+  ## remove every second letter
+  objects = list(
+    seq.int(from = 2, to = max(y), by = 2),
+    seq.int(from = 1, to = max(y), by = 2)
+    )
+  z = rmObjects(combine(y, y), objects)
+  
+  if (interactive()) display(normalize(z), title='Object removal')
+  
+  ## the number of objects left in each image
+  apply(z, 3, max)
+  
+  ## perform object removal without re-enumerating
+  z = rmObjects(y, objects, reenumerate = FALSE)
+  
+  ## labels of objects left
+  unique(as.vector(z))[-1L]
+  
+  ## re-index objects
+  z = reenumerate(z)
+  unique(as.vector(z))[-1L]
 }
 
 \author{

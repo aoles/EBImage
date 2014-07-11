@@ -103,7 +103,7 @@ paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col, SEXP _thick) {
 
 /*----------------------------------------------------------------------- */
 SEXP
-rmObjects (SEXP x, SEXP _index) {
+rmObjects (SEXP x, SEXP _index, SEXP _reenum) {
     SEXP res, index;
     int nprotect, nx, ny, nz, i, j, im, nobj, * indexes, found;
     double * data;
@@ -138,13 +138,15 @@ rmObjects (SEXP x, SEXP _index) {
             else
                 indexes[i] = i + 1;
         }
-        /* shring indexes */
-        j = 1;
-        for ( i = 0; i < nobj; i++ ) {
-            if ( indexes[i] > 0 ) {
-                indexes[i] = j;
-                j++;
-            }
+        /* reenumerate object indices */
+        if ( INTEGER(_reenum)[0] ) {
+          j = 1;
+          for ( i = 0; i < nobj; i++ ) {
+              if ( indexes[i] > 0 ) {
+                  indexes[i] = j;
+                  j++;
+              }
+          }
         }
         /* reset image */
         for ( i = 0; i < nx * ny; i++ ) {
@@ -158,6 +160,7 @@ rmObjects (SEXP x, SEXP _index) {
     UNPROTECT (nprotect);
     return res;
 }
+
 
 /*----------------------------------------------------------------------- */
 SEXP

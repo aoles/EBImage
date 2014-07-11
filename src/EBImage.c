@@ -44,7 +44,7 @@ static R_CallMethodDef libraryRCalls[] = {
     {"watershed",                       (DL_FUNC) &watershed,    3},
     {"propagate",                       (DL_FUNC) &propagate,      4},
     {"paintObjects",                    (DL_FUNC) &paintObjects,  5},
-    {"rmObjects",                       (DL_FUNC) &rmObjects, 2},
+    {"rmObjects",                       (DL_FUNC) &rmObjects, 3},
     {"tile",                            (DL_FUNC) &tile,     3},
     {"untile",                          (DL_FUNC) &untile,         3},
     {"stackObjects",                    (DL_FUNC) &stackObjects,  5},

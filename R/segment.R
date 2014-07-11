@@ -27,11 +27,11 @@ propagate = function (x, seeds, mask=NULL, lambda=1e-4) {
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ocontour = function(x) {
   validImage(x)
-  storage.mode(x)='integer'
+  if(!is.integer(x)) storage.mode(x) = 'integer'
   y = .Call(C_ocontour, x)[-1]
-  y = lapply(y, function(z) matrix(z, ncol=2, byrow=TRUE))
   names(y) = seq_along(y)
-  y[sapply(y, nrow)>0]
+  y = y[sapply(y, length)>0] # remove missing objects
+  lapply(y, function(z) matrix(z, ncol=2, byrow=TRUE))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -43,7 +43,6 @@ bwlabel = function(x) {
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 colorLabels = function(x, normalize = TRUE){
   len = length( (d = dim(x)) )
-  x = imageData(x)
   
   # linearize image data for convenient processing
   dim(x) = c(prod(d[1:2]), if(len>2) prod(d[3:len]) else 1)
@@ -63,8 +62,5 @@ colorLabels = function(x, normalize = TRUE){
   
   y = new("Image", .Data = y, colormode = Color)
   
-  if (normalize) 
-    y = normalize(y)
-  
-  y
+  if (normalize) normalize(y) else y
 }
