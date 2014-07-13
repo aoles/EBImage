@@ -9,11 +9,13 @@ Returns a threshold value based on Otsu's method, which can be then used to redu
 }
 
 \usage{
-otsu(x, levels = 256)
+otsu(x, range = c(0, 1), levels = 256)
 }
 
 \arguments{
   \item{x}{A \code{Grayscale} \code{Image} object or an array.}
+  
+  \item{range}{Numeric vector of length 2 specifying the histogram range used for thresholding.}
   
   \item{levels}{Number of grayscale levels.}
 }
