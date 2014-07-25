@@ -5,7 +5,7 @@ display = function(x, title = deparse(substitute(x), width.cutoff = 500L, nlines
 
   switch(method,
     browser = displayInBrowser(x, title),
-    raster  = displayRaster(x, frame, all) ) 
+    raster  = displayRaster.native(x, frame, all) ) 
 
   invisible(NULL)
 }
@@ -34,7 +34,7 @@ displayRaster = function(image, frame, all = FALSE, drawGrid = TRUE, ...){
     else
       if ( frame<1 || frame>nf ) stop("Incorrect 'frame' number: It must range between 1 and ", frame)
     
-    ncol = nrow = 1
+    ncol = nrow = 1L
   }
     
   dim <- dim(image) 
@@ -61,10 +61,62 @@ displayRaster = function(image, frame, all = FALSE, drawGrid = TRUE, ...){
   ## draw grid lines in case of multiple frames
   if( all && isTRUE(drawGrid) && nf>1 ) {
     clip(xran[1], xran[2], yran[1], yran[2])
-    abline(h = seq_len(ncol-1)*xdim + .5, v = seq_len(ncol-1)*xdim + .5, col = "white")
+    abline(h = seq_len(nrow-1)*ydim + .5, v = seq_len(ncol-1)*xdim + .5, col = "white")
   }
 }
 
+displayRaster.native = function(image, frame, all = FALSE, drawGrid = TRUE, ...){
+  all = isTRUE(all)
+  nf = getNumberOfFrames(image, type="render")
+  
+  ## display all frames in a grid-like environment
+  if ( all ) {
+    ncol = ceiling(sqrt(nf))
+    nrow = ceiling(nf/ncol)
+  }
+  ## display a single frame only
+  else {
+    ## when the image contains a single frame only display it and don't care about the 'frame' argument at all
+    if (nf==1)
+      frame = 1
+    else 
+      if (missing(frame)) {
+        frame = 1
+        message("The image contains more than one frame: only the first one is displayed. To display all frames use 'all = TRUE'.")
+      }
+    else
+      if ( frame<1 || frame>nf ) stop("Incorrect 'frame' number: It must range between 1 and ", frame)
+    
+    ncol = nrow = 1L
+  }
+  
+  dim <- dim(image) 
+  xdim <- dim[1]
+  ydim <- dim[2]
+  
+  xran = c(0, ncol*xdim) + .5
+  yran = c(0, nrow*ydim) + .5
+  
+  ## set graphical parameters
+  par(bty="n", mai=c(0,0,0,0), xaxs="i", yaxs="i", xaxt="n", yaxt="n")    
+  plot(xran, yran, type="n", xlab="", ylab="", asp=1, ylim=rev(yran))
+  
+  for(r in seq_len(nrow)) {
+    for(c in seq_len(ncol)) {
+      f = if(all) (r-1)*ncol + c else frame
+      if ( f <= nf )
+        rasterImage(as.nativeRaster(getFrame(image, f, type="render")), (c-1)*xdim + .5, r*ydim + .5, c*xdim + .5, (r-1)*ydim +.5, ...)
+      else
+        break
+    }
+  }    
+  
+  ## draw grid lines in case of multiple frames
+  if( all && isTRUE(drawGrid) && nf>1 ) {
+    clip(xran[1], xran[2], yran[1], yran[2])
+    abline(h = seq_len(nrow-1)*ydim + .5, v = seq_len(ncol-1)*xdim + .5, col = "white")
+  }
+}
 ## displays an image using JavaScript
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 displayInBrowser = function(x, title){
@@ -103,4 +155,19 @@ displayInBrowser = function(x, title){
   query = paste0("file://", normalizePath(file.path(tempDir,"display.html")))
 
   browseURL(query)
+}
+
+as.nativeRaster = function(x) {
+  x = round(imageData(x) * 255)
+  
+  y = if(length(dim(x)) == 3L)
+    x[,,1L] + x[,,2L] * 256 + x[,,3L] * 65536 + 255 * 16777216 - 4294967296
+  else
+    x + x * 256 + x * 65536 + 255 * 16777216 - 4294967296
+  storage.mode(y) = "integer"
+  # native raster representation containes already transposed image data as in the Image class, but with swapped dimensions!
+  attr(y, "dim") = dim(y)[2:1]
+  attr(y, "class") = "nativeRaster"
+  attr(y, "channels") = 4L
+  y
 }

@@ -6,6 +6,7 @@
 \alias{Color}
 \alias{is.Image}
 \alias{as.Image}
+\alias{as.array.Image}
 \alias{as.raster.Image}
 \alias{print.Image}
 \alias{median.Image}
@@ -50,7 +51,9 @@
 Image(data, dim, colormode)
 as.Image(x)
 is.Image(x)
-as.raster.Image(y, i)
+
+\method{as.array}{Image}(x, \ldots)
+\method{as.raster}{Image}(x, i = 1)
 
 colorMode(y)
 colorMode(y) <- value
@@ -61,7 +64,6 @@ imageData(y) <- value
 getFrame(y, i, type = c('total', 'render'))
 getNumberOfFrames(y, type = c('total', 'render'))
 }
-
 
 \arguments{
   \item{data}{A vector or array containing the pixel intensities of an image. If missing, the default 1x1
@@ -83,6 +85,8 @@ getNumberOfFrames(y, type = c('total', 'render'))
     can be either \code{Grayscale} or \code{Color}. For \code{imageData}, an \code{Image} object or an array.}
 
   \item{type}{A character string containing \code{total} or \code{render}. Default is \code{total}.}
+  
+  \item{\dots}{further arguments passed to or from other methods.}
 }
 
 \value{
@@ -90,7 +94,7 @@ getNumberOfFrames(y, type = c('total', 'render'))
 
   \code{is.Image} returns TRUE if \code{x} is an \code{Image} object and FALSE otherwise.
 
-  \code{as.raster.Image} coerces an Image object to a raster object. For stacked images the \code{i}-th frame is returned (by default the first one).
+  \code{as.raster} coerces an Image object to a raster object. For stacked images the \code{i}-th frame is returned (by default the first one).
 
   \code{colorMode} returns the color mode of \code{y} and \code{colorMode<-} changes the color mode
   of \code{y}.
