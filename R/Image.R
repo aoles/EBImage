@@ -105,6 +105,10 @@ as.Image = function(x) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## define method for the S3 generic 'as.array'
+as.array.Image = function(x, ...) x@.Data
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 colorMode = function (y) {
   if (is(y, 'Image')) y@colormode
   else Grayscale
@@ -505,10 +509,10 @@ getNumberOfFrames = function(y, type = c('total', 'render')) {
   type = match.arg(type)
   d = dim(y)
   if (type=='render' && colorMode(y)==Color) {
-    if (length(d)< 3L) return(1L)
-    else return(prod(d[-seq_len(3)]))
+    if (length(d)< 3L) 1L
+    else as.integer(prod(d[-seq_len(3)]))
   }
-  else return(prod(d[-seq_len(2)]))
+  else as.integer(prod(d[-seq_len(2)]))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -756,11 +760,12 @@ parseColorMode = function(colormode) {
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## returns the raster representation of an image (by default the first frame)
-as.raster.Image = function(y, i = 1) {
-  x = getFrame(y, i, type='render')
-  x = clipImage(x)
+as.raster.Image = function(x, i = 1) {
+  y = getFrame(x, i, type='render')
+  y = clipImage(y)
   ## get image data with swapped XY dimensions
-  x = transpose(x, coerce = TRUE)
+  y = transpose(y, coerce = TRUE)
   ## the actual raster representation
-  as.raster(x)
+  # the as.raster.array function does the transposition again!
+  as.raster(y)
 }

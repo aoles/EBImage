@@ -20,7 +20,7 @@
   Image methods
   \itemize{
     \item \code{Image}
-    \item \code{as.Image}, \code{is.Image}, \code{as.raster.Image}
+    \item \code{as.Image}, \code{is.Image}, \code{as.raster}
     \item \code{colorMode}, \code{imageData}
     \item \code{getFrame}, \code{getNumberOfFrames}
   }
@@ -40,7 +40,7 @@
 
   Image segmentation, objects manipulation
   \itemize{
-    \item \code{thresh}, \code{bwlabel}
+    \item \code{thresh}, \code{bwlabel}, \code{otsu}
     \item \code{watershed}, \code{propagate}
     \item \code{ocontour}
     \item \code{paintObjects}, \code{rmObjects}, \code{reenumerate}
@@ -64,7 +64,7 @@
 
   Color space manipulation
   \itemize{  
-    \item \code{rgbImage}, \code{channel}
+    \item \code{rgbImage}, \code{channel}, \code{toRGB}
   }
 
   Image stacking, combining, tiling

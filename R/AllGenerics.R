@@ -17,7 +17,7 @@
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 ## image IO, display
-setGeneric ("image",          function (x, ...)        standardGeneric("image") )
+setGeneric ("image", function (x, ...) standardGeneric("image") )
 
 ## statistics
-setGeneric ("hist",           function (x, ...)        standardGeneric("hist") )
+setGeneric ("hist", function (x, ...) standardGeneric("hist") )
