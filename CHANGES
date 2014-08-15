@@ -1,0 +1,467 @@
+version 4.5.22
+- fixed 'fg.col' and 'bg.col' handling in 'tile'
+
+version 4.5.21
+- set 'col = "white"' for grid lines in 'displayRaster'
+
+version 4.5.20
+- added grid lines to 'displayRaster'
+- cleaned up 'displayRaster' code
+
+version 4.5.19
+- 'displayRaster' does not restore 'par' graphical parameters on exit
+- fixed 'interpolate' argument passing in 'displayRaster'
+
+version 4.5.18
+- improvements to documentation
+
+version 4.5.17
+- added 'luminance' conversion mode to 'channel'
+- removed old code of 'writeImage'
+- added package news from previous versions to 'NEWS.Rd'
+- updated CHANGES
+
+version 4.5.16
+- further memory and performance improvements to 'readImage'
+- 'clipImage' now relies on the C coded 'normalize' function (up to 5x faster!)
+- significant performance improvements (up to 2x faster):
+  'Image'
+  'is.Image'
+  'selectChannel'
+  'show'
+  'flip'/'flop'
+- minor performance improvements (i.e. by using call to 'new' instead of 'Image'):
+  'validImage'
+  'filter2'
+  'colorLabels'
+  'rgbImage'
+  'affine'
+  'tile'
+  'isXbitImage'
+  'writeImage'
+- when called on an Image object 'as.Image' returns now it's argument rather than the Grayscale-coerced copy
+- Image constructor handles now properly multi-dimensional character arrays
+- fixed color mode check in 'validImageObject'
+- removed unnecessary calls to 'validObject'
+  NOTE: there is no need to check for object validity after creating it with 'new' (this is done automatically by R)
+- added some missing imports from 'methods' to the NAMESPACE file
+
+version 4.5.15
+- memory improvement to 'readImage'
+
+version 4.5.14
+- minor improvements to 'is.Image' and 'transpose'
+
+version 4.5.12
+- updated man page of 'flip', 'flop', and 'rotate'
+
+version 4.5.11
+- fix to 'getFrame' and 'combine' for single channel Color Images
+- added convenience function 'toRGB'
+
+version 4.5.10
+- fixed performance of 'readImage', especially on big image stacks
+
+version 4.5.9
+- 'colorLabels' now supports multidimensional images
+
+version 4.5.8
+- 'getFrame' now uses 'asub' from the abind package
+
+version 4.5.7
+- improved code and performance of 'colorLabels'
+
+version 4.5.6
+- updated 'getNumberOfFrames' and 'getFrame' functions to support multi-dimensional images
+
+version 4.5.5
+- added 'interpolate' parameter to the internal 'displayRaster' function
+
+version 4.5.4
+- fixed header title in the vignette
+- rolled back the change from 'array' to 'as.array' from previous commit
+
+version 4.5.3
+performance optimizations:
+- changed 'array' call to 'as.array' in Image constructor
+- 'normalize' does not reassign returned value to the original object
+
+version 4.5.2
+- minor modifications to code and documentation
+
+version 4.5.1
+- moved vignette from 'inst/doc/' to 'vignettes/'
+
+version 4.3.7
+- fixed a bug in 'getFrame' function: XY dimensions equal 1 were dropped
+
+version 4.3.5
+- minor documentation fixes
+
+version 4.3.4
+- modified the 'normalize' function to accept presetting the input intensity range (requested by Bernd Fischer)
+- added 'colorLabels' function by Bernd Fischer
+
+version 4.3.3
+- vignette uses now the 'BiocStyle' formatting
+
+version 4.3.2
+- 'normalize' now uses the generic from BiocGenerics
+
+version 4.3.1
+- fixed the redefinition of default arguments in C function templates which triggered errors in the clang compiler
+
+version 4.1.7
+- updated 'NEWS.Rd' and vignette papersize
+
+version 4.1.6
+- fixed long argument handling in 'deparse()' by adding 'width.cutoff' and 'nlines'
+- changed brush size in the 'morphology.Rd' from 100 to 99
+- maintainer changed
+
+version 4.1.5
+- fixed a bug in the 'medianFilter' function caused by incorrect [0:1] <> integer range conversion
+
+version 4.1.4
+- fixed a bug in the 'erode'/'dilate' functions introduced by the previous fix in version 3.99.2
+
+version 4.1.3
+- added function 'localCurvature' to compute local signed curvature along a line segment
+
+version 4.1.2
+- fixed a bug in the 'resize' function causing the new image width to be calculated incorrectly when only height was provided (reported by Bernd Fischer)
+- the range of pixel coordinates displayed in the Javascript viewer is now (1,1):(w,h) rather than (0,0):(w-1,h-1) and matches the indices of the corresponding Image array
+
+version 4.1.1
+- "inline double peekpixel" has been changed to "static inline double peekpixel", to be C99 compatible (thanks to Nathan Coulter)
+
+version 3.99.19
+- improved JavaScript image viewer with some minor bugs fixed
+- removed unused files from 'scripts/'
+- added 'NEWS.Rd'
+
+version 3.99.18
+- further improvements to the JavaScript image viewer; exit on-screen help using either 'ESC' or 'Q'
+- added 'transpose' to unit tests
+
+version 3.99.17:
+- removed all dependencies towards GTK+ and ImageMagick
+- deprecated: blur, equalize,
+- deprecated: drawtext, drawfont
+- deprecated: getFeatures, hullFeatures, zernikeMoments, edgeProfile, edgeFeatures
+- deprecated: haralickFeatures, haralickMatrix
+- deprecated: moments, smoments, rmoments, cmoments
+- overhauled the testing procedure in tests/test.R
+
+version 3.99.16
+- CSS fix disabling bilinear filtering of rescaled images in the JavaScript image viewer
+
+version 3.99.15
+- numerous improvements and bug fixes to the JavaScript image viewer, including: on-screen help displayed by pressing 'H', and fixed mouse wheel action (now consistent behavior across browsers and platforms)
+
+version 3.99.14
+- minor documentation updates
+
+version 3.99.13
+- improved JavaScript image viewer with upgraded user interface
+
+version 3.99.12
+- renamed 'swapXY' to 'transpose'
+- updated documentation on 'transpose', 'readImage', writeImage', and 'display'
+
+version 3.99.11
+- better argument handling in the 'display' function
+- a message rather than a warning is now issued when displaying multiframe images using the 'raster' method
+- range clipping to [0:1] in 'writeImage'
+
+version 3.99.10
+- improved 'getFrame' function: better performance by reassigning array dimension only when needed
+
+version 3.99.9
+- 'font-face' misspelling in 'display.template'
+- restored the original 'getFrame' function
+
+version 3.99.8
+- substituted the former GTK+ based 'display' function by the new one relying on 'displayInBrowser' and 'displayRaster' functions
+- substituted all calls to 'paste0' by 'paste'
+- disabled bilinear filtering of rescaled images in the JavaScript image viewer
+- fixed a minor bug in the 'displayRaster' function: a warning message was triggered for single-frame images
+
+version 3.99.7
+- changed handling of greyscale images containing an alpha channel (aka. GA): instead of discarding the second channel and reading pixel data into a 'Greyscale' Image both channels are now stored in a 'Color' Image
+- removed 'readImageOld' and 'writeImageOld'
+- removed 'inst/scripts/newAgainstOld.R'
+- updated 'inst/scripts/readWriteTest.R'
+
+version 3.99.5
+- new 'displayInBrowser' function: preview of the new JavaScript based image viewer
+
+version 3.99.4
+- readImage' can now read directly from URLs
+- some fixes and improvements to 'displayRaster'
+
+version 3.99.3
+- replaced 'readImage' and 'writeImage' by the new 'readImage2' and 'writeImage2' functions; moved the previous ones to 'readImageOld' and 'writeImageOld'
+
+version 3.99.2
+- bumped version from 4.0.1 to 3.99.2 to prepare the future 4.0.0 version
+- refactored the functions, not using ImageMagick any longer: translate, affine, rotate, resize
+- removed: animate
+- deprecated: blur, equalize
+- todo: man pages have to be synced with recent changes (blur, resize, affine, rotate, translate, display)
+- todo: overhaul the unit tests
+- todo: remove the old moment generating functions: hullFeatures...
+- todo: remove last dependencies to IM
+- fixed a bug in 'erode'/'dilate' functions: incorrect range of loop indices caused memory reads from outside the kernel vector
+- added 'readImage2' and 'writeImage2' functions: candidates for replacing the original ImageMagick based I/O functions
+- added 'swapXY' function swapping the first two indices of an image array during I/O operations
+- added 'displayRaster' function displaying images using R graphics
+- modified 'getFrame': improved performance
+- modified 'as.raster'
+- 'inst/images/lena.gif' is now 'inst/images/lena.png' (preparing for dropping GIF support)
+- in '/inst/scripts/': scripts for testing the new read/write functions against the former ones using test images from the on-line EBImage Test Images repository (http://www-huber.embl.de/EBImage/ExampleImages/)
+
+version 3.13.2
+- deprecated 'equalize'
+- fixed occurences of partial argument matching that 'R CMD check' had complained about
+
+version 3.13.1
+- fixed a bug in ImageMagickCall that cause some matrices not to be normalized to [0;1] before IM calls
+
+version 3.13.0
+- addition of greyscale functions for computation of the self-complementary top-hat (I. Kats)
+- a median filter based on Perreault's constant time median filter (J. Barry)
+
+3.11.2
+- fixed the angle computation of computeFeatures.moment (there was a sign inversion before for angles larger than pi/4)
+
+3.9.9
+- animate() does not work anymore (IM issues I guess...) and now calls display(); I will reimplement the animating function using timer messages in display()
+
+3.9.8
+- fixed flop() when working with rectangular images (bug reported by Takeo Katsuki)
+
+3.9.7
+- TrueColor is not present any more
+- fixed paintObjects using Kevin Keraudren's bug fix
+- paintObjects behavior has now changed with respect to the opacity parameter
+
+3.9.6
+- the functions getFeatures, hullFeatures, edgeProfile, edgeFeatures are now obsolete
+- the functions moments, cmoments, smoments, rmoments, haralickFeatures, haralickMatrix, zernikeMoments are now obsolete 
+- the functions are still exported for backward compatibility reasons
+- removed some TrueColor tests, which is going to be discarded from EBImage
+- removed the deprecated arguments: iter, no.GTK, main, colorize
+
+3.9.5
+- exporting computeFeatures
+
+3.9.4
+- fixed haralickFeatures and haralickMatrix when no objects are present
+
+3.9.3
+- experimental support for computeFeatures
+- ocontour does not return empty objects anymore
+
+3.9.2
+- the gaussian shape in makeBrush() is now conform to Matlab (J. Barry)
+- added the affine() transform
+
+3.9.1
+- added the gaussian shape in makeBrush()
+- fixed the quality argument in writeImage()
+
+3.7.1
+- added getFrame(), to extract the i-th frame of an image
+- from Paul Murrell: added a PROTECT/UNPROTECT statement in lib_readImages()
+- from Paul Murrell: added as.raster.Image() 
+
+3.5.5
+- now supports Cellomics .c01 image file format
+
+3.5.4
+- drawCircle() now returns the transformed image and does not modify the input image anymore 
+
+3.5.3
+- removed print click position feature
+
+3.5.2
+- added drawCircle()
+- display() now prints click positions
+
+3.5.1
+- lgomp was removed from linking options, to prevent a segfault caused in OpenSUSE 11.2 and 11.3 by dynamic linking of lgomp (optionally used by ImageMagick but not used in EBImage) together with lpthread (required and used by GTK)
+- removed Makevars.in
+- minimal IM required version is now 6.3.7
+- lower vignette image quality to save space
+
+3.3.2
+- now uses MagickCoreGenesis and MagickCoreTerminus to start/terminate ImageMagick, to be compatible with IM 6.6.x
+
+3.3.1
+- removed frameDist, matchObject
+- removed stopIfNotImage, morphKern, mkball, mkbox
+- removed header, assert, chooseImage
+- removed resample, sharpen, umask, modulate
+- removed negate, affinet, normalize2, noise
+- removed mediansmooth, cgamma, enhance, denoise
+- removed contrast, despeckle, edge, segment
+- removed cthresh, athresh
+- removed channelMix
+- removed applyGaussian and pseudoZernike
+
+3.1.3 
+- merge devel with release version 3.0.1
+
+3.0.1
+- updated CHANGES
+- updated manual pages
+- now uses is(x, 'Image') instead of class(x)=='Image' to allow people inherit from the EBImage class
+- updated INSTALL file, with new tips for Windows and MacOS users
+- removed Gene*.tif old images
+
+2.99.8
+- new INSTALL
+- new vignette
+
+2.99.7
+- stackObjects OK
+
+2.99.6
+- doc: propagate, combine, tile, untile, rmObjects, reenumerate, hullFeatures
+
+2.99.5
+- channel OK
+- paintObjects, drawtext OK
+- colors.c removed
+- doc: watershed
+- simpler combine
+
+2.99.4
+- deprecated channelMix
+- doc: filter2, moments, cmoments, smoments, rmoments
+- doc: paintObjects, getFeatures, rgbImage, channel
+
+2.99.3
+- bwlabel OK
+- safer rgbImage
+
+2.99.2
+- doc: tresh
+- floodFill and fillHull : doc + test + examples
+
+2.99.1
+- starting the pre 3.0.0 release
+- doc: equalize, blur, gblur, normalize, EBImage, EBImage-deprecated
+
+2.7.22
+- fixed a bug preventing from reading palette images in color
+- deprecated all ImageMagick functions except blur, gblur, equalize, resize and rotate
+- validImage now checks validity of arrays
+- new doc for ocontour, translate, resize, rotate , flip, flop
+- new examples for makeBrush
+
+2.7.21
+- moment features renamed from '*' to 'm.*'
+- geometric hull features  from 'h.*' to 'g.*' to not to be confused with Haralick's features 'h.*'
+- moment features now need ref to be computed
+- getFeatures now just concatenate hull, moments, edge, haralick and zernike features
+- no more s2maj and s2min in hullFeatures: now only l1 and l2 (eigenvalues of the covariance matrix)(to be consistent with moments)
+
+2.7.20
+- outline renamed in ocontour, ocontour documentation added
+- build warnings should disappear
+
+2.7.19
+- outline added
+
+2.7.16
+- fixed warnings due to unused variables in C code
+- fixed a drawtext bug which prevented EBImage to be checked on R 2.9.0
+- fixed floodFill example by restoring inst/images/holes.png
+
+2.7.15
+- no warnings anymore in R CMD check
+- S4 methods removed
+- header and assert deprecated
+- test framework added
+- documentation updated
+- morphKern, mkball and mkbox deprecated 
+- all '...' arguments removed
+- horizontal slider and clean display.c code added
+- zernikeMoments arguments 'pseudo' and 'apply.Gaussian' deprecated
+- display and readImage argument 'colormode' deprecated
+- display arguments: 'main', 'no.GTK' deprecated
+- .ImageCall and ensureStorageMode functions removed
+
+2.7.11
+- no ImageX object anymore: Image now extends array
+
+2.7.10
+- fixed ReadImage bug when filename=''
+
+2.7.9
+- created tile.c, tile.h
+- out of range [0:1] normalize for Magick
+- matrix: channel 4, untile, getFeatures fixed
+- x11 channel OK
+
+2.7.8
+- validImage in C, removed isImage in C
+- merged IndexedImage class within Image, no IndexedImage class anymore !
+- removed spurious '...'
+- classUnion ImageX instead of Image !
+- now Image supports non-numeric storage.mode (e.g. logical) !
+- ImageCall instead of Call to check Image validity and storage.mode
+- deprecated: matchObject, stopIfNotImage
+
+2.7.7
+- reenumerate, hullFeatures, rmObjects, watershed: work fine on md and Color
+- watershed: fixed bug when used on distmap(lena>0.5)
+- getFeatures, hullFeatures, edgeProfile, edgeFeatures: work fine on md and Color
+- cmoments, smoment, rmoments, moments: work fine on md and Color
+- haralickFeatures, haralickMatrix, zernikeMoments: work fine on md and Color
+- zernikeMoments: work fine on md and Color
+- frameDist deprecated
+- class.IndexedImage.R: stop message in case of TrueColor now OK
+- checked all INTEGER(GET_DIM())[2] OK
+- merged all features in features.R
+- renamed methods-display.R in display.R, filters_watershed.cpp in watershed.cpp
+- watershed is now interruptable
+- objects methods moved from class.IndexedImage.R to objects.R
+
+2.7.6
+- fixed dy instead of dx in lib_filterThresh L37 in nFramePix = (2 * dx + 1) * (2 * dx + 1); (bug submitted by Glenn Davis)
+- tile, untile, thresh: works fine on md, Color
+- vignettes build OK
+- translate: check param input OK
+- keeping correct storage.mode after binary operations on TrueColor images
+- deprecated functions moved to deprecated.R
+- vignette changes: (indexing a[,,,1] instead of a[,,1] and promote usage of rgbImage)
+- unit test inst/scripts/test.R added
+- new deprecated.R file
+
+2.7.5
+- functions copy, .isCorrectType, .correctType have been removed
+- multidimensional arrays are now handled
+- new color mode Color added
+- functions getNumberOfFrames, translate added
+- signature combine has been changed
+- validity method added
+- file filters.R renamed in magick.R
+- file spatial.R added
+- abind dependency added
+- new fast distmap algorithm, up to 1000 times faster
+- readImage now uses by default the native image color mode
+- C functions getColorMode, getNumberOfFrames, getNumberOfChannels, getColorStrides added
+- C function lib_paintFeatures renamed to paintObjects
+- C function lib_matchFeatures renamed to matchObjects
+- C function lib_deleteFeatures renamed to rmObjects
+- C function lib_stack_objects renamed to stackObjects
+- C function lib_tile_stack renamed to tile
+- C function lib_untile renamed to untile
+- display is faster since pixbuf are now directly built from SEXP
+- writeImage now uses a quality of 100 by default
+- keep correct storage.mode after binary operations 
+- the Image constructor is doing now the conversion between TrueColor and (Grayscale or Color) images
+- cleaner show, print methods

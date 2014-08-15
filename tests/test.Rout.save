@@ -1,0 +1,333 @@
+
+R version 3.1.0 (2014-04-10) -- "Spring Dance"
+Copyright (C) 2014 The R Foundation for Statistical Computing
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> ## cat tests/test.R | R --vanilla &>tests/test.Rout.save
+> library("EBImage")
+> 
+> ## returns a hashcode given an object
+> hash <- function(x) {
++   if (is.list(x)) hash(sapply(x,hash))
++   else {
++     xd <- as.numeric(x)
++     xd <- xd[!is.nan(xd)]
++     if (is.matrix(xd)) sum(xd*(1:length(xd))) + 0.7*hash(dim(xd))
++     else sum(xd*(1:length(xd))) - 0.1
++   }
++ }
+> 
+> ## try to evaluate fun(x,...) 
+> check <- function(fun, x, ...) {
++   passed <- TRUE
++ 
++   cat("checking \'", fun, "\' ... ", sep="")
++   y=try(do.call(fun,c(list(x),list(...))), silent=TRUE)
++   if (class(y)=="try-error" || ( is.Image(y) && !validObject(y)) ) {
++     y <- NULL
++     passed <- FALSE
++   }
++ 
++   if (passed) cat("OK (hash=", hash(y), ")\n", sep="") 
++   else cat("FAILED\n")
++ 
++   y
++ }
+> 
+> testEBImageFunctions <- function(x) {
++   cat("new test (hash=", hash(x), ")\n", sep="")
++ 
++   ## pixel arithmetic
++   z <- check(">", x, 0.5)
++   z <- check("+", x, x)
++   z <- check("/", x, 2)
++   z <- check("transpose", x)
++   if (mode(x)!="logical") z <- check("median", x)
++ 
++   ## image methods
++   z <- check("Image", x, colormode=Color)
++   z <- check("as.Image", x)
++   z <- check("is.Image", x)
++   z <- check("imageData", x)
++   z <- check("imageData<-", x, z)
++   z <- check("colorMode<-", x, Grayscale)
++   z <- check("getNumberOfFrames", x, type="render")
++ 
++   ## subset
++   sub <- list(x, 1:10, 1:7)
++   if (length(dim(x))>2) sub <- c(sub, rep(TRUE, length(dim(x))-2))
++   z <- do.call("check", c("[", sub))
++ 
++   ## spatial transform
++   z <- check("resize", x, 137, 22)
++   z <- check("rotate", x, 20)
++   z <- check("flip", x)
++   z <- check("flop", x)
++   z <- check("translate", x, c(-7, 5))
++   z <- check("affine", x, matrix(c(-7, 5, 0.1, -0.2, 0.3, 1), ncol=2))
++   z <- check("transpose", x)
++ 
++   ## segmentation
++   z <- check("thresh", x)
++   y <- check("bwlabel", x>0.5)
++   z <- check("rmObjects", getFrame(y, 1), 3)
++   z <- check("reenumerate", y)
++   z <- paintObjects(channel(y, "gray"), x)
++   y <- check("ocontour", x>0.5)
++   z <- check("localCurvature", y[[1]])
++ 
++   ## filtering
++   z <- check("normalize", x)
++   z <- check("gblur", x, sigma=2)
++   z <- check("filter2", x, array(1, dim=c(5, 5)))
++   if (length(dim(x))<=3) z <- check("medianFilter", x, 3)
++ 
++   ## morphological operations
++   y <- x>0.5
++   z <- check("erode", y)
++   z <- check("dilate", y)
++   z <- check("distmap", y)
++   z <- check("watershed", y)
++   z <- check('floodFill', y, c(10, 10), 0.5)
++   z <- check('fillHull', y)
++   z <- check("erodeGreyScale", x)
++   z <- check("dilateGreyScale", x)
++   z <- check("whiteTopHatGreyScale", x)
++   z <- check("selfcomplementaryTopHatGreyScale", x)
++ 
++   ## colorspace
++   z <- check("channel", x, "rgb")
++   z <- check("rgbImage", x, x>0.5)
++ 
++   ## image stacking, combining, tiling
++   z <- check("combine", x, x)
++   y <- check("tile", x, nx=2)
++   z <- check("untile", y, c(2,2))
++ 
++   ## features
++   y <- getFrame(x, 1)
++   z <- check("computeFeatures", bwlabel(y>0.5), y, expandRef=NULL)
++   cat("\n")
++ }
+> 
+> ## test: grayscale 2D 
+> x <- readImage(system.file("images","lena.png", package="EBImage"))[1:32, 1:50]
+> testEBImageFunctions(x)
+new test (hash=677933.5)
+checking '>' ... OK (hash=1138592)
+checking '+' ... OK (hash=1355867)
+checking '/' ... OK (hash=338966.7)
+checking 'transpose' ... OK (hash=672316.3)
+checking 'median' ... OK (hash=0.4215686)
+checking 'Image' ... OK (hash=677933.5)
+checking 'as.Image' ... OK (hash=677933.5)
+checking 'is.Image' ... OK (hash=0.9)
+checking 'imageData' ... OK (hash=677933.5)
+checking 'imageData<-' ... OK (hash=677933.5)
+checking 'colorMode<-' ... OK (hash=677933.5)
+checking 'getNumberOfFrames' ... OK (hash=0.9)
+checking '[' ... OK (hash=1318.59)
+checking 'resize' ... OK (hash=2376180)
+checking 'rotate' ... OK (hash=498041.8)
+checking 'flip' ... OK (hash=664660.3)
+checking 'flop' ... OK (hash=677900.4)
+checking 'translate' ... OK (hash=432339.5)
+checking 'affine' ... OK (hash=22143.49)
+checking 'transpose' ... OK (hash=672316.3)
+checking 'thresh' ... OK (hash=318475.9)
+checking 'bwlabel' ... OK (hash=1236120)
+checking 'rmObjects' ... OK (hash=1215179)
+checking 'reenumerate' ... OK (hash=1236120)
+checking 'ocontour' ... OK (hash=2110077)
+checking 'localCurvature' ... OK (hash=2107740)
+checking 'normalize' ... OK (hash=762286.7)
+checking 'gblur' ... OK (hash=677963.2)
+checking 'filter2' ... OK (hash=16949548)
+checking 'medianFilter' ... OK (hash=677823.3)
+checking 'erode' ... OK (hash=814906.9)
+checking 'dilate' ... OK (hash=1255542)
+checking 'distmap' ... OK (hash=5976133)
+checking 'watershed' ... OK (hash=1138592)
+checking 'floodFill' ... OK (hash=580201.4)
+checking 'fillHull' ... OK (hash=1192750)
+checking 'erodeGreyScale' ... OK (hash=627634.7)
+checking 'dilateGreyScale' ... OK (hash=708558.7)
+checking 'whiteTopHatGreyScale' ... OK (hash=13588.63)
+checking 'selfcomplementaryTopHatGreyScale' ... OK (hash=5314.178)
+checking 'channel' ... OK (hash=6058968)
+checking 'rgbImage' ... OK (hash=4035726)
+checking 'combine' ... OK (hash=2697590)
+checking 'tile' ... OK (hash=3846811)
+checking 'untile' ... OK (hash=3139255)
+checking 'computeFeatures' ... OK (hash=3736511)
+
+> 
+> ## test: color 2D
+> x <- readImage(system.file("images","lena-color.png", package="EBImage"))[1:67, 1:17,]
+> testEBImageFunctions(x)
+new test (hash=2906472)
+checking '>' ... OK (hash=2057460)
+checking '+' ... OK (hash=5812943)
+checking '/' ... OK (hash=1453236)
+checking 'transpose' ... OK (hash=2884426)
+checking 'median' ... OK (hash=0.4176471)
+checking 'Image' ... OK (hash=2906472)
+checking 'as.Image' ... OK (hash=2906472)
+checking 'is.Image' ... OK (hash=0.9)
+checking 'imageData' ... OK (hash=2906472)
+checking 'imageData<-' ... OK (hash=2906472)
+checking 'colorMode<-' ... OK (hash=2906472)
+checking 'getNumberOfFrames' ... OK (hash=0.9)
+checking '[' ... OK (hash=11981.28)
+checking 'resize' ... OK (hash=19974971)
+checking 'rotate' ... OK (hash=1624704)
+checking 'flip' ... OK (hash=2918634)
+checking 'flop' ... OK (hash=2909976)
+checking 'translate' ... OK (hash=1660361)
+checking 'affine' ... OK (hash=229401.6)
+checking 'transpose' ... OK (hash=2884426)
+checking 'thresh' ... OK (hash=1773976)
+checking 'bwlabel' ... OK (hash=3722843)
+checking 'rmObjects' ... OK (hash=649229.9)
+checking 'reenumerate' ... OK (hash=3073613)
+checking 'ocontour' ... OK (hash=773259.8)
+checking 'localCurvature' ... OK (hash=771557.3)
+checking 'normalize' ... OK (hash=3806553)
+checking 'gblur' ... OK (hash=2909484)
+checking 'filter2' ... OK (hash=72720322)
+checking 'medianFilter' ... OK (hash=2934683)
+checking 'erode' ... OK (hash=1395826)
+checking 'dilate' ... OK (hash=2471121)
+checking 'distmap' ... OK (hash=Inf)
+checking 'watershed' ... OK (hash=2894076)
+checking 'floodFill' ... OK (hash=3060333)
+checking 'fillHull' ... OK (hash=2191791)
+checking 'erodeGreyScale' ... OK (hash=2693268)
+checking 'dilateGreyScale' ... OK (hash=3097664)
+checking 'whiteTopHatGreyScale' ... OK (hash=91389.01)
+checking 'selfcomplementaryTopHatGreyScale' ... OK (hash=148854.6)
+checking 'channel' ... OK (hash=2906472)
+checking 'rgbImage' ... OK (hash=12609190)
+checking 'combine' ... OK (hash=12798162)
+checking 'tile' ... OK (hash=18209839)
+checking 'untile' ... OK (hash=13989412)
+checking 'computeFeatures' ... OK (hash=239444.9)
+
+> 
+> ## test: color 3D
+> x <- readImage(system.file("images","lena-color.png", package="EBImage"))[1:41, 1:18,]
+> x <- combine(x, x)
+> testEBImageFunctions(x)
+new test (hash=5506686)
+checking '>' ... OK (hash=4890280)
+checking '+' ... OK (hash=11013373)
+checking '/' ... OK (hash=2753343)
+checking 'transpose' ... OK (hash=5510074)
+checking 'median' ... OK (hash=0.4137255)
+checking 'Image' ... OK (hash=5506686)
+checking 'as.Image' ... OK (hash=5506686)
+checking 'is.Image' ... OK (hash=0.9)
+checking 'imageData' ... OK (hash=5506686)
+checking 'imageData<-' ... OK (hash=5506686)
+checking 'colorMode<-' ... OK (hash=5506686)
+checking 'getNumberOfFrames' ... OK (hash=1.9)
+checking '[' ... OK (hash=51835.01)
+checking 'resize' ... OK (hash=90110193)
+checking 'rotate' ... OK (hash=3999057)
+checking 'flip' ... OK (hash=5512107)
+checking 'flop' ... OK (hash=5506599)
+checking 'translate' ... OK (hash=3094953)
+checking 'affine' ... OK (hash=589294.3)
+checking 'transpose' ... OK (hash=5510074)
+checking 'thresh' ... OK (hash=2900466)
+checking 'bwlabel' ... OK (hash=7264428)
+checking 'rmObjects' ... OK (hash=272690.9)
+checking 'reenumerate' ... OK (hash=5085114)
+checking 'ocontour' ... OK (hash=298907.8)
+checking 'localCurvature' ... OK (hash=298035.4)
+checking 'normalize' ... OK (hash=4207650)
+checking 'gblur' ... OK (hash=5507715)
+checking 'filter2' ... OK (hash=137686941)
+checking 'erode' ... OK (hash=3286960)
+checking 'dilate' ... OK (hash=5641688)
+checking 'distmap' ... OK (hash=Inf)
+checking 'watershed' ... OK (hash=5974596)
+checking 'floodFill' ... OK (hash=5188430)
+checking 'fillHull' ... OK (hash=5253376)
+checking 'erodeGreyScale' ... OK (hash=5123645)
+checking 'dilateGreyScale' ... OK (hash=5764578)
+checking 'whiteTopHatGreyScale' ... OK (hash=140101.3)
+checking 'selfcomplementaryTopHatGreyScale' ... OK (hash=144311.9)
+checking 'channel' ... OK (hash=5506686)
+checking 'rgbImage' ... OK (hash=29219740)
+checking 'combine' ... OK (hash=23011968)
+checking 'tile' ... OK (hash=6496789)
+checking 'untile' ... OK (hash=4536552)
+checking 'computeFeatures' ... OK (hash=241975.8)
+
+> 
+> ## test: logical 2D
+> x <- readImage(system.file("images","lena.png", package="EBImage"))[1:32, 1:50]>0.5
+> testEBImageFunctions(x)
+new test (hash=1138592)
+checking '>' ... OK (hash=1138592)
+checking '+' ... OK (hash=2277184)
+checking '/' ... OK (hash=569295.9)
+checking 'transpose' ... OK (hash=1064532)
+checking 'Image' ... OK (hash=1138592)
+checking 'as.Image' ... OK (hash=1138592)
+checking 'is.Image' ... OK (hash=0.9)
+checking 'imageData' ... OK (hash=1138592)
+checking 'imageData<-' ... OK (hash=1138592)
+checking 'colorMode<-' ... OK (hash=1138592)
+checking 'getNumberOfFrames' ... OK (hash=0.9)
+checking '[' ... OK (hash=2484.9)
+checking 'resize' ... OK (hash=4003708)
+checking 'rotate' ... OK (hash=814130.9)
+checking 'flip' ... OK (hash=1080128)
+checking 'flop' ... OK (hash=1140459)
+checking 'translate' ... OK (hash=755568.9)
+checking 'affine' ... OK (hash=35786.4)
+checking 'transpose' ... OK (hash=1064532)
+checking 'thresh' ... OK (hash=659965.9)
+checking 'bwlabel' ... OK (hash=1236120)
+checking 'rmObjects' ... OK (hash=1215179)
+checking 'reenumerate' ... OK (hash=1236120)
+checking 'ocontour' ... OK (hash=2110077)
+checking 'localCurvature' ... OK (hash=2107740)
+checking 'normalize' ... OK (hash=1138592)
+checking 'gblur' ... OK (hash=1147556)
+checking 'filter2' ... OK (hash=28644160)
+checking 'medianFilter' ... OK (hash=1220127)
+checking 'erode' ... OK (hash=814906.9)
+checking 'dilate' ... OK (hash=1255542)
+checking 'distmap' ... OK (hash=5976133)
+checking 'watershed' ... OK (hash=1138592)
+checking 'floodFill' ... OK (hash=580201.4)
+checking 'fillHull' ... OK (hash=1192750)
+checking 'erodeGreyScale' ... OK (hash=763447.9)
+checking 'dilateGreyScale' ... OK (hash=1255542)
+checking 'whiteTopHatGreyScale' ... OK (hash=142227.9)
+checking 'selfcomplementaryTopHatGreyScale' ... OK (hash=189465.9)
+checking 'channel' ... OK (hash=10073376)
+checking 'rgbImage' ... OK (hash=4496384)
+checking 'combine' ... OK (hash=4496384)
+checking 'tile' ... OK (hash=4839749)
+checking 'untile' ... OK (hash=3809740)
+checking 'computeFeatures' ... OK (hash=13758086)
+
+> 

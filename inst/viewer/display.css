@@ -1,0 +1,97 @@
+   body {
+    margin: 0px;
+    padding: 0px;
+    border: 0px; 
+    background-color:#dddddd;
+    overflow: hidden;
+   }
+   img {
+    image-rendering:optimizeSpeed;             /* Legal fallback                 */
+    image-rendering:-moz-crisp-edges;          /* Firefox                        */
+    image-rendering:-o-crisp-edges;            /* Opera                          */
+    image-rendering:-webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+    image-rendering:optimize-contrast;         /* CSS3 Proposed                  */
+    -ms-interpolation-mode:nearest-neighbor;   /* IE8+                           */
+   }
+   div {
+    display:block;
+    margin:0px;
+    padding:0px;
+    border:0px;
+    overflow:hidden;
+   }
+   button {
+    font-size:20px;
+    font-family:Arial,sans-serif;
+    width:32px;
+    height:32px;
+    line-height:100%;
+    vertical-align:top;
+   }
+   .buttons{
+    float:left;
+    width:50%;
+    min-width:128px;
+   }
+   #toolbar{
+    overflow: inherit;
+    min-width:128px;
+   }
+   #zoombuttons{
+    text-align:right;
+    margin-right:-1px;
+   }
+   #button_org{
+    font-size:14px;
+   }
+   #canvas{
+    position:relative;
+    z-index:1;
+    background-color:#222222;
+   }
+   #ebimage{
+    position:absolute;
+    z-index:2;
+    cursor:crosshair;
+   }
+   #statusbar, .status{	
+    font-size:14px;
+    font-family:"Lucida Console", Monaco, monospace;
+    margin-right:10px;
+    padding:1px;
+    float:left;
+   }
+   #help{
+    position:relative;
+    margin:auto;
+    top:50px;
+    width:360px;
+    border-radius:10px;
+    overflow:auto;
+    border:1px solid #eeeeee;
+    z-index:3;
+    display:none;
+   }
+   .key{
+    font-family:"Lucida Console", Monaco, monospace;
+    font-weight:bold;
+   }
+   .topic{
+    font-size:14px;
+    font-weight:bold;
+    padding-top:5px;
+   }
+   .close{
+    text-align:center;
+    font-weight:bold;
+    padding:5px;
+   }
+   table{
+    background-color:white;
+    opacity:0.8;
+    border-radius:8px;
+    padding-left:5px;
+    padding-right:5px;
+    font-size:12px;
+    font-family:Tahoma, Geneva, sans-serif;
+   }
