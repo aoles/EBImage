@@ -3,7 +3,8 @@ useDynLib("EBImage", .registration = TRUE, .fixes = "C_")
 importFrom("BiocGenerics", "normalize", "combine")
 importFrom("methods", "Ops", "show", "new", "validObject", "is")
 importFrom("graphics", "image", "hist")
-importFrom("stats", "median")
+importFrom("grDevices", "as.raster")
+importFrom("stats", "median", "quantile")
 importFrom("abind", "abind", "adrop", "asub")
 importFrom("locfit", "lp", "locfit")
 importFrom("tiff", "readTIFF", "writeTIFF")
@@ -14,14 +15,17 @@ importFrom("png", "readPNG", "writePNG")
 exportClasses(Image)
 
 ## image class, accessors
-export(Image, is.Image, as.Image, as.array.Image, as.raster.Image, print.Image)
+export(Image, is.Image, as.Image)
 export(Grayscale, Color)
 exportMethods(Ops, "[")
 export(colorMode, "colorMode<-", imageData, "imageData<-")
 export(getFrame, getNumberOfFrames)
+S3method(as.array, Image)
+S3method(as.raster, Image)
+S3method(print, Image)
 
 ## image IO, display
-exportMethods("show")
+exportMethods(show)
 export(readImage, writeImage)
 export(display)
 
@@ -39,7 +43,8 @@ export(ocontour)
 export(paintObjects, rmObjects, reenumerate, colorLabels)
 
 ## statistics
-export(median.Image, quantile.Image)
+S3method(median, Image)
+S3method(quantile, Image)
 exportMethods(hist)
 
 ## image enhancement, filtering
