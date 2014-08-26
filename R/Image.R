@@ -760,12 +760,12 @@ parseColorMode = function(colormode) {
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## returns the raster representation of an image (by default the first frame)
-as.raster.Image = function(x, i = 1) {
+as.raster.Image = function(x, i = 1, ...) {
   y = getFrame(x, i, type='render')
   y = clipImage(y)
   ## get image data with swapped XY dimensions
   y = transpose(y, coerce = TRUE)
   ## the actual raster representation
   # the as.raster.array function does the transposition again!
-  as.raster(y)
+  as.raster(y, ...)
 }

@@ -53,7 +53,7 @@ as.Image(x)
 is.Image(x)
 
 \method{as.array}{Image}(x, \ldots)
-\method{as.raster}{Image}(x, i = 1)
+\method{as.raster}{Image}(x, i = 1, \ldots)
 
 colorMode(y)
 colorMode(y) <- value
@@ -79,7 +79,7 @@ getNumberOfFrames(y, type = c('total', 'render'))
 
   \item{y}{An \code{Image} object or an array.}
 
-  \item{i}{A numeric.}
+  \item{i}{Number of frame.}
 
   \item{value}{For \code{colorMode}, a numeric or a character string containing the color mode which
     can be either \code{Grayscale} or \code{Color}. For \code{imageData}, an \code{Image} object or an array.}
@@ -94,7 +94,7 @@ getNumberOfFrames(y, type = c('total', 'render'))
 
   \code{is.Image} returns TRUE if \code{x} is an \code{Image} object and FALSE otherwise.
 
-  \code{as.raster} coerces an Image object to a raster object. For stacked images the \code{i}-th frame is returned (by default the first one).
+  \code{as.raster} coerces an Image object to its raster representation. For stacked images the \code{i}-th frame is returned (by default the first one).
 
   \code{colorMode} returns the color mode of \code{y} and \code{colorMode<-} changes the color mode
   of \code{y}.
