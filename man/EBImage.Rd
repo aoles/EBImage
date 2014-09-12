@@ -22,7 +22,7 @@
     \item \code{Image}
     \item \code{as.Image}, \code{is.Image}, \code{as.raster}
     \item \code{colorMode}, \code{imageData}
-    \item \code{getFrame}, \code{getNumberOfFrames}
+    \item \code{getFrame}, \code{numberOfFrames}
   }
 
   Image I/O, display

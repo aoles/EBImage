@@ -8,7 +8,7 @@ otsu <- function(x, range = c(0, 1), levels = 256){
   breaks = seq(range[1], range[2], length.out = levels+1)
   
 # prepare 3D array for apply function 
-  dim(x) = c(dim(x)[seq_len(2)], getNumberOfFrames(x, 'total'))
+  dim(x) = c(dim(x)[seq_len(2)], numberOfFrames(x, 'total'))
   
 # threshold each frame separately
   apply(x, 3, function(y) {
