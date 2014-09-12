@@ -46,7 +46,7 @@ testEBImageFunctions <- function(x) {
   z <- check("imageData", x)
   z <- check("imageData<-", x, z)
   z <- check("colorMode<-", x, Grayscale)
-  z <- check("getNumberOfFrames", x, type="render")
+  z <- check("numberOfFrames", x, type="render")
 
   ## subset
   sub <- list(x, 1:10, 1:7)

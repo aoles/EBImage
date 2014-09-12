@@ -14,7 +14,7 @@ display = function(x, title = deparse(substitute(x), width.cutoff = 500L, nlines
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 displayRaster = function(image, frame, all = FALSE, drawGrid = TRUE, ...){
   all = isTRUE(all)
-  nf = getNumberOfFrames(image, type="render")
+  nf = numberOfFrames(image, type="render")
   
   ## display all frames in a grid-like environment
   if ( all ) {
@@ -67,7 +67,7 @@ displayRaster = function(image, frame, all = FALSE, drawGrid = TRUE, ...){
 
 displayRaster.native = function(image, frame, all = FALSE, drawGrid = TRUE, ...){
   all = isTRUE(all)
-  nf = getNumberOfFrames(image, type="render")
+  nf = numberOfFrames(image, type="render")
   
   ## display all frames in a grid-like environment
   if ( all ) {
@@ -138,7 +138,7 @@ displayInBrowser = function(x, title){
 
   ## get image parameters
   dims = dim(x)
-  nf = getNumberOfFrames(x, "render")
+  nf = numberOfFrames(x, "render")
 
   ## fill-in in the template
   a = sub("HEIGHT",dims[2], sub("WIDTH",dims[1], sub("FRAMES",nf, sub("IMAGE",basename(imageFile), sub("TITLE", title, a)))))

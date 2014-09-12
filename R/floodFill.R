@@ -18,7 +18,7 @@
 floodFill = function(x, pt, col, tolerance=0) {
   validImage(x)
 
-  n = getNumberOfFrames(x, 'total')
+  n = numberOfFrames(x, 'total')
   pt = matrix(as.integer(pt), nrow=n, ncol=2, byrow=TRUE)
   if (is.character(col)) col = as.numeric(col2rgb(col)/255)
   col = as.numeric(matrix(col, nrow=n, ncol=1))

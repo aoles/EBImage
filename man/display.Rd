@@ -63,5 +63,5 @@ If \code{method = "raster"} images are displayed using R's built-in \code{raster
   if (interactive()) display(resize(yt, 256, 256), method = "raster", all = TRUE)
 
   ## Display the last frame 
-  if (interactive()) display(yt, method = "raster", frame = getNumberOfFrames(yt, type = "render"))
+  if (interactive()) display(yt, method = "raster", frame = numberOfFrames(yt, type = "render"))
 }
