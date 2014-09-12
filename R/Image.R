@@ -149,7 +149,7 @@ validImageObject = function(object) {
 
   ## check dim
   if (length(dim(object))<2) return('object must have at least two dimensions')
-  if (getNumberOfFrames(object,'total')<1) return('Image must contain at least one frame')
+  if (numberOfFrames(object,'total')<1) return('Image must contain at least one frame')
 
   TRUE
 }
@@ -375,7 +375,7 @@ writeImage = function (x, files, type, quality=100L, bits.per.sample, compressio
   if ((quality<1L) || (quality>100L))
     stop("'quality' must be a value between 1 and 100.")
   
-  nf = getNumberOfFrames(x, type='render')
+  nf = numberOfFrames(x, type='render')
   lf = length(files)
   colormode = colorMode(x)
   
@@ -480,7 +480,7 @@ getFrame = function(y, i, type = c('total', 'render')) .getFrame(y, i, match.arg
 .getFrame = function(y, i, type, colormode) {
   if(missing(colormode)) colormode = colorMode(y)
   
-  n = getNumberOfFrames(y, type = type)
+  n = numberOfFrames(y, type = type)
   if (i<1 || i>n) stop("'i' must belong between 1 and ", n)
   
   ## frame dimensions
@@ -506,6 +506,11 @@ getFrame = function(y, i, type = c('total', 'render')) .getFrame(y, i, match.arg
 ## If type='render', return the number of frames to be rendered after color channel merging
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 getNumberOfFrames = function(y, type = c('total', 'render')) {
+  .Deprecated(new = "numberOfFrames")
+  numberOfFrames(y, type)
+}
+
+numberOfFrames = function(y, type = c('total', 'render')) {
   type = match.arg(type)
   d = dim(y)
   if (type=='render' && colorMode(y)==Color) {
@@ -519,14 +524,17 @@ getNumberOfFrames = function(y, type = c('total', 'render')) {
 showImage = function (object) {
   nd = dim(object)
   ld = length(nd)
+  dimorder = names(dimnames(object))
   
-  cat('Image\n')
+  cat(class(object)[1],'\n')
   
-  cat('  colormode:',c('Grayscale', NA, 'Color')[1+colorMode(object)],'\n')
-  cat('  storage.mode:', typeof(object), '\n')
-  cat('  dim:',nd,'\n')
-  cat('  nb.total.frames:',getNumberOfFrames(object,'total'),'\n')
-  cat('  nb.render.frames:',getNumberOfFrames(object,'render'),'\n')
+  cat('  colorMode    :',c('Grayscale', NA, 'Color')[1+colorMode(object)],'\n')
+  cat('  storage.mode :',typeof(object),'\n')
+  cat('  dim          :',nd,'\n')
+  if ( !is.null(dimorder) )
+  cat('  dimorder     :',dimorder,'\n')
+  cat('  frames.total :',numberOfFrames(object,'total'),'\n')
+  cat('  frames.render:',numberOfFrames(object,'render'),'\n')
   
   if (nd[1]>5) nd[1] = 5
   if (nd[2]>6) nd[2] = 6
@@ -536,9 +544,8 @@ showImage = function (object) {
   
   nds = paste0('[1:',nd[1],',1:',nd[2],paste(rep(',1',ld-2),collapse=''),']')
   
-  cat('\nimageData(object)', nds, ':\n', sep='')
+  cat('\nimageData(object)', nds, '\n', sep='')
   print.default(asub(object@.Data, ndl))
-  cat('\n')
   
   invisible(NULL)
 }

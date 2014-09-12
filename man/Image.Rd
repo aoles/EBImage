@@ -15,6 +15,7 @@
 \alias{colorMode<-}
 \alias{getFrame}
 \alias{getNumberOfFrames}
+\alias{numberOfFrames}
 \alias{imageData}
 \alias{imageData<-}
 \alias{colormode}
@@ -62,7 +63,7 @@ imageData(y)
 imageData(y) <- value
 
 getFrame(y, i, type = c('total', 'render'))
-getNumberOfFrames(y, type = c('total', 'render'))
+numberOfFrames(y, type = c('total', 'render'))
 }
 
 \arguments{
@@ -103,7 +104,7 @@ getNumberOfFrames(y, type = c('total', 'render'))
 }
 
 \details{
-  Depending on \code{type}, \code{getNumberOfFrames} returns the total number of frames contained
+  Depending on \code{type}, \code{numberOfFrames} returns the total number of frames contained
   in the object \code{y} or the number of rendered frames. The total number of frames is independent
   of the color mode and equals to the product of all the dimensions except the two first ones. The
   number of rendered frames is equal to the total number of frames in the \code{Grayscale} color mode, or

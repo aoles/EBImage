@@ -19,7 +19,7 @@ export(Image, is.Image, as.Image)
 export(Grayscale, Color)
 exportMethods(Ops, "[")
 export(colorMode, "colorMode<-", imageData, "imageData<-")
-export(getFrame, getNumberOfFrames)
+export(getFrame, numberOfFrames)
 S3method(as.array, Image)
 S3method(as.raster, Image)
 S3method(print, Image)
@@ -73,6 +73,9 @@ export(computeFeatures)
 export(computeFeatures.basic, computeFeatures.shape, computeFeatures.moment, computeFeatures.haralick)
 export(standardExpandRef)
 export(localCurvature)
+
+## deprecated
+export(getNumberOfFrames)
 
 ## defunct
 export(blur, equalize)
