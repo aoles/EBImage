@@ -141,15 +141,16 @@ imageData = function (y) {
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 validImageObject = function(object) {
   ## check colormode
-  if (!is.integer(colorMode(object))) return('colormode must be an integer')
-  if (colorMode(object)!=0 && colorMode(object)!=2) return('invalid colormode')
+  colormode = colorMode(object)
+  if (!is.integer(colormode)) return('colormode must be an integer')
+  if (colormode!=0 && colormode!=2) return('invalid colormode')
 
   ## check array
   if (!is.array(object)) return('object must be an array')
 
   ## check dim
   if (length(dim(object))<2) return('object must have at least two dimensions')
-  if (numberOfFrames(object,'total')<1) return('Image must contain at least one frame')
+  if (.numberOfFrames(object, 'total', colormode)<1) return('Image must contain at least one frame')
 
   TRUE
 }
@@ -420,9 +421,9 @@ writeImage = function (x, files, type, quality=100L, bits.per.sample, compressio
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("[", "Image",
            function(x, i , j, ..., drop = TRUE) {
-             ## list(...) doesn't work in this S4 method dispatch framework
-             ## we are using the following trick:
-             ## the current call is evaluated, but using x@.Data instead of x in the previous calling frame
+             ## list(...) doesn't work in this S4 method dispatch framework we
+             ## are using the following trick: the current call is evaluated,
+             ## but using x@.Data instead of x in the previous calling frame
              sc = sys.call()
              args = as.list(sc[-c(1L, 2L)])
              numIndices = length(args) - !is.null(args$drop)
@@ -432,7 +433,8 @@ setMethod ("[", "Image",
                callNextMethod()
              }
              else {
-               # subset image array without dropping dimensions in order to preserve spatial dimensions
+               # subset image array without dropping dimensions in order to
+               # preserve spatial dimensions
                sc$drop = FALSE
                sc[[2L]] = call('slot', sc[[2L]], '.Data')
                y = eval.parent(sc)
@@ -472,15 +474,16 @@ ind2sub = function(x, y) {
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 getFrame = function(y, i, type = c('total', 'render')) .getFrame(y, i, match.arg(type))
 
-## It is useful to have the internal copy of getFrame which can be called on arrays directly
-## by specifying the apriopriate colormode. In combination with transpose(..., coerce=TRUE)
-## this approach is significantly faster compared to doing these operations on Image objects
-## and is exloited by the writeImage function
+## It is useful to have the internal function for getFrame which can be called
+## on arrays directly by specifying the apriopriate colormode. In combination
+## with transpose(..., coerce=TRUE) this approach is significantly faster
+## compared to doing these operations on Image objects and is exploited by the
+## writeImage function
 
 .getFrame = function(y, i, type, colormode) {
   if(missing(colormode)) colormode = colorMode(y)
   
-  n = numberOfFrames(y, type = type)
+  n = .numberOfFrames(y, type, colormode)
   if (i<1 || i>n) stop("'i' must belong between 1 and ", n)
   
   ## frame dimensions
@@ -507,13 +510,19 @@ getFrame = function(y, i, type = c('total', 'render')) .getFrame(y, i, match.arg
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 getNumberOfFrames = function(y, type = c('total', 'render')) {
   .Deprecated(new = "numberOfFrames")
-  numberOfFrames(y, type)
+  .numberOfFrames(y, match.arg(type))
 }
 
-numberOfFrames = function(y, type = c('total', 'render')) {
-  type = match.arg(type)
+numberOfFrames = function(y, type = c('total', 'render')) .numberOfFrames(y, match.arg(type))
+
+## have internal function .numberOfFrames for compatibility with .getFrame which
+## can be called on arrays directly by specifying the apriopriate colormode.
+
+.numberOfFrames = function(y, type, colormode) {
+  if(missing(colormode)) colormode = colorMode(y)
+  
   d = dim(y)
-  if (type=='render' && colorMode(y)==Color) {
+  if (type=='render' && colormode==Color) {
     if (length(d)< 3L) 1L
     else as.integer(prod(d[-seq_len(3)]))
   }

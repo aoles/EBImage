@@ -17,7 +17,7 @@ paintObjects = function (x, tgt, opac=c(1, 1), col=c('red', NA), thick=FALSE) {
   validImage(x)
   if (colorMode(x)!=Grayscale)  stop("'", deparse(substitute(x), width.cutoff = 500L, nlines = 1), "' must be in 'Grayscale' color mode")
   if (any(dim(x)[1:2] != dim(tgt)[1:2])) stop( "'x' and 'tgt' must have the same size" )
-  if (numberOfFrames(x,'render') != numberOfFrames(tgt,'render')) stop( "'x' and 'tgt' must have the same number of render frames" )                           
+  if (.numberOfFrames(x,'render') != .numberOfFrames(tgt,'render')) stop( "'x' and 'tgt' must have the same number of render frames" )                           
   
   col = c(col, rep(NA, 3-length(col)))
   opac = c(opac, rep(1, 3-length(opac)))
@@ -36,7 +36,7 @@ paintObjects = function (x, tgt, opac=c(1, 1), col=c('red', NA), thick=FALSE) {
 stackObjects = function (x, ref, combine=TRUE, bg.col='black', ext) {
   ## check arguments
   checkCompatibleImages(x, ref, 'render')
-  nz = numberOfFrames(x)
+  nz = .numberOfFrames(x, 'total')
   if (colorMode(x) != Grayscale) stop("'x' must be an image in 'Grayscale' color mode or an array")
     
   ## uses 'computeFeatures.moment' to get centers and theta
@@ -71,15 +71,17 @@ reenumerate = function(x) {
   
   if(!is.integer(x)) storage.mode(x) = 'integer'
   
-  dim(x) = c(.dim[seq_len(2)], numberOfFrames(x, 'total'))
+  # prepare 3D array for the 'apply' function
+  dim(x) = c(.dim[seq_len(2)], .numberOfFrames(x, 'total'))
   
   res = apply(x, 3, function(im) {
     from = sort.int(unique.default(as.vector(im)))
     to = seq_along(from) - 1L
     to[match(im, from)]
   })
-  dim(res) = .dim
   
+  # reconstruct Image
+  dim(res) = .dim
   imageData(x) = res
   
   x
