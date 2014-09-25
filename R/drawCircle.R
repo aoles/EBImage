@@ -5,7 +5,7 @@ drawCircle <- function(img, x, y, radius, col, fill=FALSE, z=1) {
   ## check whether parameters are OK
   if (missing(radius)) stop("'radius' is missing")
   if (radius<1) stop("'radius' must be positive integer")
-  if (z<1 | z>numberOfFrames(img, 'render')) stop("'z' must be a positive integer lower than the number of image frames")
+  if (z<1 | z>.numberOfFrames(img, 'render')) stop("'z' must be a positive integer lower than the number of image frames")
   xyzr = as.integer(c(x, y, z-1, radius))
   if (length(xyzr)!=4 || any(is.na(xyzr))) stop("'x', 'y', 'z' and 'radius' must be scalar values")
   fill = as.integer(fill)
