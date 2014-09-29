@@ -12,7 +12,7 @@
 }
 
 \usage{
-readImage(files, type, all = TRUE, \dots)
+readImage(files, type, all = TRUE, names = sub("\\\\.[^.]*$", "", basename(files)), \dots)
 writeImage(x, files, type, quality = 100, bits.per.sample, compression = "none", \dots)
 }
 
@@ -20,6 +20,7 @@ writeImage(x, files, type, quality = 100, bits.per.sample, compression = "none",
   \item{files}{a character vector of file names or URLs.}
   \item{type}{image type (optional). Supported values are: \code{jpeg}, \code{png}, and \code{tiff}. If missing, file format is automatically determined by file name extension.}
   \item{all}{logical: when the file contains more than one image should all frames be read, or only the first one?}
+  \item{names}{a character vector used for frame names. Should have the same length as files.}
   \item{x}{an \code{Image} object or an array.} 
   \item{bits.per.sample}{a numeric scalar specifying the number of bits per sample (only for \code{tiff} files). Supported values are 8 and 16.}
   \item{compression}{the desired compression algorithm (only for \code{tiff} files). For a list of supported values consult the documentation of the \code{\link{writeTIFF}} function from the \pkg{tiff} package.}

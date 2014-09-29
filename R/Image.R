@@ -218,7 +218,7 @@ determineFileType = function(files, type) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-readImage = function(files, type, all=TRUE, ...) {
+readImage = function(files, type, all=TRUE, names = sub("\\.[^.]*$", "", basename(files)), ...) {
   
   .readURL = function(url, buffer=2^24){
     f = try(file(url, "rb"), silent=TRUE)
@@ -242,8 +242,8 @@ readImage = function(files, type, all=TRUE, ...) {
   .readFun = switch(type,
                    tiff = function(x, ...) {
                      y = readTIFF(x, all = all, ...)
-                     if ( (l=length(y)) > 1L){
-                       names(y) = seq_len(l)
+                     if ( (l=length(y)) > 1L) {
+                       if (!is.null(names)) names(y) = seq_len(l)
                        # make sure all frames have the same dimensions
                        if(!all(duplicated(lapply(y, dim))[-1L]))
                          stop(sprintf("Frame dimensions of the '%s' file are not equal.", x))
@@ -264,7 +264,7 @@ readImage = function(files, type, all=TRUE, ...) {
       options(w)
       ## is not URL
       if (inherits(i,"try-error")) {
-        warning( paste0(unlist(strsplit(attr(i,"condition")$message, "(converted from warning) ", fixed=TRUE)), collapse=""))
+        warning( sub("(converted from warning) ", "", attr(i,"condition")$message, fixed = TRUE) )
         return(NULL)
       }
     }
@@ -297,7 +297,7 @@ readImage = function(files, type, all=TRUE, ...) {
   else {
     y = lapply(files, .loadFun, ...)
     # chop of anything behind the last single dot including the dot itself
-    names(y) = unlist(strsplit(basename(files), split="\\.[^.]*$", fixed = FALSE, perl = FALSE))
+    names(y) = names
     y = .flatten(y)   
   }
   
