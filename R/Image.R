@@ -45,7 +45,7 @@ Image = function(data = array(0, dim=c(1,1)), dim, colormode) {
       else
         parseColorMode(colormode)
     
-    if (missing(dim)){
+    if (missing(dim)) {
       dim = setdim(data)
       
       if ( colormode==Color )

@@ -21,6 +21,7 @@ filter2 = function(x, filter) {
   
   dx = dim(x)
   df = dim(filter)
+  dnames = dimnames(x)
   
   if (any(df%%2==0)) stop("dimensions of 'filter' matrix must be odd")
   if (any(dx[1:2]<df)) stop("dimensions of 'x' must be bigger than 'filter'")
@@ -45,9 +46,8 @@ filter2 = function(x, filter) {
     Re(fft(fft(xx)*wf, inverse=TRUE)/pdx)[index1, index2]
   })
   dim(y) = dx
-  
-  if(is.Image(x))
-    new("Image", .Data = y, colormode = colorMode(x))
-  else
-    y
+  dimnames(y) = dnames
+    
+  imageData(x) <- y
+  x
 }
