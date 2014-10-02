@@ -29,9 +29,34 @@ affine <- function (x, m, filter = c("bilinear", "none"), output.dim, bg.col = "
   m <- solve(m)
   
   ## create output image
-  y <- Image(data = bg.col, dim = d, colormode = colorMode(x))
-
+  y <- x
+  imageData(y) <- bgImage(bg.col, d, colorMode(x))
+  
   .Call(C_affine, castImage(x), castImage(y), m, filter)
+}
+
+## the code of this function is based on the Image constructor and probably could be reused in a more clever way
+bgImage = function(data, dim, colormode) {
+
+  ## special character case
+  if (is.character(data)) {
+    data = col2rgb(data)/255
+        
+    if ( missing(dim) && colormode==Color )
+      dim = c(dim[1:2], 3, if((ld=length(dim))>2) dim[3:ld] else NULL)
+    
+    if ( colormode==Color ) {
+      res = abind(array(data[1,,drop=FALSE], dim[-3]), array(data[2,,drop=FALSE], dim[-3]), array(data[3,,drop=FALSE], dim[-3]), along = 2.5)
+      dimnames(res) = NULL
+    }
+    else
+      res = array(data = (data[1,,drop=FALSE] + data[2,,drop=FALSE] + data[3,,drop=FALSE]) / 3, dim = dim)
+  }
+  ## default numeric case
+  else {
+    res = array(data, dim = dim)
+  }
+  res
 }
 
 rotate <- function(x, angle, filter = "bilinear", output.origin = c(0, 0), ...) {
