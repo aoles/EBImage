@@ -69,7 +69,9 @@ validImage (SEXP x,int test) {
 int
 getColorMode(SEXP x) {
   int colorMode;
-  if (strcmp( CHAR( asChar( GET_CLASS(x) ) ), "Image") == 0) colorMode=INTEGER(GET_SLOT(x, mkString("colormode")))[0];
+  
+  //if (strcmp( CHAR( asChar( GET_CLASS(x) ) ), "Image") == 0) colorMode=INTEGER(GET_SLOT(x, mkString("colormode")))[0];
+  if (R_has_slot(x, mkString("colormode"))) colorMode=INTEGER(GET_SLOT(x, mkString("colormode")))[0];
   else colorMode = MODE_GRAYSCALE;
 
   return(colorMode);
