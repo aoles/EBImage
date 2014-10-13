@@ -1,6 +1,37 @@
 \name{EBImage-NEWS}
 \title{News for Package 'EBImage'}
 
+\section{Changes in version 4.8.0}{
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item 'otsu' thresholding method (contributed by Philip A. Marais, University of Pretoria, South Africa)
+      \item Support for dimnames in Image objects
+      \item 'bg.col' argument to 'affine' transformations
+      \item 'reenumerate' argument to 'rmObjects'
+      \item 'names' argument to 'readImage'
+      \item 'as.array' method for Image objects
+      \item 'as.nativeRaster' function
+    }
+  }
+  \subsection{SIGNIFICANT USER-VISIBLE CHANGES}{
+    \itemize{
+      \item Performance improvements to 'Image', 'selectChannel', 'combine ' and 'reenumerate'
+      \item Use a more efficient 'nativeRaster' representation in 'displayRaster'
+      \item Cleaner output of the 'show-Image' method; print true object class name and dimorder (if set)
+      \item 'readImage' sets Image dimnames to corresponding file names
+      \item 'filter2' and 'affine' return object of the same class as input
+      \item Renamed 'getNumberOfFrames' to 'numberOfFrames'
+    }
+  }
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item Handling of dimensions of character arrays
+      \item Drawing of grid lines in 'displayRaster'
+      \item Passing of '...' arguments in 'readImage'
+    }
+  }
+}
+
 \section{Changes in version 4.6.0}{
   \subsection{NEW FEATURES}{
     \itemize{
