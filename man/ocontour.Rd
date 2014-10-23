@@ -30,7 +30,7 @@ ocontour(x)
 \examples{
   x = readImage(system.file("images", "shapes.png", package="EBImage"))
   x = x[1:120,50:120]
-  if(interactive()) display(x)
+  display(x)
   oc = ocontour(x)
   plot(oc[[1]], type='l')
   points(oc[[1]], col=2)

@@ -11,7 +11,10 @@
 }
 
 \usage{
-display(x, title = deparse(substitute(x), width.cutoff = 500L, nlines = 1), method = c("browser", "raster"), frame, all = FALSE)
+display(x, 
+        title = deparse(substitute(x), width.cutoff = 500L, nlines = 1),
+        method = if ( interactive() ) "browser" else "raster",
+        frame, all = FALSE)
 }
 
 \arguments{
@@ -45,10 +48,7 @@ If \code{method = "raster"} images are displayed using R's built-in \code{raster
 \examples{
   ## Display a single image
   x = readImage(system.file("images", "lena-color.png", package="EBImage"))
-  if (interactive()) {
-    display(x, "Lena")
-    display(x, method = "raster")
-  }
+  display(x, "Lena")
 
   ## Display a thresholded sequence ...
   y = readImage(system.file("images", "lena.png", package="EBImage"))
@@ -57,11 +57,11 @@ If \code{method = "raster"} images are displayed using R's built-in \code{raster
   yt = combine(yt)
 
   ## ... using the browser viewer ...
-  if (interactive()) display(yt, "Blurred Lenas")
+  display(yt, "Blurred Lenas")
 
   ## ... or using R's build-in raster functions
-  if (interactive()) display(resize(yt, 256, 256), method = "raster", all = TRUE)
+  display(resize(yt, 256, 256), method = "raster", all = TRUE)
 
   ## Display the last frame 
-  if (interactive()) display(yt, method = "raster", frame = numberOfFrames(yt, type = "render"))
+  display(yt, method = "raster", frame = numberOfFrames(yt, type = "render"))
 }

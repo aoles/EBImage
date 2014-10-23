@@ -40,12 +40,12 @@ drawCircle(img, x, y, radius, col, fill=FALSE, z=1)
   ## Simple white circle
   x = matrix(0, nrow=300, ncol=300)
   y = drawCircle(x, 100, 200, 47, col=1)
-  if (interactive()) display(y)
+  display(y)
   
   ## Simple filled yellow circle
   x = channel(y, 'rgb')
   y = drawCircle(x, 200, 140, 57, col='yellow', fill=TRUE)
-  if (interactive()) display(y)
+  display(y)
 }
 
 

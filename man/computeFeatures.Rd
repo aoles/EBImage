@@ -137,8 +137,8 @@ standardExpandRef(ref, refnames)
   x = thresh(y, 10, 10, 0.05)
   x = opening(x, makeBrush(5, shape='disc'))
   x = bwlabel(x)
-  if (interactive()) display(y, title="Cell nuclei")
-  if (interactive()) display(x, title="Segmented nuclei")
+  display(y, title="Cell nuclei")
+  display(x, title="Segmented nuclei")
 
   ## compute shape features
   fts = computeFeatures.shape(x)

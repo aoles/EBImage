@@ -55,11 +55,11 @@ watershed(x, tolerance=1, ext=1)
 \examples{
   x = readImage(system.file('images', 'shapes.png', package='EBImage'))
   x = x[110:512,1:130]
-  if (interactive()) display(x, title='Binary')
+  display(x, title='Binary')
   y = distmap(x)
-  if (interactive()) display(normalize(y), title='Distance map')
+  display(normalize(y), title='Distance map')
   w = watershed(y)
-  if (interactive()) display(normalize(w), title='Watershed')
+  display(normalize(w), title='Watershed')
 }
 
 \author{
