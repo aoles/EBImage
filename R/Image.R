@@ -376,7 +376,7 @@ writeImage = function (x, files, type, quality=100L, bits.per.sample, compressio
   if ((quality<1L) || (quality>100L))
     stop("'quality' must be a value between 1 and 100.")
   
-  nf = numberOfFrames(x, type='render')
+  nf = .numberOfFrames(x, type='render')
   lf = length(files)
   colormode = colorMode(x)
   
@@ -487,18 +487,18 @@ getFrame = function(y, i, type = c('total', 'render')) .getFrame(y, i, match.arg
   if (i<1 || i>n) stop("'i' must belong between 1 and ", n)
   
   ## frame dimensions
-  len = length( (d = dim(y)) )
-  fdim = if (colormode==Color && type=='render' && len>2L) 3L else 2L
-  if (len==fdim) return(y)
+  ld = length( (d = dim(y)) )
+  fd = if (colormode==Color && type=='render' && ld>2L) 3L else 2L
+  if (ld==fd) return(y)
   
   # preserve spatial dimensions
   # for Image class this is already taken care by the "]" method itself ..
-  x = asub(y, as.list(ind2sub(i, d[-seq_len(fdim)])), (fdim+1):len, drop = is(y, 'Image'))
+  x = asub(y, as.list(ind2sub(i, d[-seq_len(fd)])), (fd+1):ld, drop = is(y, 'Image'))
   
   # .. we only need to take care of plain arrays
-  if(length( (d = dim(x)) ) > fdim){
+  if(length( (d = dim(x)) ) > fd){
     dims = which(d==1L)
-    x = adrop(x, drop = dims[dims>fdim]) 
+    x = adrop(x, drop = dims[dims>fd]) 
   }
   
   return(x)
@@ -682,12 +682,14 @@ combineImages = function (x, y, ...) {
   dy = dim(y)
   
   if ( dx[1] != dy[1] || dx[2] != dy[2] ) stop("images must have the same 2D frame size to be combined")
+  if ( colorMode(x) != colorMode(y) ) stop("images must have the same color mode to be combined")
   
   ## merging along position guided by colorMode
-  along = if (colorMode(x)==Color && colorMode(y)==Color) 4 else 3
+  colormode = colorMode(x)
+  along = if (colormode == Color) 4L else 3L
   
   ## add extra dimension in case of single frame Color Images
-  if (along == 4) {
+  if (along == 4L) {
     if(colorMode(x)==Color && length(dx)==2) dim(x) = c(dx, 1)
     if(colorMode(y)==Color && length(dy)==2) dim(y) = c(dy, 1)
   }

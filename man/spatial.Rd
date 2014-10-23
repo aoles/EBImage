@@ -89,23 +89,14 @@ affine(x, m, filter = c("bilinear", "none"), output.dim, bg.col = "black")
 
 \examples{
   x <- readImage(system.file("images", "lena.png", package="EBImage"))
-  if (interactive()) display(x)
+  display(x)
 
-  y <- flip(x)
-  if (interactive()) display(y, title='flip(x)')
-
-  y = flop(x) 
-  if (interactive()) display(y, title='flop(x)')
-
-  y <- resize(x, 128) 
-  if (interactive()) display(y, title='resize(x, 128)')
-
-  y <- rotate(x, 30) 
-  if (interactive()) display(y, title='rotate(x, 30)')
-
-  y <- translate(x, c(120, -20)) 
-  if (interactive()) display(y, title='translate(x, c(120, -20))')
+  display( flip(x) )
+  display( flop(x) ) 
+  display( resize(x, 128) )
+  display( rotate(x, 30) )
+  display( translate(x, c(120, -20)) )
 
   m <- matrix(c(0.6, 0.2, 0, -0.2, 0.3, 300), nrow=3)
-  if (interactive()) display(affine(x, m), title='affine transform')
+  display( affine(x, m) )
 }

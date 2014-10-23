@@ -48,12 +48,12 @@ combine(x, y, ...)
   ## combination of color images
   lena = readImage(system.file("images", "lena-color.png", package="EBImage"))
   x = combine(lena, flip(lena), flop(lena))
-  if (interactive()) display(x)
+  display(x)
 
   ## Blurred lenas
   x = resize(lena, 128, 128)
   xt = list()
   for (t in seq(0.1, 5, len=9)) xt=c(xt, list(gblur(x, s=t)))
   xt = combine(xt)
-  if (interactive()) display(xt, title='Blurred Lenas')
+  display(xt, title='Blurred Lenas')
 }

@@ -116,19 +116,16 @@ makeBrush(size, shape=c('box', 'disc', 'diamond', 'Gaussian', 'line'), step=TRUE
 \examples{	
   x = readImage(system.file("images", "shapes.png", package="EBImage"))
   kern = makeBrush(5, shape='diamond')  
-  if (interactive()) {
-    display(x)
-    display(kern, title='Structuring element')
-    display(erode(x, kern), title='Erosion of x')
-    display(dilate(x, kern), title='Dilatation of x')
-  }
+  
+  display(x)
+  display(kern, title='Structuring element')
+  display(erode(x, kern), title='Erosion of x')
+  display(dilate(x, kern), title='Dilatation of x')
 
   ## makeBrush
-  if (interactive()) {
-    display(makeBrush(99, shape='diamond'))
-    display(makeBrush(99, shape='disc', step=FALSE))
-    display(2000*makeBrush(99, shape='Gaussian', sigma=10))
-  }
+  display(makeBrush(99, shape='diamond'))
+  display(makeBrush(99, shape='disc', step=FALSE))
+  display(2000*makeBrush(99, shape='Gaussian', sigma=10))
 }
 
 \references{

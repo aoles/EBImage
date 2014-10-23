@@ -48,7 +48,7 @@
   ## number of objects found
   max(y)
   
-  if (interactive()) display(normalize(y), title='Objects')
+  display(normalize(y), title='Objects')
   
   ## remove every second letter
   objects = list(
@@ -57,7 +57,7 @@
     )
   z = rmObjects(combine(y, y), objects)
   
-  if (interactive()) display(normalize(z), title='Object removal')
+  display(normalize(z), title='Object removal')
   
   ## the number of objects left in each image
   apply(z, 3, max)

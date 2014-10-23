@@ -36,11 +36,11 @@ fillHull(x)
 
 \examples{
   x = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
-  if (interactive()) display(x)
+  display(x)
 
   y = thresh(x, 10, 10, 0.05)
-  if (interactive()) display(y, title='Cell nuclei')
+  display(y, title='Cell nuclei')
 
   y = fillHull(y)
-  if (interactive()) display(y, title='Cell nuclei without holes')
+  display(y, title='Cell nuclei without holes')
 }

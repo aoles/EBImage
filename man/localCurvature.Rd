@@ -66,5 +66,5 @@ localCurvature(x, h, maxk)
   I=Image(0, dim=dim(x))
   imageData(I)[contours[[2]]+1]=abs(curv)
   x2[x2!=2]=0
-  if (interactive()) display(combine(x2, 10*I), title = "Lena's curvature")
+  display(combine(x2, 10*I), title = "Lena's curvature")
 }

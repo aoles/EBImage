@@ -40,10 +40,9 @@ The transposition of an image is performed by swapping the X and Y indices of it
 \examples{
   x = readImage(system.file("images", "lena-color.png", package="EBImage"))
   y = transpose(x)
-  if (interactive()) {
-    display(x, title='Lena')
-    display(y, title='Transposed Lena')
-  }
+  
+  display(x, title='Lena')
+  display(y, title='Transposed Lena')
 
   ## performing the transposition of an image twice should result in the original image
   z = transpose(y)
