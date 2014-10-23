@@ -38,5 +38,5 @@ Performs color coding of object masks, which are typically obtained using the \c
   x = x[110:512,1:130]
   y = bwlabel(x)
   z = colorLabels(y)
-  if (interactive()) display(z, title='Colored segmentation')
+  display(z, title='Colored segmentation')
 }

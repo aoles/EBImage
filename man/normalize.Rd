@@ -49,10 +49,10 @@
   x = readImage(system.file('images', 'shapes.png', package='EBImage'))
   x = x[110:512,1:130]
   y = bwlabel(x)
-  if (interactive()) display(x, title='Original')
+  display(x, title='Original')
 
   print(range(y))
   y = normalize(y)
   print(range(y))
-  if (interactive()) display(y, title='Segmented')
+  display(y, title='Segmented')
 }

@@ -1,7 +1,10 @@
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-display = function(x, title = deparse(substitute(x), width.cutoff = 500L, nlines = 1), method = c("browser", "raster"), frame, all = FALSE) {
+display = function(x, 
+                   title = deparse(substitute(x), width.cutoff = 500L, nlines = 1), 
+                   method = if ( interactive() ) "browser" else "raster",
+                   frame, all = FALSE) {
   validImage(x)
-  method = match.arg(method)
+  method = match.arg(method, c("browser", "raster"))
 
   switch(method,
     browser = displayInBrowser(x, title),
@@ -88,14 +91,22 @@ displayInBrowser = function(x, title){
   close(f)
 
   ## get image parameters
-  dims = dim(x)
+  d = dim(x)
   nf = .numberOfFrames(x, "render")
 
   ## fill-in in the template
-  a = sub("HEIGHT",dims[2], sub("WIDTH",dims[1], sub("FRAMES",nf, sub("IMAGE",basename(imageFile), sub("TITLE", title, a)))))
+  a = sub("HEIGHT",d[2L], sub("WIDTH",d[1L], sub("FRAMES",nf, sub("IMAGE",basename(imageFile), sub("TITLE", title, a)))))
 
   ## temporarily switch to tempdir and write the files
-  wd = setwd(tempDir) 
+  wd = setwd(tempDir)
+  
+  ## fill missing channels
+  if ( isTRUE(colorMode(x) == Color && d[3L] < 3L) ) {
+    fd = d
+    fd[3L] = 3L - d[3L] 
+    imageData(x) = abind(x, Image(0, fd), along = 3L)
+  }
+  
   writeImage(x, imageFile)
   cat(a, file=htmlFile, sep="\n")
   file.copy(scriptFile, tempDir)
@@ -109,16 +120,16 @@ displayInBrowser = function(x, title){
 }
 
 ## take plain array as input
-
 as.nativeRaster = function(x) {
   x = round(x * 255)
+  d = dim(x)
   
-  y = if(length(dim(x)) == 3L)
-    x[,,1L] + x[,,2L] * 256 + x[,,3L] * 65536 + 255 * 16777216 - 4294967296
+  y = if(length(d) == 3L)
+    Reduce("+", lapply(seq_len(4), function(i) 2^((i-1)*8) * if (i > d[3L]) { if ( i == 4L) 255 else 0 } else x[,,i]) ) - 4294967296
   else
     x + x * 256 + x * 65536 + 255 * 16777216 - 4294967296
   storage.mode(y) = "integer"
-  # native raster representation containes already transposed image data as in the Image class, but with swapped dimensions!
+  # native raster representation contains already transposed image data as in the Image class, but with swapped dimensions!
   attr(y, "dim") = dim(y)[2:1]
   attr(y, "class") = "nativeRaster"
   attr(y, "channels") = 4L

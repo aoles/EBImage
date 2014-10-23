@@ -41,9 +41,9 @@ medianFilter(x, size, cacheSize=512)
 
 \examples{
   x = readImage(system.file("images", "nuclei.tif", package="EBImage"))
-  if (interactive()) display(x, title='Nuclei')
+  display(x, title='Nuclei')
   y = medianFilter(x, 5)  
-  if (interactive()) display(y, title='Filtered nuclei')
+  display(y, title='Filtered nuclei')
 }
 
 \references{

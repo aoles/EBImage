@@ -49,15 +49,15 @@ untile(x, nim, lwd=1)
   xt = list()
   for (t in seq(0.1, 5, len=9)) xt=c(xt, list(gblur(x, s=t)))
   xt = combine(xt)
-  if (interactive()) display(xt, title='Blurred Lenas')
+  display(xt, title='Blurred Lenas')
 
   ## tile
   xt = tile(xt, 3)
-  if (interactive()) display(xt, title='Tiled Lenas')
+  display(xt, title='Tiled Lenas')
 
   ## untile
   xu = untile(lena, c(3, 3))
-  if (interactive()) display(xu, title='Lena blocks')
+  display(xu, title='Lena blocks')
 }
 
 \author{

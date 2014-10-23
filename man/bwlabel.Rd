@@ -41,27 +41,27 @@ bwlabel(x)
   ## simple example
   x = readImage(system.file('images', 'shapes.png', package='EBImage'))
   x = x[110:512,1:130]
-  if (interactive()) display(x, title='Binary')
+  display(x, title='Binary')
   y = bwlabel(x)
-  if (interactive()) display(normalize(y), title='Segmented')
+  display(normalize(y), title='Segmented')
 
   ## read nuclei images
   x = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
-  if (interactive()) display(x)
+  display(x)
 
   ## computes binary mask
   y = thresh(x, 10, 10, 0.05)
   y = opening(y, makeBrush(5, shape='disc'))
-  if (interactive()) display(y, title='Cell nuclei binary mask')
+  display(y, title='Cell nuclei binary mask')
 
   ## bwlabel
   z = bwlabel(y)
-  if (interactive()) display(normalize(z), title='Cell nuclei')
+  display(normalize(z), title='Cell nuclei')
   nbnuclei = apply(z, 3, max)
   cat('Number of nuclei=', paste(nbnuclei, collapse=','),'\n')
 
   ## recolor nuclei in colors
   cols = c('black', sample(rainbow(max(z))))
   zrainbow = Image(cols[1+z], dim=dim(z))
-  if (interactive()) display(zrainbow, title='Cell nuclei (recolored)')
+  display(zrainbow, title='Cell nuclei (recolored)')
 }

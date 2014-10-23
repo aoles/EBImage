@@ -47,11 +47,11 @@ The default number of \code{levels} corresponds to the number of gray levels of 
 
 \examples{
   x = readImage(system.file("images", "lena.png", package="EBImage"))
-  if (interactive()) display(x)
+  display(x)
   
   ## threshold using Otsu's method
   y = x > otsu(x)
-  if (interactive()) display(y)
+  display(y)
 }
 
 \keyword{manip}

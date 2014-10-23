@@ -57,15 +57,15 @@ stackObjects(x, ref, combine=TRUE, bg.col='black', ext)
   x = readImage(system.file('images', 'shapes.png', package='EBImage'))
   x = x[110:512,1:130]
   y = bwlabel(x)
-  if (interactive()) display(normalize(y), title='Objects')
+  display(normalize(y), title='Objects')
   z = stackObjects(y, normalize(y))
-  if (interactive()) display(z, title='Stacked objects')
+  display(z, title='Stacked objects')
 
   ## load images
   nuc = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
   cel = readImage(system.file('images', 'cells.tif', package='EBImage'))
   img = rgbImage(green=cel, blue=nuc)
-  if (interactive()) display(img, title='Cells')
+  display(img, title='Cells')
 
   ## segment nuclei
   nmask = thresh(nuc, 10, 10, 0.05)
@@ -79,11 +79,11 @@ stackObjects(x, ref, combine=TRUE, bg.col='black', ext)
   ## using paintObjects to highlight objects
   res = paintObjects(cmask, img, col='#ff00ff')
   res = paintObjects(nmask, res, col='#ffff00')
-  if (interactive()) display(res, title='Segmented cells')
+  display(res, title='Segmented cells')
 
   ## stacked cells
   st = stackObjects(cmask, img)
-  if (interactive()) display(st, title='Stacked objects')
+  display(st, title='Stacked objects')
 }
 
 \author{

@@ -91,11 +91,10 @@ propagate(x, seeds, mask=NULL, lambda=1e-4)
     segmented[,,i] = prop
   }
 
-  if(interactive()){
-    display(x, title='Image')
-    display(seeds/max(seeds), title='Seeds')
-    display(segmented, title="Voronoi regions")
-  }
+  display(x, title='Image')
+  display(seeds/max(seeds), title='Seeds')
+  display(segmented, title="Voronoi regions")
+  
 }
 
 \author{

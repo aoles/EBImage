@@ -43,9 +43,9 @@ thresh(x, w=5, h=5, offset=0.01)
 
 \examples{
   x = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
-  if (interactive()) display(x)
+  display(x)
   y = thresh(x, 10, 10, 0.05)
-  if (interactive()) display(y)
+  display(y)
 }
 
 \keyword{manip}

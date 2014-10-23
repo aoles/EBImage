@@ -43,9 +43,9 @@ distmap(x, metric=c('euclidean', 'manhattan'))
 
 \examples{
   x = readImage(system.file("images", "shapes.png", package="EBImage"))
-  if (interactive()) display(x)
+  display(x)
   dx = distmap(x)
-  if (interactive()) display(dx/10, title='Distance map of x')
+  display(dx/10, title='Distance map of x')
 }
 
 

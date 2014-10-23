@@ -66,18 +66,18 @@ which just changes the way that EBImage renders an image.
 
 \examples{
  x = readImage(system.file("images", "shapes.png", package="EBImage"))
- if (interactive()) display(x)
+ display(x)
  y = channel(x, 'asgreen')
- if (interactive()) display(y)
+ display(y)
 
  ## rgbImage
  x = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
  y = readImage(system.file('images', 'cells.tif', package='EBImage'))
- if (interactive()) display(x, title='Cell nuclei')
- if (interactive()) display(y, title='Cell bodies')
+ display(x, title='Cell nuclei')
+ display(y, title='Cell bodies')
 
  cells = rgbImage(green=1.5*y, blue=x)
- if (interactive()) display(cells, title='Cells')
+ display(cells, title='Cells')
 }
 
 \author{

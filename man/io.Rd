@@ -58,16 +58,16 @@ writeImage(x, files, type, quality = 100, bits.per.sample, compression = "none",
   ## Read and display an image
   f = system.file("images", "lena-color.png", package="EBImage")
   x = readImage(f)
-  if (interactive()) display(x)
+  display(x)
 
   ## Read and display a multi-frame TIFF
   y = readImage(system.file("images", "nuclei.tif", package="EBImage"))
-  if (interactive()) display(y)
+  display(y)
 
   ## Read an image directly from a remote location by specifying its URL
   try({
     im = readImage("http://www-huber.embl.de/EBImage/ExampleImages/berlin.tif")
-    if (interactive()) display(im, title = "Berlin Impressions")
+    display(im, title = "Berlin Impressions")
   })
 
   ## Convert a PNG file into JPEG
