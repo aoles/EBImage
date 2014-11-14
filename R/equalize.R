@@ -3,9 +3,8 @@ equalize <- function(x, range = c(0, 1), levels = 256){
   validImage(x)
   if ( !is.numeric(range) || length(range) != 2 ) stop("'range' must be a numeric vector of length 2.")
   levels = as.integer(levels)
-  if ( is.na(levels) || levels < 1 ) stop("Levels must be at least equal 1.") 
-  offset = (range[2]-range[1]) / (levels-1) *.5
-  breaks = seq(range[1]-offset, range[2]+offset, length.out = levels+1)
+  if ( is.na(levels) || levels < 1 ) stop("Levels must be at least equal 1.")
+  breaks = seq(range[1], range[2], length.out = levels+1)
   d = dim(x)
   n = prod(d[seq_len(2)])
   
