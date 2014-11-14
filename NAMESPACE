@@ -51,6 +51,7 @@ exportMethods(hist)
 export(filter2)
 export(gblur)
 export(medianFilter)
+export(equalize)
 
 ## morphological operations
 export(makeBrush)
@@ -78,7 +79,7 @@ export(localCurvature)
 export(getNumberOfFrames)
 
 ## defunct
-export(blur, equalize)
+export(blur)
 export(drawtext, drawfont)
 export(getFeatures, hullFeatures, zernikeMoments)
 export(edgeProfile, edgeFeatures)
