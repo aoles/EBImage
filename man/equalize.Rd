@@ -19,7 +19,7 @@ equalize(x, range = c(0, 1), levels = 256)
 
   \item{range}{numeric vector of length 2, the output range of the equalized histogram}
 
-  \item{levels}{number of grayscale levels (Grayscale images) or intensity levels for each channel (Color images)}
+  \item{levels}{number of grayscale levels (Grayscale images) or intensity levels of each channel (Color images)}
 }
 
 \value{
