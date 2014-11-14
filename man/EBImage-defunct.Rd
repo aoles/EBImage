@@ -2,7 +2,6 @@
 
 \alias{EBImage-defunct}
 \alias{blur}
-\alias{equalize}
 \alias{drawtext}
 \alias{drawfont}
 \alias{getFeatures}
@@ -28,7 +27,6 @@
 
 \usage{
 blur(...)
-equalize(...)
 drawtext(...)
 drawfont(...)
 getFeatures(...)

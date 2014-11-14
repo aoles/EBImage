@@ -6,10 +6,6 @@ blur <- function(...) {
   .Defunct(new="gblur")
 }
 
-equalize <- function(...) {
-  .Defunct()
-}
-
 drawtext <- function(...) {
   .Defunct()
 }
