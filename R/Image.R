@@ -649,11 +649,11 @@ toRGB = function(x) {
   channel(x, "rgb")
 }
 
-## GP: Useful ?
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("hist", signature(x="Image"),
-  function (x, breaks=64L, main=paste("Image histogram:", length(x), "pixels"), xlab="Intensity", ...) {
-
+  function (x, breaks=64L, rg=range(x, na.rm=TRUE), main=paste("Image histogram:", length(x), "pixels"), xlab="Intensity", ...) {
+    if ( !is.numeric(rg) || length(rg) != 2 ) stop("'range' must be a numeric vector of length 2.")
+    
     if ( colorMode(x) != Grayscale ) {
       colores = c("red", "green", "blue")
       y = lapply(colores, function(m) imageData(channel(x, m)))
@@ -662,17 +662,18 @@ setMethod ("hist", signature(x="Image"),
       y = list(black=imageData(x))
     }
 
-    rg = range(unlist(y), na.rm=TRUE)
     if(length(breaks)==1L) {
-      dr = (rg[2]-rg[1])/(breaks*2L+2L)
-      breaks = seq(rg[1]-dr, rg[2]+dr, length=breaks+1L)
+      bins = breaks
+      breaks = seq(rg[1], rg[2], length=breaks+1L)
+    } else {
+      bins = length(breaks) - 1L
     }
-
-    h = lapply(y, hist, breaks=breaks, plot=FALSE)
-    px = sapply(h, "[[", "breaks")[-1L,,drop=FALSE]
-    matplot(x = px + dr*(col(px)-ncol(px)/2)/2,
-            y = sapply(h, "[[", "counts"), type="s", lty=1L,
-            main=main, xlab=xlab, col=names(y), ylab="counts", ...)
+    
+    h = lapply(y, hist.default, breaks=breaks, plot=FALSE)
+    xx = vapply(h, "[[", vector(mode = "double", length = bins+1L), "breaks")
+    yy = vapply(h, "[[", vector(mode = "integer", length = bins), "counts")
+    yy = rbind(yy, yy[bins,])
+    matplot(xx, yy, type="s", lty=1L, main=main, xlab=xlab, col=names(y), ylab="counts", ...)
   }
 )
 
