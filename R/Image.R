@@ -97,10 +97,17 @@ Image = function(data = array(0, dim=c(1,1)), dim, colormode) {
 is.Image <- function (x) is(x, "Image")
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-as.Image = function(x) {
-  if(is.Image(x))
-    x
-  else
+as.Image <- function(x) UseMethod("as.Image")
+
+as.Image.default = function(x) {
+  isImage = which(is(x) == "Image")
+  
+  if ( length(isImage) ) {
+    if (isImage == 1L)
+      x 
+    else
+      as(x, "Image")
+  } else 
     Image(x)
 }
 
