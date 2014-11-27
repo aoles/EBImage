@@ -42,7 +42,7 @@ equalize(x, range = c(0, 1), levels = 256)
   hist(y)
   display(y, title='Equalized Grayscale Image')
 
-  x = readImage(system.file('images', 'lena-color.png', package='EBImage'))
+  x = readImage(system.file('images', 'sample-color.png', package='EBImage'))
   hist(x)
   y = equalize(x)
   hist(y)

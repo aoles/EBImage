@@ -46,14 +46,14 @@ combine(x, y, ...)
 
 \examples{
   ## combination of color images
-  lena = readImage(system.file("images", "lena-color.png", package="EBImage"))
-  x = combine(lena, flip(lena), flop(lena))
+  img = readImage(system.file("images", "sample-color.png", package="EBImage"))[257:768,,]
+  x = combine(img, flip(img), flop(img))
   display(x)
 
-  ## Blurred lenas
-  x = resize(lena, 128, 128)
+  ## Blurred images
+  x = resize(img, 128, 128)
   xt = list()
   for (t in seq(0.1, 5, len=9)) xt=c(xt, list(gblur(x, s=t)))
   xt = combine(xt)
-  display(xt, title='Blurred Lenas')
+  display(xt, title='Blurred images')
 }

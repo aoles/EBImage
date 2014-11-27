@@ -46,7 +46,7 @@ The default number of \code{levels} corresponds to the number of gray levels of 
 }
 
 \examples{
-  x = readImage(system.file("images", "lena.png", package="EBImage"))
+  x = readImage(system.file("images", "sample.png", package="EBImage"))
   display(x)
   
   ## threshold using Otsu's method

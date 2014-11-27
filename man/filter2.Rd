@@ -45,19 +45,19 @@ filter2(x, filter)
 }
 
 \examples{
-  x = readImage(system.file("images", "lena-color.png", package="EBImage"))
-  display(x, title='Lena')
+  x = readImage(system.file("images", "sample-color.png", package="EBImage"))
+  display(x, title='Sample')
 
   ## Low-pass disc-shaped filter
   f = makeBrush(21, shape='disc', step=FALSE)
   display(f, title='Disc filter')
   f = f/sum(f)
   y = filter2(x, f)
-  display(y, title='Filtered lena')
+  display(y, title='Filtered image')
 
   ## High-pass Laplacian filter
   la = matrix(1, nc=3, nr=3)
   la[2,2] = -8
   y = filter2(x, la)
-  display(y, title='Filtered lena')
+  display(y, title='Filtered image')
 }

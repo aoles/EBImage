@@ -106,18 +106,19 @@ testEBImageFunctions <- function(x) {
 }
 
 ## test: grayscale 2D 
-x <- readImage(system.file("images","lena.png", package="EBImage"))[1:32, 1:50]
+x <- readImage(system.file("images","sample.png", package="EBImage"))[1:32, 1:48]
 testEBImageFunctions(x)
 
 ## test: color 2D
-x <- readImage(system.file("images","lena-color.png", package="EBImage"))[1:67, 1:17,]
+x <- readImage(system.file("images","sample-color.png", package="EBImage"))[1:65, 1:17,]
 testEBImageFunctions(x)
 
 ## test: color 3D
-x <- readImage(system.file("images","lena-color.png", package="EBImage"))[1:41, 1:18,]
+x <- readImage(system.file("images","sample-color.png", package="EBImage"))[1:33, 1:16,]
 x <- combine(x, x)
 testEBImageFunctions(x)
 
 ## test: logical 2D
-x <- readImage(system.file("images","lena.png", package="EBImage"))[1:32, 1:50]>0.5
+x <- readImage(system.file("images","sample.png", package="EBImage"))[32:63, 32:63]
+x <- x > otsu(x)
 testEBImageFunctions(x)
