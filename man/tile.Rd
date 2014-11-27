@@ -43,21 +43,21 @@ untile(x, nim, lwd=1)
 }
 
 \examples{
-  ## make a set of blurred Lenas
-  lena = readImage(system.file("images", "lena-color.png", package="EBImage"))
-  x = resize(lena, 128, 128)
+  ## make a set of blurred images
+  img = readImage(system.file("images", "sample-color.png", package="EBImage"))[257:768,,]
+  x = resize(img, 128, 128)
   xt = list()
   for (t in seq(0.1, 5, len=9)) xt=c(xt, list(gblur(x, s=t)))
   xt = combine(xt)
-  display(xt, title='Blurred Lenas')
+  display(xt, title='Blurred images')
 
   ## tile
   xt = tile(xt, 3)
-  display(xt, title='Tiled Lenas')
+  display(xt, title='Tiles')
 
   ## untile
-  xu = untile(lena, c(3, 3))
-  display(xu, title='Lena blocks')
+  xu = untile(img, c(3, 3))
+  display(xu, title='Blocks')
 }
 
 \author{

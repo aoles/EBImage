@@ -88,7 +88,7 @@ affine(x, m, filter = c("bilinear", "none"), output.dim, bg.col = "black")
 }
 
 \examples{
-  x <- readImage(system.file("images", "lena.png", package="EBImage"))
+  x <- readImage(system.file("images", "sample.png", package="EBImage"))
   display(x)
 
   display( flip(x) )

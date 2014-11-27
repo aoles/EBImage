@@ -49,7 +49,7 @@ floodFill(x, pt, col, tolerance=0)
   y = floodFill(y, c(156, 52), 'orange')	
   display(y)
 
-  x = readImage(system.file("images", "lena.png", package="EBImage"))
+  x = readImage(system.file("images", "sample.png", package="EBImage"))
   y = floodFill(x, c(226, 121), 1, tolerance=0.1)
   display(y)
 }

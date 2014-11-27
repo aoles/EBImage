@@ -47,17 +47,17 @@ If \code{method = "raster"} images are displayed using R's built-in \code{raster
 
 \examples{
   ## Display a single image
-  x = readImage(system.file("images", "lena-color.png", package="EBImage"))
-  display(x, "Lena")
+  x = readImage(system.file("images", "sample-color.png", package="EBImage"))[257:768,,]
+  display(x, "Sample")
 
   ## Display a thresholded sequence ...
-  y = readImage(system.file("images", "lena.png", package="EBImage"))
+  y = readImage(system.file("images", "sample.png", package="EBImage"))
   yt = list()
   for (t in seq(0.1, 5, len=9)) yt=c(yt, list(gblur(y, s=t)))
   yt = combine(yt)
 
   ## ... using the browser viewer ...
-  display(yt, "Blurred Lenas")
+  display(yt, "Blurred images")
 
   ## ... or using R's build-in raster functions
   display(resize(yt, 256, 256), method = "raster", all = TRUE)
