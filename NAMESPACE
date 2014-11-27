@@ -23,6 +23,8 @@ export(getFrame, numberOfFrames)
 S3method(as.array, Image)
 S3method(as.raster, Image)
 S3method(print, Image)
+S3method(as.Image, Image)
+S3method(as.Image, default)
 
 ## image IO, display
 exportMethods(show)
