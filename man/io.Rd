@@ -56,7 +56,7 @@ writeImage(x, files, type, quality = 100, bits.per.sample, compression = "none",
 
 \examples{
   ## Read and display an image
-  f = system.file("images", "lena-color.png", package="EBImage")
+  f = system.file("images", "sample-color.png", package="EBImage")
   x = readImage(f)
   display(x)
 
