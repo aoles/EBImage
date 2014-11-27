@@ -99,17 +99,9 @@ is.Image <- function (x) is(x, "Image")
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 as.Image <- function(x) UseMethod("as.Image")
 
-as.Image.default = function(x) {
-  isImage = which(is(x) == "Image")
-  
-  if ( length(isImage) ) {
-    if (isImage == 1L)
-      x 
-    else
-      as(x, "Image")
-  } else 
-    Image(x)
-}
+as.Image.Image = function(x) x
+
+as.Image.default = function(x) Image(x)
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## define method for the S3 generic 'as.array'
