@@ -33,16 +33,15 @@ BiocStyle::latex()
 \end{center}
 \end{figure}
 
-\bioctitle[Introduction to \Rpackage{EBImage}]{Introduction to \Rpackage{EBImage},\\
-an image processing and analysis toolkit for R}
-\author{Gregoire Pau, Oleg Sklyar, Wolfgang Huber\\\email{gpau@ebi.ac.uk}}
+\bioctitle[Introduction to \Rpackage{EBImage}]{Introduction to \Rpackage{EBImage}}
+\author{Andrzej Oles, Gregoire Pau, Oleg Sklyar, Wolfgang Huber\\\email{gpau@ebi.ac.uk}}
 
 \maketitle
 
 \tableofcontents
 
 
-\section{Reading/displaying/writing images}
+\section{Reading, displaying and writing images}
 
 The package \Biocpkg{EBImage} is loaded by the following command.
 <<library,results=hide>>=
@@ -53,7 +52,7 @@ display = function(...) if (interactive()) EBImage::display(...)
 @
 
 The function \Rfunction{readImage} is able to read images from files
-or URLs. Current supported image formats are JPEG, PNG and TIFF.
+or URLs. Currently supported image formats are JPEG, PNG and TIFF\footnote{See the RBioFormats package for support of a much wider range of formats.}.
 
 <<readImage1>>=
 f = system.file("images", "sample.png", package="EBImage")
@@ -96,9 +95,9 @@ writeImage(nuc, 'nuc.jpeg', quality=85)
 \end{center}
 \end{figure}
 
-Images can be written with \Rfunction{writeImage}. The file format
-is deduced from the file name extension. This is useful to convert
-image formats, here from PNG format to JPEG format.
+Images can be written with \Rfunction{writeImage}. The file format is deduced from the
+file name extension. The format need not be the same as the format of the file from which
+the image was read.
 
 <<writeImage>>=
 writeImage(img,  'img.jpeg', quality=85)
