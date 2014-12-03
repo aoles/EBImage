@@ -34,7 +34,7 @@ BiocStyle::latex()
 \end{figure}
 
 \bioctitle[Introduction to \Rpackage{EBImage}]{Introduction to \Rpackage{EBImage}}
-\author{Andrzej Oles, Gregoire Pau, Oleg Sklyar, Wolfgang Huber\\\email{gpau@ebi.ac.uk}}
+\author{Andrzej Ole\'s, Gregoire Pau, Oleg Sklyar, Wolfgang Huber\\\email{andrzej.oles@embl.de}}
 
 \maketitle
 
@@ -52,7 +52,7 @@ display = function(...) if (interactive()) EBImage::display(...)
 @
 
 The function \Rfunction{readImage} is able to read images from files
-or URLs. Currently supported image formats are JPEG, PNG and TIFF\footnote{See the RBioFormats package for support of a much wider range of formats.}.
+or URLs. Currently supported image formats are JPEG, PNG and TIFF\footnote{See the \Githubpkg{aoles/RBioFormats} package for support of a much wider range of formats.}.
 
 <<readImage1>>=
 f = system.file("images", "sample.png", package="EBImage")

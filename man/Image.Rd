@@ -22,6 +22,7 @@
 \alias{Ops,Image,Image-method}
 \alias{Ops,numeric,Image-method}
 \alias{Ops,Image,numeric-method}
+\alias{Math2,Image-method}
 \alias{[,Image,ANY,ANY,ANY-method}
 \alias{[,Image-method}
 \alias{show,Image-method}
