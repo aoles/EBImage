@@ -179,6 +179,14 @@ setMethod("Ops", signature(e1="numeric", e2="Image"),
 	}
 )
 
+## legacy code addressing broken 'Math2' S4GroupGenerics in R 3.1.2
+setMethod("Math2", "Image",
+          function(x, digits) {
+            x@.Data <- callGeneric(x = x@.Data, digits = digits)
+            x
+          }
+)
+
 ## private
 ## determines image type
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
