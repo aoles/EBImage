@@ -121,6 +121,7 @@ displayInBrowser = function(x, title){
 
 ## take plain array as input
 as.nativeRaster = function(x) {
+  x = clipImage(x)
   x = round(x * 255)
   d = dim(x)
   
