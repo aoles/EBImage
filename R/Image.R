@@ -537,7 +537,7 @@ numberOfFrames = function(y, type = c('total', 'render')) .numberOfFrames(y, mat
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-showImage = function (object) {
+showImage = function (object, short=FALSE) {
   nd = dim(object)
   ld = length(nd)
   dimorder = names(dimnames(object))
@@ -552,23 +552,24 @@ showImage = function (object) {
   cat('  frames.total :',numberOfFrames(object,'total'),'\n')
   cat('  frames.render:',numberOfFrames(object,'render'),'\n')
   
-  if (nd[1]>5) nd[1] = 5
-  if (nd[2]>6) nd[2] = 6
-  if (ld>2) nd[3:ld] = 1
-  
-  ndl = lapply(nd, seq_len)
-  
-  nds = paste0('[1:',nd[1],',1:',nd[2],paste(rep(',1',ld-2),collapse=''),']')
-  
-  cat('\nimageData(object)', nds, '\n', sep='')
-  print.default(asub(object@.Data, ndl))
-  
+  if ( !isTRUE(short) ) {
+    if (nd[1]>5) nd[1] = 5
+    if (nd[2]>6) nd[2] = 6
+    if (ld>2) nd[3:ld] = 1
+    
+    ndl = lapply(nd, seq_len)
+    
+    nds = paste0('[1:',nd[1],',1:',nd[2],paste(rep(',1',ld-2),collapse=''),']')
+    
+    cat('\nimageData(object)', nds, '\n', sep='')
+    print.default(asub(object@.Data, ndl))
+  }
   invisible(NULL)
 }
 
-setMethod ("show", signature(object = "Image"), showImage)
+setMethod ("show", signature(object = "Image"), function(object) showImage(object))
 
-print.Image <- function(x, ...) show(x)
+print.Image <- function(x, ...) showImage(x, ...)
 
 ## GP: Useful ?
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
