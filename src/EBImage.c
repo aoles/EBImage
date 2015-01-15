@@ -30,39 +30,41 @@ See: ../LICENSE for license, LGPL
 // C preferred way to get rid of 'unused parameter' warnings
 #define UNUSED(expr) do { (void)(expr); } while (0)
 
-static R_CallMethodDef libraryRCalls[] = {
-    {"lib_erode_dilate",                (DL_FUNC) &lib_erode_dilate,   3},
-    {"lib_erode_dilate_greyscale",      (DL_FUNC) &lib_erode_dilate_greyscale,   3},
-    {"lib_opening_closing_greyscale",   (DL_FUNC) &lib_opening_closing_greyscale,   3},
-    {"lib_tophat_greyscale",            (DL_FUNC) &lib_tophat_greyscale,   3},
-    {"thresh",                          (DL_FUNC) &thresh,   2},
-    {"floodFill",                       (DL_FUNC) &floodFill,      4},
-    {"fillHull",                        (DL_FUNC) &fillHull,       1},
-    {"bwlabel",                         (DL_FUNC) &bwlabel,       1},
-    {"normalize",                       (DL_FUNC) &normalize,      4},
-    {"distmap",                         (DL_FUNC) &distmap,            2},
-    {"watershed",                       (DL_FUNC) &watershed,    3},
-    {"propagate",                       (DL_FUNC) &propagate,      4},
-    {"paintObjects",                    (DL_FUNC) &paintObjects,  5},
-    {"rmObjects",                       (DL_FUNC) &rmObjects, 3},
-    {"tile",                            (DL_FUNC) &tile,     3},
-    {"untile",                          (DL_FUNC) &untile,         3},
-    {"stackObjects",                    (DL_FUNC) &stackObjects,  5},
-    {"ocontour",                        (DL_FUNC) &ocontour,  1},
-    {"haralickMatrix",                  (DL_FUNC) &haralickMatrix,  3},
-    {"haralickFeatures",                (DL_FUNC) &haralickFeatures,       1},
-    {"drawCircle",                      (DL_FUNC) &drawCircle, 4},
-    {"affine",                          (DL_FUNC) &affine, 4},
-    {"medianFilter",                    (DL_FUNC) &medianFilter, 4},
+#define CALLDEF(name, n)  {#name, (DL_FUNC) &name, n}
+
+static R_CallMethodDef CallEntries[] = {
+    CALLDEF(lib_erode_dilate, 3),
+    CALLDEF(lib_erode_dilate_greyscale, 3),
+    CALLDEF(lib_opening_closing_greyscale, 3),
+    CALLDEF(lib_tophat_greyscale, 3),
+    CALLDEF(thresh, 2),
+    CALLDEF(floodFill, 4),
+    CALLDEF(fillHull, 1),
+    CALLDEF(bwlabel, 1),
+    CALLDEF(normalize, 4),
+    CALLDEF(distmap, 2),
+    CALLDEF(watershed, 3),
+    CALLDEF(propagate, 4),
+    CALLDEF(paintObjects, 5),
+    CALLDEF(rmObjects, 3),
+    CALLDEF(tile, 3),
+    CALLDEF(untile, 3),
+    CALLDEF(stackObjects, 5),
+    CALLDEF(ocontour, 1),
+    CALLDEF(haralickMatrix, 3),
+    CALLDEF(haralickFeatures, 1),
+    CALLDEF(drawCircle, 4),
+    CALLDEF(affine, 4),
+    CALLDEF(medianFilter, 3),
     /* add above all R-lib functions from common.h */
     {NULL, NULL, 0}
 };
 
-void R_init_EBImage (DllInfo * winDll) {
-    R_registerRoutines (winDll, NULL, libraryRCalls, NULL, NULL);
-    R_useDynamicSymbols (winDll, FALSE);
+void R_init_EBImage (DllInfo *dll) {
+    R_registerRoutines (dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols (dll, FALSE);
 }
 
-void R_unload_EBImage (DllInfo * winDll) {
-  UNUSED(winDll);
+void R_unload_EBImage (DllInfo *dll) {
+    UNUSED(dll);
 }
