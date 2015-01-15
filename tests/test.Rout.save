@@ -1,5 +1,5 @@
 
-R version 3.1.1 (2014-07-10) -- "Sock it to Me"
+R version 3.1.2 (2014-10-31) -- "Pumpkin Helmet"
 Copyright (C) 2014 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
@@ -94,7 +94,7 @@ Type 'q()' to quit R.
 +   z <- check("normalize", x)
 +   z <- check("gblur", x, sigma=2)
 +   z <- check("filter2", x, array(1, dim=c(5, 5)))
-+   if (length(dim(x))<=3) z <- check("medianFilter", x, 3)
++   z <- check("medianFilter", x, 3)
 + 
 +   ## morphological operations
 +   y <- x>0.5
@@ -209,7 +209,7 @@ checking 'localCurvature' ... OK (hash=116636.2)
 checking 'normalize' ... OK (hash=1788995)
 checking 'gblur' ... OK (hash=2023705)
 checking 'filter2' ... OK (hash=50652074)
-checking 'medianFilter' ... OK (hash=1994829)
+checking 'medianFilter' ... OK (hash=2032139)
 checking 'erode' ... OK (hash=830816.9)
 checking 'dilate' ... OK (hash=1293651)
 checking 'distmap' ... OK (hash=6038778)
@@ -262,6 +262,7 @@ checking 'localCurvature' ... OK (hash=106275.7)
 checking 'normalize' ... OK (hash=2693244)
 checking 'gblur' ... OK (hash=2344608)
 checking 'filter2' ... OK (hash=58662977)
+checking 'medianFilter' ... OK (hash=2348208)
 checking 'erode' ... OK (hash=1547948)
 checking 'dilate' ... OK (hash=2509384)
 checking 'distmap' ... OK (hash=10836360)

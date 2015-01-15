@@ -456,32 +456,52 @@ void ctmf(
     }
 }
 
-SEXP medianFilter (SEXP Rx, SEXP Rr, SEXP Rcn, SEXP Rmemsize) {
- PointXY size;
- SEXP Ry;
- PROTECT(Rr = AS_INTEGER(Rr));
- PROTECT(Rcn = AS_INTEGER(Rcn));
- PROTECT(Rmemsize = AS_INTEGER(Rmemsize));
- int i;
- int *dim;
- int *r = INTEGER(Rr);
- int *cn = INTEGER(Rcn);
- int *memsize = INTEGER(Rmemsize);
- dim = INTEGER (GET_DIM(Rx));
- size.x = dim[0];
- size.y = dim[1];
- uint16_t *px, *py;
- px = (uint16_t *) R_alloc(size.x*size.y*(*cn), sizeof(uint16_t));
- py = (uint16_t *) R_alloc(size.x*size.y*(*cn), sizeof(uint16_t));
- PROTECT(Rx = AS_INTEGER(Rx));
- for (i=0;i<(*cn)*size.x*size.y;i++) 
-  px[i] = (uint16_t)INTEGER(Rx)[i];
- ctmf(px, py, size.x, size.y, size.x*(*cn), size.x*(*cn), *r, *cn, (*memsize)*1024);
- PROTECT(Ry = Rf_alloc3DArray(INTSXP, size.x, size.y, *cn));
- for(i=0;i<size.x*size.y*(*cn);i++) { 
-  INTEGER(Ry)[i]=py[i];
- }
- UNPROTECT(5);
- return Ry;
+//updated by Andrzej Oles, 2015
+
+SEXP medianFilter (SEXP _in, SEXP _r, SEXP _memsize) {
+  const double max_uint16 = 65535.0;
+  int nprotect = 0, x, y, z, r, memsize, i, j, imagesize, framesize;
+  SEXP res;
+  
+  x = INTEGER(GET_DIM(_in))[0];
+  y = INTEGER(GET_DIM(_in))[1];
+  framesize = x*y;
+  z = getNumberOfFrames(_in, 0);
+  imagesize = x*y*z;
+  r = INTEGER(_r)[0];
+  memsize = INTEGER(_memsize)[0] * 1024;
+    
+  PROTECT ( res = duplicate(_in) );
+  nprotect++;
+  
+  double *out = REAL(res);
+  
+  uint16_t *px, *py;
+  px = (uint16_t *) R_alloc(imagesize, sizeof(uint16_t));
+  py = (uint16_t *) R_alloc(imagesize, sizeof(uint16_t));
+  
+  for (i = 0; i < imagesize; i++) {
+    double el = out[i];
+    // clip
+    if (el < 0.0) el = 0;
+    else if (el > 1.0) el = 1.0;
+    // convert to int
+    el *= max_uint16;
+    px[i] = (uint16_t) el;
+  }
+  
+  // process channels separately
+  for(int j = 0; j < z; j++)
+    ctmf(&px[framesize*j], &py[framesize*j], x, y, x, x, r, 1, memsize);
+  
+  // convert back to [0:1] range
+  for (i = 0; i < imagesize; i++) {
+    double el = (double) py[i];
+    //out[i] = (double) px[i];
+    out[i] = el / max_uint16;
+  }
+  UNPROTECT(nprotect);
+ 
+  return res;
 }
 
