@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-SEXP medianFilter (SEXP, SEXP, SEXP, SEXP);
+SEXP medianFilter (SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus
 };

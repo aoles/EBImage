@@ -75,7 +75,7 @@ testEBImageFunctions <- function(x) {
   z <- check("normalize", x)
   z <- check("gblur", x, sigma=2)
   z <- check("filter2", x, array(1, dim=c(5, 5)))
-  if (length(dim(x))<=3) z <- check("medianFilter", x, 3)
+  z <- check("medianFilter", x, 3)
 
   ## morphological operations
   y <- x>0.5
