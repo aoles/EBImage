@@ -21,6 +21,7 @@ See: ../LICENSE for license, LGPL
 #include "objects.h"
 #include "ocontour.h"
 #include "tile.h"
+#include "nativeRaster.h"
 
 #include <R.h>
 #include <Rdefines.h>
@@ -56,6 +57,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(drawCircle, 4),
     CALLDEF(affine, 4),
     CALLDEF(medianFilter, 3),
+    CALLDEF(nativeRaster, 1),
     /* add above all R-lib functions from common.h */
     {NULL, NULL, 0}
 };
