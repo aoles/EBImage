@@ -93,7 +93,7 @@ propagate(x, seeds, mask=NULL, lambda=1e-4)
 
   display(x, title='Image')
   display(seeds/max(seeds), title='Seeds')
-  display(segmented, title="Voronoi regions")
+  display(segmented, title="Voronoi regions", all=TRUE)
   
 }
 
