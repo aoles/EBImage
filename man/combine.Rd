@@ -48,12 +48,12 @@ combine(x, y, ...)
   ## combination of color images
   img = readImage(system.file("images", "sample-color.png", package="EBImage"))[257:768,,]
   x = combine(img, flip(img), flop(img))
-  display(x)
+  display(x, all=TRUE)
 
   ## Blurred images
   x = resize(img, 128, 128)
   xt = list()
   for (t in seq(0.1, 5, len=9)) xt=c(xt, list(gblur(x, s=t)))
   xt = combine(xt)
-  display(xt, title='Blurred images')
+  display(xt, title='Blurred images', all=TRUE)
 }

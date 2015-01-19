@@ -1,9 +1,11 @@
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 display = function(x, 
                    title = deparse(substitute(x), width.cutoff = 500L, nlines = 1), 
-                   method = if ( interactive() ) "browser" else "raster",
+                   method,
                    frame, all = FALSE) {
   validImage(x)
+  if ( missing(method) )
+    method = getOption("display", if ( interactive() ) "browser" else "raster")
   method = match.arg(method, c("browser", "raster"))
 
   switch(method,
@@ -32,7 +34,7 @@ displayRaster = function(image, frame, all = FALSE, drawGrid = TRUE, ...){
     else 
       if (missing(frame)) {
         frame = 1
-        message("The image contains more than one frame: only the first one is displayed. To display all frames use 'all = TRUE'.")
+        message("The image contains more than one frame: only the first one is displayed.\nTo display all frames use 'all = TRUE'.")
       }
     else
       if ( frame<1 || frame>nf ) stop("Incorrect number of frame: it must range between 1 and ", frame)
