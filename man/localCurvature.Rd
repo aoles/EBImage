@@ -55,16 +55,16 @@ localCurvature(x, h, maxk)
   points(plotRange, 1/plotRange, type='l')
 
   ## Calculate curvature
-  f=system.file("images", "sample.png", package="EBImage")
-  x=readImage(f)
-  mk=makeBrush(size=21, shape="Gaussian", sigma=9)
-  x2=filter2(x, filter=mk)
-  x2=thresh(x2, w=50, h=50)
-  x2=bwlabel(x2)
-  contours=ocontour(x2)
-  curv=localCurvature(x=contours[[2]], h=11)$curvature
-  I=Image(0, dim=dim(x))
-  imageData(I)[contours[[2]]+1]=abs(curv)
-  x2[x2!=2]=0
-  display(combine(x2, 10*I), title = "Image curvature")
+  x = readImage(system.file("images", "shapes.png", package="EBImage"))[25:74, 60:109]
+  x = resize(x, 200)
+  y = gblur(x, 3) > .3
+  display(y)
+  
+  contours = ocontour(bwlabel(y))
+  c = localCurvature(x=contours[[1]], h=11)
+  i = c$curvature >= 0
+  pos = neg = array(0, dim(x))
+  pos[c$contour[i,]+1]  = c$curvature[i]
+  neg[c$contour[!i,]+1] = -c$curvature[!i]
+  display(10*(rgbImage(pos, , neg)), title = "Image curvature")
 }
