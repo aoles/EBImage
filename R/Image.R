@@ -99,7 +99,14 @@ is.Image <- function (x) is(x, "Image")
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 as.Image <- function(x) UseMethod("as.Image")
 
-as.Image.Image = function(x) x
+as.Image.Image = function(x) {
+  ## true Image
+  if ( class(x)=="Image" )
+    x
+  ## coerce subclasses to Image superclass
+  else
+    as(x, "Image")
+}
 
 as.Image.default = function(x) Image(x)
 
@@ -481,6 +488,21 @@ ind2sub = function(x, y) {
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 getFrame = function(y, i, type = c('total', 'render')) .getFrame(y, i, match.arg(type))
 
+getFrames = function(y, i, type = c('total', 'render')) {
+  type = match.arg(type)
+  colormode = colorMode(y)
+  
+  n = .numberOfFrames(y, type, colormode)
+  
+  if ( missing(i) ) 
+    i = seq_len(n)
+  else
+    if ( any(i>n) ) stop("'i' must be a vector of numbers ranging from 1 to ", n)
+  
+  
+  lapply(i, function(i) .getFrame(y, i, type, colormode))
+}
+
 ## It is useful to have the internal function for getFrame which can be called
 ## on arrays directly by specifying the apriopriate colormode. In combination
 ## with transpose(..., coerce=TRUE) this approach is significantly faster
@@ -508,6 +530,8 @@ getFrame = function(y, i, type = c('total', 'render')) .getFrame(y, i, match.arg
     x = adrop(x, drop = dims[dims>fd]) 
   }
   
+  ## return single channels as Greyscale
+  if ( colormode==Color && type=='total' ) colorMode(x) = Grayscale
   return(x)
 }
 
