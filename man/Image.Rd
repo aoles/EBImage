@@ -14,6 +14,7 @@
 \alias{colorMode}
 \alias{colorMode<-}
 \alias{getFrame}
+\alias{getFrames}
 \alias{getNumberOfFrames}
 \alias{numberOfFrames}
 \alias{imageData}
@@ -64,6 +65,7 @@ imageData(y)
 imageData(y) <- value
 
 getFrame(y, i, type = c('total', 'render'))
+getFrames(y, i, type = c('total', 'render'))
 numberOfFrames(y, type = c('total', 'render'))
 }
 
@@ -81,7 +83,7 @@ numberOfFrames(y, type = c('total', 'render'))
 
   \item{y}{An \code{Image} object or an array.}
 
-  \item{i}{Number of frame.}
+  \item{i}{Number(s) of frame(s). A single number in case of \code{getFrame}, or a vector of frame numbers for \code{getFrames}. If missing all frames are returned.}
 
   \item{value}{For \code{colorMode}, a numeric or a character string containing the color mode which
     can be either \code{Grayscale} or \code{Color}. For \code{imageData}, an \code{Image} object or an array.}
