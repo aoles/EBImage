@@ -22,7 +22,7 @@
 \usage{
 flip(x)
 flop(x)
-rotate(x, angle, filter = "bilinear", output.origin = c(0, 0), ...)
+rotate(x, angle, filter = "bilinear", output.dim, ...)
 translate(x, v, filter = "none", ...)
 resize(x, w, h, filter = "bilinear", output.dim = c(w, h), output.origin = c(0, 0), ...)
 
@@ -38,8 +38,7 @@ affine(x, m, filter = c("bilinear", "none"), output.dim, bg.col = "black")
   \item{filter}{A character string indicating the interpolating sampling filter.
                 Valid values are 'none' or 'bilinear'. See Details.}
   \item{output.dim}{A vector of 2 numbers indicating the dimension of the output image. 
-                    Default is \code{dim(x)} in all transforms except in \code{resize}, where 
-                    it is \code{c(w, h)}.}
+                    For \code{affine} and \code{translate} the default is \code{dim(x)}, for \code{resize} it equals \code{c(w, h)}, and for \code{rotate} it defaults to the bounding box size of the rotated image.}
   \item{output.origin}{A vector of 2 numbers indicating the output coordinates of the origin in pixels. 
                        Default is \code{c(0, 0)}. }
   
