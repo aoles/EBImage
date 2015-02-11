@@ -496,9 +496,10 @@ getFrames = function(y, i, type = c('total', 'render')) {
   
   if ( missing(i) ) 
     i = seq_len(n)
-  else
-    if ( any(i>n) ) stop("'i' must be a vector of numbers ranging from 1 to ", n)
-  
+  else {
+    i = as.integer(i)
+    if ( any(i<1L) || any(i>n) ) stop("'i' must be a vector of numbers ranging from 1 to ", n)
+  }
   
   lapply(i, function(i) .getFrame(y, i, type, colormode))
 }
