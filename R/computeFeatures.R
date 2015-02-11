@@ -59,7 +59,7 @@ computeFeatures = function(x, ref, methods.noref=c("computeFeatures.moment", "co
   }
   
   ## compute features
-  if (!properties) {
+  if ( !isTRUE(properties) ) {
     ## prepare data
     xs = splitObjects(x)
     if (length(xs)==0) return(NULL)
@@ -128,7 +128,7 @@ standardExpandRef = function(ref, refnames) {
 ## basic pixel-independant statistics
 computeFeatures.basic = function(x, ref, properties=FALSE, basic.quantiles=c(0.01, 0.05, 0.5, 0.95, 0.99), xs, ...) {
   qnames = paste0('b.q', gsub('\\.', '', as.character(basic.quantiles)))
-  if (!properties) {
+  if ( !isTRUE(properties) ) {
     ## check arguments
     x = checkx(x)
     if (missing(xs)) xs = splitObjects(x)
@@ -158,7 +158,7 @@ computeFeatures.basic = function(x, ref, properties=FALSE, basic.quantiles=c(0.0
 
 ## shape features
 computeFeatures.shape = function(x, properties=FALSE, xs, ...) {
-  if (!properties) {
+  if ( !isTRUE(properties) ) {
     ## check arguments
     x = checkx(x)
     if (missing(xs)) xs = splitObjects(x)
@@ -186,7 +186,7 @@ computeFeatures.shape = function(x, properties=FALSE, xs, ...) {
 
 ## image moments
 computeFeatures.moment = function(x, ref, properties=FALSE, xs, ...) {
-  if (!properties) {
+  if ( !isTRUE(properties) ) {
     ## check arguments
     x = checkx(x)
     if (missing(xs)) xs = splitObjects(x)
@@ -234,7 +234,7 @@ computeFeatures.moment = function(x, ref, properties=FALSE, xs, ...) {
 ## h.*: haralick features
 computeFeatures.haralick = function(x, ref, properties=FALSE, haralick.nbins=32, haralick.scales=c(1, 2), xs, ...) {
   snames = paste0("s", haralick.scales)
-  if (!properties) {
+  if ( !isTRUE(properties) ) {
     ## check arguments
     x = checkx(x)
     if (missing(xs)) xs = splitObjects(x)
@@ -328,7 +328,7 @@ checkx = function(x) {
 
 ## split an labelled image into list of points
 splitObjects = function(x) {
-  z = which(as.integer(x)>=1)
+  z = which(as.integer(x)>0L)
   split(z, x[z])
 }
 
