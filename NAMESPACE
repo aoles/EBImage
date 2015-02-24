@@ -10,6 +10,7 @@ importFrom("locfit", "lp", "locfit")
 importFrom("tiff", "readTIFF", "writeTIFF")
 importFrom("jpeg", "readJPEG", "writeJPEG")
 importFrom("png", "readPNG", "writePNG")
+importFrom("fftwtools", "fftw2d", "fftw_c2c_2d")
 
 ## classes
 exportClasses(Image)

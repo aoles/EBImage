@@ -1,6 +1,6 @@
 # 2D convolution-based linear filter for images and matrix data
 
-# Copyright (c) 2007 Gregoire Pau, Oleg Sklyar
+# Copyright (c) 2007-2015, Andrzej Oleś, Gregoire Pau, Oleg Sklyar
 
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public License
@@ -15,6 +15,7 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 filter2 = function(x, filter) {
   validObject(x)
   validObject(filter)
@@ -33,21 +34,28 @@ filter2 = function(x, filter) {
   ## create fft filter matrix
   wf = matrix(0.0, nrow=dx[1], ncol=dx[2])
   wf[(cx[1]-cf[1]):(cx[1]+cf[1]),(cx[2]-cf[2]):(cx[2]+cf[2])] = filter
-  wf = fft(wf)
   
-  ## convert to a frame-based 3D array
-  dim(x) = c(dx[1:2],prod(dx)/prod(dx[1:2]))
+  #wf = fftw2d(wf)
+  wf = fftw_c2c_2d(wf)
   
   index1 = c(cx[1]:dx[1],1:(cx[1]-1))
   index2 = c(cx[2]:dx[2],1:(cx[2]-1))
-  pdx = prod(dim(x)[1:2])
-  y = apply(x, 3, function(xx) {
-    dim(xx) = dx[1:2]
-    Re(fft(fft(xx)*wf, inverse=TRUE)/pdx)[index1, index2]
-  })
-  dim(y) = dx
+  pdx = prod(dx[1:2])
+  
+  #.filter = function(xx) Re(fftw2d(fftw2d(xx)*wf, inverse=1)/pdx)[index1, index2]
+  .filter = function(xx) Re(fftw_c2c_2d(fftw_c2c_2d(xx)*wf, inverse=1)/pdx)[index1, index2]
+  
+  ## convert to a frame-based 3D array
+  if ( length(dx) > 2L ) {    
+    y = apply(x, 3:length(dx), .filter)
+    dim(y) = dx
+  }
+  else {
+    y = .filter(x)
+  }
+  
   dimnames(y) = dnames
-    
+  
   imageData(x) <- y
   x
 }
