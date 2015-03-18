@@ -35,15 +35,13 @@ filter2 = function(x, filter) {
   wf = matrix(0.0, nrow=dx[1], ncol=dx[2])
   wf[(cx[1]-cf[1]):(cx[1]+cf[1]),(cx[2]-cf[2]):(cx[2]+cf[2])] = filter
   
-  #wf = fftw2d(wf)
-  wf = fftw_c2c_2d(wf)
+  wf = fftw2d(wf)
   
   index1 = c(cx[1]:dx[1],1:(cx[1]-1))
   index2 = c(cx[2]:dx[2],1:(cx[2]-1))
   pdx = prod(dx[1:2])
   
-  #.filter = function(xx) Re(fftw2d(fftw2d(xx)*wf, inverse=1)/pdx)[index1, index2]
-  .filter = function(xx) Re(fftw_c2c_2d(fftw_c2c_2d(xx)*wf, inverse=1)/pdx)[index1, index2]
+  .filter = function(xx) Re(fftw2d(fftw2d(xx)*wf, inverse=1)/pdx)[index1, index2]
   
   ## convert to a frame-based 3D array
   if ( length(dx) > 2L ) {    
