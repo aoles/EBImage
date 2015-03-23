@@ -18,7 +18,7 @@ paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col, SEXP _thick) {
     int nprotect, nx, ny, nz, im, index, thick;
     int i, j;
     double *opac, *col;
-    double *dx, *dres, dp;
+    double *dx, *dres, dp, val;
     int redstride, greenstride, bluestride;
     int xcolormode;
 
@@ -46,38 +46,41 @@ paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col, SEXP _thick) {
       getColorStrides(tgt, im, &redstride, &greenstride, &bluestride);
       
       for ( j = 0; j < ny; j++ ) {
-        for ( i = 0; i < nx; i++ ) {	    
-                    
-          if(thick) {
-            if (  ( i > 0       && dx[j*nx + i-1] != dx[j*nx + i] ) ||
-                  ( i < nx - 1  && dx[j*nx + i+1] != dx[j*nx + i] ) ||
-                  ( j > 0       && dx[(j-1)*nx + i] != dx[j*nx + i] ) ||
-                  ( j < ny - 1  && dx[(j+1)*nx + i] != dx[j*nx + i] ) ) 
+        for ( i = 0; i < nx; i++ ) {      
+          val = dx[j*nx + i];
+          
+          if (thick) {
+            /* object border */
+            if (  ( i > 0       && dx[j*nx + i-1] != val ) ||
+                  ( i < nx - 1  && dx[j*nx + i+1] != val ) ||
+                  ( j > 0       && dx[(j-1)*nx + i] != val ) ||
+                  ( j < ny - 1  && dx[(j+1)*nx + i] != val ) ) 
               index = 0;
             else {
-              /* if it is on the border */
-              if ( i < 1 || i > nx - 2 || j < 1 || j > ny - 2 ) {
-                if ( dx[j*nx + i] > 0 ) index = 2;
-                else continue;
-              }
-              else {
-                if ( dx[j*nx + i] > 1 ) index = 1;
-                else continue;
-              }
+              /* background */
+              if ( val <= 0 )
+                continue;
+              /* if image edge index=2, if object body index=1 */
+              else
+                index = (i==0 || i==nx-1 || j==0 || j==ny-1 || val < 1) ? 2 : 1;
             }
-           
           }
           
           else {
-        	  /* pixel is contact */
-        	  index = 1;
-        	  if ( dx[j*nx + i]<=0 ) continue;
-        	  if ( dx[j*nx + i] < 1.0 || i < 1 || i > nx - 2 || j < 1 || j > ny - 2 ) index = 2;
-        	  else {
-        	    /* check if pixel is border, edge is same as contact */
-        	    if ( dx[j*nx + i-1] != dx[j*nx + i] ||  dx[j*nx + i+1] != dx[j*nx + i] ||
-        		 dx[(j-1)*nx + i] != dx[j*nx + i] || dx[(j+1)*nx + i] != dx[j*nx + i]) index = 0;
-        	  }	  
+            /* background */
+            if ( val <= 0 )
+              continue;
+            else {
+              /* object border */
+              if (  ( i > 0       && dx[j*nx + i-1] != val ) ||
+                    ( i < nx - 1  && dx[j*nx + i+1] != val ) ||
+                    ( j > 0       && dx[(j-1)*nx + i] != val ) ||
+                    ( j < ny - 1  && dx[(j+1)*nx + i] != val ) ) 
+                index = 0;
+              /* if image edge index=2, if object body index=1 */
+              else
+                index = (i==0 || i==nx-1 || j==0 || j==ny-1 || val < 1) ? 2 : 1;
+            }
           }
           
           if (redstride!=-1) {
