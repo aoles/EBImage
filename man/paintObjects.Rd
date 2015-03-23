@@ -9,7 +9,7 @@
 }
 
 \usage{
-paintObjects(x, tgt, opac=c(1, 1), col=c('red', NA), thick=FALSE)
+paintObjects(x, tgt, opac=c(1, 1), col=c('red', NA), thick=FALSE, closed=FALSE)
 }
 
 \arguments{
@@ -29,6 +29,8 @@ paintObjects(x, tgt, opac=c(1, 1), col=c('red', NA), thick=FALSE)
     painted in \code{red} while object bodies are not painted.}
     
   \item{thick}{A logical indicating whether to use thick boundary contours. Default is \code{FALSE}.}
+  
+  \item{closed}{A logical indicating whether object contours should be closed along image edges or remain open.}
 }
 
 \value{
@@ -66,6 +68,7 @@ paintObjects(x, tgt, opac=c(1, 1), col=c('red', NA), thick=FALSE)
 
 \author{
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006-2007
+  Andrzej Oles, \email{andrzej.oles@embl.de}, 2015
 }
 
 
