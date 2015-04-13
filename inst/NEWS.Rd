@@ -1,6 +1,72 @@
 \name{EBImage-NEWS}
 \title{News for Package 'EBImage'}
 
+\section{Changes in version 4.10.0}{
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item 'paintObjects' allows control over behavior at image edges
+      \item 'getFrames' function returning a list of Image objects
+      \item default 'display' method can be set by \code{options("EBImage.display")}
+      \item 'short' argument to the Image 'print' method
+      \item 'equalize' function performing histogram equalization
+    }
+  }
+  \subsection{SIGNIFICANT USER-VISIBLE CHANGES}{
+    \itemize{
+      \item 'translate' moves the image in the opposite direction as before
+      \item 'rotate' returns an image centered in a recalculated bounding box 
+      \item 'as.Image' coerces subclasses to Image objects
+      \item 'getFrame' returns individual channels of a Color image as Grayscale frames
+      \item  'display' method defaults to 'raster' unless used interactively
+      \item 'combine' allows to combine images of the same color mode only
+    }
+  }
+  \subsection{PERFORMANCE IMPROVEMENTS}{
+    \itemize{
+      \item 'filter2': calculate FFT using methods from the 'fftwtools' package
+      \item 'as.nativeRaster': now implemented in C
+      \item 'medianFilter': double to integer conversion moved to C code
+      \item 'hist': fixed binning issues and improved performance
+    }
+  }
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item 'medianFilter': fixed multi-channel image handling; preserve original object class
+      \item 'as.nativeRaster': allow for an arbitrary number of color channels
+      \item 'display': set missing color channels to blank
+    }
+  }
+}
+
+\section{Changes in version 4.8.3}{
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item 'paintObjects': the body of an object with ID=1 was not highlighted when option \code{thick} was set
+    }
+  }
+}
+
+\section{Changes in version 4.8.2}{
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item Clip images in 'as.nativeRaster'
+    }
+  }
+}
+
+\section{Changes in version 4.8.1}{
+  \subsection{SIGNIFICANT USER-VISIBLE CHANGES}{
+    \itemize{
+      \item New sample PNG images
+    }
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item Workaround to broken 'Math2' S4GroupGenerics in R 3.1.2
+    }
+  }
+  }
+}
+
 \section{Changes in version 4.8.0}{
   \subsection{NEW FEATURES}{
     \itemize{

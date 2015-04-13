@@ -20,7 +20,7 @@ display(x,
 \arguments{
   \item{x}{an \code{Image} object or an array.}
   \item{title}{a character string used as a window title.}
-  \item{method}{the method used to display images, can be \code{browser} or \code{raster}. Defaults to \code{browser} when R is used interactively and \code{raster} otherwise. The default behavior can be overridden by setting \code{options("display")}. See Details.}
+  \item{method}{the method used to display images, can be \code{browser} or \code{raster}. Defaults to \code{browser} when R is used interactively and \code{raster} otherwise. The default behavior can be overridden by setting \code{options("EBImage.display")}. See Details.}
   \item{frame}{a numeric indicating the frame number; only works in conjunction with \code{method = "raster"} and \code{all = FALSE}.}
   \item{all}{should all frames of a stacked image be displayed, or just a single \code{frame}?}
 }
@@ -30,7 +30,7 @@ display(x,
 }
 
 \details{
-The default method used for displaying images depends on whether called from and interactive R session. If \code{interactive()} returns \code{TRUE} images are displayed using the \code{"browser"} method, otherwise the \code{"raster"} method is used. This behavior can be overridden and the default display method fixed regardless the interactivity by setting \code{options("display")} to either \code{"browser"} or \code{"raster"}.
+The default method used for displaying images depends on whether called from and interactive R session. If \code{interactive()} returns \code{TRUE} images are displayed using the \code{"browser"} method, otherwise the \code{"raster"} method is used. This behavior can be overridden and the default display method fixed regardless the interactivity by setting \code{options("EBImage.display")} to either \code{"browser"} or \code{"raster"}.
 
 The \code{"browser"} method runs an interactive JavaScript image viewer using the default web browser. Multiple windows or tabs can be opened in this way. Pressing 'h' displays a list of available features along with corresponding mouse and keyboard actions.
 
