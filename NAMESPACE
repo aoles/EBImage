@@ -10,7 +10,7 @@ importFrom("locfit", "lp", "locfit")
 importFrom("tiff", "readTIFF", "writeTIFF")
 importFrom("jpeg", "readJPEG", "writeJPEG")
 importFrom("png", "readPNG", "writePNG")
-importFrom("fftwtools", "fftw2d", "fftw_c2c_2d")
+importFrom("fftwtools", "fftw2d")
 
 ## classes
 exportClasses(Image)
@@ -74,7 +74,7 @@ export(drawCircle)
 
 ## features extraction
 export(computeFeatures)
-export(computeFeatures.basic, computeFeatures.shape, computeFeatures.moment, computeFeatures.haralick)
+export(computeFeatures.basic, computeFeatures.haralick, computeFeatures.moment, computeFeatures.shape)
 export(standardExpandRef)
 export(localCurvature)
 
