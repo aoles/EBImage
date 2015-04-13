@@ -5,7 +5,7 @@ display = function(x,
                    frame, all = FALSE) {
   validImage(x)
   if ( missing(method) )
-    method = getOption("display", if ( interactive() ) "browser" else "raster")
+    method = getOption("EBImage.display", if ( interactive() ) "browser" else "raster")
   method = match.arg(method, c("browser", "raster"))
 
   switch(method,
