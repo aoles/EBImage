@@ -28,7 +28,7 @@ watershed(x, tolerance=1, ext=1)
     is a reasonable value if \code{x} comes from \code{distmap}.}
 
   \item{ext}{Radius of the neighborhood in pixels for the detection
-    of neighboring objects. Higher value smooths out small objects. }
+    of neighboring objects. Higher value smoothes out small objects. }
 }
 
 \value{
@@ -38,11 +38,10 @@ watershed(x, tolerance=1, ext=1)
 
 \details{
   The algorithm identifies and separates objects that stand out of the
-  background (zero). After the water fill, the source image
-  is flipped upside down and the resulting valleys (values with higher
-  intensities) are filled in first until another object or background is met.
-  The deepest valleys (pixels with highest intensity) become indexed first,
-  starting from 1.
+  background (zero). It inverts the image and uses water to fill
+  the resulting valleys (pixels with high intensity in the source image)
+  until another object or background is met.
+  The deepest valleys become indexed first, starting from 1.
 
   The function \code{bwlabel} is a simpler, faster alternative to 
   segment connected objects from binary images.
