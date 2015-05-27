@@ -28,6 +28,8 @@ equalize(x, range = c(0, 1), levels = 256)
 }
 
 \details{
+ Histogram equalization is an adaptive image contrast adjustment method. It flattens the image histogram by performing linearization of the cumulative distribution function of pixel intensities.
+
  Individual channels of \code{Color} images and frames of image stacks are equalized separately.
 }
 

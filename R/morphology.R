@@ -8,8 +8,8 @@ distmap = function (x, metric=c('euclidean', 'manhattan')) {
   validImage(x)
   if (any(is.na(x))) stop("'x' shouldn't contain any NAs")
   metric = match.arg(metric)
-  imetric = switch(metric,euclidean=0,manhattan=1)
-  return (.Call(C_distmap, castImage(x), as.integer(imetric)))
+  imetric = 
+  return (.Call(C_distmap, castImage(x), switch(metric, euclidean=0L, manhattan=1L)))
 }
 
 makeBrush = function(size, shape=c('box', 'disc', 'diamond', 'Gaussian', 'line'), step=TRUE, sigma=0.3, angle=45) {
@@ -92,6 +92,16 @@ closing = function (x, kern=makeBrush(5, shape='diamond')) {
   validImage(x)
   erode(dilate(x, kern), kern)
 }
+
+## deprecate "GreyScale" notation
+
+erodeGrayscale = function(...) erodeGreyScale(...)
+dilateGrayscale = function(...) dilateGreyScale(...)
+openingGrayscale = function(...) openingGreyScale(...)
+closingGrayscale = function(...) closingGreyScale(...)
+whiteTopHatGrayscale = function(...) whiteTopHatGreyScale(...)
+blackTopHatGrayscale = function(...) blackTopHatGreyScale(...)
+selfcomplementaryTopHatGrayscale = function(...) selfcomplementaryTopHatGreyScale(...)
 
 erodeGreyScale = function (x, kern=makeBrush(5, shape='diamond')) {
     validImage(x)

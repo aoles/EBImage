@@ -2,10 +2,10 @@
 
 \alias{paintObjects}
 
-\title{Marks objects in images}
+\title{Mark objects in images}
 
 \description{
-  This function marks objects in images.
+  Higlight objects in images by outlining and/or painting them.
 }
 
 \usage{

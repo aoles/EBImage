@@ -14,7 +14,7 @@
 display(x, 
         title = deparse(substitute(x), width.cutoff = 500L, nlines = 1),
         method,
-        frame, all = FALSE)
+        frame, all = FALSE, ...)
 }
 
 \arguments{
@@ -23,6 +23,7 @@ display(x,
   \item{method}{the method used to display images, can be \code{browser} or \code{raster}. Defaults to \code{browser} when R is used interactively and \code{raster} otherwise. The default behavior can be overridden by setting \code{options("EBImage.display")}. See Details.}
   \item{frame}{a numeric indicating the frame number; only works in conjunction with \code{method = "raster"} and \code{all = FALSE}.}
   \item{all}{should all frames of a stacked image be displayed, or just a single \code{frame}?}
+  \item{...}{arguments passed to internal methods}
 }
 
 \value{
