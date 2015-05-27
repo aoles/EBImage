@@ -139,8 +139,8 @@ numberOfFrames(y, type = c('total', 'render'))
   z = Image(m, colormode='Color')
   display(normalize(z))
 
-  y = Image(c('red', 'violet', '#ff51a5', 'yellow'), dim=c(71, 71))
-  display(y)
+  y = Image(matrix(c('red', 'violet', '#ff51a5', 'yellow'), nrow=10, ncol=10))
+  display(y, interpolate=FALSE)
 
   ## colorMode example
   x = readImage(system.file('images', 'nuclei.tif', package='EBImage'))

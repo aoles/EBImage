@@ -2,7 +2,7 @@
 display = function(x, 
                    title = deparse(substitute(x), width.cutoff = 500L, nlines = 1), 
                    method,
-                   frame, all = FALSE) {
+                   frame, all = FALSE, ...) {
   validImage(x)
   if ( missing(method) )
     method = getOption("EBImage.display", if ( interactive() ) "browser" else "raster")
@@ -10,7 +10,7 @@ display = function(x,
 
   switch(method,
     browser = displayInBrowser(x, title),
-    raster  = displayRaster(x, frame, all) ) 
+    raster  = displayRaster(x, frame, all, ...) ) 
 
   invisible(NULL)
 }
