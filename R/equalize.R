@@ -5,6 +5,7 @@ equalize <- function(x, range = c(0, 1), levels = 256){
   levels = as.integer(levels)
   if ( is.na(levels) || levels < 1 ) stop("Levels must be at least equal 1.")
   breaks = seq(range[1], range[2], length.out = levels+1)
+  x = castImage(x)  # converts logical to numeric
   d = dim(x)
   n = prod(d[seq_len(2)])
   

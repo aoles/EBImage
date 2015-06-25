@@ -1,6 +1,8 @@
 ## cat tests/test.R | R --vanilla &>tests/test.Rout.save
 library("EBImage")
 
+set.seed(0) # make random color permutations in 'colorLabels' reproducible
+
 ## returns a hashcode given an object
 hash <- function(x) {
   if (is.list(x)) hash(sapply(x,hash))
@@ -24,7 +26,7 @@ check <- function(fun, x, ...) {
   }
 
   if (passed) cat("OK (hash=", hash(y), ")\n", sep="") 
-  else cat("FAILED\n")
+  else cat("FAIL\n")
 
   y
 }
@@ -36,6 +38,7 @@ testEBImageFunctions <- function(x) {
   z <- check(">", x, 0.5)
   z <- check("+", x, x)
   z <- check("/", x, 2)
+  z <- check("*", 2, x)
   z <- check("transpose", x)
   if (mode(x)!="logical") z <- check("median", x)
 
@@ -47,7 +50,19 @@ testEBImageFunctions <- function(x) {
   z <- check("imageData<-", x, z)
   z <- check("colorMode<-", x, Grayscale)
   z <- check("numberOfFrames", x, type="render")
-
+  z <- check("getFrames", x)
+  z <- check("display", x, all=TRUE)
+  
+  ## drawCircle
+  d <- dim(x)
+  c.x <- round(d[1L]/2)
+  c.y <- round(d[2L]/2)
+  radius <- c.x - 1
+  nf <- numberOfFrames(x, "render")
+  fill <- nf > 1
+  col = if ( colorMode(x)==Color ) "yellow" else 1
+  z <- check("drawCircle", x, c.x, c.x, radius, col, fill, nf)
+  
   ## subset
   sub <- list(x, 1:10, 1:7)
   if (length(dim(x))>2) sub <- c(sub, rep(TRUE, length(dim(x))-2))
@@ -65,6 +80,7 @@ testEBImageFunctions <- function(x) {
   ## segmentation
   z <- check("thresh", x)
   y <- check("bwlabel", x>0.5)
+  z <- check("colorLabels", y)
   z <- check("rmObjects", getFrame(y, 1), 3)
   z <- check("reenumerate", y)
   z <- paintObjects(channel(y, "gray"), x)
@@ -76,19 +92,25 @@ testEBImageFunctions <- function(x) {
   z <- check("gblur", x, sigma=2)
   z <- check("filter2", x, array(1, dim=c(5, 5)))
   z <- check("medianFilter", x, 3)
+  z <- check("equalize", x)
 
   ## morphological operations
   y <- x>0.5
   z <- check("erode", y)
   z <- check("dilate", y)
+  z <- check("opening", y, makeBrush(5, 'line'))
+  z <- check("closing", y, makeBrush(5, 'disc'))
   z <- check("distmap", y)
   z <- check("watershed", y)
   z <- check('floodFill', y, c(10, 10), 0.5)
   z <- check('fillHull', y)
-  z <- check("erodeGreyScale", x)
-  z <- check("dilateGreyScale", x)
-  z <- check("whiteTopHatGreyScale", x)
-  z <- check("selfcomplementaryTopHatGreyScale", x)
+  z <- check("erodeGrayscale", x)
+  z <- check("dilateGrayscale", x)
+  z <- check("openingGrayscale", x)
+  z <- check("closingGrayscale", x)
+  z <- check("whiteTopHatGrayscale", x)
+  z <- check("blackTopHatGrayscale", x)
+  z <- check("selfcomplementaryTopHatGrayscale", x)
 
   ## colorspace
   z <- check("channel", x, "rgb")
@@ -105,20 +127,34 @@ testEBImageFunctions <- function(x) {
   cat("\n")
 }
 
-## test: grayscale 2D 
-x <- readImage(system.file("images","sample.png", package="EBImage"))[1:32, 1:48]
+sample <- readImage(system.file("images","sample.png", package="EBImage"))
+sample.color <- readImage(system.file("images","sample-color.png", package="EBImage"))
+
+## test: 2D Grayscale
+x <- sample[1:32, 1:48]
 testEBImageFunctions(x)
 
-## test: color 2D
-x <- readImage(system.file("images","sample-color.png", package="EBImage"))[1:65, 1:17,]
+## test: 2D Color
+colorMode(x) <- Color
+x <- t(x)
 testEBImageFunctions(x)
 
-## test: color 3D
-x <- readImage(system.file("images","sample-color.png", package="EBImage"))[1:33, 1:16,]
+## test: 3D Color
+x <- sample.color[1:65, 1:17,]
+testEBImageFunctions(x)
+
+## test: 3D Grayscale logical
+x <- sample[32:63, 32:63]
+x <- x > otsu(x)
 x <- combine(x, x)
 testEBImageFunctions(x)
 
-## test: logical 2D
-x <- readImage(system.file("images","sample.png", package="EBImage"))[32:63, 32:63]
-x <- x > otsu(x)
+## test: 4D Color
+x <- sample.color[1:33, 1:16,]
+x <- combine(x, x)
+testEBImageFunctions(x)
+
+## test: 4D Grayscale
+colorMode(x) <- Grayscale
+imageData(x) <- aperm(x, c(2, 1, 4, 3))
 testEBImageFunctions(x)
