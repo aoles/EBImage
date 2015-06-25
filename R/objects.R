@@ -48,7 +48,6 @@ stackObjects = function (x, ref, combine=TRUE, bg.col='black', ext) {
   ## check arguments
   checkCompatibleImages(x, ref, 'render')
   nz = .numberOfFrames(x, 'total')
-  if (colorMode(x) != Grayscale) stop("'x' must be an image in 'Grayscale' color mode or an array")
     
   ## uses 'computeFeatures.moment' to get centers and theta
   hf = lapply(seq_len(nz), function(i) computeFeatures.moment(getFrame(x, i)))

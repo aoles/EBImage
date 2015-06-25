@@ -12,6 +12,13 @@
 \alias{whiteTopHatGreyScale}
 \alias{blackTopHatGreyScale}
 \alias{selfcomplementaryTopHatGreyScale}
+\alias{dilateGrayscale}
+\alias{erodeGrayscale}
+\alias{openingGrayscale}
+\alias{closingGrayscale}
+\alias{whiteTopHatGrayscale}
+\alias{blackTopHatGrayscale}
+\alias{selfcomplementaryTopHatGrayscale}
 
 
 \title{Perform morphological operations on images}
