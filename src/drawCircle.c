@@ -78,14 +78,9 @@ SEXP drawCircle(SEXP _a, SEXP _xyzr, SEXP _rgb, SEXP _fill) {
   res = REAL(_res);
 
   // draw circle
-  if (getColorMode(_res)==MODE_GRAYSCALE) {
-    rasterCircle(&res[redstride], width, height, x, y, radius, REAL(_rgb)[0], fill);
-  } 
-  else if (getColorMode(_res)==MODE_COLOR) {
-    rasterCircle(&res[redstride], width, height, x, y, radius, REAL(_rgb)[0], fill);
-    rasterCircle(&res[greenstride], width, height, x, y, radius, REAL(_rgb)[1], fill);
-    rasterCircle(&res[bluestride], width, height, x, y, radius, REAL(_rgb)[2], fill);
-  }
+  if (redstride!=-1) rasterCircle(&res[redstride], width, height, x, y, radius, REAL(_rgb)[0], fill);
+  if (greenstride!=-1) rasterCircle(&res[greenstride], width, height, x, y, radius, REAL(_rgb)[1], fill);
+  if (bluestride!=-1)  rasterCircle(&res[bluestride], width, height, x, y, radius, REAL(_rgb)[2], fill);
   
   UNPROTECT (nprotect);
   return _res;
