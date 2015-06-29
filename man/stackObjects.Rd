@@ -39,12 +39,12 @@ stackObjects(x, ref, combine=TRUE, bg.col='black', ext)
 }
 
 \details{
-  \code{stackObjects} creates a set of \code{nbobj} images of size
-  (\code{2*ext+1}, \code{2*ext+1}), where \code{nbobj} is the number of objects
+  \code{stackObjects} creates a set of \code{n} images of size
+  (\code{2*ext+1}, \code{2*ext+1}), where \code{n} is the number of objects
   in \code{x}, and places each object of \code{x} in this set.
   
-  If not specified, \code{ext} is estimated using the 95\% quantile of
-  2*sqrt(\code{g.l1}), where \code{g.l1} is the semi-major axis
+  If not specified, \code{ext} is estimated using the 98\% quantile of
+  m.majoraxis/2, where \code{m.majoraxis} is the semi-major axis
   descriptor extracted from \code{computeFeatures.moment}, taken over
   all the objects of the image \code{x}.
 }

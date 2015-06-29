@@ -169,21 +169,24 @@ rmObjects (SEXP x, SEXP _index, SEXP _reenum) {
 SEXP
 stackObjects (SEXP obj, SEXP ref, SEXP _bgcol, SEXP xy_list, SEXP extension) {
   SEXP res, st=NULL, dim, xys;
-  int nx, ny, nz, nprotect, im, x, y, i, j, pxi, nobj, index;
+  int nx, ny, nz, nc, nprotect, im, x, y, i, j, pxi, nobj, index;
   double *dobj, *dref, *xy, xx, yy,  *bgcol;
   double * dst;
   int ext = floor(REAL(extension)[0]);
   int snx = 2 * ext + 1;
   int sny = 2 * ext + 1;
   int mode = getColorMode(ref);
-  int redstride, greenstride, bluestride;
-  int redstridet, greenstridet, bluestridet;
+  int nbChannels = getNumberOfChannels(ref);
+  int stride, shift;
  
   nx = INTEGER ( GET_DIM(obj) )[0];
   ny = INTEGER ( GET_DIM(obj) )[1];
-  nz = getNumberOfFrames(obj,0);
+  nz = getNumberOfFrames(obj, 0);
   bgcol = REAL(_bgcol);
   nprotect = 0;
+
+  // allow only up to 3 color channels
+  if (nbChannels>3) nbChannels = 3;
 
   if (nz == 1) {
     PROTECT(res = Rf_duplicate(_bgcol));
@@ -199,7 +202,6 @@ stackObjects (SEXP obj, SEXP ref, SEXP _bgcol, SEXP xy_list, SEXP extension) {
     // set dobj, dref and strides
     dobj = &(REAL(obj)[im * nx * ny]);
     dref = REAL(ref);
-    getColorStrides(ref, im, &redstridet, &greenstridet, &bluestridet);
 
     // get number of objects = max index
     nobj = 0;
@@ -207,56 +209,38 @@ stackObjects (SEXP obj, SEXP ref, SEXP _bgcol, SEXP xy_list, SEXP extension) {
 
     if (nobj>0) {
       // create stack
+      PROTECT(st = allocVector(REALSXP, nobj * snx * sny * nbChannels));
+      nprotect++;
+      dst = REAL(st);
+      
+      // bg color initialization
+      for (j=0; j<nobj; j++) {
+        for(nc=0; nc<nbChannels; nc++) {
+          shift = j*nbChannels*snx*sny + nc*snx*sny;
+          for (i=0; i<snx*sny; i++) dst[i+shift] = bgcol[nc];
+        }
+      }
+      
       if (mode==MODE_GRAYSCALE) {
-	PROTECT(st = allocVector(REALSXP, nobj * snx * sny));
-	nprotect++;
-	dst = REAL(st);
-
-	// bg color initialization
-	for (i = 0; i < nobj * snx * sny; i++) dst[i] = bgcol[0];
-      
-	// set dims
-	PROTECT (dim = allocVector( INTSXP, 3 ));
-	nprotect++;
-	INTEGER (dim)[0] = snx;
-	INTEGER (dim)[1] = sny;
-	INTEGER (dim)[2] = nobj;
-	SET_DIM (st, dim);
-	UNPROTECT(1); nprotect--; // dim
+      	PROTECT (dim = allocVector( INTSXP, 3 ));
+      	nprotect++;
+      	INTEGER (dim)[0] = snx;
+      	INTEGER (dim)[1] = sny;
+      	INTEGER (dim)[2] = nobj;
       }
-      else if (mode==MODE_COLOR)  {
-	// create stack
-	PROTECT(st = allocVector(REALSXP, nobj * snx * sny * 3));
-	nprotect++;
-	dst = REAL( st );
-
-	// bg color initialization
-	for (j=0; j<nobj; j++) {
-	  redstride = j*3*snx*sny + 0*snx*sny;
-	  greenstride = j*3*snx*sny + 1*snx*sny;
-	  bluestride = j*3*snx*sny + 2*snx*sny;
-	  for (i=0; i<snx*sny; i++) {
-	    dst[i+redstride] = bgcol[0];
-	    dst[i+greenstride] = bgcol[1];
-	    dst[i+bluestride] = bgcol[2];
-	  }
-	}
-      
-	// set dims
-	PROTECT (dim = allocVector( INTSXP, 4));
-	nprotect++;
-	INTEGER (dim)[0] = snx;
-	INTEGER (dim)[1] = sny;
-	INTEGER (dim)[2] = 3;
-	INTEGER (dim)[3] = nobj;
-	SET_DIM (st, dim);
-	UNPROTECT(1); nprotect--; // dim
+      else if (mode==MODE_COLOR) {
+      	PROTECT (dim = allocVector( INTSXP, 4));
+      	nprotect++;
+      	INTEGER (dim)[0] = snx;
+      	INTEGER (dim)[1] = sny;
+      	INTEGER (dim)[2] = nbChannels;
+      	INTEGER (dim)[3] = nobj;
       }
-
+      SET_DIM (st, dim);
+      
       // set slot
       if (nz == 1 ) res = SET_SLOT(res, install(".Data"), st);
       else SET_VECTOR_ELT(res, im, SET_SLOT(VECTOR_ELT(res, im), install(".Data"), st) );
-      UNPROTECT( 1 ); nprotect--; // st
 
       // get xy
       if (nz == 1) xys = xy_list;
@@ -269,28 +253,24 @@ stackObjects (SEXP obj, SEXP ref, SEXP _bgcol, SEXP xy_list, SEXP extension) {
       
       // copy ref
       for (x = 0; x < nx; x++) {
-	for (y = 0; y < ny; y++) {
-	  index = dobj[x + y * nx] - 1; // background index 0 is not kept
-	  if (index < 0) continue;
-	 
-	  // target frame x, y coordinates
-	  xx = x - floor(xy[index]) + ext + 1 ;
-	  yy = y - floor(xy[index + nobj]) + ext + 1;
-	  
-	  if ( xx < 0 || xx >= snx || yy < 0 || yy >= sny ) continue;
-	  else {
-	    pxi = xx + yy * snx;
-	    if (mode==MODE_GRAYSCALE) dst[ pxi + index * sny * snx ] = dref[x + y * nx + im*nx*ny];
-	    else { 
-	      redstride = index*3*snx*sny + 0*snx*sny;
-	      greenstride = index*3*snx*sny + 1*snx*sny;
-	      bluestride = index*3*snx*sny + 2*snx*sny;
-	      dst[pxi + redstride] = dref[x + y * nx + redstridet];
-	      dst[pxi + greenstride] = dref[x + y * nx + greenstridet];
-	      dst[pxi + bluestride] = dref[x + y * nx + bluestridet];
-	    }	  
-	  }
-	}
+      	for (y = 0; y < ny; y++) {
+      	  index = dobj[x + y * nx] - 1; // background index 0 is not kept
+      	  if (index < 0) continue;
+      	 
+      	  // target frame x, y coordinates
+      	  xx = x - floor(xy[index]) + ext + 1 ;
+      	  yy = y - floor(xy[index + nobj]) + ext + 1;
+      	  
+      	  if ( xx < 0 || xx >= snx || yy < 0 || yy >= sny ) continue;
+      	  else {
+      	    pxi = xx + yy * snx;
+            for(nc=0; nc<nbChannels; nc++) {
+              stride = im*nbChannels*nx*ny+nc*nx*ny;
+              shift = index*nbChannels*snx*sny + nc*snx*sny;
+              dst[pxi + shift] = dref[x + y * nx + stride];
+            }  
+      	  }
+      	}
       }
     } // nobj>0
     else {
