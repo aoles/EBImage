@@ -41,7 +41,7 @@ checkCompatibleImages=function(x, ref, type='total') {
   validImage(x)
   if (!missing(ref)) {
     validImage(ref)
-    if ( .numberOfFrames(x, type) != .numberOfFrames(ref, type) ) stop( "'", xn, "' and '", refn, "' must have the same ",type," number of frames" )
-    if ( any(dim(x)[1:2] != dim(ref)[1:2]) ) stop( "'", xn, "' and '", refn, "' must have the same spatial 2D dimensions" )
+    if ( .numberOfFrames(x, type) != .numberOfFrames(ref, type) ) stop(sprintf("'%s' and '%s' must have the same number of '%s' frames", xn, refn, type))
+    if ( any(dim(x)[1:2] != dim(ref)[1:2]) ) stop(sprintf("'%s' and '%s' must have the same spatial 2D dimensions", xn, refn, type))
   }
 }

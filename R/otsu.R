@@ -4,8 +4,9 @@ otsu <- function(x, range = c(0, 1), levels = 256){
   if ( colorMode(x) != Grayscale ) stop("Only thresholding of Grayscale images is supported.")
   if ( !is.numeric(range) || length(range) != 2 ) stop("'range' must be a numeric vector of length 2.")
   levels = as.integer(levels)
-  if ( is.na(levels) || levels < 1 ) stop("Levels must be at least equal 1.") 
+  if ( is.na(levels) || levels < 1 ) stop("Levels must be at least equal 1.")
   breaks = seq(range[1], range[2], length.out = levels+1)
+  x = castImage(x)  # converts logical to numeric
   
 # prepare 3D array for the 'apply' function
   dim(x) = c(dim(x)[seq_len(2)], .numberOfFrames(x, 'total', Grayscale))

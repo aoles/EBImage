@@ -25,25 +25,29 @@ makeBrush = function(size, shape=c('box', 'disc', 'diamond', 'Gaussian', 'line')
   else if (shape == 'line') {
     angle = angle %% 180
     angle.radians = angle * pi / 180;
-    z.y = ceiling(abs(cos(angle.radians) * size))
-    z.x = ceiling(abs(sin(angle.radians) * size))
-    if (z.y == 0)
-      z.y = 1
-    if (z.x == 0)
-      z.x = 1
-    z = array(0, dim=c(z.y, z.x));
-    for (i in 1:size) {
-      i.y = ceiling(cos(angle.radians) * i)
-      i.x = ceiling(sin(angle.radians) * i)
-      if (i.y < 0)
-        i.y = z.y + i.y
-      if (i.x < 0)
-        i.x = z.x + i.x
-      if (i.y == 0)
-        i.y = 1
-      if (i.x == 0)
-        i.x = 1
-      z[i.y, i.x] = 1
+    tg = tan(angle.radians)
+    sizeh = (size-1)/2
+    if ( angle < 45 || angle > 135) {
+      z.x = sizeh
+      z.y = round(sizeh*tg)
+    }
+    else {
+      z.y = sizeh
+      z.x = round(sizeh/tg)
+    }
+    z = array(0, dim=2*c(z.x, z.y)+1);
+    for (i in -sizeh:sizeh) {
+      if ( angle < 45 || angle > 135) {
+        ## scan horizontally
+        i.x = i
+        i.y = round(i*tg)
+      }
+      else {
+        ## scan vertically
+        i.y = i
+        i.x = round(i/tg) 
+      }
+      z[i.x+z.x+1, i.y+z.y+1] = 1
     }
   }
   else if (shape=='gaussian') {
