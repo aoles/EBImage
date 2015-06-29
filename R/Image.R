@@ -714,21 +714,23 @@ setMethod ("hist", signature(x="Image"),
 combineImages = function (x, y, ...) {
   dx = dim(x)
   dy = dim(y)
+  cx = colorMode(x)
+  cy = colorMode(y)
   
   if ( dx[1] != dy[1] || dx[2] != dy[2] ) stop("images must have the same 2D frame size to be combined")
-  if ( colorMode(x) != colorMode(y) ) stop("images must have the same color mode to be combined")
+  if ( cx != cy ) stop("images must have the same color mode to be combined")
   
   ## merging along position guided by colorMode
-  colormode = colorMode(x)
-  along = if (colormode == Color) 4L else 3L
+  along = if (cx == Color) 4L else 3L
   
   ## add extra dimension in case of single frame Color Images
   if (along == 4L) {
-    if(colorMode(x)==Color && length(dx)==2) dim(x) = c(dx, 1)
-    if(colorMode(y)==Color && length(dy)==2) dim(y) = c(dy, 1)
+    if (length(dx)==2L) dim(x) = c(dx, 1)
+    if (length(dy)==2L) dim(y) = c(dy, 1)
   }
   z = abind(x, y, along = along)
-  dimnames(z) = NULL
+  ## don't introduce unnecessary dimnames
+  if ( is.null(dimnames(x)) && is.null(dimnames(y)) ) dimnames(z) = NULL
   imageData(x) = z
     
   validObject(x)
@@ -790,9 +792,10 @@ rgbImage = function(red=NULL, green=NULL, blue=NULL) {
   if (is.null(red)) red = array(0, dim=d)
   if (is.null(green)) green = array(0, dim=d)
   if (is.null(blue)) blue = array(0, dim=d)
-
+  
   x = abind(red, green, blue, along=2.5)
-  dimnames(x) = NULL
+  ## don't introduce unnecessary dimnames
+  if ( all(vapply(list(red, green, blue), function(x) is.null(dimnames(x)), logical(1L))) ) dimnames(x) = NULL
   
   new("Image", .Data = x, colormode = Color)
 }

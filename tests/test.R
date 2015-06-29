@@ -74,16 +74,24 @@ testEBImageFunctions <- function(x) {
   z <- check("flip", x)
   z <- check("flop", x)
   z <- check("translate", x, c(-7, 5))
-  z <- check("affine", x, matrix(c(-7, 5, 0.1, -0.2, 0.3, 1), ncol=2))
+  z <- check("affine", x, matrix(c(-7, 5, 0.1, -0.2, 0.3, 1), ncol=2L))
   z <- check("transpose", x)
 
   ## segmentation
   z <- check("thresh", x)
-  y <- check("bwlabel", x>0.5)
+  y <- check("channel", x, "luminance")
+  z <- check("otsu", y)
+  y <- check("bwlabel", normalize(y, separate=FALSE) > 0.5)
   z <- check("colorLabels", y)
-  z <- check("rmObjects", getFrame(y, 1), 3)
-  z <- check("reenumerate", y)
-  z <- paintObjects(channel(y, "gray"), x)
+  z <- check("stackObjects", y, x)
+  z <- check("paintObjects", y, x, col=c("#ff00ff", "#ffff00"), opac=c(1.0, 0.5))  
+  z <- check("rmObjects", y, as.list(seq_len(numberOfFrames(y))), FALSE)
+  z <- check("reenumerate", z)
+  
+  ## features
+  z <- check("computeFeatures", getFrame(y, 1), getFrame(x, 1), expandRef=NULL)
+  
+  ## curvature
   y <- check("ocontour", x>0.5)
   z <- check("localCurvature", y[[1]])
 
@@ -95,7 +103,7 @@ testEBImageFunctions <- function(x) {
   z <- check("equalize", x)
 
   ## morphological operations
-  y <- x>0.5
+  y <- x > 0.5
   z <- check("erode", y)
   z <- check("dilate", y)
   z <- check("opening", y, makeBrush(5, 'line'))
@@ -113,7 +121,7 @@ testEBImageFunctions <- function(x) {
   z <- check("selfcomplementaryTopHatGrayscale", x)
 
   ## colorspace
-  z <- check("channel", x, "rgb")
+  z <- check("toRGB", x)
   z <- check("rgbImage", x, x>0.5)
 
   ## image stacking, combining, tiling
@@ -121,9 +129,6 @@ testEBImageFunctions <- function(x) {
   y <- check("tile", x, nx=2)
   z <- check("untile", y, c(2,2))
 
-  ## features
-  y <- getFrame(x, 1)
-  z <- check("computeFeatures", bwlabel(y>0.5), y, expandRef=NULL)
   cat("\n")
 }
 
@@ -156,5 +161,5 @@ testEBImageFunctions(x)
 
 ## test: 4D Grayscale
 colorMode(x) <- Grayscale
-imageData(x) <- aperm(x, c(2, 1, 4, 3))
+imageData(x) <- aperm(x, c(2L, 1L, 4L, 3L))
 testEBImageFunctions(x)

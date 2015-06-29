@@ -46,11 +46,12 @@ paintObjects = function (x, tgt, opac=c(1, 1), col=c('red', NA), thick=FALSE, cl
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 stackObjects = function (x, ref, combine=TRUE, bg.col='black', ext) {
   ## check arguments
+  if (colorMode(x) != Grayscale) stop("'x' must be an image in 'Grayscale' color mode or an array")
   checkCompatibleImages(x, ref, 'render')
   nz = .numberOfFrames(x, 'total')
-    
+  
   ## uses 'computeFeatures.moment' to get centers and theta
-  hf = lapply(seq_len(nz), function(i) computeFeatures.moment(getFrame(x, i)))
+  hf = lapply(getFrames(x), computeFeatures.moment)
 
   if (missing(ext)) {
     ext = unlist(sapply(hf, function(h) h[, 'm.majoraxis']))/2
@@ -59,10 +60,10 @@ stackObjects = function (x, ref, combine=TRUE, bg.col='black', ext) {
   xy = lapply(hf, function(h) h[,c('m.cx', 'm.cy'), drop=FALSE])
   if (nz==1) xy = xy[[1]]
   bg.col = Image(bg.col, colormode=colorMode(ref))
-    
-  res = .Call(C_stackObjects, castImage(x), castImage(ref), bg.col, xy, as.numeric(ext))
-  if (!combine || !is.list(res)) res
-  else combine(res)
+  
+ res = .Call(C_stackObjects, castImage(x), castImage(ref), bg.col, xy, as.numeric(ext))
+ if (!combine || !is.list(res)) res
+ else combine(res)
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
