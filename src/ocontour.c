@@ -4,7 +4,7 @@
 #include <Rdefines.h>
 #include "ocontour.h"
 
-#define MAX_NB_POINTS 32768
+#define MAX_NB_POINTS 65535
 
 static int rotr[8]={-1,-1,-1,0,1,1,1,0};
 static int rotc[8]={-1,0,1,1,1,0,-1,-1};
@@ -30,11 +30,11 @@ SEXP ocontour(SEXP _image) {
   nbCells++;
  
   // Output result
-  PROTECT(_res = allocVector(VECSXP, nbCells));
+  _res = PROTECT(allocVector(VECSXP, nbCells));
   nprotect++;
 
   // Temporary vector to store the current oriented contour
-  octemp=(int *)R_Calloc(MAX_NB_POINTS*2, int);
+  octemp=(int *)R_Calloc(MAX_NB_POINTS*2+1, int);
 
   // For each object, except the 0-th one (background)
   for (k=1; k<nbCells; k++) {
@@ -54,30 +54,30 @@ SEXP ocontour(SEXP _image) {
       // Turn around the edges of the object
       direction=0;
       do {
-	// Stores (r,c) in the oriented contour matrix
-	octemp[2*nboc]=r;
-	octemp[2*nboc+1]=c;
-	if (nboc<MAX_NB_POINTS) nboc++;
-	
-	// Change direction
-	for (j=0; j<8; j++) {
-	  ndirection=(j+direction)%8;
-	  nr=r+rotr[ndirection];
-	  nc=c+rotc[ndirection];
-	  if (nr>=0 && nc>=0 && nr<height && nc<width) {
-	    if (image[nr+nc*height]==k) break;
-	  }
-	}
-	if (j!=8) {
-	  direction=dir[(nr-r+1)+3*(nc-c+1)];
-	  r=nr;
-	  c=nc;
-	}
+      	// Stores (r,c) in the oriented contour matrix
+      	octemp[2*nboc]=r;
+      	octemp[2*nboc+1]=c;
+      	if (nboc<MAX_NB_POINTS) nboc++;
+        
+      	// Change direction
+      	for (j=0; j<8; j++) {
+      	  ndirection=(j+direction)%8;
+      	  nr=r+rotr[ndirection];
+      	  nc=c+rotc[ndirection];
+      	  if (nr>=0 && nc>=0 && nr<height && nc<width) {
+      	    if (image[nr+nc*height]==k) break;
+      	  }
+      	}
+      	if (j!=8) {
+      	  direction=dir[(nr-r+1)+3*(nc-c+1)];
+      	  r=nr;
+      	  c=nc;
+      	}
       } while (r!=ocr || c!=occ);
     }
-    
     // Copy octemp in an element of _res
-    _oc=allocVector(INTSXP, nboc*2);
+    _oc = PROTECT(allocVector(INTSXP, nboc*2));
+    nprotect++;
     SET_VECTOR_ELT(_res, k, _oc);
     memcpy(INTEGER(_oc), octemp, nboc*2*sizeof(int));
   } // k
