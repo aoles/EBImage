@@ -47,20 +47,20 @@ tile (SEXP obj, SEXP _hdr, SEXP params) {
   if (mode!=MODE_COLOR) {
     PROTECT ( dm = allocVector( INTSXP, 2) );
     nprotect++;
-    INTEGER (dm)[0] = nxr;
-    INTEGER (dm)[1] = nyr;
   } else {
     PROTECT ( dm = allocVector( INTSXP, 3) );
     nprotect++;
-    INTEGER (dm)[0] = nxr;
-    INTEGER (dm)[1] = nyr;
     INTEGER (dm)[2] = nc;
   }
-  SET_DIM ( ims, dm ) ;
+  INTEGER (dm)[0] = nxr;
+  INTEGER (dm)[1] = nyr;
+  
+  SET_DIM ( ims, dm ) ;  
 
   /* create resulting image from header */
   PROTECT( res = Rf_duplicate(obj) );
   nprotect++;
+  SET_DIMNAMES (res, R_NilValue);
   if (strcmp( CHAR( asChar( GET_CLASS(obj) ) ), "Image") == 0) {
     res = SET_SLOT( res, install(".Data"), ims );
   } else res=ims;
