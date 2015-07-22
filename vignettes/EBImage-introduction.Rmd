@@ -460,7 +460,7 @@ logo_dilate = dilate(logo, kern)
 display(combine(logo_erode, logo_dilate), all=TRUE)
 ```
 
-Opening and closing are combinations of the two operations above: opening performs erosion followed by dilation, while closing does the opposite, i.e, performs dilation followed by erosion. Opening is useful for morphological noise removal, as it removes small objects from the foreground, and closing can be used to fill small holes in the foreground. These operations are implemented by `opening` and `closing`. 
+Opening and closing are combinations of the two operations above: opening performs erosion followed by dilation, while closing does the opposite, i.e, performs dilation followed by erosion. Opening is useful for morphological noise removal, as it removes small objects from the background, and closing can be used to fill small holes in the foreground. These operations are implemented by `opening` and `closing`. 
 
 Functions to perform morphology operations on grayscale images have "Grayscale" appended to their names, e.g., `erodeGrayscale` or `closingGrayscale`.
 
