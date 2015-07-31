@@ -1,5 +1,5 @@
 
-otsu <- function(x, range = c(0, 1), levels = 256){
+otsu <- function(x, range = c(min(x), max(x)), levels = 256){
   validImage(x)
   if ( colorMode(x) != Grayscale ) stop("Only thresholding of Grayscale images is supported.")
   if ( !is.numeric(range) || length(range) != 2 ) stop("'range' must be a numeric vector of length 2.")
