@@ -334,7 +334,7 @@ splitObjects = function(x) {
 
 .haralickMatrix <- function(x, ref, nc=32) {
   checkCompatibleImages(x, ref)
-  rref <- range(ref)
+  rref <- range.default(ref)
   if ( rref[1] < 0 || rref[2] > 1 ) {
     ref[ref<0] = 0
     ref[ref>1] = 1
