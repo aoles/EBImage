@@ -19,7 +19,9 @@ check <- function(fun, x, ...) {
   passed <- TRUE
 
   cat("checking \'", fun, "\' ... ", sep="")
-  y=try(do.call(fun,c(list(x),list(...))), silent=TRUE)
+  opt = options(warn=-1)
+  y <- try(do.call(fun,c(list(x),list(...))), silent=TRUE)
+  options(opt)
   if (class(y)=="try-error" || ( is.Image(y) && !validObject(y)) ) {
     y <- NULL
     passed <- FALSE
@@ -30,6 +32,16 @@ check <- function(fun, x, ...) {
 
   y
 }
+
+checkIO <- function(x) {
+  cat("checking IO for \'", x, "\' ... ", sep="")
+  x <- get(x)
+  y <- try(identical(x, readImage(writeImage(x, tempfile("", fileext = ".tif")))), silent=TRUE)
+  if ( isTRUE(y) ) cat("OK\n") else cat("FAIL\n")
+  invisible(y)
+}
+
+testIOFunctions <- function(...) invisible(lapply(list(...), function(y) checkIO(y)))
 
 testEBImageFunctions <- function(x) {
   cat("new test (hash=", hash(x), ")\n", sep="")
@@ -60,7 +72,7 @@ testEBImageFunctions <- function(x) {
   radius <- c.x - 1
   nf <- numberOfFrames(x, "render")
   fill <- nf > 1
-  col = if ( colorMode(x)==Color ) "yellow" else 1
+  col <- if ( colorMode(x)==Color ) "yellow" else 1
   z <- check("drawCircle", x, c.x, c.x, radius, col, fill, nf)
   
   ## subset
@@ -73,7 +85,7 @@ testEBImageFunctions <- function(x) {
   z <- check("rotate", x, 20)
   z <- check("flip", x)
   z <- check("flop", x)
-  z <- check("translate", x, c(-7, 5))
+  z <- check("translate", x, c(-7, 5), bg.col=1)
   z <- check("affine", x, matrix(c(-7, 5, 0.1, -0.2, 0.3, 1), ncol=2L))
   z <- check("transpose", x)
 
@@ -84,7 +96,8 @@ testEBImageFunctions <- function(x) {
   y <- check("bwlabel", normalize(y, separate=FALSE) > 0.5)
   z <- check("colorLabels", y)
   z <- check("stackObjects", y, x)
-  z <- check("paintObjects", y, x, col=c("#ff00ff", "#ffff00"), opac=c(1.0, 0.5))  
+  cls <- if ( colorMode(x)==Color ) TRUE else FALSE
+  z <- check("paintObjects", y, x, col=c("#ff00ff", "#ffff00"), opac=c(1.0, 0.5), closed=cls)  
   z <- check("rmObjects", y, as.list(seq_len(numberOfFrames(y))), FALSE)
   z <- check("reenumerate", z)
   
@@ -105,9 +118,9 @@ testEBImageFunctions <- function(x) {
   ## morphological operations
   y <- x > 0.5
   z <- check("erode", y)
-  z <- check("dilate", y)
+  z <- check("dilate", y, makeBrush(5, 'disc'))
   z <- check("opening", y, makeBrush(5, 'line'))
-  z <- check("closing", y, makeBrush(5, 'disc'))
+  z <- check("closing", y, makeBrush(4, 'line', angle=30))
   z <- check("distmap", y)
   z <- check("watershed", y)
   z <- check('floodFill', y, c(10, 10), 0.5)
@@ -134,6 +147,10 @@ testEBImageFunctions <- function(x) {
 
 sample <- readImage(system.file("images","sample.png", package="EBImage"))
 sample.color <- readImage(system.file("images","sample-color.png", package="EBImage"))
+logo <- readImage("http://www.huber.embl.de/EBImage/logo.png")
+
+## test: IO operations
+testIOFunctions("sample", "sample.color", "logo")
 
 ## test: 2D Grayscale
 x <- sample[1:32, 1:48]
