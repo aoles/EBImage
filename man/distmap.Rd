@@ -47,5 +47,3 @@ distmap(x, metric=c('euclidean', 'manhattan'))
   dx = distmap(x)
   display(dx/10, title='Distance map of x')
 }
-
-

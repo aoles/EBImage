@@ -35,5 +35,3 @@ ocontour(x)
   plot(oc[[1]], type='l')
   points(oc[[1]], col=2)
 }
-
-

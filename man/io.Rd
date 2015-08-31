@@ -79,5 +79,3 @@ writeImage(x, files, type, quality = 100, bits.per.sample, compression = "none",
   files = writeImage(y, tempfile("", , ".jpeg"), quality = 85)
   cat("Files created: ", files, sep="\n")
 }
-
-

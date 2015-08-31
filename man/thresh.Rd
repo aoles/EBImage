@@ -49,4 +49,3 @@ thresh(x, w=5, h=5, offset=0.01)
 }
 
 \keyword{manip}
-

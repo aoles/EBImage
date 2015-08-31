@@ -536,15 +536,10 @@ getFrames = function(y, i, type = c('total', 'render')) {
   return(x)
 }
 
-## getNumberOfFrames
+## numberOfFrames
 ## If type='total', returns the total number of frames
 ## If type='render', return the number of frames to be rendered after color channel merging
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-getNumberOfFrames = function(y, type = c('total', 'render')) {
-  .Deprecated(new = "numberOfFrames")
-  .numberOfFrames(y, match.arg(type))
-}
-
 numberOfFrames = function(y, type = c('total', 'render')) .numberOfFrames(y, match.arg(type))
 
 ## have internal function .numberOfFrames for compatibility with .getFrame which

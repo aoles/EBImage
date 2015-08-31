@@ -45,4 +45,3 @@ The Gaussian filter is created with the function \code{makeBrush}.
   y = gblur(x, sigma=8)
   display(y, title='gblur(x, sigma=8)')
 }
-

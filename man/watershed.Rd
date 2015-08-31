@@ -66,4 +66,3 @@ watershed(x, tolerance=1, ext=1)
 }
 
 \keyword{manip}
-
