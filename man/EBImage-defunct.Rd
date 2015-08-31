@@ -1,10 +1,12 @@
 \name{EBImage-defunct}
 
 \alias{EBImage-defunct}
+\alias{animate}
 \alias{blur}
 \alias{drawtext}
 \alias{drawfont}
 \alias{getFeatures}
+\alias{getNumberOfFrames}
 \alias{hullFeatures}
 \alias{zernikeMoments}
 \alias{edgeProfile}
@@ -16,34 +18,47 @@
 \alias{smoments}
 \alias{cmoments}
 
-\docType{package}
+\title{Defunct functions in package \sQuote{EBImage}}
 
-\title{EBImage defunct functions}
+\description{These functions are defunct and no longer available.}
 
-\description{
-  These following functions are defunct and will be removed in the next
-  Bioconductor release.
-}
-
-\usage{
-blur(...)
-drawtext(...)
-drawfont(...)
-getFeatures(...)
-hullFeatures(...)
-zernikeMoments(...)
-edgeProfile(...)
-edgeFeatures(...)
-haralickFeatures(...)
-haralickMatrix(...)
-moments(...)
-rmoments(...)
-smoments(...)
-cmoments(...)
-}
-
-\arguments{
-  \item{...}{Defunct arguments.}
+\details{
+  The following functions are defunct and no longer available; use
+  the replacement indicated below.
+  
+  \itemize{
+    \item{\code{animate}: \code{\link{display}}}
+  
+    \item{\code{blur}: \code{\link{gblur}}}
+  
+    \item{\code{drawtext}: see package vignette for documentation on how to add text labels to images}
+  
+    \item{\code{drawfont}: see package vignette for documentation on how to add text labels to images}
+  
+    \item{\code{getFeatures}: \code{\link{computeFeatures}}}
+  
+    \item{\code{getNumberOfFrames}: \code{\link{numberOfFrames}}}
+  
+    \item{\code{hullFeatures}: \code{\link{computeFeatures.shape}}}
+  
+    \item{\code{zernikeMoments}: \code{\link{computeFeatures}}}
+  
+    \item{\code{edgeProfile}: \code{\link{computeFeatures}}}
+  
+    \item{\code{edgeFeatures}: \code{\link{computeFeatures.shape}}}
+  
+    \item{\code{haralickFeatures}: \code{\link{computeFeatures}}}
+  
+    \item{\code{haralickMatrix}: \code{\link{computeFeatures}}}
+  
+    \item{\code{moments}: \code{\link{computeFeatures.moment}}}
+  
+    \item{\code{cmoments}: \code{\link{computeFeatures.moment}}}
+  
+    \item{\code{rmoments}: \code{\link{computeFeatures.moment}}}
+  
+    \item{\code{smoments}: \code{\link{computeFeatures.moment}}}
+  }
 }
 
 \keyword{package}

@@ -83,5 +83,3 @@ which just changes the way that EBImage renders an image.
 \author{
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}
 }
-
-

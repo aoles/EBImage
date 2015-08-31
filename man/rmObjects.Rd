@@ -76,6 +76,3 @@
 \author{
   Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006-2007
 }
-
-
-

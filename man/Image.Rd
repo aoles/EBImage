@@ -15,7 +15,6 @@
 \alias{colorMode<-}
 \alias{getFrame}
 \alias{getFrames}
-\alias{getNumberOfFrames}
 \alias{numberOfFrames}
 \alias{imageData}
 \alias{imageData<-}
@@ -149,5 +148,3 @@ numberOfFrames(y, type = c('total', 'render'))
   colorMode(x) = Color
   display(x, title='Cell nuclei in RGB')
 }
-
-
