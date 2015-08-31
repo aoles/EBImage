@@ -26,21 +26,27 @@ Type 'q()' to quit R.
 > hash <- function(x) {
 +   if (is.list(x)) hash(sapply(x,hash))
 +   else {
-+     xd <- as.numeric(x)
-+     xd <- xd[!is.nan(xd)]
-+     if (is.matrix(xd)) sum(xd*(1:length(xd))) + 0.7*hash(dim(xd))
-+     else sum(xd*(1:length(xd))) - 0.1
++     xd <- suppressWarnings(as.numeric(x))
++     xd <- xd[!(is.nan(xd)||is.na(xd))]
++     lxd <- length(xd)
++     if (lxd==0L) NA
++     else {
++       if (is.matrix(xd)) sum(xd*(1:lxd)) + 0.7*hash(dim(xd))
++       else sum(xd*(1:lxd)) - 0.1
++     }
 +   }
 + }
 > 
 > ## try to evaluate fun(x,...) 
-> check <- function(fun, x, ...) {
+> check <- function(fun, x, ..., capture.output=FALSE) {
 +   passed <- TRUE
 + 
 +   cat("checking \'", fun, "\' ... ", sep="")
-+   opt = options(warn=-1)
-+   y <- try(do.call(fun,c(list(x),list(...))), silent=TRUE)
-+   options(opt)
++   
++   expr = quote(do.call(fun,c(list(x),list(...))))
++   if (isTRUE(capture.output)) expr = call("capture.output", expr)
++   y <- try(suppressWarnings(eval(expr)), silent=TRUE)
++   
 +   if (class(y)=="try-error" || ( is.Image(y) && !validObject(y)) ) {
 +     y <- NULL
 +     passed <- FALSE
@@ -64,7 +70,10 @@ Type 'q()' to quit R.
 > 
 > testEBImageFunctions <- function(x) {
 +   cat("new test (hash=", hash(x), ")\n", sep="")
-+ 
++   
++   z <- check("show", x, capture.output=TRUE)
++   z <- check("print", x, short=TRUE, capture.output=TRUE)
++   
 +   ## pixel arithmetic
 +   z <- check(">", x, 0.5)
 +   z <- check("+", x, x)
@@ -80,8 +89,8 @@ Type 'q()' to quit R.
 +   z <- check("imageData", x)
 +   z <- check("imageData<-", x, z)
 +   z <- check("colorMode<-", x, Grayscale)
-+   z <- check("numberOfFrames", x, type="render")
-+   z <- check("getFrames", x)
++   y <- check("numberOfFrames", x, type="render")
++   z <- if ( y==1L ) check("getFrames", x, 1L, "render") else check("getFrames", x)
 +   z <- check("display", x, all=TRUE)
 +   
 +   ## drawCircle
@@ -164,20 +173,31 @@ Type 'q()' to quit R.
 +   cat("\n")
 + }
 > 
+> ## check error handling
+> mock <- try(suppressWarnings(readImage(system.file("images", package="EBImage"), type="png")), silent=TRUE)
+> mock <- try(suppressWarnings(readImage("http://www.huber.embl.de/EBImage/missing.file ", type="png")), silent=TRUE)
+> 
+> ## single greyscale and color images
 > sample <- readImage(system.file("images","sample.png", package="EBImage"))
 > sample.color <- readImage(system.file("images","sample-color.png", package="EBImage"))
+> ## multi-frame image stack
+> cells = readImage(system.file("images","nuclei.tif", package="EBImage"))
+> ## test reading from URL
 > logo <- readImage("http://www.huber.embl.de/EBImage/logo.png")
 > 
 > ## test: IO operations
-> testIOFunctions("sample", "sample.color", "logo")
+> testIOFunctions("sample", "sample.color", "cells", "logo")
 checking IO for 'sample' ... OK
 checking IO for 'sample.color' ... OK
+checking IO for 'cells' ... OK
 checking IO for 'logo' ... OK
 > 
 > ## test: 2D Grayscale
 > x <- sample[1:32, 1:48]
-> testEBImageFunctions(x)
+> testEBImageFunctions(as.array(x))
 new test (hash=765760.9)
+checking 'show' ... OK (hash=NA)
+checking 'print' ... OK (hash=NA)
 checking '>' ... OK (hash=988518.9)
 checking '+' ... OK (hash=1531522)
 checking '/' ... OK (hash=382880.4)
@@ -186,13 +206,13 @@ checking 'transpose' ... OK (hash=652051.4)
 checking 'median' ... OK (hash=0.5039216)
 checking 'Image' ... OK (hash=765760.9)
 checking 'as.Image' ... OK (hash=765760.9)
-checking 'is.Image' ... OK (hash=0.9)
+checking 'is.Image' ... OK (hash=-0.1)
 checking 'imageData' ... OK (hash=765760.9)
 checking 'imageData<-' ... OK (hash=765760.9)
-checking 'colorMode<-' ... OK (hash=765760.9)
+checking 'colorMode<-' ... OK (hash=NA)
 checking 'numberOfFrames' ... OK (hash=0.9)
 checking 'getFrames' ... OK (hash=765760.8)
-checking 'display' ... OK (hash=-0.1)
+checking 'display' ... OK (hash=NA)
 checking 'drawCircle' ... OK (hash=783607.7)
 checking '[' ... OK (hash=1285.273)
 checking 'resize' ... OK (hash=2892296)
@@ -242,10 +262,11 @@ checking 'untile' ... OK (hash=3086653)
 
 > 
 > ## test: 2D Color
-> colorMode(x) <- Color
 > x <- t(x)
-> testEBImageFunctions(x)
+> testEBImageFunctions(Image(as.vector(x), dim(x), Color))
 new test (hash=652051.4)
+checking 'show' ... OK (hash=NA)
+checking 'print' ... OK (hash=NA)
 checking '>' ... OK (hash=729326.9)
 checking '+' ... OK (hash=1304103)
 checking '/' ... OK (hash=326025.7)
@@ -260,7 +281,7 @@ checking 'imageData<-' ... OK (hash=652051.4)
 checking 'colorMode<-' ... OK (hash=652051.4)
 checking 'numberOfFrames' ... OK (hash=0.9)
 checking 'getFrames' ... OK (hash=652051.3)
-checking 'display' ... OK (hash=-0.1)
+checking 'display' ... OK (hash=NA)
 checking 'drawCircle' ... OK (hash=676219)
 checking '[' ... OK (hash=1308.398)
 checking 'resize' ... OK (hash=2514000)
@@ -313,6 +334,8 @@ checking 'untile' ... OK (hash=2792774)
 > x <- sample.color[1:65, 1:17,]
 > testEBImageFunctions(x)
 new test (hash=2036151)
+checking 'show' ... OK (hash=NA)
+checking 'print' ... OK (hash=NA)
 checking '>' ... OK (hash=1058553)
 checking '+' ... OK (hash=4072301)
 checking '/' ... OK (hash=1018075)
@@ -326,8 +349,8 @@ checking 'imageData' ... OK (hash=2036151)
 checking 'imageData<-' ... OK (hash=2036151)
 checking 'colorMode<-' ... OK (hash=2036151)
 checking 'numberOfFrames' ... OK (hash=0.9)
-checking 'getFrames' ... OK (hash=1408210)
-checking 'display' ... OK (hash=-0.1)
+checking 'getFrames' ... OK (hash=2036151)
+checking 'display' ... OK (hash=NA)
 checking 'drawCircle' ... OK (hash=2051226)
 checking '[' ... OK (hash=9950.096)
 checking 'resize' ... OK (hash=14861531)
@@ -382,6 +405,8 @@ checking 'untile' ... OK (hash=11979224)
 > x <- combine(x, x)
 > testEBImageFunctions(x)
 new test (hash=1055560)
+checking 'show' ... OK (hash=NA)
+checking 'print' ... OK (hash=NA)
 checking '>' ... OK (hash=1055560)
 checking '+' ... OK (hash=2111120)
 checking '/' ... OK (hash=527779.9)
@@ -395,7 +420,7 @@ checking 'imageData<-' ... OK (hash=1055560)
 checking 'colorMode<-' ... OK (hash=1055560)
 checking 'numberOfFrames' ... OK (hash=1.9)
 checking 'getFrames' ... OK (hash=916715.6)
-checking 'display' ... OK (hash=-0.1)
+checking 'display' ... OK (hash=NA)
 checking 'drawCircle' ... OK (hash=1662517)
 checking '[' ... OK (hash=1889.9)
 checking 'resize' ... OK (hash=8793638)
@@ -449,6 +474,8 @@ checking 'untile' ... OK (hash=1026938)
 > x <- combine(x, x)
 > testEBImageFunctions(x)
 new test (hash=2354709)
+checking 'show' ... OK (hash=NA)
+checking 'print' ... OK (hash=NA)
 checking '>' ... OK (hash=2013322)
 checking '+' ... OK (hash=4709417)
 checking '/' ... OK (hash=1177354)
@@ -463,7 +490,7 @@ checking 'imageData<-' ... OK (hash=2354709)
 checking 'colorMode<-' ... OK (hash=2354709)
 checking 'numberOfFrames' ... OK (hash=1.9)
 checking 'getFrames' ... OK (hash=1440422)
-checking 'display' ... OK (hash=-0.1)
+checking 'display' ... OK (hash=NA)
 checking 'drawCircle' ... OK (hash=2598839)
 checking '[' ... OK (hash=40701.82)
 checking 'resize' ... OK (hash=74670396)
@@ -517,6 +544,8 @@ checking 'untile' ... OK (hash=1881137)
 > imageData(x) <- aperm(x, c(2L, 1L, 4L, 3L))
 > testEBImageFunctions(x)
 new test (hash=2233136)
+checking 'show' ... OK (hash=NA)
+checking 'print' ... OK (hash=NA)
 checking '>' ... OK (hash=1541186)
 checking '+' ... OK (hash=4466272)
 checking '/' ... OK (hash=1116568)
@@ -531,7 +560,7 @@ checking 'imageData<-' ... OK (hash=2233136)
 checking 'colorMode<-' ... OK (hash=2233136)
 checking 'numberOfFrames' ... OK (hash=5.9)
 checking 'getFrames' ... OK (hash=1229859)
-checking 'display' ... OK (hash=-0.1)
+checking 'display' ... OK (hash=NA)
 checking 'drawCircle' ... OK (hash=2497845)
 checking '[' ... OK (hash=41200.75)
 checking 'resize' ... OK (hash=71367854)

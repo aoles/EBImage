@@ -7,21 +7,27 @@ set.seed(0) # make random color permutations in 'colorLabels' reproducible
 hash <- function(x) {
   if (is.list(x)) hash(sapply(x,hash))
   else {
-    xd <- as.numeric(x)
-    xd <- xd[!is.nan(xd)]
-    if (is.matrix(xd)) sum(xd*(1:length(xd))) + 0.7*hash(dim(xd))
-    else sum(xd*(1:length(xd))) - 0.1
+    xd <- suppressWarnings(as.numeric(x))
+    xd <- xd[!(is.nan(xd)||is.na(xd))]
+    lxd <- length(xd)
+    if (lxd==0L) NA
+    else {
+      if (is.matrix(xd)) sum(xd*(1:lxd)) + 0.7*hash(dim(xd))
+      else sum(xd*(1:lxd)) - 0.1
+    }
   }
 }
 
 ## try to evaluate fun(x,...) 
-check <- function(fun, x, ...) {
+check <- function(fun, x, ..., capture.output=FALSE) {
   passed <- TRUE
 
   cat("checking \'", fun, "\' ... ", sep="")
-  opt = options(warn=-1)
-  y <- try(do.call(fun,c(list(x),list(...))), silent=TRUE)
-  options(opt)
+  
+  expr = quote(do.call(fun,c(list(x),list(...))))
+  if (isTRUE(capture.output)) expr = call("capture.output", expr)
+  y <- try(suppressWarnings(eval(expr)), silent=TRUE)
+  
   if (class(y)=="try-error" || ( is.Image(y) && !validObject(y)) ) {
     y <- NULL
     passed <- FALSE
@@ -45,7 +51,10 @@ testIOFunctions <- function(...) invisible(lapply(list(...), function(y) checkIO
 
 testEBImageFunctions <- function(x) {
   cat("new test (hash=", hash(x), ")\n", sep="")
-
+  
+  z <- check("show", x, capture.output=TRUE)
+  z <- check("print", x, short=TRUE, capture.output=TRUE)
+  
   ## pixel arithmetic
   z <- check(">", x, 0.5)
   z <- check("+", x, x)
@@ -61,8 +70,8 @@ testEBImageFunctions <- function(x) {
   z <- check("imageData", x)
   z <- check("imageData<-", x, z)
   z <- check("colorMode<-", x, Grayscale)
-  z <- check("numberOfFrames", x, type="render")
-  z <- check("getFrames", x)
+  y <- check("numberOfFrames", x, type="render")
+  z <- if ( y==1L ) check("getFrames", x, 1L, "render") else check("getFrames", x)
   z <- check("display", x, all=TRUE)
   
   ## drawCircle
@@ -145,21 +154,28 @@ testEBImageFunctions <- function(x) {
   cat("\n")
 }
 
+## check error handling
+mock <- try(suppressWarnings(readImage(system.file("images", package="EBImage"), type="png")), silent=TRUE)
+mock <- try(suppressWarnings(readImage("http://www.huber.embl.de/EBImage/missing.file ", type="png")), silent=TRUE)
+
+## single greyscale and color images
 sample <- readImage(system.file("images","sample.png", package="EBImage"))
 sample.color <- readImage(system.file("images","sample-color.png", package="EBImage"))
+## multi-frame image stack
+cells = readImage(system.file("images","nuclei.tif", package="EBImage"))
+## test reading from URL
 logo <- readImage("http://www.huber.embl.de/EBImage/logo.png")
 
 ## test: IO operations
-testIOFunctions("sample", "sample.color", "logo")
+testIOFunctions("sample", "sample.color", "cells", "logo")
 
 ## test: 2D Grayscale
 x <- sample[1:32, 1:48]
-testEBImageFunctions(x)
+testEBImageFunctions(as.array(x))
 
 ## test: 2D Color
-colorMode(x) <- Color
 x <- t(x)
-testEBImageFunctions(x)
+testEBImageFunctions(Image(as.vector(x), dim(x), Color))
 
 ## test: 3D Color
 x <- sample.color[1:65, 1:17,]
