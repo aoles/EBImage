@@ -121,5 +121,3 @@ propagate(x, seeds, mask=NULL, lambda=1e-4)
 
    [3] CellProfiler: http://www.cellprofiler.org
 }
-
-

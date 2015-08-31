@@ -65,4 +65,3 @@ untile(x, nim, lwd=1)
 }
 
 \keyword{manip}
-

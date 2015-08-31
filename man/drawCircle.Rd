@@ -47,5 +47,3 @@ drawCircle(img, x, y, radius, col, fill=FALSE, z=1)
   y = drawCircle(x, 200, 140, 57, col='yellow', fill=TRUE)
   display(y)
 }
-
-

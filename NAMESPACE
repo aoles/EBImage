@@ -79,16 +79,8 @@ export(computeFeatures.basic, computeFeatures.haralick, computeFeatures.moment, 
 export(standardExpandRef)
 export(localCurvature)
 
-## deprecated
-export(getNumberOfFrames)
-
 ## defunct
-export(blur)
-export(drawtext, drawfont)
-export(getFeatures, hullFeatures, zernikeMoments)
-export(edgeProfile, edgeFeatures)
-export(haralickFeatures, haralickMatrix)
-export(moments, cmoments, smoments, rmoments)
+export(getNumberOfFrames)
 
 ## methods extending S4 generics from the BiocGenerics package
 exportMethods(normalize, combine)

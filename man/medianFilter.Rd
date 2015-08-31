@@ -49,4 +49,3 @@ medianFilter(x, size, cacheSize=512)
 \references{
   [1] S. Perreault and P. Hebert, "Median Filtering in Constant Time", IEEE Trans Image Process 16(9), 2389-2394, 2007
 }
-
