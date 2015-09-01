@@ -9,7 +9,7 @@ display = function(x,
   method = match.arg(method, c("browser", "raster"))
 
   switch(method,
-    browser = displayInBrowser(x, title),
+    browser = displayInBrowser(x, title, ...),
     raster  = displayRaster(x, frame, all, ...) ) 
 
   invisible(NULL)
@@ -29,15 +29,13 @@ displayRaster = function(image, frame, all = FALSE, drawGrid = TRUE, ...){
   ## display a single frame only
   else {
     ## when the image contains a single frame only display it and don't care about the 'frame' argument at all
-    if (nf==1)
+    if (nf==1) 
       frame = 1
-    else 
-      if (missing(frame)) {
+    else if (missing(frame)) {
         frame = 1
         message("The image contains more than one frame: only the first one is displayed.\nTo display all frames use 'all = TRUE'.")
       }
-    else
-      if ( frame<1 || frame>nf ) stop("Incorrect number of frame: it must range between 1 and ", frame)
+    if ( frame<1 || frame>nf ) stop("Incorrect number of frame: it must range between 1 and ", frame)
     
     ncol = nrow = 1L
   }
@@ -69,6 +67,7 @@ displayRaster = function(image, frame, all = FALSE, drawGrid = TRUE, ...){
   }
 }
 
+# nocov start
 displayRaster.old = function(image, frame, all = FALSE, drawGrid = TRUE, ...){
   all = isTRUE(all)
   nf = .numberOfFrames(image, type="render")
@@ -124,11 +123,11 @@ displayRaster.old = function(image, frame, all = FALSE, drawGrid = TRUE, ...){
     abline(h = seq_len(nrow-1)*ydim + .5, v = seq_len(ncol-1)*xdim + .5, col = "white")
   }
 }
-
+# nocov end
 
 ## displays an image using JavaScript
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-displayInBrowser = function(x, title){
+displayInBrowser = function(x, title, ...){
   ## template and script files
   templateFile = system.file("viewer","display.template", package = "EBImage")
   cssFile = system.file("viewer","display.css", package = "EBImage")
@@ -147,6 +146,7 @@ displayInBrowser = function(x, title){
 
   ## get image parameters
   d = dim(x)
+  if ( length(d)==2L ) d = c(d, 1L)
   nf = .numberOfFrames(x, "render")
 
   ## fill-in in the template
@@ -171,10 +171,11 @@ displayInBrowser = function(x, title){
   ## create browser query
   query = paste0("file://", normalizePath(file.path(tempDir,"display.html")))
 
-  browseURL(query)
+  browseURL(query, ...)
 }
 
-## take plain array as input
+# nocov start
+# take plain array as input
 as.nativeRaster.old = function(x) {
   x = clipImage(x)
   x = round(x * 255)
@@ -192,5 +193,6 @@ as.nativeRaster.old = function(x) {
   attr(y, "channels") = 4L
   y
 }
+# nocov end
 
 as.nativeRaster = function(x) .Call(C_nativeRaster, castImage(x))  
