@@ -35,7 +35,7 @@ check <- function(fun, x, ..., capture.output=FALSE) {
 
   if (passed) cat("OK (hash=", hash(y), ")\n", sep="") 
   else cat("FAIL\n")
-
+  
   y
 }
 
@@ -72,7 +72,8 @@ testEBImageFunctions <- function(x) {
   z <- check("colorMode<-", x, Grayscale)
   y <- check("numberOfFrames", x, type="render")
   z <- if ( y==1L ) check("getFrames", x, 1L, "render") else check("getFrames", x)
-  z <- check("display", x, all=TRUE)
+  z <- check("display", x, method = "browser", browser = "false")
+  z <- check("display", x, method = "raster", all = (y > 2L), capture.output=TRUE)
   
   ## drawCircle
   d <- dim(x)
@@ -131,7 +132,7 @@ testEBImageFunctions <- function(x) {
   z <- check("opening", y, makeBrush(5, 'line'))
   z <- check("closing", y, makeBrush(4, 'line', angle=30))
   z <- check("distmap", y)
-  z <- check("watershed", y)
+  z <- check("watershed", z)
   z <- check('floodFill', y, c(10, 10), 0.5)
   z <- check('fillHull', y)
   z <- check("erodeGrayscale", x)
@@ -142,6 +143,12 @@ testEBImageFunctions <- function(x) {
   z <- check("blackTopHatGrayscale", x)
   z <- check("selfcomplementaryTopHatGrayscale", x)
 
+  ## propagate
+  y <- thresh(x, offset=0.02)
+  y <- fillHull(y)
+  y <- bwlabel(y)
+  z <- check("propagate", x, y, x>0.5)
+  
   ## colorspace
   z <- check("toRGB", x)
   z <- check("rgbImage", x, x>0.5)
@@ -162,18 +169,19 @@ mock <- try(suppressWarnings(readImage("http://www.huber.embl.de/EBImage/missing
 sample <- readImage(system.file("images","sample.png", package="EBImage"))
 sample.color <- readImage(system.file("images","sample-color.png", package="EBImage"))
 ## multi-frame image stack
-cells = readImage(system.file("images","nuclei.tif", package="EBImage"))
+nuclei = readImage(system.file("images","nuclei.tif", package="EBImage"))
 ## test reading from URL
 logo <- readImage("http://www.huber.embl.de/EBImage/logo.png")
 
 ## test: IO operations
-testIOFunctions("sample", "sample.color", "cells", "logo")
+testIOFunctions("sample", "sample.color", "nuclei", "logo")
 
 ## test: 2D Grayscale
-x <- sample[1:32, 1:48]
+x <- nuclei[50:113,208:255,2]
 testEBImageFunctions(as.array(x))
 
 ## test: 2D Color
+x <- sample[1:32, 1:48]
 x <- t(x)
 testEBImageFunctions(Image(as.vector(x), dim(x), Color))
 
