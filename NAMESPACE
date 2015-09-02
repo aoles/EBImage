@@ -28,7 +28,7 @@ S3method(as.Image, Image)
 S3method(as.Image, default)
 
 ## image IO, display
-exportMethods(show)
+exportMethods(show, image)
 export(readImage, writeImage)
 export(display)
 

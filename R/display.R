@@ -28,21 +28,20 @@ displayRaster = function(image, frame, all = FALSE, drawGrid = TRUE, ...){
   }
   ## display a single frame only
   else {
-    ## when the image contains a single frame only display it and don't care about the 'frame' argument at all
-    if (nf==1) 
-      frame = 1
-    else if (missing(frame)) {
-        frame = 1
-        message("The image contains more than one frame: only the first one is displayed.\nTo display all frames use 'all = TRUE'.")
-      }
-    if ( frame<1 || frame>nf ) stop("Incorrect number of frame: it must range between 1 and ", frame)
-    
+    if ( missing(frame) ) {
+      frame = 1L
+      if ( nf > 1L ) message("Only the first frame of the image stack is displayed.\nTo display all frames use 'all = TRUE'.")
+    }
+    else {
+      frame = as.integer(frame[1L])
+      if ( frame<1L || frame>nf ) stop( "Frame index out of range: 'frame' must be between 1 and ", nf)
+    }
     ncol = nrow = 1L
   }
   
-  dim <- dim(image) 
-  xdim <- dim[1]
-  ydim <- dim[2]
+  d <- dim(image) 
+  xdim <- d[1L]
+  ydim <- d[2L]
   
   xran = c(0, ncol*xdim) + .5
   yran = c(0, nrow*ydim) + .5
