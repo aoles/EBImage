@@ -19,14 +19,17 @@ hash <- function(x) {
 }
 
 ## try to evaluate fun(x,...) 
-check <- function(fun, x, ..., capture.output=FALSE) {
+check <- function(fun, x, ..., capture.output=FALSE, suppressWarnings=FALSE, suppressMessages=FALSE) {
   passed <- TRUE
 
   cat("checking \'", fun, "\' ... ", sep="")
   
   expr = quote(do.call(fun,c(list(x),list(...))))
-  if (isTRUE(capture.output)) expr = call("capture.output", expr)
-  y <- try(suppressWarnings(eval(expr)), silent=TRUE)
+  if ( isTRUE(capture.output) ) expr = call("capture.output", expr)
+  if ( isTRUE(suppressWarnings) ) expr = call("suppressWarnings", expr)
+  if ( isTRUE(suppressMessages) ) expr = call("suppressMessages", expr)
+  
+  y <- try(eval(expr), silent=TRUE)
   
   if (class(y)=="try-error" || ( is.Image(y) && !validObject(y)) ) {
     y <- NULL
@@ -42,7 +45,11 @@ check <- function(fun, x, ..., capture.output=FALSE) {
 checkIO <- function(x) {
   cat("checking IO for \'", x, "\' ... ", sep="")
   x <- get(x)
-  y <- try(identical(x, readImage(writeImage(x, tempfile("", fileext = ".tif")))), silent=TRUE)
+  y <- try({
+    xx <- readImage(writeImage(x, tempfile("", fileext = ".tif")))
+    dimnames(xx) <- dimnames(x)
+    identical(x, xx)
+    }, silent=TRUE)
   if ( isTRUE(y) ) cat("OK\n") else cat("FAIL\n")
   invisible(y)
 }
@@ -54,6 +61,10 @@ testEBImageFunctions <- function(x) {
   
   z <- check("show", x, capture.output=TRUE)
   z <- check("print", x, short=TRUE, capture.output=TRUE)
+  if ( typeof(x)=="logical" )
+    z <- check("hist", EBImage:::castImage(x), breaks = c(0, .5, 1))
+  else
+    z <- check("hist", x)
   
   ## pixel arithmetic
   z <- check(">", x, 0.5)
@@ -61,19 +72,28 @@ testEBImageFunctions <- function(x) {
   z <- check("/", x, 2)
   z <- check("*", 2, x)
   z <- check("transpose", x)
-  if (mode(x)!="logical") z <- check("median", x)
+  z <- check("median", x)
+  z <- check("quantile", x)
 
   ## image methods
-  z <- check("Image", x, colormode=Color)
+  z <- check("Image", x, colormode="Color")
   z <- check("as.Image", x)
   z <- check("is.Image", x)
   z <- check("imageData", x)
   z <- check("imageData<-", x, z)
-  z <- check("colorMode<-", x, Grayscale)
+  z <- check("as.raster", x)
+  z <- check("colorMode<-", x, Grayscale, suppressWarnings=TRUE)
   y <- check("numberOfFrames", x, type="render")
   z <- if ( y==1L ) check("getFrames", x, 1L, "render") else check("getFrames", x)
   z <- check("display", x, method = "browser", browser = "false")
-  z <- check("display", x, method = "raster", all = (y > 2L), capture.output=TRUE)
+  if ( y>2L ) {
+    z <- check("display", x, method = "raster", all = TRUE)
+    z <- check("image", x, i = 3L)
+  }
+  else {
+    z <- if (y==1L) check("display", x, method = "raster") else check("display", x, method = "raster", frame = 2L, suppressMessages=TRUE)
+    z <- check("image", x, suppressMessages=TRUE)
+  }
   
   ## drawCircle
   d <- dim(x)
@@ -107,8 +127,8 @@ testEBImageFunctions <- function(x) {
   z <- check("colorLabels", y)
   z <- check("stackObjects", y, x)
   cls <- if ( colorMode(x)==Color ) TRUE else FALSE
-  z <- check("paintObjects", y, x, col=c("#ff00ff", "#ffff00"), opac=c(1.0, 0.5), closed=cls)  
-  z <- check("rmObjects", y, as.list(seq_len(numberOfFrames(y))), FALSE)
+  z <- check("paintObjects", y, x, col=c("#ff00ff", "#ffff00"), opac=c(1.0, 0.5), thick=cls, closed=cls)  
+  z <- check("rmObjects", y, as.list(seq_len(numberOfFrames(y))), cls)
   z <- check("reenumerate", z)
   
   ## features
@@ -130,7 +150,7 @@ testEBImageFunctions <- function(x) {
   z <- check("erode", y)
   z <- check("dilate", y, makeBrush(5, 'disc'))
   z <- check("opening", y, makeBrush(5, 'line'))
-  z <- check("closing", y, makeBrush(4, 'line', angle=30))
+  z <- check("closing", y, makeBrush(4, 'line', angle=30), suppressWarnings=TRUE)
   z <- check("distmap", y)
   z <- check("watershed", z)
   z <- check('floodFill', y, c(10, 10), 0.5)
@@ -169,7 +189,8 @@ mock <- try(suppressWarnings(readImage("http://www.huber.embl.de/EBImage/missing
 sample <- readImage(system.file("images","sample.png", package="EBImage"))
 sample.color <- readImage(system.file("images","sample-color.png", package="EBImage"))
 ## multi-frame image stack
-nuclei = readImage(system.file("images","nuclei.tif", package="EBImage"))
+f = system.file("images","nuclei.tif", package="EBImage")
+nuclei = readImage(c(f, f))
 ## test reading from URL
 logo <- readImage("http://www.huber.embl.de/EBImage/logo.png")
 
