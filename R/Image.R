@@ -591,25 +591,25 @@ setMethod ("show", signature(object = "Image"), function(object) showImage(objec
 
 print.Image <- function(x, ...) showImage(x, ...)
 
-## GP: Useful ?
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("image", signature(x="Image"),
-  function(x, i, xlab = "", ylab = "", axes = FALSE, col=gray ((0:255) / 255), ...) {
-    dimx <- dim (x)
+  function(x, i, xlab = "", ylab = "", axes = FALSE, col = gray((0:255) / 255), useRaster = TRUE, ...) {
+    nf = .numberOfFrames(x, type="total")
+    
     if ( missing(i) ) {
-      if ( dimx[3] > 1 ) warning( "missing i for an image stack, assuming i=1" )
-      i <- 1
+      i = 1L
+      if ( nf > 1L ) message( "Missing frame index for an image stack, assuming 'i = 1'")
     }
-    i <- as.integer ( i[1] )
-    if ( i < 1 || i > dimx[3] )
-      stop( "index 'i' out of range" )
-    if ( any(dimx == 0) )
-      stop( "image size is zero, nothing to plot" )
-    X <- 1:dimx[1]
-    Y <- 1:dimx[2]
-    Z <- imageData(x[,,i])[, rev(Y), 1, drop=TRUE]
-    asp <- dimx[2] / dimx[1]
-    graphics:::image (x=X, y=Y, z=Z, asp=1, col=col, axes=axes, xlab=xlab, ylab=ylab, ...)
+    else {
+      i = as.integer(i[1L])
+      if ( i<1L || i>nf ) stop( "Frame index out of range: 'i' must be between 1 and ", nf)
+    }
+    
+    d <- dim(x)
+    X <- 1:d[1L]
+    Y <- 1:d[2L]
+    Z <- .getFrame(x, i, "total")
+    image.default(x=X, y=Y, z=Z, asp=1, col=col, axes=axes, xlab=xlab, ylab=ylab, useRaster=useRaster, ...)
   }
 )
 
@@ -681,11 +681,11 @@ toRGB = function(x) {
 setMethod ("hist", signature(x="Image"),
   function (x, breaks=64L, rg=range(x, na.rm=TRUE), main=paste("Image histogram:", length(x), "pixels"), xlab="Intensity", ...) {
     if ( !is.numeric(rg) || length(rg) != 2 ) stop("'range' must be a numeric vector of length 2.")
-    
-    if ( colorMode(x) != Grayscale ) {
-      colores = c("red", "green", "blue")
-      y = lapply(colores, function(m) imageData(channel(x, m)))
-      names(y) = colores
+    if ( colorMode(x)==Color ) {
+      d3 = dim(x)[3L]
+      nc = if ( is.na(d3) ) 1L else min(d3, 3L)
+      colores = c("red", "green", "blue")[1:nc]
+      y = sapply(colores, function(m) imageData(channel(x, m)), simplify = FALSE, USE.NAMES = TRUE)
     } else {
       y = list(black=imageData(x))
     }

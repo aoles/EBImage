@@ -23,9 +23,7 @@ typedef struct {
 typedef double numeric;
 
 double distanceXY (const PointXY, const PointXY);
-double distancexy (int, int, int, int);
 PointXY pointFromIndex (const int, const int);
-int indexFromPoint (const PointXY, const int);
 int indexFromXY (const int, const int, const int);
 int getColorMode (SEXP x);
 int validImage (SEXP x,int test);
