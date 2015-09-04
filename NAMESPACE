@@ -76,7 +76,7 @@ export(drawCircle)
 ## features extraction
 export(computeFeatures)
 export(computeFeatures.basic, computeFeatures.haralick, computeFeatures.moment, computeFeatures.shape)
-export(standardExpandRef)
+export(standardExpandRef, gblob)
 export(localCurvature)
 
 ## defunct

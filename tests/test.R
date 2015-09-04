@@ -5,7 +5,7 @@ set.seed(0) # make random color permutations in 'colorLabels' reproducible
 
 ## returns a hashcode given an object
 hash <- function(x) {
-  if (is.list(x)) hash(sapply(x,hash))
+  if ( is.list(x) && length(x)>0L ) hash(sapply(x, hash))
   else {
     xd <- suppressWarnings(as.numeric(x))
     xd <- xd[!(is.nan(xd)||is.na(xd))]
@@ -97,17 +97,17 @@ testEBImageFunctions <- function(x) {
   
   ## drawCircle
   d <- dim(x)
-  c.x <- round(d[1L]/2)
-  c.y <- round(d[2L]/2)
-  radius <- c.x - 1
+  c.x <- ceiling(d[1L]/2)
+  c.y <- ceiling(d[2L]/2)
+  radius <- max(c.x-1, 1)
   nf <- numberOfFrames(x, "render")
   fill <- nf > 1
   col <- if ( colorMode(x)==Color ) "yellow" else 1
   z <- check("drawCircle", x, c.x, c.x, radius, col, fill, nf)
   
   ## subset
-  sub <- list(x, 1:10, 1:7)
-  if (length(dim(x))>2) sub <- c(sub, rep(TRUE, length(dim(x))-2))
+  sub <- list(x, 1:min(10,d[1L]), 1:min(7,d[2L]))
+  if (length(d)>2) sub <- c(sub, rep(TRUE, length(d)-2))
   z <- do.call("check", c("[", sub))
 
   ## spatial transform
@@ -123,24 +123,32 @@ testEBImageFunctions <- function(x) {
   z <- check("thresh", x)
   y <- check("channel", x, "luminance")
   z <- check("otsu", y)
-  y <- check("bwlabel", normalize(y, separate=FALSE) > 0.5)
-  z <- check("colorLabels", y)
+  y <- suppressWarnings(normalize(y, separate=FALSE))
+  y[is.nan(y)] <- 0
+  y <- check("bwlabel", y > 0.5)
+  z <- check("colorLabels", y, suppressWarnings=TRUE)
   z <- check("stackObjects", y, x)
+  z <- check("stackObjects", Image(dim=dim(y)), x)
   cls <- if ( colorMode(x)==Color ) TRUE else FALSE
   z <- check("paintObjects", y, x, col=c("#ff00ff", "#ffff00"), opac=c(1.0, 0.5), thick=cls, closed=cls)  
   z <- check("rmObjects", y, as.list(seq_len(numberOfFrames(y))), cls)
   z <- check("reenumerate", z)
   
   ## features
-  z <- check("computeFeatures", getFrame(y, 1), getFrame(x, 1), expandRef=NULL)
+  x1 <- getFrame(x, 1)
+  x2 <- list(x=x1, y=2*x1)
+  y1 <- getFrame(y, 1)
+  expandRef <- if ( min(dim(x1)) > 31L ) function(ref, refnames) standardExpandRef(ref, refnames, gblob(n=31L)) else NULL
+  z <- check("computeFeatures", y1, x2, expandRef = expandRef)
+  z <- check("computeFeatures", y1, x2, expandRef = expandRef, properties = TRUE)
   
   ## curvature
   y <- check("ocontour", x>0.5)
-  z <- check("localCurvature", y[[1]])
+  if (length(y) > 0L ) z <- check("localCurvature", y[[1L]])
 
   ## filtering
-  z <- check("normalize", x)
-  z <- check("gblur", x, sigma=2)
+  z <- check("normalize", x, suppressWarnings=TRUE)
+  z <- check("gblur", x, sigma=1)
   z <- check("filter2", x, array(1, dim=c(5, 5)))
   z <- check("medianFilter", x, 3)
   z <- check("equalize", x)
@@ -153,7 +161,7 @@ testEBImageFunctions <- function(x) {
   z <- check("closing", y, makeBrush(4, 'line', angle=30), suppressWarnings=TRUE)
   z <- check("distmap", y)
   z <- check("watershed", z)
-  z <- check('floodFill', y, c(10, 10), 0.5)
+  z <- check('floodFill', y, c(5, 5), 0.5)
   z <- check('fillHull', y)
   z <- check("erodeGrayscale", x)
   z <- check("dilateGrayscale", x)
@@ -174,7 +182,7 @@ testEBImageFunctions <- function(x) {
   z <- check("rgbImage", x, x>0.5)
 
   ## image stacking, combining, tiling
-  z <- check("combine", x, x)
+  z <- check("combine", list(NULL, x, x, NULL, NULL))
   y <- check("tile", x, nx=2)
   z <- check("untile", y, c(2,2))
 
@@ -196,6 +204,9 @@ logo <- readImage("http://www.huber.embl.de/EBImage/logo.png")
 
 ## test: IO operations
 testIOFunctions("sample", "sample.color", "nuclei", "logo")
+
+## test: blank image
+testEBImageFunctions(Image(0, c(8, 8)))
 
 ## test: 2D Grayscale
 x <- nuclei[50:113,208:255,2]

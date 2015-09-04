@@ -1,15 +1,20 @@
 drawCircle <- function(img, x, y, radius, col, fill=FALSE, z=1) {
   validImage(img)
-  if (any(is.na(img))) stop("'x' shouldn't contain any NAs")
+  if ( any(is.na(img)) ) stop("'img' shouldn't contain any NAs")
 
+  toScalarInteger = function(x) suppressWarnings(as.integer(x)[1L])
+  
   ## check whether parameters are OK
-  if (missing(radius)) stop("'radius' is missing")
-  if (radius<1) stop("'radius' must be positive integer")
-  if (z<1 | z>.numberOfFrames(img, 'render')) stop("'z' must be a positive integer lower than the number of image frames")
-  xyzr = as.integer(c(x, y, z-1, radius))
-  if (length(xyzr)!=4 || any(is.na(xyzr))) stop("'x', 'y', 'z' and 'radius' must be scalar values")
-  fill = as.integer(fill)
-  if (length(fill)!=1)  stop("'fill' must be a logical")
+  r = toScalarInteger(radius)
+  if ( !isTRUE(r>0L) ) stop("'radius' must be a positive integer")
+  
+  z = toScalarInteger(z)
+  if ( !isTRUE(z>0L) || isTRUE(z>.numberOfFrames(img, 'render')) ) stop("'z' must be a positive integer lower than the number of image frames")
+  
+  xy = c(toScalarInteger(x), toScalarInteger(y))
+  if ( any(is.na(xy)) ) stop("'x', 'y' must be numeric scalars")
+  
+  fill = suppressWarnings(as.integer(isTRUE(as.logical(fill)[1L])))
   
   if (colorMode(img)==Color) {
     rgb = as.numeric(col2rgb(col)/255)
@@ -19,5 +24,5 @@ drawCircle <- function(img, x, y, radius, col, fill=FALSE, z=1) {
     if (length(rgb)!=3 || any(is.na(rgb))) stop("In Grayscale mode, 'col' must be a scalar value")
   }
   
-  invisible(.Call(C_drawCircle, castImage(img), xyzr, rgb, fill))
+  invisible(.Call(C_drawCircle, castImage(img), c(xy-1L, z-1L, r), rgb, fill))
 }

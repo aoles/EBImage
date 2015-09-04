@@ -28,9 +28,6 @@ See: ../LICENSE for license, LGPL
 #include <R_ext/Rdynload.h>
 #include <R_ext/Error.h>
 
-// C preferred way to get rid of 'unused parameter' warnings
-#define UNUSED(expr) do { (void)(expr); } while (0)
-
 #define CALLDEF(name, n)  {#name, (DL_FUNC) &name, n}
 
 static R_CallMethodDef CallEntries[] = {
@@ -65,8 +62,4 @@ static R_CallMethodDef CallEntries[] = {
 void R_init_EBImage (DllInfo *dll) {
     R_registerRoutines (dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols (dll, FALSE);
-}
-
-void R_unload_EBImage (DllInfo *dll) {
-    UNUSED(dll);
 }
