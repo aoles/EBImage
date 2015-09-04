@@ -5,6 +5,9 @@
 \alias{combine,matrix,matrix-method}
 \alias{combine,Image,Image-method}
 \alias{combine,list,missing-method}
+\alias{combine,ANY,NULL-method}
+\alias{combine,NULL,ANY-method}
+\alias{combine,NULL,NULL-method}
 
 \title{Combining images}
 
@@ -18,7 +21,7 @@ combine(x, y, ...)
 
 
 \arguments{
-   \item{x}{An \code{Image} object, an array, or a list of \code{Image} objects and arrays.}
+   \item{x}{An \code{Image} object, an array, or a list containing \code{Image} objects and arrays.}
    \item{y}{An \code{Image} object or an array.}
    \item{...}{\code{Image} objects or arrays.}
 }

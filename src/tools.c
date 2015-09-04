@@ -29,7 +29,6 @@ indexFromXY (const int x, const int y, const int xsize) {
 int
 validImage (SEXP x,int test) {
   int colorMode;
-  double *dp;
   char *msg=NULL;
 
   // check Nil
@@ -43,8 +42,6 @@ validImage (SEXP x,int test) {
     if (LENGTH(GET_DIM(x))<2) msg="object must contain at least two dimensions";
     if (INTEGER(GET_DIM(x))[0]<1 || INTEGER(GET_DIM(x))[1]<1) msg="spatial dimensions of object must be higher than zero"; 
     if (getNumberOfFrames(x,0)<1) msg="object must contain at least one frame";
-    
-    dp=REAL(x);
   }
 
   if (test==0 && msg!=NULL) error(msg);

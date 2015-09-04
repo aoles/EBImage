@@ -41,19 +41,15 @@ floodFill(SEXP x, SEXP point, SEXP col, SEXP tol) {
   
   // initialize result
   PROTECT(res = Rf_duplicate(x));
-  nprotect++;  
+  nprotect++;
   
   // do the job over images
  for (i=0; i<nz; i++) {
     pt.x = INTEGER(point)[i]-1;
     pt.y = INTEGER(point)[nz+i]-1;
     
-    if (pt.x < 0 || pt.x >= size.x || pt.y < 0 || pt.y >= size.y)
-      error("coordinates of the starting point must be inside the image boundaries");
-    
     if (IS_NUMERIC(res)) _floodFill<double>(&(REAL(res)[i*size.x*size.y]), size, pt, REAL(col)[i], REAL(tol)[0]);
     if (IS_INTEGER(res)) _floodFill<int>(&(INTEGER(res)[i*size.x*size.y]), size, pt, INTEGER(col)[i], REAL(tol)[0]);
-    
   }
 
   UNPROTECT (nprotect);
@@ -73,7 +69,6 @@ fillHull(SEXP x) {
 
   int *dim=INTEGER(GET_DIM(x));
   XYPoint size(dim[0], dim[1]);
-
 
   // return itself if nothing to do
   if (size.x <= 0 || size.y <= 0 || nz < 1) return x;

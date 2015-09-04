@@ -274,9 +274,8 @@ stackObjects (SEXP obj, SEXP ref, SEXP _bgcol, SEXP xy_list, SEXP extension) {
       }
     } // nobj>0
     else {
-      // set slot 
-      if (nz == 1 ) res = SET_SLOT(res, install(".Data"), R_NilValue);
-      else SET_VECTOR_ELT(res, im, SET_SLOT(VECTOR_ELT(res, im), install(".Data"), R_NilValue));
+      if (nz == 1) res = R_NilValue;
+      else SET_VECTOR_ELT(res, im, R_NilValue);
     } 
   } // im
 
