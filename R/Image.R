@@ -498,7 +498,7 @@ getFrames = function(y, i, type = c('total', 'render')) {
     i = seq_len(n)
   else {
     i = as.integer(i)
-    if ( any(i<1L) || any(i>n) ) stop("'i' must be a vector of numbers ranging from 1 to ", n)
+    if ( any( i<1L || i>n ) ) stop("'i' must be a vector of numbers ranging from 1 to ", n)
   }
   
   lapply(i, function(i) .getFrame(y, i, type, colormode))
@@ -741,11 +741,16 @@ setMethod("combine", signature("Image", "Image"), combineImages)
 ## special case of combining a list of images
 setMethod("combine", signature("list", "missing"), 
   function(x, y, ...) {
-    names(x) <- NULL
+    if (!is.null(names(x))) names(x) <- NULL
     do.call(combine, x)
   }
 )
-          
+
+## useful when combining image lists containing NULL elements
+setMethod("combine", signature("ANY", "NULL"), function(x, y, ...) x)
+setMethod("combine", signature("NULL", "ANY"), function(x, y, ...) y)
+setMethod("combine", signature("NULL", "NULL"), function(x, y, ...) NULL)
+
 ## Median & quantile redefinition
 ## needed to overcome an isObject() test in median() which greatly slows down median()
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

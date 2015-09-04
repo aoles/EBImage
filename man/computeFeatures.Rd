@@ -6,6 +6,7 @@
 \alias{computeFeatures.moment}
 \alias{computeFeatures.haralick}
 \alias{standardExpandRef}
+\alias{gblob}
   
 \title{Compute object features}
 
@@ -17,11 +18,13 @@
 computeFeatures(x, ref, methods.noref=c("computeFeatures.moment", "computeFeatures.shape"),
   methods.ref=c("computeFeatures.basic", "computeFeatures.moment", "computeFeatures.haralick"),
   xname="x", refnames, properties=FALSE, expandRef=standardExpandRef, ...)
+  
 computeFeatures.basic(x, ref, properties=FALSE, basic.quantiles=c(0.01, 0.05, 0.5, 0.95, 0.99), xs, ...)
 computeFeatures.shape(x, properties=FALSE, xs, ...)
 computeFeatures.moment(x, ref, properties=FALSE, xs, ...)
 computeFeatures.haralick(x, ref , properties=FALSE, haralick.nbins=32, haralick.scales=c(1, 2), xs, ...)
-standardExpandRef(ref, refnames)
+
+standardExpandRef(ref, refnames, filter = gblob())
 }
 
 \arguments{
@@ -54,6 +57,7 @@ standardExpandRef(ref, refnames)
     scales to use to compute the Haralick features.}
   \item{xs}{An optional temporary object created by
     \code{computeFeatures} used for performance considerations.}
+  \item{filter}{The filter applied to reference images using \code{\link{filter2}} in order to add granulometry.}
   \item{...}{Optional arguments passed to the feature computation functions.}
 }
 

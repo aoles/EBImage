@@ -1,4 +1,5 @@
 ## tests
+# nocov start
 tests = function() {
 
   ## build labeled image x and reference y
@@ -40,6 +41,7 @@ tests = function() {
   x2[100, 100] = 1
   ft = computeFeatures(x2, y)
 }
+# nocov end
 
 ## main function
 computeFeatures = function(x, ref, methods.noref=c("computeFeatures.moment", "computeFeatures.shape"),
@@ -99,7 +101,7 @@ computeFeatures = function(x, ref, methods.noref=c("computeFeatures.moment", "co
 }
 
 ## standard reference expansion
-standardExpandRef = function(ref, refnames) {
+standardExpandRef = function(ref, refnames, filter = gblob()) {
   ## check arguments
   ref = convertRef(ref, refnames)
   nref = length(ref)
@@ -119,8 +121,7 @@ standardExpandRef = function(ref, refnames) {
   }
 
   ## adding granulometry by blob transform
-  blob = gblob(x0=15, n=49, alpha=0.8, beta=1.2)
-  bref = lapply(ref, function(r) filter2(r, blob)/2)
+  bref = lapply(ref, function(r) filter2(r, filter)/2)
   names(bref) = paste0("B", names(ref))
   c(ref, bref)
 }
@@ -272,12 +273,11 @@ computeFeatures.haralick = function(x, ref, properties=FALSE, haralick.nbins=32,
 }
 
 ## make a blob
-## example: blob = gblob(x0=15, n=49, alpha=0.8, beta=1.2)
-gblob = function(x0, n, alpha, beta) {
+gblob = function(x0=15, n=49, alpha=0.8, beta=1.2) {
   xx = seq(-x0, x0, length.out=n)
   xx = matrix(xx, nrow=length(xx), ncol=length(xx))
   xx = sqrt(xx^2+t(xx)^2)
-  z = dnorm(xx, mean=0, sd=alpha) -  0.65*dnorm(xx, mean=0, sd=beta)
+  z = dnorm(xx, mean=0, sd=alpha) - 0.65*dnorm(xx, mean=0, sd=beta)
   z/sum(z)
 }
 
