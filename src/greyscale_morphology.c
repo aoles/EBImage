@@ -1,6 +1,6 @@
 /* -------------------------------------------------------------------------
 Morphological filters for greyscale images
-Copyright (c) 2012 Ilia Kats
+Copyright (c) 2012-2015 Ilia Kats, Andrzej Oles
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
 
@@ -23,44 +23,30 @@ if (occupied == buffer) {\
     pointer = R_Realloc(pointer, buffer, type);\
 }
 
+#define INDEX_FROM_XY(x, y, xsize) ((x) + (y) * (xsize))
+
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
+#define MAX(x, y) ((x) > (y) ? (x) : (y))
+
 typedef struct {
     int yOffset;
-    int xOffset;
-    int length;
-    int rIndex;
+    int xOffset1;
+    int xOffset2;
+    int n;
 } chord;
 
 typedef struct {
     chord *C;
-    int *R;
     int CLength;
-    int RLength;
     int minYoffset;
     int maxYoffset;
     int minXoffset;
     int maxXoffset;
-    int maxChordLength;
+    int maxN;
 } chordSet;
 
 
-typedef numeric (*compare) (numeric, numeric);
-
-int contains_int(int *array, int what, int array_length) {
-    for (int i = 0; i < array_length; i++) {
-        if (array[i] == what)
-            return i;
-    }
-    return -1;
-}
-
-void insert_in_int(int *array, int what, int where, int array_length) {
-    for (int i = array_length - 1; i >= where; --i) {
-        array[i + 1] = array[i];
-    }
-    array[where] = what;
-}
-
-void compute_lookup_table_for_line(numeric ***T, numeric *image, int yOff, int line, chordSet *set, PointXY size, compare minmax) {
+void compute_lookup_table_for_line_dilate(numeric ***T, numeric *image, int yOff, int line, chordSet *set, PointXY size) {
     int effectiveY;
     if (line + yOff >= size.y)
         effectiveY = size.y - 1;
@@ -68,35 +54,74 @@ void compute_lookup_table_for_line(numeric ***T, numeric *image, int yOff, int l
         effectiveY = line + yOff;
     else
         effectiveY = 0;
-    for (int i = 0; i < size.x; ++i) {
-
-        T[yOff][0][i] = image[indexFromXY(i, effectiveY, size.x)];
+  
+    int maxX = MIN(size.x, size.x + set->maxXoffset);
+    int i = set->minXoffset;
+    
+    for (i; i < 0; ++i) {
+      T[yOff][0][i] = image[INDEX_FROM_XY(0, effectiveY, size.x)];
     }
-    for (int i = set->minXoffset; i < 0; ++i) {
-        T[yOff][0][i] = image[indexFromXY(0, effectiveY, size.x)];
+    for (i; i < maxX; ++i) {
+      T[yOff][0][i] = image[INDEX_FROM_XY(i, effectiveY, size.x)];
     }
-    for (int i = size.x; i < size.x + set->maxXoffset; ++i) {
-        T[yOff][0][i] = image[indexFromXY(size.x - 1, effectiveY, size.x)];
+    for (i; i < size.x + set->maxXoffset; ++i) {
+      T[yOff][0][i] = image[INDEX_FROM_XY(size.x - 1, effectiveY, size.x)];
     }
+    
+    for (int i = 1, d = 1; i <= set->maxN; ++i, d *= 2) {
+      for (int j = set->minXoffset; j <= size.x + set->maxXoffset - 2 * d; ++j) {
+          T[yOff][i][j] = MAX(T[yOff][i - 1][j], T[yOff][i - 1][j + d]);
+      }
+    }
+}
 
+void compute_lookup_table_for_line_erode(numeric ***T, numeric *image, int yOff, int line, chordSet *set, PointXY size) {
+  int effectiveY;
+  if (line + yOff >= size.y)
+    effectiveY = size.y - 1;
+  else if (line + yOff >= 0)
+    effectiveY = line + yOff;
+  else
+    effectiveY = 0;
+  
+  int maxX = MIN(size.x, size.x + set->maxXoffset);
+  int i = set->minXoffset;
+  
+  for (i; i < 0; ++i) {
+    T[yOff][0][i] = image[INDEX_FROM_XY(0, effectiveY, size.x)];
+  }
+  for (i; i < maxX; ++i) {
+    T[yOff][0][i] = image[INDEX_FROM_XY(i, effectiveY, size.x)];
+  }
+  for (i; i < size.x + set->maxXoffset; ++i) {
+    T[yOff][0][i] = image[INDEX_FROM_XY(size.x - 1, effectiveY, size.x)];
+  }
+  
+  for (int i = 1, d = 1; i <= set->maxN; ++i, d *= 2) {
+    for (int j = set->minXoffset; j <= size.x + set->maxXoffset - 2 * d; ++j) {
+      T[yOff][i][j] = MIN(T[yOff][i - 1][j], T[yOff][i - 1][j + d]);
+    }
+  }
+}
 
-
-    for (int i = 1; i < set->RLength; ++i) {
-        for (int j = set->minXoffset; j < size.x + set->maxXoffset; ++j) {
-            int d = set->R[i] - set->R[i - 1];
-            T[yOff][i][j] = minmax(T[yOff][i - 1][j], T[yOff][i - 1][j + d]);
+void dilate_line(numeric ***T, numeric *output, chordSet *set, int line, int width) {
+    for (int i = 0; i < width; ++i) {
+        for (int j = 0; j < set->CLength; ++j) {
+            numeric v = MAX(T[set->C[j].yOffset][set->C[j].n][i + set->C[j].xOffset1], T[set->C[j].yOffset][set->C[j].n][i + set->C[j].xOffset2]);
+            int index = INDEX_FROM_XY(i, line, width);
+            output[index] = MAX(output[index], v);
         }
     }
 }
 
-void erode_line(numeric ***T, numeric *output, chordSet *set, int line, int width, compare minmax) {
-    for (int i = 0; i < width; ++i) {
-        for (int j = 0; j < set->CLength; ++j) {
-            numeric v = T[set->C[j].yOffset][set->C[j].rIndex][i + set->C[j].xOffset];
-            int index = indexFromXY(i, line, width);
-            output[index] = minmax(output[index], v);
-        }
+void erode_line(numeric ***T, numeric *output, chordSet *set, int line, int width) {
+  for (int i = 0; i < width; ++i) {
+    for (int j = 0; j < set->CLength; ++j) {
+      numeric v = MIN(T[set->C[j].yOffset][set->C[j].n][i + set->C[j].xOffset1], T[set->C[j].yOffset][set->C[j].n][i + set->C[j].xOffset2]);
+      int index = INDEX_FROM_XY(i, line, width);
+      output[index] = MIN(output[index], v);
     }
+  }
 }
 
 chordSet buildChordSet(SEXP kernel) {
@@ -107,50 +132,42 @@ chordSet buildChordSet(SEXP kernel) {
     korigin.x = (int) ceil((float)ksize.x / 2) - 1; // -1 due to 0-based indices
     korigin.y = (int) ceil((float)ksize.y / 2) - 1;
 
-    chordSet set = {.RLength = 0, .CLength = 0, .minYoffset = 0, .maxYoffset = 0, .minXoffset = 0, .maxXoffset = 0, .maxChordLength = 0,};
-
-    int RBufLength = 0, CBufLength = 0;
-    set.R = R_Calloc(BUF_LENGTH, int);
-    RBufLength = BUF_LENGTH;
+    chordSet set = {.CLength = 0, .minYoffset = korigin.y, .maxYoffset = -korigin.y, .minXoffset = korigin.x, .maxXoffset = -korigin.x, .maxN = 0,};
+    
+    int CBufLength = 0;
     set.C = R_Calloc(BUF_LENGTH, chord);
     CBufLength = BUF_LENGTH;
     for (int i = 0; i < ksize.y; ++i) {
         int prevValue = 0, beginChord = 0;
         for (int j = 0; j < ksize.x; ++j) {
-            int index = indexFromXY(j, i, ksize.x);
+            int index = INDEX_FROM_XY(j, i, ksize.x);
             if ((kern[index] == 0 && prevValue == 1) || (j == ksize.x - 1 && (prevValue == 1 || j == 0))) {
+                if (kern[index] == 1)
+                  ++j;
                 int length = j - beginChord;
                 int yOff = i - korigin.y;
                 int xOff = beginChord - korigin.x;
-                int xEnd = length - korigin.x;
+                int n = 0;
+                if (length > 1) n = (int) floor(log2(length-1));
+                int xEnd = j - korigin.x - 1;
                 chord c;
-                if (j == ksize.x -1)
-                    length++;
-                int rindex = contains_int(set.R, length, set.RLength);
-                if (rindex < 0) {
-                    set.R[set.RLength] = length;
-                    c.rIndex = set.RLength++;
-                } else {
-                    c.rIndex = rindex;
-                }
-                CHECK_BUFFER(set.R, set.RLength, RBufLength, int)
-
                 c.yOffset = yOff;
-                c.xOffset = xOff;
-                c.length = length;
+                c.xOffset1 = xOff;
+                c.xOffset2 = xOff + length - (int) pow(2, n);
+                c.n = n;
                 set.C[set.CLength++] = c;
                 CHECK_BUFFER(set.C, set.CLength, CBufLength, chord)
-
+                  
                 if (yOff < set.minYoffset)
                     set.minYoffset = yOff;
                 else if (yOff > set.maxYoffset)
                     set.maxYoffset = yOff;
                 if (xOff < set.minXoffset)
                     set.minXoffset = xOff;
-                else if (xEnd > set.maxXoffset)
+                if (xEnd > set.maxXoffset)
                     set.maxXoffset = xEnd;
-                if (length > set.maxChordLength)
-                    set.maxChordLength = length;
+                if (c.n > set.maxN)
+                    set.maxN = n;
             } else if (kern[index] == 1 && prevValue == 0) {
                 beginChord = j;
             }
@@ -158,46 +175,20 @@ chordSet buildChordSet(SEXP kernel) {
         }
     }
 
-    int begin = 1;
-    while (set.R[0] > 1) {
-        insert_in_int(set.R, (int)ceil((float)set.R[0] / 2), 0, set.RLength++);
-        for (int j = 0; j < set.CLength; ++j) {
-            if (set.C[j].rIndex >= 0)
-                ++set.C[j].rIndex;
-        }
-        CHECK_BUFFER(set.R, set.RLength, RBufLength, int)
-        ++begin;
-    }
-    for (int i = begin; i < set.RLength; ++i) {
-        if (2 * set.R[i - 1] < set.R[i]) {
-            insert_in_int(set.R, (int)ceil((float)set.R[i] / 2), i, set.RLength++);
-            for (int j = 0; j < set.CLength; ++j) {
-                if (set.C[j].rIndex >= i)
-                    ++set.C[j].rIndex;
-            }
-            CHECK_BUFFER(set.R, set.RLength, RBufLength, int)
-            --i;
-        }
-    }
     return set;
-}
-
-void free_set(chordSet *set) {
-    R_Free(set->R);
-    R_Free(set->C);
 }
 
 numeric*** allocate_lookup_table(chordSet *set, int width) {
     numeric ***T;
-    T = R_Calloc(abs(set->minYoffset) + abs(set->maxYoffset) + 1, numeric**); // + 1 for offset of 0
-    T = T + abs(set->minYoffset);
+    T = R_Calloc(set->maxYoffset - set->minYoffset + 1, numeric**); // + 1 for offset of 0
+    T = T - set->minYoffset;
 
-    int Txlength = width + abs(set->minXoffset) + abs(set->maxXoffset);
+    int Txlength = width - set->minXoffset + set->maxXoffset + 1;
     for (int i = set->minYoffset; i <= set->maxYoffset; ++i) {
-        T[i] = R_Calloc(set->RLength, numeric*);
-        for (int j = 0; j < set->RLength; j++) {
-            T[i][j] = R_Calloc(Txlength, numeric);
-            T[i][j] = T[i][j] + abs(set->minXoffset);
+        T[i] = R_Calloc(set->maxN + 1, numeric*);
+        for (int j = 0, d = 1; j <= set->maxN; ++j, d *= 2) {
+            T[i][j] = R_Calloc(Txlength - d, numeric);
+            T[i][j] = T[i][j] - set->minXoffset;
         }
     }
     return T;
@@ -205,13 +196,13 @@ numeric*** allocate_lookup_table(chordSet *set, int width) {
 
 void free_lookup_table(numeric ***T, chordSet *set) {
     for (int i = set->minYoffset; i <= set->maxYoffset; ++i) {
-        for (int j = 0; j < set->RLength; j++) {
-            numeric *first = T[i][j] - abs(set->minXoffset);
+        for (int j = 0; j < set->maxN; j++) {
+            numeric *first = T[i][j] + set->minXoffset;
             R_Free(first);
         }
         R_Free(T[i]);
     }
-    numeric ***first = T - abs(set->minYoffset);
+    numeric ***first = T + set->minYoffset;
     R_Free(first);
 }
 
@@ -223,11 +214,18 @@ SEXP lib_erode_dilate_greyscale_internal (SEXP x, int what, chordSet *set, numer
     PointXY size;
     SEXP res;
 
-    compare minmax;
-    if (what == ERODE)
-        minmax = &fmin;
-    else
-        minmax = &fmax;
+    void (*compute_lookup_table_for_line)(numeric ***, numeric *, int, int, chordSet *, PointXY);
+    void (*process_line)(numeric ***, numeric *, chordSet *, int, int);
+    
+    if (what == ERODE) {
+      process_line = &erode_line;
+      compute_lookup_table_for_line = &compute_lookup_table_for_line_erode;
+    }
+    else {
+      process_line = &dilate_line;
+      compute_lookup_table_for_line = &compute_lookup_table_for_line_dilate;
+    }
+    
     dim = INTEGER ( GET_DIM(x) );
     size.x = dim[0];
     size.y = dim[1];
@@ -245,17 +243,18 @@ SEXP lib_erode_dilate_greyscale_internal (SEXP x, int what, chordSet *set, numer
             tgt[j] = 1 - what;
         }
         for (int j = set->minYoffset; j <= set->maxYoffset; ++j) {
-            compute_lookup_table_for_line(T, src, j, 0, set, size, minmax);
+            compute_lookup_table_for_line(T, src, j, 0, set, size);
         }
-        erode_line(T, tgt, set, 0, size.x, minmax);
+        
+        process_line(T, tgt, set, 0, size.x);
         for (int j = 1; j < size.y; ++j) {
             numeric **first = T[set->minYoffset];
             for (int k = set->minYoffset; k < set->maxYoffset; ++k) {
                 T[k] = T[k + 1];
             }
             T[set->maxYoffset] = first;
-            compute_lookup_table_for_line(T, src, set->maxYoffset, j, set, size, minmax);
-            erode_line(T, tgt, set, j, size.x, minmax);
+            compute_lookup_table_for_line(T, src, set->maxYoffset, j, set, size);
+            process_line(T, tgt, set, j, size.x);
         }
     }
 
@@ -278,7 +277,7 @@ SEXP lib_erode_dilate_greyscale (SEXP x, SEXP kernel, SEXP what) {
     numeric ***T = allocate_lookup_table(&set, INTEGER ( GET_DIM(x) )[0]);
     SEXP img = lib_erode_dilate_greyscale_internal(x, operation, &set, T);
     free_lookup_table(T, &set);
-    free_set(&set);
+    R_Free(set.C);
     return img;
 }
 
@@ -288,7 +287,7 @@ SEXP lib_opening_closing_greyscale (SEXP x, SEXP kernel, SEXP what) {
     numeric ***T = allocate_lookup_table(&set, INTEGER ( GET_DIM(x) )[0]);
     SEXP img = lib_opening_closing_greyscale_internal(x, operation, &set, T);
     free_lookup_table(T, &set);
-    free_set(&set);
+    R_Free(set.C);
     return img;
 }
 
@@ -349,8 +348,7 @@ SEXP lib_tophat_greyscale (SEXP x, SEXP kernel, SEXP what) {
     }
 
     free_lookup_table(T, &set);
-    free_set(&set);
+    R_Free(set.C);
     UNPROTECT (nprotect);
     return res;
 }
-
