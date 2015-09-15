@@ -18,12 +18,6 @@ pointFromIndex (const int index, const int xsize) {
 }
 
 /*----------------------------------------------------------------------- */
-int
-indexFromXY (const int x, const int y, const int xsize) {
-    return x + y * xsize;
-}
-
-/*----------------------------------------------------------------------- */
 // test=0 will make validImage fail if x is not an image
 // test=1 will return 0 if x is not an Image
 int
