@@ -17,7 +17,7 @@ int _match (numeric * kernel, PointXY * ksize, numeric * data, PointXY * dsize, 
 SEXP
 lib_erode_dilate (SEXP x, SEXP kernel, SEXP what) {
     numeric resetTo, * tgt, * src, *kern;
-    int nz, i, j, nprotect;
+    int nz, z, i, j, idx, nprotect;
     int * dim;
     PointXY size, ksize, pt;
     SEXP res;
@@ -43,14 +43,17 @@ lib_erode_dilate (SEXP x, SEXP kernel, SEXP what) {
     PROTECT ( res = Rf_duplicate(x) );
     nprotect++;
 
-    for ( i = 0; i < nz; i++ ) {
-      tgt = &( REAL(res)[i * size.x * size.y] );
-      src = &( REAL(x)[i * size.x * size.y] );
-      for ( j = 0; j < size.x * size.y; j++ ) {
-	if ( tgt[j] == resetTo ) continue;
-	pt = pointFromIndex (j, size.x);
-	if ( !_match(kern, &ksize, src, &size, &pt, resetTo) )
-	  tgt[j] = resetTo;
+    for ( z = 0; z < nz; z++ ) {
+      tgt = &( REAL(res)[z * size.x * size.y] );
+      src = &( REAL(x)[z * size.x * size.y] );
+      for ( j = 0; j < size.y; j++ ) {
+        for ( i = 0; i < size.x; i++ ) {
+          idx = INDEX_FROM_XY(i, j, size.x);
+          if ( tgt[idx] == resetTo ) continue;
+          pt = (PointXY) {.x = i, .y = j};
+          if ( _match(kern, &ksize, src, &size, &pt, resetTo) )
+            tgt[idx] = resetTo;
+        }
       }
     }
     
@@ -73,8 +76,7 @@ _match (numeric * kernel, PointXY * ksize, numeric * data, PointXY * dsize, Poin
             xx = at->x + i;
             yy = at->y + j;
             if ( xx < 0 || yy < 0 || xx >= dsize->x || yy >= dsize->y ) continue;
-            if ( data[xx + yy * dsize->x] == mismatch ) return 0;
+            if ( data[xx + yy * dsize->x] == mismatch ) return 1;
         }
-    return 1;
+    return 0;
 }
-

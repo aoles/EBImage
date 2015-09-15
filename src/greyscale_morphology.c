@@ -23,8 +23,6 @@ if (occupied == buffer) {\
     pointer = R_Realloc(pointer, buffer, type);\
 }
 
-#define INDEX_FROM_XY(x, y, xsize) ((x) + (y) * (xsize))
-
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 

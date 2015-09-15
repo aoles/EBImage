@@ -29,7 +29,7 @@ paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col, SEXP _thick) {
     ny = INTEGER(GET_DIM(x))[1];
     nz = getNumberOfFrames(x, 0);
     nprotect = 0;
-    xcolormode = getColorMode(x);
+    xcolormode = COLOR_MODE(x);
     if (xcolormode != MODE_GRAYSCALE) error("'x' must be in 'Grayscale' color mode");
 
     PROTECT ( res = Rf_duplicate(tgt) );
@@ -175,7 +175,7 @@ stackObjects (SEXP obj, SEXP ref, SEXP _bgcol, SEXP xy_list, SEXP extension) {
   int ext = floor(REAL(extension)[0]);
   int snx = 2 * ext + 1;
   int sny = 2 * ext + 1;
-  int mode = getColorMode(ref);
+  int mode = COLOR_MODE(ref);
   int nbChannels = getNumberOfChannels(ref);
   int stride, shift;
  

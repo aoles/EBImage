@@ -10,22 +10,20 @@ extern "C" {
 
 #define MODE_GRAYSCALE  0
 #define MODE_COLOR      2
-#define MODE_MAX        2
+
+#define COLOR_MODE(x) ( R_has_slot(x, mkString("colormode")) ? INTEGER(GET_SLOT(x, mkString("colormode")))[0] : MODE_GRAYSCALE )
+
+#define INDEX_FROM_XY(x, y, xsize) ((x) + (y) * (xsize))
+#define POINT_FROM_INDEX(index, xsize) (PointXY) {.x = index % xsize, .y = index / xsize}
+
+#define DISTANCE_XY(pt1, pt2) sqrt( (long double) ( (pt1.x - pt2.x) * (pt1.x - pt2.x) + (pt1.y - pt2.y) * (pt1.y - pt2.y) ) )
 
 typedef struct {
     int x, y;
 } PointXY;
-
-typedef struct {
-  int x, y, z;
-} PointXYZ;
   
 typedef double numeric;
 
-double distanceXY (const PointXY, const PointXY);
-PointXY pointFromIndex (const int, const int);
-int indexFromXY (const int, const int, const int);
-int getColorMode (SEXP x);
 int validImage (SEXP x,int test);
 int getNumberOfFrames (SEXP x, int type);
 int getNumberOfChannels (SEXP x);
