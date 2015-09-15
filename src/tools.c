@@ -2,26 +2,9 @@
 #include <R.h>
 #include <Rdefines.h>
 
-/*----------------------------------------------------------------------- */
-double
-distanceXY (const PointXY pt1, const PointXY pt2) {
-    return sqrt ( (long double)( (pt1.x - pt2.x) * (pt1.x - pt2.x) + (pt1.y - pt2.y) * (pt1.y - pt2.y) ) );
-}
-
-/*----------------------------------------------------------------------- */
-PointXY
-pointFromIndex (const int index, const int xsize) {
-    PointXY res;
-    res.y = floor (index / xsize);
-    res.x = index - res.y * xsize;
-    return res;
-}
-
-/*----------------------------------------------------------------------- */
 // test=0 will make validImage fail if x is not an image
 // test=1 will return 0 if x is not an Image
-int
-validImage (SEXP x,int test) {
+int validImage (SEXP x,int test) {
   int colorMode;
   char *msg=NULL;
 
@@ -29,7 +12,7 @@ validImage (SEXP x,int test) {
   if (x==R_NilValue) msg="object is NULL";
   else {
     // check colormode
-    colorMode=getColorMode(x);
+    colorMode=COLOR_MODE(x);
     if (colorMode<0 || colorMode >2) msg="invalid colormode";
     
     // check dim
@@ -43,27 +26,12 @@ validImage (SEXP x,int test) {
   else return(1);
 }
 
-
-/*----------------------------------------------------------------------- */
-int
-getColorMode(SEXP x) {
-  int colorMode;
-  
-  //if (strcmp( CHAR( asChar( GET_CLASS(x) ) ), "Image") == 0) colorMode=INTEGER(GET_SLOT(x, mkString("colormode")))[0];
-  if (R_has_slot(x, mkString("colormode"))) colorMode=INTEGER(GET_SLOT(x, mkString("colormode")))[0];
-  else colorMode = MODE_GRAYSCALE;
-
-  return(colorMode);
-}
-
-/*----------------------------------------------------------------------- */
 // If type=0, returns the total number of frames
 // If type=1, returns the number of frames to be rendered, according to the colorMode
-int
-getNumberOfFrames(SEXP x, int type) {
+int getNumberOfFrames(SEXP x, int type) {
   int n,colorMode;
   int k,p,kp;
-  colorMode=getColorMode(x);
+  colorMode=COLOR_MODE(x);
 
   if (type==1 && colorMode==MODE_COLOR) kp=3;
   else kp=2;
@@ -77,12 +45,10 @@ getNumberOfFrames(SEXP x, int type) {
   return(n);
 }
 
-/*----------------------------------------------------------------------- */
-int
-getNumberOfChannels(SEXP x) {
+int getNumberOfChannels(SEXP x) {
   int colorMode;
   int nbChannels;
-  colorMode=getColorMode(x);
+  colorMode=COLOR_MODE(x);
 
   if (colorMode!=MODE_COLOR) nbChannels=1;
   else {
@@ -92,10 +58,8 @@ getNumberOfChannels(SEXP x) {
   return(nbChannels);
 }
 
-/*----------------------------------------------------------------------- */
-// colorMode must be MODE_GRAYSCALE or MODE_COLOR
 void getColorStrides(SEXP x,int index,int *redstride,int *greenstride,int *bluestride) {
-  int width,height,colorMode,nbChannels;
+  int width, height, nbChannels;
 
   width=INTEGER(GET_DIM(x))[0];
   height=INTEGER(GET_DIM(x))[1];
