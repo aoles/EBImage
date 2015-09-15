@@ -491,7 +491,7 @@ SEXP medianFilter (SEXP _in, SEXP _r, SEXP _memsize) {
   }
   
   // process channels separately
-  for(int j = 0; j < z; j++)
+  for(j = 0; j < z; j++)
     ctmf(&px[framesize*j], &py[framesize*j], x, y, x, x, r, 1, memsize);
   
   // convert back to [0:1] range

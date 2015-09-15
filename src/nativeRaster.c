@@ -12,13 +12,12 @@ Copyright (c) 2015 Andrzej Oles
 
 SEXP nativeRaster (SEXP _in) {
   int nprotect = 0, x, y, c, i, j;
-  double *in;
   uint32_t *out;
-  SEXP res, class, channels;
+  SEXP res;
   
   x = INTEGER (GET_DIM(_in))[0];
   y = INTEGER (GET_DIM(_in))[1];
-  c = getColorMode(_in);
+  c = COLOR_MODE(_in);
   
   // pointers to color channels
   double *rgba[4] = {NULL, NULL, NULL, NULL};

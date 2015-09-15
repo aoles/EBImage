@@ -14,11 +14,11 @@ See: ../LICENSE for license, LGPL
 SEXP
 tile (SEXP obj, SEXP _hdr, SEXP params) {
   SEXP res, dm, ims;
-  int mode =  getColorMode(obj);
+  int mode =  COLOR_MODE(obj);
   int ndy, ndx  = INTEGER(params)[0];
   int lwd = INTEGER(params)[1];
   int nc= getNumberOfChannels(obj);
-  int nprotect, nx, ny, nz, ifg, ibg, nxr, nyr, * iim, i, j, index, x, y;
+  int nprotect, nx, ny, nz, nxr, nyr, i, j, index, x, y;
   double *hdr, * dim, onetondx;
   int rredstride,rgreenstride,rbluestride;
   int oredstride,ogreenstride,obluestride;
@@ -41,7 +41,7 @@ tile (SEXP obj, SEXP _hdr, SEXP params) {
   /* allocate memory for the image */
   PROTECT( ims = allocVector(REALSXP, nc*nxr * nyr) );
   nprotect++;
-  dim = REAL(ims); iim = NULL;
+  dim = REAL(ims);
   
   // make res final object
   if (mode!=MODE_COLOR) {
@@ -127,7 +127,7 @@ tile (SEXP obj, SEXP _hdr, SEXP params) {
 /*----------------------------------------------------------------------- */
 SEXP
 untile(SEXP img, SEXP nim, SEXP linewd) {
-  int mode = getColorMode(img);
+  int mode = COLOR_MODE(img);
   int nimx = INTEGER(nim)[0];
   int nimy = INTEGER(nim)[1];
 
@@ -139,7 +139,7 @@ untile(SEXP img, SEXP nim, SEXP linewd) {
   int nc = getNumberOfChannels(img);
   int nprotect=0, i, j, im, y, iim;
   SEXP res, dim, dat;
-  void *src, *tgt; double *dd; int *id;
+  void *src, *tgt; double *dd;
 
   int rredstride,rgreenstride,rbluestride;
   int oredstride,ogreenstride,obluestride;
