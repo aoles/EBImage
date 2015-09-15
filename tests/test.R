@@ -4,7 +4,9 @@ library("EBImage")
 set.seed(0) # make random color permutations in 'colorLabels' reproducible
 
 ## returns a hashcode given an object
-hash <- function(x) {
+hash = function (x) .Call(digest:::digest_impl, serialize(x, connection=NULL, ascii=FALSE), 7L, -1L, 14L, 0L, 0L, PACKAGE="digest")
+
+hashold <- function(x) {
   if ( is.list(x) && length(x)>0L ) hash(sapply(x, hash))
   else {
     xd <- suppressWarnings(as.numeric(x))
@@ -22,7 +24,7 @@ hash <- function(x) {
 check <- function(fun, x, ..., capture.output=FALSE, suppressWarnings=FALSE, suppressMessages=FALSE) {
   passed <- TRUE
 
-  cat("checking \'", fun, "\' ... ", sep="")
+  cat(sprintf("checking \'%s\' %s ", fun, paste(rep(".", 35L-nchar(fun)), collapse = "")))
   
   expr = quote(do.call(fun,c(list(x),list(...))))
   if ( isTRUE(capture.output) ) expr = call("capture.output", expr)
@@ -36,21 +38,24 @@ check <- function(fun, x, ..., capture.output=FALSE, suppressWarnings=FALSE, sup
     passed <- FALSE
   }
 
-  if (passed) cat("OK (hash=", hash(y), ")\n", sep="") 
+  if (passed) cat("PASS (", hash(y), " ", hashold(y), ")\n", sep="") 
   else cat("FAIL\n")
   
   y
 }
 
-checkIO <- function(x) {
-  cat("checking IO for \'", x, "\' ... ", sep="")
-  x <- get(x)
-  y <- try({
-    xx <- readImage(writeImage(x, tempfile("", fileext = ".tif")))
-    dimnames(xx) <- dimnames(x)
-    identical(x, xx)
-    }, silent=TRUE)
-  if ( isTRUE(y) ) cat("OK\n") else cat("FAIL\n")
+checkIO <- function(name) {
+  cat("checking IO for \'", name, "\' ... ", sep="")
+  x = get(name)
+  y = FALSE
+  if ( !is.null(x) ) {
+    y <- try({
+      xx <- readImage(writeImage(x, tempfile("", fileext = ".tif")))
+      dimnames(xx) <- dimnames(x)
+      identical(x, xx)
+      }, silent=TRUE)
+  }
+  if ( isTRUE(y) ) cat("PASS\n") else cat("FAIL\n")
   invisible(y)
 }
 
@@ -189,18 +194,20 @@ testEBImageFunctions <- function(x) {
   cat("\n")
 }
 
+
 ## check error handling
-mock <- try(suppressWarnings(readImage(system.file("images", package="EBImage"), type="png")), silent=TRUE)
-mock <- try(suppressWarnings(readImage("http://www.huber.embl.de/EBImage/missing.file ", type="png")), silent=TRUE)
+try.readImage <- function(...) tryCatch(suppressWarnings(readImage(...)), error = function(e) NULL)
+mock <- try.readImage(system.file("images", package="EBImage"), type="png")
+mock <- try.readImage("http://www.huber.embl.de/EBImage/missing.file ", type="png")
 
 ## single greyscale and color images
-sample <- readImage(system.file("images","sample.png", package="EBImage"))
-sample.color <- readImage(system.file("images","sample-color.png", package="EBImage"))
+sample <- try.readImage(system.file("images","sample.png", package="EBImage"))
+sample.color <- try.readImage(system.file("images","sample-color.png", package="EBImage"))
 ## multi-frame image stack
 f = system.file("images","nuclei.tif", package="EBImage")
-nuclei = readImage(c(f, f))
+nuclei = try.readImage(c(f, f))
 ## test reading from URL
-logo <- readImage("http://www.huber.embl.de/EBImage/logo.png")
+logo <- try.readImage("http://www.huber.embl.de/EBImage/logo.png")
 
 ## test: IO operations
 testIOFunctions("sample", "sample.color", "nuclei", "logo")
