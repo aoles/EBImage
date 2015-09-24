@@ -21,7 +21,7 @@ hashold <- function(x) {
 }
 
 ## try to evaluate fun(x,...) 
-check <- function(fun, x, ..., capture.output=FALSE, suppressWarnings=FALSE, suppressMessages=FALSE) {
+check <- function(fun, x, ..., capture.output=FALSE, suppressWarnings=FALSE, suppressMessages=FALSE, expectError=FALSE, debug=FALSE) {
   passed <- TRUE
 
   cat(sprintf("checking \'%s\' %s ", fun, paste(rep(".", 35L-nchar(fun)), collapse = "")))
@@ -33,13 +33,19 @@ check <- function(fun, x, ..., capture.output=FALSE, suppressWarnings=FALSE, sup
   
   y <- try(eval(expr), silent=TRUE)
   
-  if (class(y)=="try-error" || ( is.Image(y) && !validObject(y)) ) {
+  if ( (class(y)=="try-error" && !isTRUE(expectError) ) || ( is.Image(y) && !validObject(y)) ) {
     y <- NULL
     passed <- FALSE
   }
 
   if (passed) cat("PASS (", hash(y), " ", hashold(y), ")\n", sep="") 
   else cat("FAIL\n")
+  
+  if ( isTRUE(debug) ) {
+    if (is.Image(y)) show(y)
+    if (is.array(y)) display(y, all=TRUE, interpolate=FALSE) 
+    else if (is.character(y)) cat(y, sep="\n")
+  }
   
   y
 }
@@ -75,8 +81,7 @@ testEBImageFunctions <- function(x) {
   z <- check(">", x, 0.5)
   z <- check("+", x, x)
   z <- check("/", x, 2)
-  z <- check("*", 2, x)
-  z <- check("transpose", x)
+  z <- check("*", 2L, x)
   z <- check("median", x)
   z <- check("quantile", x)
 
@@ -129,7 +134,6 @@ testEBImageFunctions <- function(x) {
   y <- check("channel", x, "luminance")
   z <- check("otsu", y)
   y <- suppressWarnings(normalize(y, separate=FALSE))
-  y[is.nan(y)] <- 0
   y <- check("bwlabel", y > 0.5)
   z <- check("colorLabels", y, suppressWarnings=TRUE)
   z <- check("stackObjects", y, x)
@@ -138,6 +142,7 @@ testEBImageFunctions <- function(x) {
   z <- check("paintObjects", y, x, col=c("#ff00ff", "#ffff00"), opac=c(1.0, 0.5), thick=cls, closed=cls)  
   z <- check("rmObjects", y, as.list(seq_len(numberOfFrames(y))), cls)
   z <- check("reenumerate", z)
+  z <- check("reenumerate", y)
   
   ## features
   x1 <- getFrame(x, 1)
@@ -153,20 +158,20 @@ testEBImageFunctions <- function(x) {
 
   ## filtering
   z <- check("normalize", x, suppressWarnings=TRUE)
-  z <- check("gblur", x, sigma=1)
+  z <- check("gblur", x, sigma=1, expectError=min(d)<7)
   z <- check("filter2", x, array(1, dim=c(5, 5)))
-  z <- check("medianFilter", x, 3)
-  z <- check("equalize", x)
+  z <- check("medianFilter", x, 2)
+  z <- check("equalize", x, suppressWarnings=TRUE)
 
   ## morphological operations
   y <- x > 0.5
   z <- check("erode", y)
   z <- check("dilate", y, makeBrush(5, 'disc'))
-  z <- check("opening", y, makeBrush(5, 'line'))
-  z <- check("closing", y, makeBrush(4, 'line', angle=30), suppressWarnings=TRUE)
+  z <- check("opening", y, makeBrush(7, 'line'))
+  z <- check("closing", y, makeBrush(4, 'line', angle=0), suppressWarnings=TRUE)
   z <- check("distmap", y)
   z <- check("watershed", z)
-  z <- check('floodFill', y, c(5, 5), 0.5)
+  z <- check('floodFill', x, c(5, 5), 0.5)
   z <- check('fillHull', y)
   z <- check("erodeGrayscale", x)
   z <- check("dilateGrayscale", x)
@@ -187,9 +192,10 @@ testEBImageFunctions <- function(x) {
   z <- check("rgbImage", x, x>0.5)
 
   ## image stacking, combining, tiling
-  z <- check("combine", list(NULL, x, x, NULL, NULL))
-  y <- check("tile", x, nx=2)
-  z <- check("untile", y, c(2,2))
+  y <- check("combine", list(NULL, x, x, NULL, NULL))
+  z <- check("combine", x, y, y)
+  y <- check("tile", z, nx=3)
+  z <- check("untile", y, c(3, 2))
 
   cat("\n")
 }
@@ -212,34 +218,36 @@ logo <- try.readImage("http://www.huber.embl.de/EBImage/logo.png")
 ## test: IO operations
 testIOFunctions("sample", "sample.color", "nuclei", "logo")
 
-## test: blank image
+## test: black image
 testEBImageFunctions(Image(0, c(8, 8)))
 
-## test: 2D Grayscale
+## test: white image
+testEBImageFunctions(Image(1L, c(5, 5)))
+
+## test: 2D Grayscale 64x48
 x <- nuclei[50:113,208:255,2]
 testEBImageFunctions(as.array(x))
 
-## test: 2D Color
+## test: 2D Color 32x48x1
 x <- sample[1:32, 1:48]
-x <- t(x)
 testEBImageFunctions(Image(as.vector(x), dim(x), Color))
 
-## test: 3D Color
+## test: 3D Color 65x17x3
 x <- sample.color[1:65, 1:17,]
 testEBImageFunctions(x)
 
-## test: 3D Grayscale logical
+## test: 3D Grayscale logical 32x32x2
 x <- sample[32:63, 32:63]
 x <- x > otsu(x)
 x <- combine(x, x)
 testEBImageFunctions(x)
 
-## test: 4D Color
+## test: 4D Color 33x16x3x2
 x <- sample.color[1:33, 1:16,]
 x <- combine(x, x)
 testEBImageFunctions(x)
 
-## test: 4D Grayscale
+## test: 4D Grayscale 16x33x2x3
 colorMode(x) <- Grayscale
 imageData(x) <- aperm(x, c(2L, 1L, 4L, 3L))
 testEBImageFunctions(x)

@@ -14,7 +14,7 @@ extern "C" {
 #define COLOR_MODE(x) ( R_has_slot(x, mkString("colormode")) ? INTEGER(GET_SLOT(x, mkString("colormode")))[0] : MODE_GRAYSCALE )
 
 #define INDEX_FROM_XY(x, y, xsize) ((x) + (y) * (xsize))
-#define POINT_FROM_INDEX(index, xsize) (PointXY) {.x = index % xsize, .y = index / xsize}
+#define POINT_FROM_INDEX(pt, index, xsize) pt.x = index % xsize; pt.y = index / xsize;
 
 #define DISTANCE_XY(pt1, pt2) sqrt( (long double) ( (pt1.x - pt2.x) * (pt1.x - pt2.x) + (pt1.y - pt2.y) * (pt1.y - pt2.y) ) )
 
@@ -30,7 +30,7 @@ int getNumberOfChannels (SEXP x);
 void getColorStrides(SEXP x,int index,int *redstride,int *greenstride,int *bluestride);
 
 #ifdef __cplusplus
-};
+}
 #endif
 
 #endif

@@ -584,7 +584,7 @@ showImage = function (object, short=FALSE) {
     cat('\nimageData(object)', nds, '\n', sep='')
     print.default(asub(object@.Data, ndl))
   }
-  invisible(NULL)
+  invisible()
 }
 
 setMethod ("show", signature(object = "Image"), function(object) showImage(object))
