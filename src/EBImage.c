@@ -52,7 +52,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(haralickMatrix, 3),
     CALLDEF(haralickFeatures, 1),
     CALLDEF(drawCircle, 4),
-    CALLDEF(affine, 4),
+    CALLDEF(affine, 5),
     CALLDEF(medianFilter, 3),
     CALLDEF(nativeRaster, 1),
     /* add above all R-lib functions from common.h */

@@ -9,7 +9,7 @@ flop <- function (x) {
 }
 
 ## performs an affine transform on a set of images
-affine <- function (x, m, filter = c("bilinear", "none"), output.dim, bg.col = "black") {
+affine <- function (x, m, filter = c("bilinear", "none"), output.dim, bg.col = "black", antialias = TRUE) {
   ## check arguments
   validImage(x)
   if ( !is.matrix(m) || dim(m)!=c(3L, 2L) ) stop("'m' must be a 3x2 matrix")
@@ -21,7 +21,7 @@ affine <- function (x, m, filter = c("bilinear", "none"), output.dim, bg.col = "
   d = dim(x)  
   if (!missing(output.dim)) {
     if( length(output.dim)!=2L || !is.numeric(output.dim) ) stop("'output.dim' must be a numeric vector of length 2")
-    d[1:2] = as.integer(output.dim)
+    d[1:2] = round(output.dim)
   }
   
   ## inverse of the transformation matrix
@@ -32,7 +32,7 @@ affine <- function (x, m, filter = c("bilinear", "none"), output.dim, bg.col = "
   y <- x
   imageData(y) <- bgImage(bg.col, d, colorMode(x))
   
-  .Call(C_affine, castImage(x), castImage(y), m, filter)
+  .Call(C_affine, castImage(x), castImage(y), m, filter, as.integer(antialias))
 }
 
 ## the code of this function is based on the Image constructor and probably could be reused in a more clever way
@@ -64,6 +64,9 @@ rotate = function(x, angle, filter = "bilinear", output.dim, ...) {
   if ( length(angle)!=1L || !is.numeric(angle) ) stop("'angle' must be a number")
   if ( !missing(output.dim) ) if ( length(output.dim)!=2L || !is.numeric(output.dim) ) stop("'output.dim' must be a numeric vector of length 2")
   
+  ## allow lossless rotation
+  if ( (angle %% 90) == 0 ) filter = "none"
+  
   angle = angle * pi / 180
   d  = dim(x)[1:2]
   dx = d[1]
@@ -91,7 +94,7 @@ rotate = function(x, angle, filter = "bilinear", output.dim, ...) {
   m <- matrix(c(cos, -sin, offset[1], 
                 sin,  cos, offset[2]), 3L, 2L) 
   
-  affine(x, m, filter, output.dim, ...)
+  affine(x = x, m = m, filter = filter, output.dim = output.dim, ...)
 }
 
 translate <- function(x, v, filter = "none", ...) {
@@ -101,10 +104,10 @@ translate <- function(x, v, filter = "none", ...) {
   m <- matrix(c(1, 0, v[1],
                 0, 1, v[2]), 3L, 2L)
   
-  affine(x, m, filter, ...)
+  affine(x = x, m = m, filter = filter, ...)
 }
 
-resize <- function(x, w, h, filter = "bilinear", output.dim = c(w, h), output.origin = c(0, 0), ...) {
+resize <- function(x, w, h, filter = "bilinear", output.dim = c(w, h), output.origin = c(0, 0), antialias = FALSE, ...) {
   ## check arguments
   if ( missing(h) && missing(w) ) stop("either 'w' or 'h' must be specified")
   if ( length(output.origin)!=2L || !is.numeric(output.origin) ) stop("'output.origin' must be a numeric vector of length 2")
@@ -118,7 +121,7 @@ resize <- function(x, w, h, filter = "bilinear", output.dim = c(w, h), output.or
   m <- matrix(c(ratio[1], 0, output.origin[1],
                 0, ratio[2], output.origin[2]), 3L, 2L)
   
-  affine(x, m, filter, output.dim, ...)
+  affine(x = x, m = m, filter = filter, output.dim = output.dim, antialias = antialias, ...)
 }
 
 ## transposes the XY dimensions

@@ -24,9 +24,9 @@ flip(x)
 flop(x)
 rotate(x, angle, filter = "bilinear", output.dim, ...)
 translate(x, v, filter = "none", ...)
-resize(x, w, h, filter = "bilinear", output.dim = c(w, h), output.origin = c(0, 0), ...)
+resize(x, w, h, filter = "bilinear", output.dim = c(w, h), output.origin = c(0, 0), antialias = FALSE, ...)
 
-affine(x, m, filter = c("bilinear", "none"), output.dim, bg.col = "black")
+affine(x, m, filter = c("bilinear", "none"), output.dim, bg.col = "black", antialias = TRUE)
 }
 
 \arguments{
@@ -44,7 +44,8 @@ affine(x, m, filter = c("bilinear", "none"), output.dim, bg.col = "black")
   
   \item{m}{A 3x2 matrix describing the affine transformation. See Details.}
   \item{bg.col}{Color used to fill the background pixels. The default is "black".}
-  \item{...}{Arguments to be passed to the \code{affine} function, such as \code{output.dim} or \code{bg.col}}  
+  \item{antialias}{If \code{TRUE}, perform bilinear sampling at image edges using \code{bg.col}.}
+  \item{...}{Arguments to be passed to the \code{affine} function, such as \code{output.dim}, \code{bg.col} or \code{atialias}.}  
 }
  
 \value{

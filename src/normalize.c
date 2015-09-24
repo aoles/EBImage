@@ -58,7 +58,7 @@ normalize (SEXP x, SEXP separate, SEXP outrange, SEXP inrange) {
   }
   
   // normalize only if normalization range is avlid
-  if ( (to-from) != 0 ) {  
+  if ( (to-from)!=0 && (diff!=0 || sep) ) {  
     for ( im = 0; im < nz; im++ ) {
       data = &( REAL(res)[ im * nx * ny ] );
       if ( sep ) {

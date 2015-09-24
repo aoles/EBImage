@@ -56,7 +56,7 @@ watershed (SEXP x, SEXP _tolerance, SEXP _ext) {
         rsort_with_index( tgt, index, nx * ny );
         /* reassign tgt as it was reset above but keep new index */
         for ( i = 0; i < nx * ny; i++ )
-            tgt[ i ] = -src[ i ];
+            tgt[ i ] = ( src[i]==0 ? 0 : -src[i] ); // avoid turning +0 into -0
 
         SeedList seeds;  /* indexes of all seed starting points, i.e. lowest values */
 
@@ -91,7 +91,7 @@ watershed (SEXP x, SEXP _tolerance, SEXP _ext) {
                      * - if none, push back */
                     /* reset j to 0 every time we assign another pixel to restart the loop */
                     nb.clear();
-                    pt = POINT_FROM_INDEX(ind, nx);
+                    POINT_FROM_INDEX(pt, ind, nx)
                     /* determine which neighbour we have, push them to nb */
                     for ( x = pt.x - ext; x <= pt.x + ext; x++ )
                         for ( y = pt.y - ext; y <= pt.y + ext; y++ ) {
@@ -169,7 +169,8 @@ check_multiple( double * tgt, double * src, int & ind, IntList & nb, SeedList & 
     int i;
     IntList::iterator  it;
     SeedList::iterator sit;
-    PointXY ptsit, pt = POINT_FROM_INDEX(ind, nx);
+    PointXY ptsit, pt;
+    POINT_FROM_INDEX(pt, ind, nx)
     double distx, dist = FLT_MAX;
 
     /* maxdiff */
@@ -184,7 +185,7 @@ check_multiple( double * tgt, double * src, int & ind, IntList & nb, SeedList & 
         }
         /* we assign to the closest centre which is above tolerance, if none than to maxdiff */
         if ( diff >= tolerance ) {
-            ptsit = POINT_FROM_INDEX((*sit).index, nx);
+            POINT_FROM_INDEX(ptsit, (*sit).index, nx)
             distx = DISTANCE_XY(pt, ptsit);
             if ( distx < dist ) {
                 dist =  distx;
