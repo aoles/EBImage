@@ -22,10 +22,10 @@ floodFill = function(x, pt, col, tolerance=0) {
   if ( is.list(pt) ) pt = unlist(pt, use.names=FALSE)
   pt = as.integer(pt)
   if ( is.character(col) ) col = as.numeric(col2rgb(col)/255)
-  col = as.numeric(matrix(col, nrow=n, ncol=1L))
+  col = if ( typeof(x)=="double" ) as.double(col) else as.integer(col)
   if ( any( pt<1L || pt>dim(x)[1:2] ) ) stop("coordinates 'pt' of the starting point(s) must be inside the image boundaries")
 
-  return( .Call(C_floodFill, castImage(x), matrix(pt, nrow=n, ncol=2L, byrow=TRUE), col, as.numeric(tolerance)))
+  return( .Call(C_floodFill, x, matrix(pt, nrow=n, ncol=2L, byrow=TRUE), matrix(col, nrow=n, ncol=1L), as.numeric(tolerance)))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

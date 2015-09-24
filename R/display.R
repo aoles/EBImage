@@ -12,7 +12,7 @@ display = function(x,
     browser = displayInBrowser(x, title, ...),
     raster  = displayRaster(x, frame, all, ...) ) 
 
-  invisible(NULL)
+  invisible()
 }
 
 ## displays an image using R graphics

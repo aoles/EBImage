@@ -11,7 +11,7 @@ extern "C" {
 SEXP watershed(SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus
-};
+}
 #endif
 
 #endif

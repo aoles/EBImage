@@ -86,7 +86,7 @@ reenumerate = function(x) {
   dim(x) = c(.dim[seq_len(2)], .numberOfFrames(x, 'total'))
   
   res = apply(x, 3, function(im) {
-    from = sort.int(unique.default(as.vector(im)))
+    from = sort.int(unique.default(c(0L, as.vector(im))))
     to = seq_along(from) - 1L
     to[match(im, from)]
   })

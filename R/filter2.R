@@ -27,21 +27,18 @@ filter2 = function(x, filter) {
   if (any(df%%2==0)) stop("dimensions of 'filter' matrix must be odd")
   if (any(dx[1:2]<df)) stop("dimensions of 'x' must be bigger than 'filter'")
   
-  ## find centres of x and filter
-  cx = dx%/%2
+  ## create fft filter matrix
+  wf = matrix(0.0, nrow=dx[1L], ncol=dx[2L])
   cf = df%/%2
   
-  ## create fft filter matrix
-  wf = matrix(0.0, nrow=dx[1], ncol=dx[2])
-  wf[(cx[1]-cf[1]):(cx[1]+cf[1]),(cx[2]-cf[2]):(cx[2]+cf[2])] = filter
+  wf[c(if (cf[1L]>0L) (dx[1L]-cf[1L]+1L):dx[1L] else NULL, 1L:(cf[1L]+1L)), 
+     c(if (cf[2L]>0L) (dx[2L]-cf[2L]+1L):dx[2L] else NULL, 1L:(cf[2L]+1L))] = filter
   
   wf = fftw2d(wf)
   
-  index1 = c(cx[1]:dx[1],1:(cx[1]-1))
-  index2 = c(cx[2]:dx[2],1:(cx[2]-1))
   pdx = prod(dx[1:2])
   
-  .filter = function(xx) Re(fftw2d(fftw2d(xx)*wf, inverse=1)/pdx)[index1, index2]
+  .filter = function(xx) Re(fftw2d(fftw2d(xx)*wf, inverse=1)/pdx)
   
   ## convert to a frame-based 3D array
   if ( length(dx) > 2L ) {    

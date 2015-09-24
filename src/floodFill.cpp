@@ -19,7 +19,6 @@ struct XYPoint {
 };
 
 template <class T> void _floodFill(T*, XYPoint, XYPoint, T, double tol = 1e-3);
-// void fillHull(int *, const XYPoint &);
 template <class T> void _fillHullT(T *, const XYPoint &);
 
 /* -------------------------------------------------------------------------- */
@@ -242,45 +241,6 @@ struct Box {
   - with a starting at top-left corner
   
 */
-/*
-void 
-fillAroundObjectHull(int **m, int **canvas, const XYPoint &size, const Box &box, 
-                     const int &rc) {
-  XYStack s;
-  XYPoint pt;
-  bool spanLeft,spanRight;
-  
-  pt.x = box.l;
-  pt.y = box.t;
-    
-  // pushes the starting pixel
-  s.push(pt);
-    
-  while(s.pop(pt)) {    
-    // climbs up along the column x as far as possible
-    while(pt.y>=box.t && m[pt.x][pt.y]!=rc && canvas[pt.x][pt.y]!=rc) pt.y--;
-    pt.y++;
-    spanLeft=false;
-    spanRight=false;
-    // processes the column x
-    while(pt.y<=box.b && m[pt.x][pt.y]!=rc) {
-      canvas[pt.x][pt.y]=rc;
-      if(!spanLeft && pt.x>box.l && m[pt.x-1][pt.y]!=rc && canvas[pt.x-1][pt.y]!=rc) {
-    	  s.push(XYPoint(pt.x-1,pt.y));
-    	  spanLeft=true;
-    	}
-      else if(spanLeft && pt.x>box.l && (m[pt.x-1][pt.y]==rc || canvas[pt.x-1][pt.y]==rc)) spanLeft=false;
-      if(!spanRight && pt.x<box.r && m[pt.x+1][pt.y]!=rc && canvas[pt.x+1][pt.y]!=rc) {
-    	  s.push(XYPoint(pt.x+1,pt.y));
-    	  spanRight=true;
-    	}
-      else if(spanRight && pt.x<box.r && (m[pt.x+1][pt.y]==rc || canvas[pt.x+1][pt.y]==rc)) spanRight=false;
-      pt.y++;
-    }
-  }
-}
-*/
-
 /* -------------------------------------------------------------------------- */
 /* Templated version by Oleg Sklyar */
 template <class T> void 
@@ -321,82 +281,6 @@ _fillAroundObjectHullT(T **m, T **canvas, const Box &box, int &rc) {
     }
   }
 }
-
-/* -------------------------------------------------------------------------- */
-/*
-void
-fillHull(int *_m, const XYPoint &srcsize) {
-  int nobj = 0, i, x, y;
-  XYPoint size = srcsize;
-
-  // computes maximum number of different objects
-  for (i=0; i < srcsize.x*srcsize.y; i++)
-    if (_m[i] > nobj) nobj = _m[i];
-
-  // nothing to do if no objects
-  if (nobj < 1) return;
-
-  // extend m 2 pixels, copy content of _m inside, the frame - 0;
-  // initialize temporary canvas with 0
-  size.x += 2;
-  size.y += 2;
-
-  typedef int* pint;
-  int ** m = new pint[size.x];
-  int ** canvas = new pint[size.x];
-  for (x=0; x < size.x; x++) {
-    m[x] = new int[size.y];
-    canvas[x] = new int[size.y];
-    for (y=0; y < size.y; y++) {
-      canvas[x][y] = 0;
-      if (x==0 || x==size.x-1 || y==0 || y==size.y-1) m[x][y] = 0;
-      else m[x][y] = _m[x-1 + (y-1)*srcsize.x];
-    }
-  }
-
-  // allocate and compute bounding boxes for all objects (the one for 0 never used)
-  Box * bbox = new Box[nobj+1];
-
-  for (i=1; i <= nobj; i++) {
-    bbox[i].l = size.x-2;
-    bbox[i].t = size.y-2;
-  }
-
-  for (x=1; x < size.x-1; x++)
-    for (y=1; y < size.y-1; y++) {
-      if ( (i=m[x][y]) == 0) continue;
-      if (x < bbox[i].l) bbox[i].l = x;
-      else if (bbox[i].r < x) bbox[i].r = x;
-      if (y < bbox[i].t) bbox[i].t = y;
-      else if (bbox[i].b < y) bbox[i].b = y;
-    }
-
-  // reverse filling
-  for (i=1; i <= nobj; i++) {
-    Box box = bbox[i];
-    box.expand(1);
-    fillAroundObjectHull(m, canvas, size, box, i);
-    // fill back the original matrix!
-  	for (x=box.l+1; x <= box.r-1; x++)
-      for (y=box.t+1; y <= box.b-1; y++) {
-	      // if ((int)_m[x-1+(y-1)*srcsize.x] > 0) continue;
-	      if (m[x][y] != 0 || canvas[x][y]==i) continue;
-        // this should never happen, but just in case
-	      if (x-1<0 || x-1>=srcsize.x || y-1<0 || y-1>=srcsize.y) continue;
- 	      _m[x-1+(y-1)*srcsize.x] = i;
-	    }
-  }
-
-  // cleanup
-  for (x=0; x < size.x; x++) {
-    delete[] m[x];
-    delete[] canvas[x];
-  }
-  delete[] m;
-  delete[] canvas;
-  delete[] bbox;
-}
-*/
 
 /* -------------------------------------------------------------------------- */
 /* Templated version by Oleg Sklyar: T assumed to be int or double (at least)
