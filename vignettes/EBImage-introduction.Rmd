@@ -433,9 +433,9 @@ display(img_median)
 
 Binary images are images which contain only two sets of pixels, with values, say 0 and 1, representing the background and foreground pixels. Such images are subject to several non-linear morphological operations: erosion, dilation, opening, and closing. These operations work by overlaying a mask, called the structuring element, over the binary image in the following way:
 
-* erosion: For every foreground pixel, put the mask around it, and if any pixel under the mask is from the background, set all these pixels to background.
+* erosion: For every foreground pixel, put the mask around it, and if any pixel covered by the mask is from the background, set all these pixels to background.
 
-* dilation: For every background pixel, put the mask around it, and if any pixel under the mask is from the foreground, set all these pixels to foreground.
+* dilation: For every background pixel, put the mask around it, and if any pixel covered by the mask is from the foreground, set all these pixels to foreground.
 
 ```{r logo-pre, echo=FALSE}
 shapes = readImage(system.file('images', 'shapes.png', package='EBImage'))
@@ -460,9 +460,7 @@ logo_dilate = dilate(logo, kern)
 display(combine(logo_erode, logo_dilate), all=TRUE)
 ```
 
-Opening and closing are combinations of the two operations above: opening performs erosion followed by dilation, while closing does the opposite, i.e, performs dilation followed by erosion. Opening is useful for morphological noise removal, as it removes small objects from the background, and closing can be used to fill small holes in the foreground. These operations are implemented by `opening` and `closing`. 
-
-Functions to perform morphology operations on grayscale images have "Grayscale" appended to their names, e.g., `erodeGrayscale` or `closingGrayscale`.
+Opening and closing are combinations of the two operations above: opening performs erosion followed by dilation, while closing does the opposite, i.e, performs dilation followed by erosion. Opening is useful for morphological noise removal, as it removes small objects from the background, and closing can be used to fill small holes in the foreground. These operations are implemented by `opening` and `closing`.
 
 
 # Thresholding

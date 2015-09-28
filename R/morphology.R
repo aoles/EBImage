@@ -8,7 +8,6 @@ distmap = function (x, metric=c('euclidean', 'manhattan')) {
   validImage(x)
   if (any(is.na(x))) stop("'x' shouldn't contain any NAs")
   metric = match.arg(metric)
-  imetric = 
   return (.Call(C_distmap, castImage(x), switch(metric, euclidean=0L, manhattan=1L)))
 }
 
@@ -79,65 +78,72 @@ makeBrush = function(size, shape=c('box', 'disc', 'diamond', 'Gaussian', 'line')
 
 erode = function (x, kern=makeBrush(5, shape='diamond')) {
   validImage(x)
-  return (.Call(C_lib_erode_dilate, castImage(x), kern, as.integer(0)) )
+  return (.Call(C_lib_erode_dilate_greyscale, castImage(x), kern, 0L))
 }
 
 dilate = function (x, kern=makeBrush(5, shape='diamond')) {
   validImage(x)
-  return (.Call(C_lib_erode_dilate, castImage(x), kern, as.integer(1)) )
+  return (.Call(C_lib_erode_dilate_greyscale, castImage(x), kern, 1L))
 }
 
 opening = function (x, kern=makeBrush(5, shape='diamond')) {
   validImage(x)
-  dilate(erode(x, kern), kern)
+  return (.Call(C_lib_opening_closing_greyscale, castImage(x), kern, 0L))
 }
 
 closing = function (x, kern=makeBrush(5, shape='diamond')) {
   validImage(x)
-  erode(dilate(x, kern), kern)
+  return (.Call(C_lib_opening_closing_greyscale, castImage(x), kern, 1L))
 }
 
-## deprecate "GreyScale" notation
+whiteTopHat = function (x, kern=makeBrush(5, shape='diamond')) {
+  validImage(x)
+  return (.Call(C_lib_tophat_greyscale, castImage(x), kern, 0L))
+}
 
-erodeGrayscale = function(...) erodeGreyScale(...)
-dilateGrayscale = function(...) dilateGreyScale(...)
-openingGrayscale = function(...) openingGreyScale(...)
-closingGrayscale = function(...) closingGreyScale(...)
-whiteTopHatGrayscale = function(...) whiteTopHatGreyScale(...)
-blackTopHatGrayscale = function(...) blackTopHatGreyScale(...)
-selfcomplementaryTopHatGrayscale = function(...) selfcomplementaryTopHatGreyScale(...)
+blackTopHat = function (x, kern=makeBrush(5, shape='diamond')) {
+  validImage(x)
+  return (.Call(C_lib_tophat_greyscale, castImage(x), kern, 1L))
+}
+
+selfComplementaryTopHat = function (x, kern=makeBrush(5, shape='diamond')) {
+  validImage(x)
+  return (.Call(C_lib_tophat_greyscale, castImage(x), kern, 2L))
+}
+
+## deprecated "GreyScale" functions
 
 erodeGreyScale = function (x, kern=makeBrush(5, shape='diamond')) {
-    validImage(x)
-    return (.Call(C_lib_erode_dilate_greyscale, castImage(x), kern, as.integer(0)) )
+  .Deprecated("erode")
+  erode(x, kern)
 }
 
 dilateGreyScale = function (x, kern=makeBrush(5, shape='diamond')) {
-    validImage(x)
-    return (.Call(C_lib_erode_dilate_greyscale, castImage(x), kern, as.integer(1)) )
+  .Deprecated("dilate")
+  dilate(x, kern)
 }
 
 openingGreyScale = function (x, kern=makeBrush(5, shape='diamond')) {
-    validImage(x)
-    return (.Call(C_lib_opening_closing_greyscale, castImage(x), kern, as.integer(0)) )
+  .Deprecated("opening")
+  opening(x, kern)
 }
 
 closingGreyScale = function (x, kern=makeBrush(5, shape='diamond')) {
-    validImage(x)
-    return (.Call(C_lib_opening_closing_greyscale, castImage(x), kern, as.integer(1)) )
+  .Deprecated("closing")
+  closing(x, kern)
 }
 
 whiteTopHatGreyScale = function (x, kern=makeBrush(5, shape='diamond')) {
-    validImage(x)
-    return (.Call(C_lib_tophat_greyscale, castImage(x), kern, as.integer(0)) )
+  .Deprecated("whiteTopHat")
+  whiteTopHat(x, kern)
 }
 
 blackTopHatGreyScale = function (x, kern=makeBrush(5, shape='diamond')) {
-    validImage(x)
-    return (.Call(C_lib_tophat_greyscale, castImage(x), kern, as.integer(1)) )
+  .Deprecated("blackTopHat")
+  blackTopHat(x, kern)
 }
 
 selfcomplementaryTopHatGreyScale = function (x, kern=makeBrush(5, shape='diamond')) {
-    validImage(x)
-    return (.Call(C_lib_tophat_greyscale, castImage(x), kern, as.integer(2)) )
+  .Deprecated("selfComplementaryTopHat")
+  selfComplementaryTopHat(x, kern)
 }
