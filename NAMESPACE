@@ -58,8 +58,7 @@ export(equalize)
 
 ## morphological operations
 export(makeBrush)
-export(erode, dilate, opening, closing, erodeGrayscale, dilateGrayscale, openingGrayscale, closingGrayscale, whiteTopHatGrayscale, blackTopHatGrayscale, selfcomplementaryTopHatGrayscale)
-export(erodeGreyScale, dilateGreyScale, openingGreyScale, closingGreyScale, whiteTopHatGreyScale, blackTopHatGreyScale, selfcomplementaryTopHatGreyScale) #deprecate these
+export(erode, dilate, opening, closing, whiteTopHat, blackTopHat, selfComplementaryTopHat)
 export(distmap)
 export(floodFill, fillHull)
 
@@ -88,3 +87,6 @@ exportMethods(normalize, combine)
 ## legacy code because of broken R 3.1.2
 importFrom("methods", "Math2")
 exportMethods(Math2)
+
+## deprecated
+export(erodeGreyScale, dilateGreyScale, openingGreyScale, closingGreyScale, whiteTopHatGreyScale, blackTopHatGreyScale, selfcomplementaryTopHatGreyScale)
