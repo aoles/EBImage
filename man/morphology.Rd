@@ -4,27 +4,15 @@
 \alias{closing}
 \alias{erode}
 \alias{opening}
+\alias{whiteTopHat}
+\alias{blackTopHat}
+\alias{selfComplementaryTopHat}
 \alias{makeBrush}
-\alias{dilateGreyScale}
-\alias{erodeGreyScale}
-\alias{openingGreyScale}
-\alias{closingGreyScale}
-\alias{whiteTopHatGreyScale}
-\alias{blackTopHatGreyScale}
-\alias{selfcomplementaryTopHatGreyScale}
-\alias{dilateGrayscale}
-\alias{erodeGrayscale}
-\alias{openingGrayscale}
-\alias{closingGrayscale}
-\alias{whiteTopHatGrayscale}
-\alias{blackTopHatGrayscale}
-\alias{selfcomplementaryTopHatGrayscale}
-
 
 \title{Perform morphological operations on images}
 
 \description{
-  Functions to perform morphological operations on binary images.
+  Functions to perform morphological operations on binary and grayscale images.
 }
 
 \usage{
@@ -32,92 +20,77 @@ dilate(x, kern)
 erode(x, kern)
 opening(x, kern)
 closing(x, kern)
-dilateGreyScale(x, kern)
-erodeGreyScale(x, kern)
-openingGreyScale(x, kern)
-closingGreyScale(x, kern)
-whiteTopHatGreyScale(x, kern)
-blackTopHatGreyScale(x, kern)
-selfcomplementaryTopHatGreyScale(x, kern)
+whiteTopHat(x, kern)
+blackTopHat(x, kern)
+selfComplementaryTopHat(x, kern)
 
 makeBrush(size, shape=c('box', 'disc', 'diamond', 'Gaussian', 'line'), step=TRUE, sigma=0.3, angle=45)
 }
 
 \arguments{
-  \item{x}{An \code{Image} object or an array.
-    \code{x} is considered as a binary image, whose pixels of value 0
-    are considered as background ones and other pixels as
-    foreground ones.}
+  \item{x}{An \code{Image} object or an array.}
   
   \item{kern}{An \code{Image} object or an array, containing the
-    structuring element. \code{kern} is considered as a binary image, whose
-    pixels of value 0 are considered as background ones and other pixels as
-    foreground ones.}
+    structuring element. \code{kern} is considered as a binary image, with
+    pixels of value 0 being the background and pixels with values other than 0 being the foreground.}
   
-  \item{size}{A numeric containing the size of the brush in pixels. This should be an odd number; even numbers are rounded to the next odd one, i.e., \code{size = 4} has the same effect as  \code{size = 5}. If shape is \code{line}, \code{size} represents the length of the line.}
+  \item{size}{A numeric containing the size of the brush in pixels. This should be an odd number; even numbers are rounded to the next odd one, i.e., \code{size = 4} has the same effect as \code{size = 5}. Default is 5}
   
   \item{shape}{A character vector indicating the shape of the brush. Can
     be \code{box}, \code{disc}, \code{diamond}, \code{Gaussian} or \code{line}. Default is
     \code{box}.}
   
   \item{step}{a logical indicating if the brush is binary. Default is
-    \code{TRUE}. The argument is relevant only for the \code{disc} and
+    \code{TRUE}. This argument is relevant only for the \code{disc} and
     \code{diamond} shapes.}
 
   \item{sigma}{An optional numeric containing the standard deviation of
-    the Gaussian shape. Default is 0.3.}
+    the \code{Gaussian} shape. Default is 0.3.}
 
   \item{angle}{An optional numeric containing the angle at which the line should be drawn. The angle is
     one between the top of the image and the line.}
-
-}
-
-\value{
-  \code{dilate}, \code{erode}, \code{opening}, \code{closing}, \code{dilateGreyScale},
-  \code{erodeGreyScale}, \code{openingGreyScale}, \code{closingGreyScale},
-  \code{whiteTopHatGreyScale}, \code{blackTopHatGreyScale} and
-  \code{selfcomplementaryTopHatGreyScale} return the transformed \code{Image} object
-  or array,  after the corresponding morphological operation.
-    
-  \code{makeBrush} generates a 2D matrix containing the desired brush.
 }
 
 \details{
-  \code{dilate} applies the mask positioning its center over every background pixel
-  (0), every pixel which is not covered by the mask is reset to foreground (1).
+  \code{dilate} applies the mask \code{kern} by positioning its center over every pixel of the
+  image \code{x}, the output value of the pixel is the maximum value of \code{x}
+  covered by the mask. In case of binary images this is equivalent of putting the mask over every background pixel, and setting all the pixels under the mask to foreground if any of these pixels is from the foreground.
+
+  \code{erode} applies the mask \code{kern} by positioning its center over every pixel of the
+  image \code{x}, the output value of the pixel is the minimum value of \code{x}
+  covered by the mask. In case of binary images this is equivalent of putting the mask over every foreground pixel, and setting all the pixels under the mask to background if any of these pixels is from the background.
+
+  \code{opening} is an erosion followed by a dilation and \code{closing} is a dilation followed by an erosion.
+
+  \code{whiteTopHat} returns the difference between the original image \code{x} and its opening by the structuring element \code{kern}.
   
-  \code{erode} applies the mask positioning its center over every foreground pixel
-  (!=0), every pixel which is not covered by the mask is reset to background (0).
+  \code{blackTopHat} subtracts the original image \code{x} from its closing by the structuring element \code{kern}.
 
-  \code{opening} is an erosion followed by a dilation and \code{closing} is a dilation
-  followed by an erosion. The same goes for the grayscale versions.
-
-  \code{dilateGreyScale} applies the mask positioning its center over every pixel of the
-  \code{Image}, the output value of the pixel is the maximum value of the \code{Image}
-  covered by the mask.
-
-  \code{erodeGreyScale} applies the mask positioning its center over every pixel of the
-  \code{Image}, the output value of the pixel is the minimum value of the \code{Image}
-  covered by the mask.
-
-  \code{whiteTopHatGreyScale} subtracts the opening of the \code{Image} from the \code{Image}
-
-  \code{blackTopHatGreyScale} subtracts the \code{Image} from the closing of the \code{Image}
-
-  \code{selfcomplementaryTopHatGreyScale} is the sum of a white top-hat and a black top-hat, simplified
-  the difference between closing and opening of the \code{Image}
+  \code{selfComplementaryTopHat} is the sum of the \code{whiteTopHat} and the \code{blackTopHat}, simplified
+  the difference between the \code{closing} and the \code{opening} of the image.
 
   \code{makeBrush} generates brushes of various sizes and shapes that can be used
   as structuring elements.
 
-  Operations on grayscale images use an implementation of the Urbach-Wilkinson algorithm[1] and can
-  only handle flat (i.e. binary) brushes.
+  \subsection{Processing Pixels at Image Borders (Padding Behavior)}{
+    Morphological functions position the center of the structuring element over each pixel in the input image. For pixels close to the edge of an image, parts of the neighborhood defined by the structuring element may extend past the border of the image. In such a case, a value is assigned to these undefined pixels, as if the image was padded with additional rows and columns. The value of these padding pixels varies for dilation and erosion operations. For dilation, pixels beyond the image border are assigned the minimum value afforded by the data type, which in case of binary images is equivalent of setting them to background. For erosion, pixels beyond the image border are assigned the maximum value afforded by the data type, which in case of binary images is equivalent of setting them to foreground.}
+}
+
+\value{
+  \code{dilate}, \code{erode}, \code{opening}, \code{whiteTopHat}, \code{blackTopHat} and
+  \code{selfComplementaryTopHat} return the transformed \code{Image} object
+  or array \code{x}, after the corresponding morphological operation.
+    
+  \code{makeBrush} generates a 2D matrix containing the desired brush.
+}
+
+\note{
+  Morphological operations are implemented using the efficient Urbach-Wilkinson algorithm [1]. Its required computing time is independent of both the image content and the number of gray levels used.
 }
 
 \author{
-  Oleg Sklyar, \email{osklyar@ebi.ac.uk}, 2006
   Ilia Kats, \email{ilia-kats@gmx.net}, 2012
-
+  Andrzej Oles, \email{andrzej.oles@embl.de}, 2015
 }
 
 \examples{	
