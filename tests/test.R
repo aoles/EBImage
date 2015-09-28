@@ -6,20 +6,6 @@ set.seed(0) # make random color permutations in 'colorLabels' reproducible
 ## returns a hashcode given an object
 hash = function (x) .Call(digest:::digest_impl, serialize(x, connection=NULL, ascii=FALSE), 7L, -1L, 14L, 0L, 0L, PACKAGE="digest")
 
-hashold <- function(x) {
-  if ( is.list(x) && length(x)>0L ) hash(sapply(x, hash))
-  else {
-    xd <- suppressWarnings(as.numeric(x))
-    xd <- xd[!(is.nan(xd)||is.na(xd))]
-    lxd <- length(xd)
-    if (lxd==0L) NA
-    else {
-      if (is.matrix(xd)) sum(xd*(1:lxd)) + 0.7*hash(dim(xd))
-      else sum(xd*(1:lxd)) - 0.1
-    }
-  }
-}
-
 ## try to evaluate fun(x,...) 
 check <- function(fun, x, ..., capture.output=FALSE, suppressWarnings=FALSE, suppressMessages=FALSE, expectError=FALSE, debug=FALSE) {
   passed <- TRUE
@@ -38,7 +24,7 @@ check <- function(fun, x, ..., capture.output=FALSE, suppressWarnings=FALSE, sup
     passed <- FALSE
   }
 
-  if (passed) cat("PASS (", hash(y), " ", hashold(y), ")\n", sep="") 
+  if (passed) cat("PASS (", hash(y), ")\n", sep="") 
   else cat("FAIL\n")
   
   if ( isTRUE(debug) ) {
