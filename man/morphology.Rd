@@ -54,11 +54,11 @@ makeBrush(size, shape=c('box', 'disc', 'diamond', 'Gaussian', 'line'), step=TRUE
 \details{
   \code{dilate} applies the mask \code{kern} by positioning its center over every pixel of the
   image \code{x}, the output value of the pixel is the maximum value of \code{x}
-  covered by the mask. In case of binary images this is equivalent of putting the mask over every background pixel, and setting all the pixels under the mask to foreground if any of these pixels is from the foreground.
+  covered by the mask. In case of binary images this is equivalent of putting the mask over every background pixel, and setting it to foreground if any of the pixels covered by the mask is from the foreground.
 
   \code{erode} applies the mask \code{kern} by positioning its center over every pixel of the
   image \code{x}, the output value of the pixel is the minimum value of \code{x}
-  covered by the mask. In case of binary images this is equivalent of putting the mask over every foreground pixel, and setting all the pixels under the mask to background if any of these pixels is from the background.
+  covered by the mask. In case of binary images this is equivalent of putting the mask over every foreground pixel, and setting it to background if any of the pixels covered by the mask is from the background.
 
   \code{opening} is an erosion followed by a dilation and \code{closing} is a dilation followed by an erosion.
 
@@ -89,8 +89,7 @@ makeBrush(size, shape=c('box', 'disc', 'diamond', 'Gaussian', 'line'), step=TRUE
 }
 
 \author{
-  Ilia Kats, \email{ilia-kats@gmx.net}, 2012
-  Andrzej Oles, \email{andrzej.oles@embl.de}, 2015
+  Ilia Kats <\email{ilia-kats@gmx.net}> (2012), Andrzej Oles <\email{andrzej.oles@embl.de}> (2015)
 }
 
 \examples{	
