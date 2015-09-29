@@ -56,8 +56,7 @@
   \itemize{
     \item \code{makeBrush}
     \item \code{erode}, \code{dilate}, \code{opening}, \code{closing}
-    \item \code{erodeGreyScale}, \code{dilateGreyScale}, \code{openingGreyScale}, \code{closingGreyScale}
-    \item \code{whiteTopHatGreyScale}, \code{blackTopHatGreyScale}, \code{selfcomplementaryTopHatGreyScale}
+    \item \code{whiteTopHat}, \code{blackTopHat}, \code{selfComplementaryTopHat}
     \item \code{distmap}
     \item \code{floodFill}, \code{fillHull}
   }

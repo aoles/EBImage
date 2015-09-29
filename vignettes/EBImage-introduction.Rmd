@@ -298,9 +298,9 @@ img_thresh
 
 For image transposition, use `transpose` rather than R's `r Rpackage("base")` function `t`. This is because the former one works also on color and multiframe images by swapping its spatial dimensions.
 
-```{r transpose, fig.width=dim(imgcol)[2L]/.dpi, fig.height=dim(imgcol)[1L]/.dpi, dpi=.dpi/2}
-imgcol_t = transpose(imgcol)
-display( imgcol_t )
+```{r transpose, fig.width=dim(img)[2L]/.dpi, fig.height=dim(img)[1L]/.dpi, dpi=.dpi/2}
+img_t = transpose(img)
+display( img_t )
 ```
 
 
@@ -433,9 +433,9 @@ display(img_median)
 
 Binary images are images which contain only two sets of pixels, with values, say 0 and 1, representing the background and foreground pixels. Such images are subject to several non-linear morphological operations: erosion, dilation, opening, and closing. These operations work by overlaying a mask, called the structuring element, over the binary image in the following way:
 
-* erosion: For every foreground pixel, put the mask around it, and if any pixel covered by the mask is from the background, set all these pixels to background.
+* erosion: For every foreground pixel, put the mask around it, and if any pixel covered by the mask is from the background, set the pixel to background.
 
-* dilation: For every background pixel, put the mask around it, and if any pixel covered by the mask is from the foreground, set all these pixels to foreground.
+* dilation: For every background pixel, put the mask around it, and if any pixel covered by the mask is from the foreground, set the pixel to foreground.
 
 ```{r logo-pre, echo=FALSE}
 shapes = readImage(system.file('images', 'shapes.png', package='EBImage'))
@@ -722,4 +722,9 @@ segmented = paintObjects(nmask, segmented, col='#ffff00')
 display(segmented, all=TRUE)
 ```
 
+# Session Info
 
+```{r sessionInfo}
+sessionInfo()
+.Machine
+```
