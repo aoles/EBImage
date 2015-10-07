@@ -7,9 +7,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-SEXP lib_erode_dilate (SEXP, SEXP, SEXP);
-
+  
+  SEXP erode_dilate (SEXP, SEXP, SEXP);
+  SEXP opening_closing (SEXP, SEXP, SEXP);
+  SEXP tophat (SEXP, SEXP, SEXP);
+  
 #ifdef __cplusplus
 };
 #endif

@@ -8,7 +8,6 @@ See: ../LICENSE for license, LGPL
 
 #include "distmap.h"
 #include "morphology.h"
-#include "greyscale_morphology.h"
 #include "spatial.h"
 #include "propagate.h"
 #include "normalize.h"
@@ -31,10 +30,9 @@ See: ../LICENSE for license, LGPL
 #define CALLDEF(name, n)  {#name, (DL_FUNC) &name, n}
 
 static R_CallMethodDef CallEntries[] = {
-    CALLDEF(lib_erode_dilate, 3),
-    CALLDEF(lib_erode_dilate_greyscale, 3),
-    CALLDEF(lib_opening_closing_greyscale, 3),
-    CALLDEF(lib_tophat_greyscale, 3),
+    CALLDEF(erode_dilate, 3),
+    CALLDEF(opening_closing, 3),
+    CALLDEF(tophat, 3),
     CALLDEF(thresh, 2),
     CALLDEF(floodFill, 4),
     CALLDEF(fillHull, 1),
