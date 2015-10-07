@@ -139,7 +139,7 @@ testEBImageFunctions <- function(x) {
   x2 <- list(x=x1, y=2*x1)
   y1 <- getFrame(y, 1)
   expandRef <- if ( min(dim(x1)) > 31L ) function(ref, refnames) standardExpandRef(ref, refnames, gblob(n=31L)) else NULL
-  z <- check("computeFeatures", y1, x2, expandRef = expandRef)
+  z <- check("computeFeatures", y1, x2, expandRef = expandRef, round = !is.null(expandRef))
   z <- check("computeFeatures", y1, x2, expandRef = expandRef, properties = TRUE)
   
   ## curvature
