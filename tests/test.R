@@ -2,12 +2,13 @@
 library("EBImage")
 
 set.seed(0) # make random color permutations in 'colorLabels' reproducible
+.digits = ceiling(-log10(.Machine$double.eps^.5) + 1)
 
 ## returns a hashcode given an object
 hash = function (x) .Call(digest:::digest_impl, serialize(x, connection=NULL, ascii=FALSE), 7L, -1L, 14L, 0L, 0L, PACKAGE="digest")
 
 ## try to evaluate fun(x,...) 
-check <- function(fun, x, ..., capture.output=FALSE, suppressWarnings=FALSE, suppressMessages=FALSE, expectError=FALSE, debug=FALSE) {
+check <- function(fun, x, ..., capture.output=FALSE, suppressWarnings=FALSE, suppressMessages=FALSE, expectError=FALSE, round=FALSE, debug=FALSE) {
   passed <- TRUE
 
   cat(sprintf("checking \'%s\' %s ", fun, paste(rep(".", 35L-nchar(fun)), collapse = "")))
@@ -24,7 +25,10 @@ check <- function(fun, x, ..., capture.output=FALSE, suppressWarnings=FALSE, sup
     passed <- FALSE
   }
 
-  if (passed) cat("PASS (", hash(y), ")\n", sep="") 
+  if (passed) {
+    if ( isTRUE(round) && class(y)!="try-error") y = round(y, digits = .digits)
+    cat("PASS (", hash(y), ")\n", sep="") 
+  }
   else cat("FAIL\n")
   
   if ( isTRUE(debug) ) {
@@ -144,8 +148,8 @@ testEBImageFunctions <- function(x) {
 
   ## filtering
   z <- check("normalize", x, suppressWarnings=TRUE)
-  z <- check("gblur", x, sigma=1, expectError=min(d)<7)
-  z <- check("filter2", x, array(1, dim=c(5, 5)))
+  z <- check("gblur", x, sigma=1, expectError=min(d)<7, round=TRUE)
+  z <- check("filter2", x, array(1, dim=c(5, 5)), round=TRUE)
   z <- check("medianFilter", x, 2)
   z <- check("equalize", x, suppressWarnings=TRUE)
 
