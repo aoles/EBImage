@@ -2,10 +2,20 @@
 library("EBImage")
 
 set.seed(0) # make random color permutations in 'colorLabels' reproducible
-.digits = ceiling(-log10(.Machine$double.eps^.5) + 1)
+.digits = floor(-log10(.Machine$double.eps^.5) - 1)
 
 ## returns a hashcode given an object
 hash = function (x) .Call(digest:::digest_impl, serialize(x, connection=NULL, ascii=FALSE, xdr=FALSE), 7L, -1L, 14L, 0L, 0L, PACKAGE="digest")
+
+hash.old <- function(x) {
+  if (is.list(x)) hash(sapply(x,hash))
+  else {
+    xd <- as.numeric(x)
+    xd <- xd[!is.nan(xd)]
+    if (is.matrix(xd)) sum(xd*(1:length(xd))) + 0.7*hash(dim(xd))
+    else sum(xd*(1:length(xd))) - 0.1
+  }
+}
 
 ## try to evaluate fun(x,...) 
 check <- function(fun, x, ..., capture.output=FALSE, suppressWarnings=FALSE, suppressMessages=FALSE, expectError=FALSE, round=FALSE, debug=FALSE) {
@@ -26,8 +36,9 @@ check <- function(fun, x, ..., capture.output=FALSE, suppressWarnings=FALSE, sup
   }
 
   if (passed) {
-    if ( isTRUE(round) && class(y)!="try-error") y = round(y, digits = .digits)
-    cat("PASS (", hash(y), ")\n", sep="") 
+    if ( isTRUE(round) && class(y)!="try-error")
+      y = if ( is.list(y) ) lapply(y, round, digits=.digits) else round(y, digits = .digits)
+    cat("PASS (", hash(y), ") ", hash.old(y), "\n", sep="") 
   }
   else cat("FAIL\n")
   
@@ -144,7 +155,7 @@ testEBImageFunctions <- function(x) {
   
   ## curvature
   y <- check("ocontour", x>0.5)
-  if (length(y) > 0L ) z <- check("localCurvature", y[[1L]])
+  if (length(y) > 0L ) z <- check("localCurvature", y[[1L]], round=TRUE)
 
   ## filtering
   z <- check("normalize", x, suppressWarnings=TRUE)
