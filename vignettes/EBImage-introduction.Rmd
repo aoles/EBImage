@@ -726,5 +726,4 @@ display(segmented, all=TRUE)
 
 ```{r sessionInfo}
 sessionInfo()
-.Machine
 ```
