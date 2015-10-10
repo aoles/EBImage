@@ -1,6 +1,58 @@
 \name{EBImage-NEWS}
 \title{News for Package 'EBImage'}
 
+\section{Changes in version 4.12.0}{
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item \sQuote{antialias} argument to the function \sQuote{affine} allowing to switch off bilinear filtering around image borders
+    }
+  }
+  \subsection{SIGNIFICANT USER-VISIBLE CHANGES}{
+    \itemize{
+      \item deprecated \sQuote{...GreyScale} morphological functions; use common functions \sQuote{dilate}, \sQuote{erode}, \sQuote{opening}, \sQuote{closing}, \sQuote{whiteTopHat}, \sQuote{blackTopHat} and \sQuote{selfComplementaryTopHat} for filtering both binary and grayscale images
+      \item \sQuote{resize} doesn't perform bilinear filtering at image borders anymore in order to prevent the blending of image edges with the background when the image is upscaled; to switch on bilinear sampling at image borders use the function argument \sQuote{antialias = TRUE}
+      \item \sQuote{floodFill} and \sQuote{fillHull} preserve storage mode
+    }
+  }
+  \subsection{PERFORMANCE IMPROVEMENTS}{
+    \itemize{
+      \item all morphological operations use the efficient Urbach-Wilkinson algorithm (up to 3x faster compared to the previous implementation)
+      \item \sQuote{rotate}: perform lossless 90/180/270 degree rotations by disabling bilinear filtering
+    }
+  }
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item reimplemented the Urbach-Wilkinson algorithm used to perform grayscale morphological transformations
+      \item improved pixel-level accuracy of spatial linear transformations: \sQuote{affine}, \sQuote{resize}, \sQuote{rotate} and \sQuote{translate}
+      \item \sQuote{display(..., method = "raster")}: displaying of single-channel color images
+      \item \sQuote{drawCircle}: corrected x-y offset
+      \item \sQuote{equalize}: in case of a single-valued histogram issue a warning and return its argument
+      \item \sQuote{hist}: accept images with \sQuote{colorMode = Color} containing less than three color channels
+      \item \sQuote{image}: corrected handling of image frames
+      \item \sQuote{medianFilter}: filter size check
+      \item \sQuote{normalize}: normalization of a flat image when the argument \sQuote{separate} is set to \sQuote{FALSE}
+      \item \sQuote{reenumerate}: corrected handling of images without background
+      \item \sQuote{stackObjects}: corrected handling of blank images without any objects
+      \item \sQuote{tile}: reset dimnames
+    }
+  }
+}
+
+\section{Changes in version 4.10.1}{
+\subsection{SIGNIFICANT USER-VISIBLE CHANGES}{
+    \itemize{
+      \item \sQuote{rgbImage} and \sQuote{combine} use dimnames if present
+      \item \sQuote{makeBrush(..., shape = "line")}: the line is drawn symmetrically around the center of the kernel, and the argument \sQuote{size} sets the maximum x-y dimension of kernel rather than the line length
+    }
+  }
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item \sQuote{drawCircle} and \sQuote{stackObjects}: corrected handling of color channels
+      \item \sQuote{ocontour}: doubled the size of the temporary buffer to accommodate longer contours and fixed indexing issue
+    }
+  }
+}
+
 \section{Changes in version 4.10.0}{
   \subsection{NEW FEATURES}{
     \itemize{
