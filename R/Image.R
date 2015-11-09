@@ -194,6 +194,14 @@ setMethod("Math2", "Image",
           }
 )
 
+## explicit method definition for 'log' needed because of the extra formal argument, see ?Math
+setMethod("log", signature(x="Image"),
+          function(x, base) {
+            x@.Data <- callGeneric(x = x@.Data, base = base)
+            x
+          }
+)
+
 ## private
 ## determines image type
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
