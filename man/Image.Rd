@@ -28,6 +28,7 @@
 \alias{show,Image-method}
 \alias{image,Image-method}
 \alias{hist,Image-method}
+\alias{log,Image-method}
 
 \title{Image class}
 
