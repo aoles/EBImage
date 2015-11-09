@@ -87,6 +87,7 @@ exportMethods(normalize, combine)
 ## legacy code because of broken R 3.1.2
 importFrom("methods", "Math2")
 exportMethods(Math2)
+exportMethods(log)
 
 ## deprecated
 export(erodeGreyScale, dilateGreyScale, openingGreyScale, closingGreyScale, whiteTopHatGreyScale, blackTopHatGreyScale, selfcomplementaryTopHatGreyScale)
