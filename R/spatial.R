@@ -35,26 +35,25 @@ affine <- function (x, m, filter = c("bilinear", "none"), output.dim, bg.col = "
   .Call(C_affine, castImage(x), castImage(y), m, filter, as.integer(antialias))
 }
 
-## the code of this function is based on the Image constructor and probably could be reused in a more clever way
-bgImage = function(data, dim, colormode) {
-
-  ## special character case
-  if (is.character(data)) {
-    data = col2rgb(data)/255
-        
-    if ( missing(dim) && colormode==Color )
-      dim = c(dim[1:2], 3, if((ld=length(dim))>2) dim[3:ld] else NULL)
+bgImage = function(col, dim, colormode) {
+  
+  ## character color description
+  if ( is.character(col) ) {
+    col = col2rgb(col, alpha = isTRUE(dim[3L]==4L)) / 255
     
     if ( colormode==Color ) {
-      res = abind(array(data[1,,drop=FALSE], dim[-3]), array(data[2,,drop=FALSE], dim[-3]), array(data[3,,drop=FALSE], dim[-3]), along = 2.5)
+      res = do.call(abind, c(
+        lapply(seq_along(col[,1L]), function(i) array(col[i,,drop=FALSE], dim[-3])),
+        along = 2.5)
+      )
       dimnames(res) = NULL
     }
     else
-      res = array(data = (data[1,,drop=FALSE] + data[2,,drop=FALSE] + data[3,,drop=FALSE]) / 3, dim = dim)
+      res = array(data = colSums(col) / 3, dim = dim)
   }
-  ## default numeric case
+  ## numeric case
   else {
-    res = array(data, dim = dim)
+    res = array(col, dim = dim)
   }
   res
 }
