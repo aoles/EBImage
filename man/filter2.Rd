@@ -9,7 +9,7 @@
 }
 
 \usage{
-filter2(x, filter)
+filter2(x, filter, boundary = c("circular"))
 }
 
 \arguments{
@@ -17,6 +17,8 @@ filter2(x, filter)
 
   \item{filter}{An \code{Image} object or an array, with odd spatial
     dimensions. Must contain only one frame.}
+    
+  \item{boundary}{Behavior at image borders. The dafault is to wrap the image around borders. Numeric argument yields linear convolution by padding the image with the given value.}
 }
 
 \value{
@@ -30,7 +32,7 @@ filter2(x, filter)
   edges, sharpen images). The function \code{makeBrush} is useful to
   generate filters.
 
-  Data is reflected around borders.
+  The default behavior at boundaries is to wrap the image around borders.
   
   If \code{x} contains multiple frames, the filter will be applied one each frame.
   
