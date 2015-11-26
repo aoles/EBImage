@@ -16,20 +16,44 @@
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-filter2 = function(x, filter) {
+filter2 = function(x, filter, boundary = c("circular")) {
+  if ( is.numeric(boundary) ) {
+    val = boundary[1L]
+    boundary = "linear"
+  }
+  else
+    boundary = match.arg(boundary)
+  
   validObject(x)
   validObject(filter)
   
-  dx = dim(x)
+  d = dx = dim(x)
   df = dim(filter)
   dnames = dimnames(x)
   
   if (any(df%%2==0)) stop("dimensions of 'filter' matrix must be odd")
   if (any(dx[1:2]<df)) stop("dimensions of 'x' must be bigger than 'filter'")
   
+  cf = df%/%2
+  
+  ## zero 
+  
+  switch(boundary,
+    ## default mode just wraps around edges
+    circular = {},
+    ## implement this
+    replicate = {},
+    ## pad with the given value
+    linear = {
+      dx[1:2] = dx[1:2] + cf[1:2]
+      xpad = array(val, dx)
+      ## is there a better way of doing this?
+      imageData(x) = do.call("[<-", c(quote(xpad), lapply(d, function(x) enquote(1:x)), quote(x)) )
+    }
+  )
+  
   ## create fft filter matrix
   wf = matrix(0.0, nrow=dx[1L], ncol=dx[2L])
-  cf = df%/%2
   
   wf[c(if (cf[1L]>0L) (dx[1L]-cf[1L]+1L):dx[1L] else NULL, 1L:(cf[1L]+1L)), 
      c(if (cf[2L]>0L) (dx[2L]-cf[2L]+1L):dx[2L] else NULL, 1L:(cf[2L]+1L))] = filter
@@ -47,6 +71,10 @@ filter2 = function(x, filter) {
   }
   else {
     y = .filter(x)
+  }
+  
+  if ( boundary!="circular" ) {
+    y = asub(y, list(1:d[1L], 1:d[2L]), 1:2)
   }
   
   dimnames(y) = dnames

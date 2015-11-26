@@ -9,7 +9,7 @@
 }
 
 \usage{
-gblur(x, sigma, radius = 2 * ceiling(3 * sigma) + 1)
+gblur(x, sigma, radius = 2 * ceiling(3 * sigma) + 1, ...)
 }
 
 \arguments{
@@ -18,7 +18,9 @@ gblur(x, sigma, radius = 2 * ceiling(3 * sigma) + 1)
   \item{sigma}{A numeric denoting the standard deviation of the Gaussian filter
     used for blurring.}
 
-  \item{radius}{The radius of the filter in pixels. Default is \code{2*ceiling(3*sigma)+1)}. }
+  \item{radius}{The radius of the filter in pixels. Default is \code{2*ceiling(3*sigma)+1)}.}
+  
+  \item{...}{Arguments passed to \code{\link{filter2}}.}
 }
 
 \value{
