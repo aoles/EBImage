@@ -16,7 +16,7 @@
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-filter2 = function(x, filter, boundary = c("circular")) {
+filter2 = function(x, filter, boundary = c("circular", "replicate")) {
   if ( is.numeric(boundary) ) {
     val = boundary[1L]
     boundary = "linear"
@@ -36,19 +36,59 @@ filter2 = function(x, filter, boundary = c("circular")) {
   
   cf = df%/%2
   
-  ## zero 
-  
   switch(boundary,
     ## default mode just wraps around edges
     circular = {},
-    ## implement this
-    replicate = {},
-    ## pad with the given value
+    ## pad with a given value
     linear = {
       dx[1:2] = dx[1:2] + cf[1:2]
       xpad = array(val, dx)
       ## is there a better way of doing this?
       imageData(x) = do.call("[<-", c(quote(xpad), lapply(d, function(x) enquote(1:x)), quote(x)) )
+    },
+    replicate = {
+      dx[1:2] = dx[1:2] + df[1:2] - 1L
+      
+      duplicate = function(x, i, j, n, along) {
+        if ( !missing(i) && !missing(j) )
+          x = asub(x, list(i, j), 1:2)
+        l = vector("list", n)
+        for (k in 1:n) l[[k]] = x
+        abind(l, along = along)
+      }
+      
+      imageData(x) = abind(
+        ## center block
+        abind(
+          x,
+          ## right column
+          duplicate(x, d[1L], 1:d[2L], cf[1L], 1L),
+          ## left column
+          duplicate(x, 1L, 1:d[2L], cf[1L], 1L),
+        along = 1L),
+        ## lower block
+        duplicate(
+          abind(
+            ## bottom row
+            asub(x, list(1:d[1L], d[2L]), 1:2),
+            ## bottom right corner
+            duplicate(x, d[1L], d[2L], cf[1L], 1L),
+            ## bottom left corner
+            duplicate(x, 1L, d[2L], cf[1L], 1L),
+          along = 1L),
+        n = cf[2L], along = 2L),
+        ## upper block
+        duplicate(
+          abind(
+            ## top row
+            asub(x, list(1:d[1L], 1L), 1:2),
+            ## top right corner
+            duplicate(x, d[1L], 1L, cf[1L], 1L),
+            ## top left corner
+            duplicate(x, 1L, 1L, cf[1L], 1L),
+          along = 1L),
+        n = cf[2L], along = 2L),
+      along = 2L)
     }
   )
   
