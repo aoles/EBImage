@@ -9,7 +9,7 @@
 }
 
 \usage{
-filter2(x, filter, boundary = c("circular"))
+filter2(x, filter, boundary = c("circular", "replicate"))
 }
 
 \arguments{
@@ -18,7 +18,7 @@ filter2(x, filter, boundary = c("circular"))
   \item{filter}{An \code{Image} object or an array, with odd spatial
     dimensions. Must contain only one frame.}
     
-  \item{boundary}{Behavior at image borders. The dafault is to wrap the image around borders. Numeric argument yields linear convolution by padding the image with the given value.}
+  \item{boundary}{Behaviour at image borders. The default is to wrap the image around borders. For other modes see details.}
 }
 
 \value{
@@ -32,9 +32,11 @@ filter2(x, filter, boundary = c("circular"))
   edges, sharpen images). The function \code{makeBrush} is useful to
   generate filters.
 
-  The default behavior at boundaries is to wrap the image around borders.
+  The default \code{"circular"} behaviour at boundaries is to wrap the image around borders.
+  In the \code{"replicate"} mode pixels outside the bounds of the image are assumed to equal the nearest border pixel value.
+  Numeric values of \code{boundary} yield linear convolution by padding the image with the given value.
   
-  If \code{x} contains multiple frames, the filter will be applied one each frame.
+  If \code{x} contains multiple frames, the filter is applied separately to each frame.
   
 }
 
@@ -43,7 +45,7 @@ filter2(x, filter, boundary = c("circular"))
 }
 
 \author{
-  Gregoire Pau, \email{gpau@ebi.ac.uk}
+  Andrzej Oleś, Gregoire Pau
 }
 
 \examples{
