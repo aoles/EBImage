@@ -710,6 +710,11 @@ setMethod ("hist", signature(x="Image"),
     yy = vapply(h, "[[", vector(mode = "integer", length = bins), "counts")
     yy = rbind(yy, yy[bins,])
     matplot(xx, yy, type="s", lty=1L, main=main, xlab=xlab, col=names(y), ylab="counts", ...)
+    
+    if ( length(h)==1L && names(h)=="black")
+      h = h$black
+    
+    invisible(h)
   }
 )
 
