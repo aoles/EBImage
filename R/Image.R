@@ -828,12 +828,30 @@ parseColorMode = function(colormode) {
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## returns the raster representation of an image (by default the first frame)
-as.raster.Image = function(x, i = 1, ...) {
-  y = getFrame(x, i, type='render')
-  y = clipImage(y)
-  ## get image data with swapped XY dimensions
-  y = transpose(y, coerce = TRUE)
-  ## the actual raster representation
-  # the as.raster.array function does the transposition again!
-  as.raster(y, ...)
+as.raster.Image = function(x, max = 1, i = 1L, ...) {
+  colormode = colorMode(x)
+  y = .getFrame(x, i, type = 'render', colormode)
+  y = clipImage(y, range = c(0, max))
+  y = imageData(y)
+  d = dim(y)
+  
+  ## grayscale
+  r <- if (colormode == Grayscale)
+    rgb(y, y, y, maxColorValue = max)
+  ## color
+  else {
+    if (length(d) == 2L)
+      rgb(y, 0, 0, maxColorValue = max)
+    else
+      switch(min(d[3L], 4L),
+             rgb(y[,,1L], 0, 0, maxColorValue = max),
+             rgb(y[,,1L], y[,,2L], 0, maxColorValue = max),
+             rgb(y[,,1L], y[,,2L], y[,,3L], maxColorValue = max),
+             rgb(y[,,1L], y[,,2L], y[,,3L], y[,,4L], maxColorValue = max)
+      )
+  }
+  
+  attributes(r) <- list(dim = d[2:1], class = "raster")
+  r
 }
+
