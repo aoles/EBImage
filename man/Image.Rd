@@ -56,7 +56,7 @@ as.Image(x)
 is.Image(x)
 
 \method{as.array}{Image}(x, \ldots)
-\method{as.raster}{Image}(x, i = 1, \ldots)
+\method{as.raster}{Image}(x, max = 1, i = 1L, \ldots)
 
 colorMode(y)
 colorMode(y) <- value
@@ -82,6 +82,8 @@ numberOfFrames(y, type = c('total', 'render'))
   \item{x}{An R object.}
 
   \item{y}{An \code{Image} object or an array.}
+  
+  \item{max}{Number giving the maximum of the color values range.}
 
   \item{i}{Number(s) of frame(s). A single number in case of \code{getFrame}, or a vector of frame numbers for \code{getFrames}. If missing all frames are returned.}
 
