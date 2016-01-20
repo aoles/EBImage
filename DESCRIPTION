@@ -12,3 +12,5 @@ License: LGPL
 LazyLoad: true
 biocViews: Visualization
 VignetteBuilder: knitr
+URL: https://github.com/aoles/EBImage
+BugReports: https://github.com/aoles/EBImage/issues
