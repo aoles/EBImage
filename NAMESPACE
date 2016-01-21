@@ -3,7 +3,7 @@ useDynLib("EBImage", .registration = TRUE, .fixes = "C_")
 importFrom("BiocGenerics", "normalize", "combine")
 importFrom("methods", "Ops", "show", "new", "validObject", "is")
 importFrom("graphics", "image", "hist")
-importFrom("grDevices", "as.raster")
+importFrom("grDevices", "as.raster", "heat.colors")
 importFrom("stats", "median", "quantile")
 importFrom("abind", "abind", "adrop", "asub")
 importFrom("locfit", "lp", "locfit")
@@ -63,7 +63,7 @@ export(distmap)
 export(floodFill, fillHull)
 
 ## colorspace
-export(rgbImage, channel, toRGB)
+export(rgbImage, channel, toRGB, colormap)
 
 ## image stacking, tiling
 export(stackObjects)
