@@ -191,6 +191,7 @@ testEBImageFunctions <- function(x) {
   ## colorspace
   z <- check("toRGB", x)
   z <- check("rgbImage", x, x>0.5)
+  z <- check("colormap", channel(x, "luminance"), heat.colors(16L))
 
   ## image stacking, combining, tiling
   y <- check("combine", list(NULL, x, x, NULL, NULL))
