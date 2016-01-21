@@ -210,6 +210,7 @@ Type 'q()' to quit R.
 +   ## colorspace
 +   z <- check("toRGB", x)
 +   z <- check("rgbImage", x, x>0.5)
++   z <- check("colormap", channel(x, "luminance"), heat.colors(16L))
 + 
 +   ## image stacking, combining, tiling
 +   y <- check("combine", list(NULL, x, x, NULL, NULL))
@@ -312,6 +313,7 @@ checking 'selfcomplementaryTopHatGreyScale' ... PASS (bb3d006dd4423285) -0.1
 checking 'propagate' .......................... PASS (bb3d006dd4423285) -0.1
 checking 'toRGB' .............................. PASS (5cb6a857d91ed0ea) -0.1
 checking 'rgbImage' ........................... PASS (5cb6a857d91ed0ea) -0.1
+checking 'colormap' ........................... PASS (4fc03a2c05330d87) 2079.9
 checking 'combine' ............................ PASS (7587cd4863b3f3d0) -0.1
 checking 'combine' ............................ PASS (8cc517353533c670) -0.1
 checking 'tile' ............................... PASS (9c28fe28dabc9dc0) 42140.88
@@ -393,6 +395,7 @@ checking 'selfcomplementaryTopHatGreyScale' ... PASS (ca0a4f4dc9dc81ce) -0.1
 checking 'propagate' .......................... PASS (545d29ae11f62e79) 324.9
 checking 'toRGB' .............................. PASS (c8f79be3016a4f30) 2849.9
 checking 'rgbImage' ........................... PASS (04e5727b08bf45cb) 1274.9
+checking 'colormap' ........................... PASS (465b64f5769d9429) 2652.253
 checking 'combine' ............................ PASS (4d32f0cd424c46ed) 1274.9
 checking 'combine' ............................ PASS (d235aa9dfa5f7f28) 7874.9
 checking 'tile' ............................... PASS (d78128e72e9c8cfb) 24420.64
@@ -476,6 +479,7 @@ checking 'selfcomplementaryTopHatGreyScale' ... PASS (1b274081f0fb6226) 47919.37
 checking 'propagate' .......................... PASS (d77091beaa461622) 3405440
 checking 'toRGB' .............................. PASS (7b33402954c29951) 12381911
 checking 'rgbImage' ........................... PASS (c44ead1803e628d9) 4859544
+checking 'colormap' ........................... PASS (fbcba322d3f5c951) 11126039
 checking 'combine' ............................ PASS (3f46a10efaaab318) 5597376
 checking 'combine' ............................ PASS (c2857e1a820b6b96) 33922678
 checking 'tile' ............................... PASS (78eab32eac869231) 78718054
@@ -559,6 +563,7 @@ checking 'selfcomplementaryTopHatGreyScale' ... PASS (657c16605738da81) 7714.351
 checking 'propagate' .......................... PASS (1c6db85ca7fd5626) 27577069
 checking 'toRGB' .............................. PASS (42e4a51e3404811e) 765760.9
 checking 'rgbImage' ........................... PASS (3e4ef74fd42ad9d7) 3520680
+checking 'colormap' ........................... PASS (d2139029833173d7) 1816912
 checking 'combine' ............................ PASS (475166958acc7172) 2960568
 checking 'combine' ............................ PASS (dcd2456fbb97967f) 18119267
 checking 'tile' ............................... PASS (da0d33a63c42b563) 33061491
@@ -641,6 +646,7 @@ checking 'selfcomplementaryTopHatGreyScale' ... PASS (d5ac6c2defbff03d) 32566.05
 checking 'propagate' .......................... PASS (2e773f4d112dbe2e) 5578273
 checking 'toRGB' .............................. PASS (de81d0d989193946) 2036151
 checking 'rgbImage' ........................... PASS (cab54e5b08f3aae8) 7617867
+checking 'colormap' ........................... PASS (1844757fe6d6692b) 1657338
 checking 'combine' ............................ PASS (07952012d019c893) 8350133
 checking 'combine' ............................ PASS (8cb162a59398a20b) 52959073
 checking 'tile' ............................... PASS (498539964fb48dd4) 107188639
@@ -725,6 +731,7 @@ checking 'selfcomplementaryTopHatGreyScale' ... PASS (6e5d2f93e8866cce) 307071.9
 checking 'propagate' .......................... PASS (260e26ccbfe28881) 1613920
 checking 'toRGB' .............................. PASS (57b9a77f5a12af4f) 8499672
 checking 'rgbImage' ........................... PASS (82e9189e21600e37) 4777616
+checking 'colormap' ........................... PASS (244a6e10e928fb5e) 10283526
 checking 'combine' ............................ PASS (fbb690c6993fed59) 3888784
 checking 'combine' ............................ PASS (db4c289138cad595) 23054440
 checking 'tile' ............................... PASS (b5d61ba1e08ccf53) 48846817
@@ -808,6 +815,7 @@ checking 'selfcomplementaryTopHatGreyScale' ... PASS (a3d119c4935ab507) 20916.47
 checking 'propagate' .......................... PASS (e7ff27d3cf0885c2) 5892508
 checking 'toRGB' .............................. PASS (7b41d26d4354fed1) 2354709
 checking 'rgbImage' ........................... PASS (05d03bf83df83dbf) 12071186
+checking 'colormap' ........................... PASS (40f159a4fec5a5e4) 2273276
 checking 'combine' ............................ PASS (943e696dd062479b) 9516503
 checking 'combine' ............................ PASS (5b2b6f0a51b05e18) 59844403
 checking 'tile' ............................... PASS (853d179912a1e6b9) 114300809
@@ -891,6 +899,7 @@ checking 'selfcomplementaryTopHatGreyScale' ... PASS (d698c1175c6f2ff6) 20808.51
 checking 'propagate' .......................... PASS (799246dd013f020b) 2201664
 checking 'toRGB' .............................. PASS (7ac5c5945e1aa8b4) 20279146
 checking 'rgbImage' ........................... PASS (6c13f1c0649a1b02) 10796552
+checking 'colormap' ........................... PASS (fffb8d91ccca5f12) 22585273
 checking 'combine' ............................ PASS (61a6f7f5c6357973) 8992851
 checking 'combine' ............................ PASS (e3af2b87e81b577e) 56431472
 checking 'tile' ............................... PASS (22c39d5bf0a57b26) 72664167
