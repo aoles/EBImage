@@ -60,7 +60,8 @@ void compute_lookup_table_for_line_dilate(numeric ***T, numeric *image, int yOff
         T[yOff][0][i] = -DBL_MAX;
       }
       for (i; i < maxX; ++i) {
-        T[yOff][0][i] = image[INDEX_FROM_XY(i, y, size.x)];
+        numeric val = image[INDEX_FROM_XY(i, y, size.x)];
+        T[yOff][0][i] = ISNA(val) ? -DBL_MAX : val;
       }
       for (i; i < size.x + set->maxXoffset; ++i) {
         T[yOff][0][i] = -DBL_MAX;
@@ -90,7 +91,8 @@ void compute_lookup_table_for_line_erode(numeric ***T, numeric *image, int yOff,
       T[yOff][0][i] = DBL_MAX;
     }
     for (i; i < maxX; ++i) {
-      T[yOff][0][i] = image[INDEX_FROM_XY(i, y, size.x)];
+      numeric val = image[INDEX_FROM_XY(i, y, size.x)];
+      T[yOff][0][i] = ISNA(val) ? DBL_MAX : val;
     }
     for (i; i < size.x + set->maxXoffset; ++i) {
       T[yOff][0][i] = DBL_MAX;
@@ -104,22 +106,32 @@ void compute_lookup_table_for_line_erode(numeric ***T, numeric *image, int yOff,
   }
 }
 
-void dilate_line(numeric ***T, numeric *output, chordSet *set, int line, int width) {
+void dilate_line(numeric ***T, numeric *input, numeric *output, chordSet *set, int line, int width) {
     for (int i = 0; i < width; ++i) {
-        for (int j = 0; j < set->CLength; ++j) {
+        int index = INDEX_FROM_XY(i, line, width);
+        if (ISNA(input[index])) {
+          output[index] = input[index];
+        }
+        else {
+          for (int j = 0; j < set->CLength; ++j) {
             numeric v = MAX(T[set->C[j].yOffset][set->C[j].n][i + set->C[j].xOffset1], T[set->C[j].yOffset][set->C[j].n][i + set->C[j].xOffset2]);
-            int index = INDEX_FROM_XY(i, line, width);
             output[index] = MAX(output[index], v);
+          }
         }
     }
 }
 
-void erode_line(numeric ***T, numeric *output, chordSet *set, int line, int width) {
+void erode_line(numeric ***T, numeric *input, numeric *output, chordSet *set, int line, int width) {
   for (int i = 0; i < width; ++i) {
-    for (int j = 0; j < set->CLength; ++j) {
-      numeric v = MIN(T[set->C[j].yOffset][set->C[j].n][i + set->C[j].xOffset1], T[set->C[j].yOffset][set->C[j].n][i + set->C[j].xOffset2]);
-      int index = INDEX_FROM_XY(i, line, width);
-      output[index] = MIN(output[index], v);
+    int index = INDEX_FROM_XY(i, line, width);
+    if (ISNA(input[index])) {
+      output[index] = input[index];
+    }
+    else {
+      for (int j = 0; j < set->CLength; ++j) {
+        numeric v = MIN(T[set->C[j].yOffset][set->C[j].n][i + set->C[j].xOffset1], T[set->C[j].yOffset][set->C[j].n][i + set->C[j].xOffset2]);
+        output[index] = MIN(output[index], v);
+      }
     }
   }
 }
@@ -212,7 +224,7 @@ SEXP erode_dilate_internal (SEXP x, int what, chordSet *set, numeric ***T) {
     SEXP res;
 
     void (*compute_lookup_table_for_line)(numeric ***, numeric *, int, int, chordSet *, PointXY);
-    void (*process_line)(numeric ***, numeric *, chordSet *, int, int);
+    void (*process_line)(numeric ***, numeric *, numeric *, chordSet *, int, int);
     
     if (what == ERODE) {
       process_line = &erode_line;
@@ -242,7 +254,7 @@ SEXP erode_dilate_internal (SEXP x, int what, chordSet *set, numeric ***T) {
         for (int j = set->minYoffset; j <= set->maxYoffset; ++j) {
             compute_lookup_table_for_line(T, src, j, 0, set, size);
         }
-        process_line(T, tgt, set, 0, size.x);
+        process_line(T, src, tgt, set, 0, size.x);
         for (int j = 1; j < size.y; ++j) {
             numeric **first = T[set->minYoffset];
             for (int k = set->minYoffset; k < set->maxYoffset; ++k) {
@@ -250,7 +262,7 @@ SEXP erode_dilate_internal (SEXP x, int what, chordSet *set, numeric ***T) {
             }
             T[set->maxYoffset] = first;
             compute_lookup_table_for_line(T, src, set->maxYoffset, j, set, size);
-            process_line(T, tgt, set, j, size.x);
+            process_line(T, src, tgt, set, j, size.x);
         }
     }
 
