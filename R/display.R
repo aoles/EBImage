@@ -47,7 +47,8 @@ displayRaster = function(image, frame, all = FALSE, drawGrid = TRUE, ...){
   yran = c(0, nrow*ydim) + .5
   
   ## set graphical parameters
-  par(bty="n", mai=c(0,0,0,0), xaxs="i", yaxs="i", xaxt="n", yaxt="n")    
+  user <- par(bty="n", mai=c(0,0,0,0), xaxs="i", yaxs="i", xaxt="n", yaxt="n")
+  on.exit(par(user))
   plot(xran, yran, type="n", xlab="", ylab="", asp=1, ylim=rev(yran))
       
   for(r in seq_len(nrow)) {
