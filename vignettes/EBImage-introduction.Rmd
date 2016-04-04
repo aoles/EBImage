@@ -26,11 +26,13 @@ library(knitr)
 .dpi = 100
 set.seed(0)
 opts_chunk$set(comment=NA, fig.align="center", dpi=.dpi)
-.output = output_format()
+.output = output()
 switch(.output,
-       html = opts_chunk$set(fig.retina=1),
-       pdf  = opts_chunk$set(out.width=".5\\textwidth")
-       )
+        html = opts_chunk$set(fig.retina=1),
+        latex = opts_chunk$set(out.width=".5\\textwidth")
+)
+
+.dev = switch(.output, html="svg", latex="pdf")
 options(EBImage.display = "raster")
 ```
 
@@ -165,7 +167,7 @@ is.Image( as.array(img) )
 
 The distribution of pixel intensities can be plotted in a histogram, and their range inspected using the `range` function.
 
-```{r hist, fig.width=6, fig.height=6, dev=switch(.output,html="svg",pdf="pdf")}
+```{r hist, fig.width=6, fig.height=6, dev=.dev}
 hist(img)
 range(img)
 ```
@@ -385,7 +387,7 @@ In fact, `filter2` does not directly perform the summation indicated in the equa
 Instead, it uses the Fast Fourier Transformation in a way that is mathematically equivalent 
 but computationally more efficient.
 
-```{r makeBrush, fig.width=6, fig.height=6, dev=switch(.output,html="svg",pdf="pdf")}
+```{r makeBrush, fig.width=6, fig.height=6, dev=.dev}
 w = makeBrush(size = 31, shape = 'gaussian', sigma = 5)
 plot(w[(nrow(w)+1)/2, ], ylab = "w", xlab = "", cex = 0.7)
 ```{r lopass, fig.width=dim(img)[1L]/.dpi, fig.height=dim(img)[2L]/.dpi, dpi=.dpi/2}
