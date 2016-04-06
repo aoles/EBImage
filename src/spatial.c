@@ -29,6 +29,8 @@ SEXP affine(SEXP _a, SEXP _b, SEXP _m, SEXP _filter, SEXP _antialias) {
   filter = INTEGER(_filter)[0];
   antialias = INTEGER(_antialias)[0];
   // get output image b data
+  PROTECT(_b = Rf_duplicate(_b));
+  
   owidth = INTEGER(GET_DIM(_b))[0];
   oheight = INTEGER(GET_DIM(_b))[1];
   b = REAL(_b);
@@ -111,5 +113,6 @@ SEXP affine(SEXP _a, SEXP _b, SEXP _m, SEXP _filter, SEXP _antialias) {
     }
   }
   
+  UNPROTECT(1);
   return _b;
 }
