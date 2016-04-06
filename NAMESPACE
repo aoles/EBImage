@@ -1,16 +1,17 @@
 useDynLib("EBImage", .registration = TRUE, .fixes = "C_")
 
-importFrom("BiocGenerics", "normalize", "combine")
-importFrom("methods", "Ops", "show", "new", "validObject", "is")
-importFrom("graphics", "image", "hist")
-importFrom("grDevices", "as.raster", "heat.colors")
-importFrom("stats", "median", "quantile")
+importFrom("BiocGenerics", "combine", "normalize")
+importFrom("methods", "as", "callGeneric", "callNextMethod", "is", "new", "Ops", "show", "validObject")
+importFrom("graphics", "abline", "clip", "hist", "hist.default", "image", "image.default", "matplot", "par", "plot", "rasterImage")
+importFrom("grDevices", "as.raster", "col2rgb", "gray", "heat.colors", "rgb")
+importFrom("stats", "dnorm", "mad", "median", "predict", "quantile", "sd")
 importFrom("abind", "abind", "adrop", "asub")
-importFrom("locfit", "lp", "locfit")
+importFrom("locfit", "locfit", "lp")
 importFrom("tiff", "readTIFF", "writeTIFF")
 importFrom("jpeg", "readJPEG", "writeJPEG")
 importFrom("png", "readPNG", "writePNG")
 importFrom("fftwtools", "fftw2d")
+importFrom("utils", "browseURL")
 
 ## classes
 exportClasses(Image)
