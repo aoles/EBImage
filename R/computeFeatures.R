@@ -33,7 +33,7 @@ tests = function() {
   
   ## test standardExpandRef
   z = standardExpandRef(yc)
-  str(z)
+  #str(z)
   display(combine(z))
   
   ## image with one point
