@@ -30,9 +30,11 @@ medianFilter(x, size, cacheSize=512)
   For a filter of radius \code{size}, the median kernel is a \code{2*size+1}
   times \code{2*size+1} square.
   
-  Images are processed using 16-bit precision. The behavior at image boundaries
-  is such as the source image \code{x} has been padded with pixels whose values
-  equal the nearest border pixel value.
+  The input image \code{x} should contain pixel values in the range from 0 to 1, 
+  inclusive; values lower than 0 or higher than 1 are clipped before applying 
+  the filter. Internal processing is performed using 16-bit precision. The 
+  behavior at image boundaries is such as the source image has been padded with
+  pixels whose values equal the nearest border pixel value.
   
   If the image contains multiple channels or frames, 
   the filter is applied to each one of them separately.
