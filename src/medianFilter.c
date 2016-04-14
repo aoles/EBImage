@@ -486,8 +486,7 @@ SEXP medianFilter (SEXP _in, SEXP _r, SEXP _memsize) {
     if (el < 0.0) el = 0;
     else if (el > 1.0) el = 1.0;
     // convert to int
-    el *= max_uint16;
-    px[i] = (uint16_t) el;
+    px[i] = (uint16_t) round(el * max_uint16);
   }
   
   // process channels separately
@@ -495,11 +494,9 @@ SEXP medianFilter (SEXP _in, SEXP _r, SEXP _memsize) {
     ctmf(&px[framesize*j], &py[framesize*j], x, y, x, x, r, 1, memsize);
   
   // convert back to [0:1] range
-  for (i = 0; i < imagesize; i++) {
-    double el = (double) py[i];
-    //out[i] = (double) px[i];
-    out[i] = el / max_uint16;
-  }
+  for (i = 0; i < imagesize; i++)
+    out[i] = (double) py[i] / max_uint16;
+  
   UNPROTECT(nprotect);
  
   return res;
