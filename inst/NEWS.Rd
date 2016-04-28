@@ -1,6 +1,30 @@
 \name{EBImage-NEWS}
 \title{News for Package 'EBImage'}
 
+\section{Changes in version 4.14.0}{
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item \sQuote{boundary} argument to \sQuote{filter2()} for specifying behaviour at image boundaries
+      \item the \sQuote{hist} method now returns a (list of) \dQuote{histogram} object(s) (http://stackoverflow.com/q/33831331/2792099 and http://stackoverflow.com/a/35838861/2792099)
+      \item \sQuote{colormap()} function for mapping a greyscale image to color using a color palette
+    }
+  }
+  \subsection{PERFORMANCE IMPROVEMENTS}{
+    \itemize{
+      \item \sQuote{as.raster.Image}: increased performance by not transposing the image twice and improved support for Color images with less than 3 channels
+    }
+  }
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item fixed the \sQuote{log} method for Image objects (https://support.bioconductor.org/p/74236/)
+      \item \sQuote{affine}: fixed handling of images containing an alpha channel (https://support.bioconductor.org/p/74876/)
+      \item retain NA's in morphological operations: \sQuote{dilate}, \sQuote{erode}, \sQuote{opening}, \sQuote{closing}, \sQuote{whiteTopHat}, \sQuote{blackTopHat}, \sQuote{selfComplementaryTopHat} (https://support.bioconductor.org/p/77295/)
+      \item fix to potential unsafe code in C function \sQuote{affine()} (thanks Tomas Kalibera)
+      \item medianFilter.c: use proper rounding rather than truncation during float to int coercion 
+    }
+  }
+}
+
 \section{Changes in version 4.12.0}{
   \subsection{NEW FEATURES}{
     \itemize{
