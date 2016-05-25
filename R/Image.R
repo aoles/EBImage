@@ -262,19 +262,19 @@ readImage = function(files, type, all=TRUE, names = sub("\\.[^.]*$", "", basenam
     stop(attr(type,"condition")$message)
   
   .readFun = switch(type,
-                   tiff = function(x, ...) {
-                     y = readTIFF(x, all = all, ...)
-                     if ( (l=length(y)) > 1L) {
-                       if (!is.null(names)) names(y) = seq_len(l)
-                       # make sure all frames have the same dimensions
-                       if(!all(duplicated(lapply(y, dim))[-1L]))
-                         stop(sprintf("Frame dimensions of the '%s' file are not equal.", x))
-                     }
-                     y
-                   },
-                   jpeg = function(x, ...) readJPEG(x, ...),
-                   png  = function(x, ...) readPNG(x, ...),
-                   stop(sprintf("Invalid type: %s. Currently supported formats are JPEG, PNG, and TIFF.", type))
+                    tiff = function(x, ...) {
+                      y = readTIFF(x, all = all, ...)
+                      if ( (l=length(y)) > 1L) {
+                        if (!is.null(names)) names(y) = seq_len(l)
+                        # make sure all frames have the same dimensions
+                        if(!all(duplicated.default(lapply(y, dim))[-1L]))
+                          stop(sprintf("Frame dimensions of the '%s' file are not equal.", x))
+                      }
+                      y
+                    },
+                    jpeg = function(x, ...) readJPEG(x, ...),
+                    png  = function(x, ...) readPNG(x, ...),
+                    stop(sprintf("Invalid type: %s. Currently supported formats are JPEG, PNG, and TIFF.", type))
   )
   
   .loadFun = function(i, ...) {
@@ -318,7 +318,6 @@ readImage = function(files, type, all=TRUE, names = sub("\\.[^.]*$", "", basenam
   #  multiple files
   else {
     y = lapply(files, .loadFun, ...)
-    # chop of anything behind the last single dot including the dot itself
     names(y) = names
     y = .flatten(y)   
   }
@@ -327,7 +326,7 @@ readImage = function(files, type, all=TRUE, names = sub("\\.[^.]*$", "", basenam
     if(length(y)==0L) stop("Empty image stack.")
     
     # check whether image dimensions match
-    if(!all(duplicated(lapply(y, dim))[-1L]))
+    if(!all(duplicated.default(lapply(y, dim))[-1L]))
       stop("Images have different dimensions")
     
     y1 = y[[1L]]
@@ -335,7 +334,7 @@ readImage = function(files, type, all=TRUE, names = sub("\\.[^.]*$", "", basenam
     if(length(y) == 1L)
       y = y1
     else
-      y = abind(y, along = length(dim(y1))+1L)
+      y = vapply(y, identity, FUN.VALUE=y1)
     rm(y1)
   }
   else{
