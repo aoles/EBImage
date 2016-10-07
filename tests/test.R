@@ -174,13 +174,6 @@ testEBImageFunctions <- function(x) {
   z <- check("watershed", z)
   z <- check('floodFill', x, c(5, 5), 0.5)
   z <- check('fillHull', y)
-  z <- check("erodeGreyScale", x, suppressWarnings=TRUE)
-  z <- check("dilateGreyScale", x, suppressWarnings=TRUE)
-  z <- check("openingGreyScale", x, suppressWarnings=TRUE)
-  z <- check("closingGreyScale", x, suppressWarnings=TRUE)
-  z <- check("whiteTopHatGreyScale", x, suppressWarnings=TRUE)
-  z <- check("blackTopHatGreyScale", x, suppressWarnings=TRUE)
-  z <- check("selfcomplementaryTopHatGreyScale", x, suppressWarnings=TRUE)
 
   ## propagate
   y <- thresh(x, offset=0.02)
