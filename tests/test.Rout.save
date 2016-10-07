@@ -1,6 +1,6 @@
 
-R version 3.2.3 (2015-12-10) -- "Wooden Christmas-Tree"
-Copyright (C) 2015 The R Foundation for Statistical Computing
+R version 3.3.0 (2016-05-03) -- "Supposedly Educational"
+Copyright (C) 2016 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -193,13 +193,6 @@ Type 'q()' to quit R.
 +   z <- check("watershed", z)
 +   z <- check('floodFill', x, c(5, 5), 0.5)
 +   z <- check('fillHull', y)
-+   z <- check("erodeGreyScale", x, suppressWarnings=TRUE)
-+   z <- check("dilateGreyScale", x, suppressWarnings=TRUE)
-+   z <- check("openingGreyScale", x, suppressWarnings=TRUE)
-+   z <- check("closingGreyScale", x, suppressWarnings=TRUE)
-+   z <- check("whiteTopHatGreyScale", x, suppressWarnings=TRUE)
-+   z <- check("blackTopHatGreyScale", x, suppressWarnings=TRUE)
-+   z <- check("selfcomplementaryTopHatGreyScale", x, suppressWarnings=TRUE)
 + 
 +   ## propagate
 +   y <- thresh(x, offset=0.02)
@@ -303,13 +296,6 @@ checking 'distmap' ............................ PASS (bb3d006dd4423285) -0.1
 checking 'watershed' .......................... PASS (bb3d006dd4423285) -0.1
 checking 'floodFill' .......................... PASS (02f684c8d407c0f3) 1039.9
 checking 'fillHull' ........................... PASS (1b5285e59ce84fa0) -0.1
-checking 'erodeGreyScale' ..................... PASS (bb3d006dd4423285) -0.1
-checking 'dilateGreyScale' .................... PASS (bb3d006dd4423285) -0.1
-checking 'openingGreyScale' ................... PASS (bb3d006dd4423285) -0.1
-checking 'closingGreyScale' ................... PASS (bb3d006dd4423285) -0.1
-checking 'whiteTopHatGreyScale' ............... PASS (bb3d006dd4423285) -0.1
-checking 'blackTopHatGreyScale' ............... PASS (bb3d006dd4423285) -0.1
-checking 'selfcomplementaryTopHatGreyScale' ... PASS (bb3d006dd4423285) -0.1
 checking 'propagate' .......................... PASS (bb3d006dd4423285) -0.1
 checking 'toRGB' .............................. PASS (5cb6a857d91ed0ea) -0.1
 checking 'rgbImage' ........................... PASS (5cb6a857d91ed0ea) -0.1
@@ -385,13 +371,6 @@ checking 'distmap' ............................ PASS (2690b089a32348c7) Inf
 checking 'watershed' .......................... PASS (545d29ae11f62e79) 324.9
 checking 'floodFill' .......................... PASS (9a58bf6b1ef39788) -0.1
 checking 'fillHull' ........................... PASS (57132767bf0cf5c4) 324.9
-checking 'erodeGreyScale' ..................... PASS (545d29ae11f62e79) 324.9
-checking 'dilateGreyScale' .................... PASS (545d29ae11f62e79) 324.9
-checking 'openingGreyScale' ................... PASS (545d29ae11f62e79) 324.9
-checking 'closingGreyScale' ................... PASS (545d29ae11f62e79) 324.9
-checking 'whiteTopHatGreyScale' ............... PASS (ca0a4f4dc9dc81ce) -0.1
-checking 'blackTopHatGreyScale' ............... PASS (ca0a4f4dc9dc81ce) -0.1
-checking 'selfcomplementaryTopHatGreyScale' ... PASS (ca0a4f4dc9dc81ce) -0.1
 checking 'propagate' .......................... PASS (545d29ae11f62e79) 324.9
 checking 'toRGB' .............................. PASS (c8f79be3016a4f30) 2849.9
 checking 'rgbImage' ........................... PASS (04e5727b08bf45cb) 1274.9
@@ -469,13 +448,6 @@ checking 'distmap' ............................ PASS (66da40cd47ec8762) 3826969
 checking 'watershed' .......................... PASS (e56c10b1b455d1ee) 2762113
 checking 'floodFill' .......................... PASS (e508f01acf50e00d) 1470197
 checking 'fillHull' ........................... PASS (b630618a382dd149) 1217568
-checking 'erodeGreyScale' ..................... PASS (64c657aee2f15dbc) 1130521
-checking 'dilateGreyScale' .................... PASS (ecfac26f136b07e4) 1843945
-checking 'openingGreyScale' ................... PASS (7f9002f9504ae7d1) 1440758
-checking 'closingGreyScale' ................... PASS (fd191543ebcf0763) 1488678
-checking 'whiteTopHatGreyScale' ............... PASS (63d21325f526b7da) 29313.46
-checking 'blackTopHatGreyScale' ............... PASS (7eb8f27f5b5edd0d) 18605.81
-checking 'selfcomplementaryTopHatGreyScale' ... PASS (1b274081f0fb6226) 47919.37
 checking 'propagate' .......................... PASS (d77091beaa461622) 3405440
 checking 'toRGB' .............................. PASS (7b33402954c29951) 12381911
 checking 'rgbImage' ........................... PASS (c44ead1803e628d9) 4859544
@@ -553,13 +525,6 @@ checking 'distmap' ............................ PASS (f6300a4f340ae60a) 12740449
 checking 'watershed' .......................... PASS (416bf360cd763da1) 988518.9
 checking 'floodFill' .......................... PASS (58b50ac20366b30b) 765755.4
 checking 'fillHull' ........................... PASS (c843a337bba9a51b) 988518.9
-checking 'erodeGreyScale' ..................... PASS (0ce045fa99d3b931) 729794.4
-checking 'dilateGreyScale' .................... PASS (ab05179d8b2a492c) 801416.4
-checking 'openingGreyScale' ................... PASS (24250541b5293bbb) 762731.7
-checking 'closingGreyScale' ................... PASS (519febd3c1f153be) 770446.1
-checking 'whiteTopHatGreyScale' ............... PASS (e9cbf4d163436114) 3029.12
-checking 'blackTopHatGreyScale' ............... PASS (e666c08b495b7e58) 4685.131
-checking 'selfcomplementaryTopHatGreyScale' ... PASS (657c16605738da81) 7714.351
 checking 'propagate' .......................... PASS (1c6db85ca7fd5626) 27577069
 checking 'toRGB' .............................. PASS (42e4a51e3404811e) 765760.9
 checking 'rgbImage' ........................... PASS (3e4ef74fd42ad9d7) 3520680
@@ -636,13 +601,6 @@ checking 'distmap' ............................ PASS (046048efe2665db2) 6038778
 checking 'watershed' .......................... PASS (c63512eb33f79e77) 1058553
 checking 'floodFill' .......................... PASS (87ccae676293e02d) 2036854
 checking 'fillHull' ........................... PASS (53e61ab2bda88b20) 1058553
-checking 'erodeGreyScale' ..................... PASS (80f18423a9428ef1) 1941712
-checking 'dilateGreyScale' .................... PASS (e4ae28ea403ad621) 2130233
-checking 'openingGreyScale' ................... PASS (86f380d942ffd78a) 2019598
-checking 'closingGreyScale' ................... PASS (5762e5c0f5df9471) 2052164
-checking 'whiteTopHatGreyScale' ............... PASS (7afe8fe7e9b65bc2) 16552.27
-checking 'blackTopHatGreyScale' ............... PASS (f6666dc028ae2ea3) 16013.67
-checking 'selfcomplementaryTopHatGreyScale' ... PASS (d5ac6c2defbff03d) 32566.05
 checking 'propagate' .......................... PASS (2e773f4d112dbe2e) 5578273
 checking 'toRGB' .............................. PASS (de81d0d989193946) 2036151
 checking 'rgbImage' ........................... PASS (cab54e5b08f3aae8) 7617867
@@ -721,13 +679,6 @@ checking 'distmap' ............................ PASS (8ba0b0fb6770e8a3) 3856630
 checking 'watershed' .......................... PASS (72d368ef2922b662) 1443978
 checking 'floodFill' .......................... PASS (45775cc98ccde7d0) 1055560
 checking 'fillHull' ........................... PASS (45775cc98ccde7d0) 1055560
-checking 'erodeGreyScale' ..................... PASS (9612cb7eb59128c1) 617311.9
-checking 'dilateGreyScale' .................... PASS (d92354132f4712fd) 1501932
-checking 'openingGreyScale' ................... PASS (ebec25e5b1451de6) 922059.9
-checking 'closingGreyScale' ................... PASS (ff0369f10e09cdaa) 1229132
-checking 'whiteTopHatGreyScale' ............... PASS (0f080c1db0b5fe55) 133499.9
-checking 'blackTopHatGreyScale' ............... PASS (6d773e85bc5a5128) 173571.9
-checking 'selfcomplementaryTopHatGreyScale' ... PASS (6e5d2f93e8866cce) 307071.9
 checking 'propagate' .......................... PASS (260e26ccbfe28881) 1613920
 checking 'toRGB' .............................. PASS (57b9a77f5a12af4f) 8499672
 checking 'rgbImage' ........................... PASS (82e9189e21600e37) 4777616
@@ -805,13 +756,6 @@ checking 'distmap' ............................ PASS (e9f6f8a5899a40fd) 10836360
 checking 'watershed' .......................... PASS (7f9231558b202abf) 2013322
 checking 'floodFill' .......................... PASS (a23cce6e67e088ae) 2355706
 checking 'fillHull' ........................... PASS (5a6494dd882e20ae) 2013322
-checking 'erodeGreyScale' ..................... PASS (5b7184ec985c0c4f) 2221928
-checking 'dilateGreyScale' .................... PASS (5e9980484c5edd77) 2490135
-checking 'openingGreyScale' ................... PASS (693d0883a1b876d3) 2345403
-checking 'closingGreyScale' ................... PASS (9d9baf64dab78e99) 2366319
-checking 'whiteTopHatGreyScale' ............... PASS (ef3ec93af3e1ff14) 9305.892
-checking 'blackTopHatGreyScale' ............... PASS (ca55c681ccf3eed7) 11610.48
-checking 'selfcomplementaryTopHatGreyScale' ... PASS (a3d119c4935ab507) 20916.47
 checking 'propagate' .......................... PASS (e7ff27d3cf0885c2) 5892508
 checking 'toRGB' .............................. PASS (7b41d26d4354fed1) 2354709
 checking 'rgbImage' ........................... PASS (05d03bf83df83dbf) 12071186
@@ -889,13 +833,6 @@ checking 'distmap' ............................ PASS (fd74d28ff7a40bc8) 7464344
 checking 'watershed' .......................... PASS (2705781a5e93a0a5) 1541186
 checking 'floodFill' .......................... PASS (c8f6a63ecc5faeb2) 2234521
 checking 'fillHull' ........................... PASS (cdeb2538f3cc7adf) 1541186
-checking 'erodeGreyScale' ..................... PASS (25483b000a8b92fa) 2103523
-checking 'dilateGreyScale' .................... PASS (e364513c4965bc24) 2367918
-checking 'openingGreyScale' ................... PASS (822810b165d46657) 2224298
-checking 'closingGreyScale' ................... PASS (f8209b506fe24a78) 2245106
-checking 'whiteTopHatGreyScale' ............... PASS (6abbc0f4590fd917) 8838.229
-checking 'blackTopHatGreyScale' ............... PASS (cc9e5025e1bf97a6) 11970.18
-checking 'selfcomplementaryTopHatGreyScale' ... PASS (d698c1175c6f2ff6) 20808.51
 checking 'propagate' .......................... PASS (799246dd013f020b) 2201664
 checking 'toRGB' .............................. PASS (7ac5c5945e1aa8b4) 20279146
 checking 'rgbImage' ........................... PASS (6c13f1c0649a1b02) 10796552

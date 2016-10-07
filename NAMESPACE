@@ -79,9 +79,6 @@ export(computeFeatures.basic, computeFeatures.haralick, computeFeatures.moment, 
 export(standardExpandRef, gblob)
 export(localCurvature)
 
-## defunct
-export(getNumberOfFrames)
-
 ## methods extending S4 generics from the BiocGenerics package
 exportMethods(normalize, combine)
 
@@ -90,5 +87,5 @@ importFrom("methods", "Math2")
 exportMethods(Math2)
 exportMethods(log)
 
-## deprecated
+## defunct
 export(erodeGreyScale, dilateGreyScale, openingGreyScale, closingGreyScale, whiteTopHatGreyScale, blackTopHatGreyScale, selfcomplementaryTopHatGreyScale)
