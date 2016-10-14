@@ -1,25 +1,39 @@
 \name{EBImage-NEWS}
 \title{News for Package 'EBImage'}
 
-\section{Changes in version 4.14.0}{
-  \subsection{NEW FEATURES}{
+\section{Changes in version 4.16.0}{
+  \subsection{SIGNIFICANT USER-VISIBLE CHANGES}{
     \itemize{
-      \item \sQuote{boundary} argument to \sQuote{filter2()} for specifying behaviour at image boundaries
-      \item the \sQuote{hist} method now returns a (list of) \dQuote{histogram} object(s) (http://stackoverflow.com/q/33831331/2792099 and http://stackoverflow.com/a/35838861/2792099)
-      \item \sQuote{colormap()} function for mapping a greyscale image to color using a color palette
+      \item made defunct deprecated '...GreyScale' family morphological functions; use common functions 'dilate', 'erode', 'opening', 'closing', 'whiteTopHat', 'blackTopHat' and 'selfComplementaryTopHat' for filtering both binary and grayscale images
+      \item removed defunct 'getNumberOfFrames' function 
     }
   }
   \subsection{PERFORMANCE IMPROVEMENTS}{
     \itemize{
-      \item \sQuote{as.raster.Image}: increased performance by not transposing the image twice and improved support for Color images with less than 3 channels
+      \item 'readImage': use 'vapply' instead of 'abind' to reduce memory footprint
+    }
+  }
+}
+
+\section{Changes in version 4.14.0}{
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item 'boundary' argument to 'filter2()' for specifying behaviour at image boundaries
+      \item the 'hist' method now returns a (list of) "histogram"" object(s) (http://stackoverflow.com/q/33831331/2792099 and http://stackoverflow.com/a/35838861/2792099)
+      \item 'colormap()' function for mapping a greyscale image to color using a color palette
+    }
+  }
+  \subsection{PERFORMANCE IMPROVEMENTS}{
+    \itemize{
+      \item 'as.raster.Image': increased performance by not transposing the image twice and improved support for Color images with less than 3 channels
     }
   }
   \subsection{BUG FIXES}{
     \itemize{
-      \item fixed the \sQuote{log} method for Image objects (https://support.bioconductor.org/p/74236/)
-      \item \sQuote{affine}: fixed handling of images containing an alpha channel (https://support.bioconductor.org/p/74876/)
-      \item retain NA's in morphological operations: \sQuote{dilate}, \sQuote{erode}, \sQuote{opening}, \sQuote{closing}, \sQuote{whiteTopHat}, \sQuote{blackTopHat}, \sQuote{selfComplementaryTopHat} (https://support.bioconductor.org/p/77295/)
-      \item fix to potential unsafe code in C function \sQuote{affine()} (thanks Tomas Kalibera)
+      \item fixed the 'log' method for Image objects (https://support.bioconductor.org/p/74236/)
+      \item 'affine': fixed handling of images containing an alpha channel (https://support.bioconductor.org/p/74876/)
+      \item retain NA's in morphological operations: 'dilate', 'erode', 'opening', 'closing', 'whiteTopHat', 'blackTopHat', 'selfComplementaryTopHat' (https://support.bioconductor.org/p/77295/)
+      \item fix to potential unsafe code in C function 'affine()' (thanks Tomas Kalibera)
       \item medianFilter.c: use proper rounding rather than truncation during float to int coercion 
     }
   }
@@ -28,36 +42,36 @@
 \section{Changes in version 4.12.0}{
   \subsection{NEW FEATURES}{
     \itemize{
-      \item \sQuote{antialias} argument to the function \sQuote{affine} allowing to switch off bilinear filtering around image borders
+      \item 'antialias' argument to the function 'affine' allowing to switch off bilinear filtering around image borders
     }
   }
   \subsection{SIGNIFICANT USER-VISIBLE CHANGES}{
     \itemize{
-      \item deprecated \sQuote{...GreyScale} morphological functions; use common functions \sQuote{dilate}, \sQuote{erode}, \sQuote{opening}, \sQuote{closing}, \sQuote{whiteTopHat}, \sQuote{blackTopHat} and \sQuote{selfComplementaryTopHat} for filtering both binary and grayscale images
-      \item \sQuote{resize} doesn't perform bilinear filtering at image borders anymore in order to prevent the blending of image edges with the background when the image is upscaled; to switch on bilinear sampling at image borders use the function argument \sQuote{antialias = TRUE}
-      \item \sQuote{floodFill} and \sQuote{fillHull} preserve storage mode
+      \item deprecated '...GreyScale' morphological functions; use common functions 'dilate', 'erode', 'opening', 'closing', 'whiteTopHat', 'blackTopHat' and 'selfComplementaryTopHat' for filtering both binary and grayscale images
+      \item 'resize' doesn't perform bilinear filtering at image borders anymore in order to prevent the blending of image edges with the background when the image is upscaled; to switch on bilinear sampling at image borders use the function argument 'antialias = TRUE'
+      \item 'floodFill' and 'fillHull' preserve storage mode
     }
   }
   \subsection{PERFORMANCE IMPROVEMENTS}{
     \itemize{
       \item all morphological operations use the efficient Urbach-Wilkinson algorithm (up to 3x faster compared to the previous implementation)
-      \item \sQuote{rotate}: perform lossless 90/180/270 degree rotations by disabling bilinear filtering
+      \item 'rotate': perform lossless 90/180/270 degree rotations by disabling bilinear filtering
     }
   }
   \subsection{BUG FIXES}{
     \itemize{
       \item reimplemented the Urbach-Wilkinson algorithm used to perform grayscale morphological transformations
-      \item improved pixel-level accuracy of spatial linear transformations: \sQuote{affine}, \sQuote{resize}, \sQuote{rotate} and \sQuote{translate}
-      \item \sQuote{display(..., method = "raster")}: displaying of single-channel color images
-      \item \sQuote{drawCircle}: corrected x-y offset
-      \item \sQuote{equalize}: in case of a single-valued histogram issue a warning and return its argument
-      \item \sQuote{hist}: accept images with \sQuote{colorMode = Color} containing less than three color channels
-      \item \sQuote{image}: corrected handling of image frames
-      \item \sQuote{medianFilter}: filter size check
-      \item \sQuote{normalize}: normalization of a flat image when the argument \sQuote{separate} is set to \sQuote{FALSE}
-      \item \sQuote{reenumerate}: corrected handling of images without background
-      \item \sQuote{stackObjects}: corrected handling of blank images without any objects
-      \item \sQuote{tile}: reset dimnames
+      \item improved pixel-level accuracy of spatial linear transformations: 'affine', 'resize', 'rotate' and 'translate'
+      \item 'display(..., method = "raster")': displaying of single-channel color images
+      \item 'drawCircle': corrected x-y offset
+      \item 'equalize': in case of a single-valued histogram issue a warning and return its argument
+      \item 'hist': accept images with 'colorMode = Color' containing less than three color channels
+      \item 'image': corrected handling of image frames
+      \item 'medianFilter': filter size check
+      \item 'normalize': normalization of a flat image when the argument 'separate' is set to 'FALSE'
+      \item 'reenumerate': corrected handling of images without background
+      \item 'stackObjects': corrected handling of blank images without any objects
+      \item 'tile': reset dimnames
     }
   }
 }
@@ -65,14 +79,14 @@
 \section{Changes in version 4.10.1}{
 \subsection{SIGNIFICANT USER-VISIBLE CHANGES}{
     \itemize{
-      \item \sQuote{rgbImage} and \sQuote{combine} use dimnames if present
-      \item \sQuote{makeBrush(..., shape = "line")}: the line is drawn symmetrically around the center of the kernel, and the argument \sQuote{size} sets the maximum x-y dimension of kernel rather than the line length
+      \item 'rgbImage' and 'combine' use dimnames if present
+      \item 'makeBrush(..., shape = "line")': the line is drawn symmetrically around the center of the kernel, and the argument 'size' sets the maximum x-y dimension of kernel rather than the line length
     }
   }
   \subsection{BUG FIXES}{
     \itemize{
-      \item \sQuote{drawCircle} and \sQuote{stackObjects}: corrected handling of color channels
-      \item \sQuote{ocontour}: doubled the size of the temporary buffer to accommodate longer contours and fixed indexing issue
+      \item 'drawCircle' and 'stackObjects': corrected handling of color channels
+      \item 'ocontour': doubled the size of the temporary buffer to accommodate longer contours and fixed indexing issue
     }
   }
 }
