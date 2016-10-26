@@ -657,7 +657,7 @@ display( rgblogo )
 display( floodFill(img, c(444, 222), col=0.2, tolerance=0.2) )
 ```
 
-## Highligting objects
+## Highlighting objects
 
 Given an image containing object masks,
 the function `paintObjects` can be used to highlight the objects from the mask in the target image provided in the `tgt` argument. 
