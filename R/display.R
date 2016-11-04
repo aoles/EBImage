@@ -17,7 +17,7 @@ display = function(x,
 
 ## displays an image using R graphics
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-displayRaster = function(image, frame, all = FALSE, drawGrid = TRUE, ...){
+displayRaster = function(image, frame, all = FALSE, drawGrid = TRUE, padding = 0, ...){
   all = isTRUE(all)
   nf = .numberOfFrames(image, type="render")
   
@@ -43,8 +43,31 @@ displayRaster = function(image, frame, all = FALSE, drawGrid = TRUE, ...){
   xdim <- d[1L]
   ydim <- d[2L]
   
-  xran = c(0, ncol*xdim) + .5
-  yran = c(0, nrow*ydim) + .5
+  padding <- as.numeric(padding)
+  padding[is.na(padding)] <- 0L
+  padding <- padding[1:2]
+  
+  if ( padding[1L] > 0 )
+    drawGrid = FALSE
+  
+  ## values greater than one are intepreted as width in pixels ...
+  if ( padding[1L] >= 1 ) {
+    xsep = round(padding[1L])
+    ysep = if (is.na(padding[2L])) xsep else round(padding[2L])
+  }
+  ## .. and smaller as fractions of frame dimensions
+  else if ( padding[1L] >= 0 ){
+    if (is.na(padding[2L]))
+      padding[2L] = padding[1L] * max(xdim, ydim)/min(xdim, ydim)
+    xsep = round(xdim * padding[1L])
+    ysep = round(ydim * padding[2L])
+  }  
+  else {
+    xsep = ysep = 0
+  }
+  
+  xran = c(0, ncol*xdim + (ncol-1)*xsep) + .5
+  yran = c(0, nrow*ydim + (nrow-1)*ysep) + .5
   
   ## set graphical parameters
   user <- par(bty="n", mai=c(0,0,0,0), xaxs="i", yaxs="i", xaxt="n", yaxt="n")
@@ -54,7 +77,7 @@ displayRaster = function(image, frame, all = FALSE, drawGrid = TRUE, ...){
   for(r in seq_len(nrow)) {
     for(c in seq_len(ncol)) {
       f = if(all) (r-1)*ncol + c else frame
-      if ( f <= nf ) rasterImage(as.nativeRaster(getFrame(image, f, type="render")), (c-1)*xdim + .5, r*ydim + .5, c*xdim + .5, (r-1)*ydim +.5, ...)
+      if ( f <= nf ) rasterImage(as.nativeRaster(getFrame(image, f, type="render")), (c-1)*(xdim+xsep) + .5, r*(ydim+ysep)-ysep + .5, c*(xdim+xsep)-xsep + .5, (r-1)*(ydim+ysep) +.5, ...)
       else
         break
     }
