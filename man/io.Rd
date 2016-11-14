@@ -8,7 +8,7 @@
 \title{Image I/O}
 
 \description{
-  Read and write images from/to files and URLs.
+  Read images from files and URLs, and write images to files.
 }
 
 \usage{

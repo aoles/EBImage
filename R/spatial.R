@@ -135,7 +135,7 @@ resize <- function(x, w, h, output.dim = c(w, h), output.origin = c(0, 0), antia
   m <- matrix(c(ratio[1], 0, (1-ratio[1]) * output.origin[1],
                 0, ratio[2], (1-ratio[2]) * output.origin[2]), 3L, 2L)
   
-  affine(x = x, m = m, filter = filter, output.dim = output.dim, antialias = antialias, ...)
+  affine(x = x, m = m, output.dim = output.dim, antialias = antialias, ...)
 }
 
 ## transposes the XY dimensions
