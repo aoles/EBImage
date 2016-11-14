@@ -58,11 +58,15 @@ bgImage = function(col, dim, colormode) {
   res
 }
 
-rotate = function(x, angle, filter = "bilinear", output.dim, ...) {
+# images are represented in a cooridinate system with the y-axis oriented
+# downwards; therefore we perform "counter-clockwise" rotation, which is
+# equivalent to clockwise rotation in a regular coordinate system
+rotate = function(x, angle, filter = "bilinear", output.dim, output.origin, ...) {
   ## check arguments
   if ( length(angle)!=1L || !is.numeric(angle) ) stop("'angle' must be a number")
-  if ( !missing(output.dim) ) if ( length(output.dim)!=2L || !is.numeric(output.dim) ) stop("'output.dim' must be a numeric vector of length 2")
-  
+  if ( !missing(output.dim) )
+    if ( length(output.dim)!=2L || !is.numeric(output.dim) ) stop("'output.dim' must be a numeric vector of length 2")
+
   ## allow lossless rotation
   if ( (angle %% 90) == 0 ) filter = "none"
   
@@ -73,23 +77,34 @@ rotate = function(x, angle, filter = "bilinear", output.dim, ...) {
   cos = cos(angle)
   sin = sin(angle)
   
-  ## new bounding box size
-  newdim = c(
-    dx * abs(cos) + dy * abs(sin),
-    dx * abs(sin) + dy * abs(cos)
-  )
-  
-  ## origin offset needed to stay in the bounding box
-  offset = c(
-    dx * max(0, -cos) + dy * max(0,  sin),
-    dx * max(0, -sin) + dy * max(0, -cos)
-  )
+  ## if no origin is specified, rotate about center of output image
+  if ( missing(output.origin) ) {
+    ## calculate new bounding box size
+    newdim = c(
+      dx * abs(cos) + dy * abs(sin),
+      dx * abs(sin) + dy * abs(cos)
+    )
     
-  if ( missing(output.dim) )
-    output.dim = newdim
-  else
-    offset = offset + (output.dim - newdim) / 2
-
+    ## offset needed to stay within the bounding box
+    offset = c(
+      dx * max(0, -cos) + dy * max(0,  sin),
+      dx * max(0, -sin) + dy * max(0, -cos)
+    )
+    
+    if ( missing(output.dim) )
+      output.dim = newdim
+    else
+      offset = offset + (output.dim - newdim) / 2
+    
+  } else {
+    if ( length(output.origin)!=2L || !is.numeric(output.origin) )
+      stop("'output.origin' must be a numeric vector of length 2")
+    offset = c(
+      output.origin[1L] * (1 - cos) + output.origin[2L] * sin,
+      output.origin[2L] * (1 - cos) - output.origin[1L] * sin
+    )
+  }
+  
   m <- matrix(c(cos, -sin, offset[1], 
                 sin,  cos, offset[2]), 3L, 2L) 
   
@@ -106,7 +121,7 @@ translate <- function(x, v, filter = "none", ...) {
   affine(x = x, m = m, filter = filter, ...)
 }
 
-resize <- function(x, w, h, filter = "bilinear", output.dim = c(w, h), output.origin = c(0, 0), antialias = FALSE, ...) {
+resize <- function(x, w, h, output.dim = c(w, h), output.origin = c(0, 0), antialias = FALSE, ...) {
   ## check arguments
   if ( missing(h) && missing(w) ) stop("either 'w' or 'h' must be specified")
   if ( length(output.origin)!=2L || !is.numeric(output.origin) ) stop("'output.origin' must be a numeric vector of length 2")
@@ -117,8 +132,8 @@ resize <- function(x, w, h, filter = "bilinear", output.dim = c(w, h), output.or
   if ( missing(output.dim) ) output.dim <- c(w, h)
   ratio <- c(w, h)/d
   
-  m <- matrix(c(ratio[1], 0, output.origin[1],
-                0, ratio[2], output.origin[2]), 3L, 2L)
+  m <- matrix(c(ratio[1], 0, (1-ratio[1]) * output.origin[1],
+                0, ratio[2], (1-ratio[2]) * output.origin[2]), 3L, 2L)
   
   affine(x = x, m = m, filter = filter, output.dim = output.dim, antialias = antialias, ...)
 }
