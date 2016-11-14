@@ -24,7 +24,7 @@ flip(x)
 flop(x)
 rotate(x, angle, filter = "bilinear", output.dim, output.origin, ...)
 translate(x, v, filter = "none", ...)
-resize(x, w, h, filter = "bilinear", output.dim = c(w, h), output.origin = c(0, 0), antialias = FALSE, ...)
+resize(x, w, h, output.dim = c(w, h), output.origin = c(0, 0), antialias = FALSE, ...)
 
 affine(x, m, filter = c("bilinear", "none"), output.dim, bg.col = "black", antialias = TRUE)
 }
