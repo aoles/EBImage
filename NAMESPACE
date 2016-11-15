@@ -32,6 +32,7 @@ S3method(as.Image, default)
 exportMethods(show, image)
 export(readImage, writeImage)
 export(display)
+S3method(plot, Image)
 
 ## spatial transform
 export(resize, rotate)
