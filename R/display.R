@@ -1,30 +1,42 @@
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-display = function(x, 
-                   title = deparse(substitute(x), width.cutoff = 500L, nlines = 1), 
-                   method,
-                   frame, all = FALSE, ...) {
+display = function(x, method, ...) {
   validImage(x)
+  
   if ( missing(method) )
     method = getOption("EBImage.display", if ( interactive() ) "browser" else "raster")
   method = match.arg(method, c("browser", "raster"))
 
   switch(method,
-    browser = displayInBrowser(x, title, ...),
-    raster  = displayRaster(x, frame, all, ...) ) 
+    browser = displayInBrowser(x, ...),
+    raster  = displayRaster(x, ...) ) 
 
   invisible()
 }
 
 ## displays an image using R graphics
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-displayRaster = function(image, frame, all = FALSE, drawGrid = TRUE, padding = 0, ...){
+displayRaster = function(image, frame, all = FALSE, drawGrid = isTRUE(spacing==0),
+                         nx, spacing = 0, margin = 0, interpolate = TRUE,
+                         title, ...) {
   all = isTRUE(all)
   nf = .numberOfFrames(image, type="render")
   
   ## display all frames in a grid-like environment
   if ( all ) {
-    ncol = ceiling(sqrt(nf))
-    nrow = ceiling(nf/ncol)
+    if ( missing(nx) )
+      ncol = ceiling(sqrt(nf))
+    else {
+      ncol = as.integer(nx[1L])
+      if ( ncol==0L ) stop( "'nx' must be coercible to a non-zero integer" )
+    }
+    
+    ## negative values are interpreted as number of rows
+    if ( ncol<0 ) {
+      nrow = -ncol
+      ncol = ceiling(nf/nrow)
+    } else {
+      nrow = ceiling(nf/ncol)
+    }
   }
   ## display a single frame only
   else {
@@ -39,60 +51,81 @@ displayRaster = function(image, frame, all = FALSE, drawGrid = TRUE, padding = 0
     ncol = nrow = 1L
   }
   
-  d <- dim(image) 
+  d <- dim(image)[1:2]
   xdim <- d[1L]
   ydim <- d[2L]
   
-  padding <- as.numeric(padding)
-  padding[is.na(padding)] <- 0L
-  padding <- padding[1:2]
-  
-  if ( padding[1L] > 0 )
-    drawGrid = FALSE
-  
-  ## values greater than one are intepreted as width in pixels ...
-  if ( padding[1L] >= 1 ) {
-    xsep = round(padding[1L])
-    ysep = if (is.na(padding[2L])) xsep else round(padding[2L])
+  ## returns a pair of horizontal and vertical pixel dimensions
+  asPixelDims <- function(x, d) {
+    x <- as.numeric(x)
+    x[ is.na(x) | x < 0] <- 0L
+    
+    ## values smaller than one are interpreted as fractions of image dimensions
+    frac = which( x>0 & x<1 )
+    x[frac] <- (d*x)[frac]
+    
+    ## single fraction is taken against the maximum dimension
+    if ( identical(frac, 1L) )
+      x = x * max(d)/d
+    
+    ## round to integer pixel values
+    x = as.integer(round(x))
+    x = rep(x, length.out=2L)
   }
-  ## .. and smaller as fractions of frame dimensions
-  else if ( padding[1L] >= 0 ){
-    if (is.na(padding[2L]))
-      padding[2L] = padding[1L] * max(xdim, ydim)/min(xdim, ydim)
-    xsep = round(xdim * padding[1L])
-    ysep = round(ydim * padding[2L])
-  }  
-  else {
-    xsep = ysep = 0
-  }
+  
+  spacing <- asPixelDims(spacing, d)
+  margin  <- asPixelDims(margin, d)
+  
+  ## draw grid unless spacing is set
+  if ( missing(drawGrid) )
+    drawGrid = if ( any(spacing)>0 ) FALSE else TRUE
+  
+  xmar <- margin[1L]
+  ymar <- margin[2L]
+  
+  xsep <- spacing[1L]
+  ysep <- spacing[2L]
   
   xran = c(0, ncol*xdim + (ncol-1)*xsep) + .5
   yran = c(0, nrow*ydim + (nrow-1)*ysep) + .5
   
+  xranm = xran + c(-xmar, xmar)
+  yranm = yran + c(-ymar, ymar)
+  
   ## set graphical parameters
-  user <- par(bty="n", mai=c(0,0,0,0), xaxs="i", yaxs="i", xaxt="n", yaxt="n")
+  user <- par(bty="n", mai=c(0,0,0,0), xaxs="i", yaxs="i", xaxt="n", yaxt="n", col = "white", ...)
   on.exit(par(user))
-  plot(xran, yran, type="n", xlab="", ylab="", asp=1, ylim=rev(yran))
+  plot(xranm, yranm, type="n", xlab="", ylab="", asp=1, ylim=rev(yranm))
       
   for(r in seq_len(nrow)) {
     for(c in seq_len(ncol)) {
       f = if(all) (r-1)*ncol + c else frame
-      if ( f <= nf ) rasterImage(as.nativeRaster(getFrame(image, f, type="render")), (c-1)*(xdim+xsep) + .5, r*(ydim+ysep)-ysep + .5, c*(xdim+xsep)-xsep + .5, (r-1)*(ydim+ysep) +.5, ...)
+      if ( f <= nf )
+        rasterImage(as.nativeRaster(getFrame(image, f, type="render")),
+                    (c-1)*(xdim+xsep) + .5,
+                    r*(ydim+ysep)-ysep + .5,
+                    c*(xdim+xsep)-xsep + .5,
+                    (r-1)*(ydim+ysep) +.5,
+                    interpolate = interpolate)
       else
         break
     }
   }    
   
-  ## draw grid lines in case of multiple frames
-  if( all && isTRUE(drawGrid) && nf>1 ) {
-    clip(xran[1], xran[2], yran[1], yran[2])
-    abline(h = seq_len(nrow-1)*ydim + .5, v = seq_len(ncol-1)*xdim + .5, col = "white")
+  ## draw grid lines
+  if ( isTRUE(drawGrid) && all && nf>1 ) {
+    clip(xran[1L], xran[2L], yran[1L], yran[2L])
+    abline(h = seq_len(nrow-1)*(ydim + ysep) - ysep/2 + .5,
+           v = seq_len(ncol-1)*(xdim + xsep) - xsep/2 + .5)
   }
 }
 
 ## displays an image using JavaScript
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-displayInBrowser = function(x, title, ...){
+displayInBrowser = function(x, title, ...) {
+  if ( missing(title) )
+    title = deparse(substitute(x, parent.frame()), width.cutoff = 500L, nlines = 1L)
+  
   ## template and script files
   templateFile = system.file("viewer","display.template", package = "EBImage")
   cssFile = system.file("viewer","display.css", package = "EBImage")
@@ -136,7 +169,9 @@ displayInBrowser = function(x, title, ...){
   ## create browser query
   query = paste0("file://", normalizePath(file.path(tempDir,"display.html")))
 
-  browseURL(query, ...)
+  browseURL(query)
 }
+
+plot.Image = function(x, ...) displayRaster(x, ...)
 
 as.nativeRaster = function(x) .Call(C_nativeRaster, castImage(x))
