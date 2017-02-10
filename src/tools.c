@@ -72,3 +72,8 @@ void getColorStrides(SEXP x,int index,int *redstride,int *greenstride,int *blues
   if (nbChannels>1) *greenstride=index*nbChannels*width*height+width*height;
   if (nbChannels>2) *bluestride=index*nbChannels*width*height+2*width*height;
 }
+
+int isImage(SEXP x) {
+  static const char *valid[] = { "Image", ""};
+  return R_check_class_etc(x, valid) + 1;
+}
