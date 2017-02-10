@@ -2,7 +2,7 @@
 #include "tools.h"
 
 /* -------------------------------------------------------------------------
-Convert from Array to list representation
+Extract frames from image stack
 
 Copyright (c) 2017 Andrzej Oles
 See: ../LICENSE for license, LGPL
@@ -13,22 +13,20 @@ See: ../LICENSE for license, LGPL
 /*----------------------------------------------------------------------- */
 SEXP
 getFrames (SEXP x, SEXP i, SEXP type) {
-  int nprotect, nx, ny, nc, typ, n, j, d, cm, dim;
-  int rendercolor;
+  int nprotect, nx, ny, nc, nd, typ, n, j, d, cm;
   int* ids;
-  SEXP res, img, frame, tmp, dm, dimnames, ndimnames, names, nnames;
+  SEXP res, img, frame, tmp, dm, dnames, ndnames, names, nnames, dx;
 
   nprotect = 0;
 
   ids = INTEGER(i);
   n   = length(i);
   typ = INTEGER(type)[0];
-
-  rendercolor = COLOR_MODE(x)==MODE_COLOR && typ==1;
   
-  nx = INTEGER (GET_DIM(x))[0];
-  ny = INTEGER (GET_DIM(x))[1];
-  dimnames = GET_DIMNAMES(x);
+  dx = GET_DIM(x);
+  nx = INTEGER(dx)[0];
+  ny = INTEGER(dx)[1];
+  dnames = GET_DIMNAMES(x);
   
   if ( typ==0 ) {  
     nc = 1; 
@@ -46,43 +44,42 @@ getFrames (SEXP x, SEXP i, SEXP type) {
   d = nx * ny * nc;
   
   /* create frame template */
- 
   PROTECT( tmp = shallow_duplicate(x) );
   nprotect++;
 
-  // set frame dimensions
-  dim = rendercolor ? 3 : 2;
+  /* set frame dimensions */
+  nd = ( cm==MODE_COLOR && length(dx)>2 ) ? 3 : 2;
   
-  PROTECT ( dm = allocVector( INTSXP, dim) );
+  PROTECT ( dm = allocVector( INTSXP, nd) );
   nprotect++;
   
-  INTEGER (dm)[0] = nx;
-  INTEGER (dm)[1] = ny;
-  if ( dim == 3 )
+  INTEGER(dm)[0] = nx;
+  INTEGER(dm)[1] = ny;
+  if ( nd == 3 )
     INTEGER(dm)[2] = nc;
   
   img = PROTECT(allocArray(TYPEOF(x), dm));
   nprotect++;
   
-  if ( dimnames != R_NilValue ) {
-    PROTECT ( ndimnames = allocVector(VECSXP, dim) );
+  if ( dnames != R_NilValue ) {
+    PROTECT ( ndnames = allocVector(VECSXP, nd) );
     nprotect++;   
   
-    for (j=0; j<dim; j++)
-      SET_VECTOR_ELT(ndimnames, j, VECTOR_ELT(dimnames, j)); 
+    for (j=0; j<nd; j++)
+      SET_VECTOR_ELT(ndnames, j, VECTOR_ELT(dnames, j)); 
     
-    names = GET_NAMES(dimnames);
+    names = GET_NAMES(dnames);
     if ( names != R_NilValue ) {
-      PROTECT ( nnames = allocVector(STRSXP, dim) );
+      PROTECT ( nnames = allocVector(STRSXP, nd) );
       nprotect++;
       
-      for (j=0; j<dim; j++)
+      for (j=0; j<nd; j++)
         SET_STRING_ELT(nnames, j, STRING_ELT(names, j));
       
-      SET_NAMES(ndimnames, nnames);
+      SET_NAMES(ndnames, nnames);
     }
     
-    SET_DIMNAMES(img, ndimnames);
+    SET_DIMNAMES(img, ndnames);
   }
 
   if ( isImage(x) ) {
