@@ -29,6 +29,8 @@ int getNumberOfFrames (SEXP x, int type);
 int getNumberOfChannels (SEXP x);
 void getColorStrides(SEXP x,int index,int *redstride,int *greenstride,int *bluestride);
 
+int isImage (SEXP x);
+
 #ifdef __cplusplus
 }
 #endif

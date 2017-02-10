@@ -3,6 +3,7 @@ Package initialization
 Copyright (c) 2006 Oleg Sklyar
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
+#include "EBImage.h"
 
 #include "tools.h"
 
@@ -21,6 +22,7 @@ See: ../LICENSE for license, LGPL
 #include "ocontour.h"
 #include "tile.h"
 #include "nativeRaster.h"
+#include "getFrames.h"
 
 #include <R.h>
 #include <Rdefines.h>
@@ -53,6 +55,8 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(affine, 5),
     CALLDEF(medianFilter, 3),
     CALLDEF(nativeRaster, 1),
+    CALLDEF(getFrame, 3),
+    CALLDEF(getFrames, 3),
     /* add above all R-lib functions from common.h */
     {NULL, NULL, 0}
 };
@@ -60,4 +64,7 @@ static R_CallMethodDef CallEntries[] = {
 void R_init_EBImage (DllInfo *dll) {
     R_registerRoutines (dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols (dll, FALSE);
+    
+    Image_colormode = install("colormode");
+    Image_Data      = install(".Data");
 }
