@@ -28,10 +28,9 @@ propagate = function (x, seeds, mask=NULL, lambda=1e-4) {
 ocontour = function(x) {
   validImage(x)
   if(!is.integer(x)) storage.mode(x) = 'integer'
-  y = .Call(C_ocontour, x)[-1]
+  y = .Call(C_ocontour, x)
   names(y) = seq_along(y)
   y = y[sapply(y, length)>0] # remove missing objects
-  lapply(y, function(z) matrix(z, ncol=2, byrow=TRUE))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
