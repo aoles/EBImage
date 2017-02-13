@@ -14,7 +14,7 @@ SEXP ocontour(SEXP _image) {
   int *image, width, height;
   int i, j, k, direction, nbCells;
   int r, c, ocr, occ, ndirection, nr, nc;
-  int nprotect=0, nboc,  *octemp;
+  int nprotect=0, nboc, *octemp;
   SEXP _res, _oc;
   
   // Transfer variables
@@ -27,7 +27,6 @@ SEXP ocontour(SEXP _image) {
   for (i=0; i<width*height; i++) {
     if (image[i]>nbCells) nbCells=image[i];
   }
-  nbCells++;
  
   // Output result
   _res = PROTECT(allocVector(VECSXP, nbCells));
@@ -35,9 +34,10 @@ SEXP ocontour(SEXP _image) {
 
   // Temporary vector to store the current oriented contour
   octemp=(int *)R_Calloc(MAX_NB_POINTS*2+1, int);
+  //objs = (int *)R_Calloc(nbCells, int);
 
   // For each object, except the 0-th one (background)
-  for (k=1; k<nbCells; k++) {
+  for (k=1; k<=nbCells; k++) {
     nboc=0;
 
     // Find min (r,c) starting point for object k
@@ -55,8 +55,8 @@ SEXP ocontour(SEXP _image) {
       direction=0;
       do {
       	// Stores (r,c) in the oriented contour matrix
-      	octemp[2*nboc]=r;
-      	octemp[2*nboc+1]=c;
+      	octemp[nboc]=r;
+      	octemp[nboc+MAX_NB_POINTS]=c;
       	if (nboc<MAX_NB_POINTS) nboc++;
         
       	// Change direction
@@ -76,10 +76,12 @@ SEXP ocontour(SEXP _image) {
       } while (r!=ocr || c!=occ);
     }
     // Copy octemp in an element of _res
-    _oc = PROTECT(allocVector(INTSXP, nboc*2));
+    _oc = PROTECT(allocMatrix(INTSXP, nboc, 2));
     nprotect++;
-    SET_VECTOR_ELT(_res, k, _oc);
-    memcpy(INTEGER(_oc), octemp, nboc*2*sizeof(int));
+    SET_VECTOR_ELT(_res, k-1, _oc);
+    memcpy(INTEGER(_oc), octemp, nboc*sizeof(int));
+    memcpy(&(INTEGER(_oc)[nboc]), &(octemp[MAX_NB_POINTS]), nboc*sizeof(int));
+    
   } // k
 
   // Free oct
