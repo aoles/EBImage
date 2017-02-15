@@ -4,9 +4,7 @@ Copyright (c) 2006 Oleg Sklyar
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
 #include "EBImage.h"
-
 #include "tools.h"
-
 #include "distmap.h"
 #include "morphology.h"
 #include "spatial.h"

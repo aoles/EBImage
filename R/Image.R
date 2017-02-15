@@ -812,39 +812,50 @@ quantile.Image <- function(x, ...) {
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 rgbImage = function(red=NULL, green=NULL, blue=NULL) {
-  compareDims = function(x, y) {
-    if (any(x!=y)) stop('images must have the same 2D frame size and number of frames to be combined')
-  }
- 
-  d = NULL
+  classname = function(x) as.character(class(x))  
   
-  if (!is.null(red)) {
-    d = dim(red)
+  set_check = function(prop, ch) {
+    if ( !is.null(ch) ) {
+      if ( is.null(prop) ) {
+        prop = list(dim = dim(ch),
+                    cls = classname(ch),
+                    ref = substitute(ch),
+                    dns = !is.null(dimnames(ch)))
+      }
+      else {
+        if  ( !identical(prop$dim, dim(ch)) )
+          stop('images must have the same 2D frame size and number of frames to be combined')
+        if ( !identical(prop$cls, classname(ch)) )
+          stop('images must be object of the same class in order to be combined')
+        prop$dns = prop$dns || !is.null(dimnames(ch))
+      }
+    }
+    prop
   }
-  if (!is.null(green)) {
-    if (is.null(d))
-      d = dim(green)
-    else
-      compareDims(d, dim(green))
-  }
-  if (!is.null(blue)) {
-    if (is.null(d))
-      d = dim(blue)
-    else
-      compareDims(d, dim(blue))
-  }
+  
+  prop = set_check(NULL, red)
+  prop = set_check(prop, green)
+  prop = set_check(prop, blue)
 
-  if (is.null(d)) stop('at least one non-null array must be supplied')
+  if (is.null(prop)) stop('at least one non-null array must be supplied')
   
-  if (is.null(red)) red = array(0, dim=d)
-  if (is.null(green)) green = array(0, dim=d)
-  if (is.null(blue)) blue = array(0, dim=d)
+  if (is.null(red)) red = array(0, dim=prop$dim)
+  if (is.null(green)) green = array(0, dim=prop$dim)
+  if (is.null(blue)) blue = array(0, dim=prop$dim)
   
   x = abind(red, green, blue, along=2.5)
   ## don't introduce unnecessary dimnames
-  if ( all(vapply(list(red, green, blue), function(x) is.null(dimnames(x)), logical(1L))) ) dimnames(x) = NULL
+  if ( !prop$dns ) dimnames(x) = NULL
   
-  new("Image", .Data = x, colormode = Color)
+  if ( extends(prop$cls, "Image") ) {
+    res = eval(prop$ref)
+    imageData(res) <- x
+    colorMode(res) <- Color
+  } else {
+    res = new("Image", .Data = x, colormode = Color)
+  }
+  
+  res
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

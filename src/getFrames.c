@@ -1,3 +1,4 @@
+#include "EBImage.h"
 #include "getFrames.h"
 #include "tools.h"
 
