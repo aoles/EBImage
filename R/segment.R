@@ -43,23 +43,32 @@ bwlabel = function(x) {
 colorLabels = function(x, normalize = TRUE){
   len = length( (d = dim(x)) )
   
+  res <- x
+  
   # linearize image data for convenient processing
-  dim(x) = c(prod(d[1:2]), if(len>2) prod(d[3:len]) else 1)
+  dim(res) = c(prod(d[1:2]), if(len>2) prod(d[3:len]) else 1)
   
   f = function(y, m) {
-    y[y > 0] = sample(m)[y[y > 0]]
+    idx <- y > 0
+    y[idx] <- sample(m)[y[idx]]
     y
   }
   
-  y = apply(x, 2, function(y) {
+  tmp = apply(res, 2, function(y) {
     m = max(y)
     replicate(3, f(y, m))
   })
   
   # restore proper dimensions
-  dim(y) = c(d[1:2], 3, if(len>2) d[3:len] else NULL)
+  dim(tmp) = c(d[1:2], 3, if(len>2) d[3:len] else NULL)
   
-  y = new("Image", .Data = y, colormode = Color)
+  if ( is.Image(x) ) {
+    imageData(res) <- tmp
+    colorMode(res) <- Color
+  }
+  else {
+    res = new("Image", .Data = tmp, colormode = Color)
+  }
   
-  if (normalize) normalize(y) else y
+  if (normalize) normalize(res) else res
 }

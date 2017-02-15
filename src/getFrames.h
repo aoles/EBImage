@@ -4,8 +4,6 @@
 #include <R.h>
 #include <Rdefines.h>
 
-#include "EBImage.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

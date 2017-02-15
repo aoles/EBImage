@@ -6,6 +6,7 @@ Copyright (c) 2006 Oleg Sklyar
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
 
+#include "EBImage.h"
 #include "tools.h"
 #include <R_ext/Error.h>
 #include <stdio.h>
@@ -168,7 +169,7 @@ rmObjects (SEXP x, SEXP _index, SEXP _reenum) {
 /*----------------------------------------------------------------------- */
 SEXP
 stackObjects (SEXP obj, SEXP ref, SEXP _bgcol, SEXP xy_list, SEXP extension) {
-  SEXP res, st=NULL, dim, xys;
+  SEXP res, st=NULL, dim, xys, img;
   int nx, ny, nz, nc, nprotect, im, x, y, i, j, pxi, nobj, index;
   double *dobj, *dref, *xy, xx, yy,  *bgcol;
   double * dst;
@@ -188,16 +189,11 @@ stackObjects (SEXP obj, SEXP ref, SEXP _bgcol, SEXP xy_list, SEXP extension) {
   // allow only up to 3 color channels
   if (nbChannels>3) nbChannels = 3;
 
-  if (nz == 1) {
-    PROTECT(res = Rf_duplicate(_bgcol));
-    nprotect++;
-  }
-  else {
+  if (nz > 1) {
     PROTECT(res = allocVector(VECSXP, nz));
     nprotect++;
-    for (im = 0; im < nz; im++) SET_VECTOR_ELT(res, im, Rf_duplicate(_bgcol) );
   }
- 
+  
   for (im = 0; im < nz; im++) {
     // set dobj, dref and strides
     dobj = &(REAL(obj)[im * nx * ny]);
@@ -238,19 +234,26 @@ stackObjects (SEXP obj, SEXP ref, SEXP _bgcol, SEXP xy_list, SEXP extension) {
       }
       SET_DIM (st, dim);
       
+      PROTECT(img = Rf_duplicate(_bgcol));
+      nprotect++;
+      
       // set slot
-      if (nz == 1 ) res = SET_SLOT(res, install(".Data"), st);
-      else SET_VECTOR_ELT(res, im, SET_SLOT(VECTOR_ELT(res, im), install(".Data"), st) );
-
+      if (isImage(_bgcol)) {
+        PROTECT(img = Rf_duplicate(_bgcol));
+        nprotect++;
+        img = SET_SLOT(img, Image_Data, st);
+      }
+      else {
+        img = st;
+      }
+      
       // get xy
       if (nz == 1) xys = xy_list;
       else xys = VECTOR_ELT(xy_list, im);
       if (xys == R_NilValue || INTEGER(GET_DIM(xys))[0] != nobj || INTEGER(GET_DIM(xys))[1] < 2) continue;
       xy = REAL(xys);
 
-      if (nz == 1) dst = REAL(res);
-      else dst = REAL(VECTOR_ELT(res, im));
-      
+      dst = REAL(img);
       // copy ref
       for (x = 0; x < nx; x++) {
       	for (y = 0; y < ny; y++) {
@@ -274,9 +277,10 @@ stackObjects (SEXP obj, SEXP ref, SEXP _bgcol, SEXP xy_list, SEXP extension) {
       }
     } // nobj>0
     else {
-      if (nz == 1) res = R_NilValue;
-      else SET_VECTOR_ELT(res, im, R_NilValue);
-    } 
+      img = R_NilValue;
+    }
+    if (nz == 1) res = img;
+    else SET_VECTOR_ELT(res, im, img);
   } // im
 
   UNPROTECT( nprotect );

@@ -1,5 +1,5 @@
 
-R version 3.3.0 (2016-05-03) -- "Supposedly Educational"
+R version 3.3.2 (2016-10-31) -- "Sincere Pumpkin Patch"
 Copyright (C) 2016 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -425,7 +425,7 @@ checking 'channel' ............................ PASS (ea1a665d75817fbb) 1470072
 checking 'otsu' ............................... PASS (0c822739ccd9b674) 0.3160156
 checking 'bwlabel' ............................ PASS (39324c5f27cd19ed) 1199387
 checking 'colorLabels' ........................ PASS (0505b0b4e09d05ed) 10021713
-checking 'stackObjects' ....................... PASS (193a729650f09a6b) 718602.9
+checking 'stackObjects' ....................... PASS (f8eb9b4047e677fb) 718602.9
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'paintObjects' ....................... PASS (f064eb914151d29d) 1447733
 checking 'rmObjects' .......................... PASS (024fa825107d90e4) -0.1
