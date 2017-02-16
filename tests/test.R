@@ -246,3 +246,8 @@ testEBImageFunctions(x)
 colorMode(x) <- Grayscale
 imageData(x) <- aperm(x, c(2L, 1L, 4L, 3L))
 testEBImageFunctions(x)
+
+## test: Image subclass
+ImageSubclass <- setClass ("ImageSubclass", contains = "Image", slots = c(foo = "character"))
+x <- ImageSubclass(x, foo="bar")
+testEBImageFunctions(x)

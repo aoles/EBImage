@@ -8,8 +8,8 @@
 extern "C" {
 #endif
 
-SEXP getFrame (SEXP, SEXP, SEXP);
-SEXP getFrames (SEXP, SEXP, SEXP);
+SEXP getFrame (SEXP, SEXP, SEXP, SEXP);
+SEXP getFrames (SEXP, SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus
 };

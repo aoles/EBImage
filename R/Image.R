@@ -513,9 +513,9 @@ getFrames.old = function(y, i, type = c('total', 'render')) {
 
 getFrames = function(y, i, type = c('total', 'render')) {
   type = match.arg(type)
-  colormode = colorMode(y)
+  mode = colorMode(y)
   
-  n = .numberOfFrames(y, type, colormode)
+  n = .numberOfFrames(y, type, mode)
   
   if ( missing(i) ) 
     i = seq_len(n)
@@ -524,9 +524,9 @@ getFrames = function(y, i, type = c('total', 'render')) {
     if ( any( i<1L || i>n ) ) stop("'i' must be a vector of numbers ranging from 1 to ", n)
   }
   
-  mode = switch(type, total = 0L, render = 1L)
+  type = switch(type, total = 0L, render = 1L)
   
-  .Call(C_getFrames, y, i, mode)
+  .Call(C_getFrames, y, i, type, mode)
 }
 
 ## It is useful to have the internal function for getFrame which can be called
@@ -562,20 +562,20 @@ getFrames = function(y, i, type = c('total', 'render')) {
 }
 
 
-.getFrame = function(y, i, type, colormode) {
-  if(missing(colormode)) colormode = colorMode(y)
+.getFrame = function(y, i, type, mode) {
+  if(missing(mode)) mode = colorMode(y)
   
-  n = .numberOfFrames(y, type, colormode)
+  n = .numberOfFrames(y, type, mode)
   if (i<1 || i>n) stop("'i' must belong between 1 and ", n)
   
   # return the argument if no subsetting neccessary
   ld = length( (d = dim(y)) )
-  fd = if (colormode==Color && type=='render' && ld>2L) 3L else 2L
+  fd = if (mode==Color && type=='render' && ld>2L) 3L else 2L
   if (ld==fd) return(y)
   
-  mode = switch(type, total = 0L, render = 1L)
+  type = switch(type, total = 0L, render = 1L)
   
-  .Call(C_getFrame, y, as.integer(i), mode)
+  .Call(C_getFrame, y, as.integer(i), type, mode)
 }
 
 ## numberOfFrames

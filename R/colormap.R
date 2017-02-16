@@ -3,7 +3,17 @@ colormap <- function(x, palette = heat.colors(256L)) {
   if (colorMode(x) != Grayscale) 
     stop("Color mapping can be applied only to grayscale images")
   
-  x <- round(1 + x * (length(palette)-1L))
+  tmp <- round(1 + x * (length(palette)-1L))
+  tmp <- Image(array(palette[tmp], dim(tmp)))
   
-  Image(array(palette[x], dim(x)))
+  if ( is.Image(x) ) {
+    res <- x
+    imageData(res) <- tmp
+    colorMode(res) <- Color
+  }
+  else {
+    res <- tmp
+  }
+  
+  res
 }

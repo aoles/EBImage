@@ -13,28 +13,28 @@ See: ../LICENSE for license, LGPL
 
 /*----------------------------------------------------------------------- */
 SEXP
-getFrames (SEXP x, SEXP i, SEXP type) {
-  int nprotect, nx, ny, nc, nd, typ, n, j, d, cm;
+getFrames (SEXP x, SEXP i, SEXP _type, SEXP _mode) {
+  int nprotect, nx, ny, nc, nd, type, n, j, d, mode;
   int* ids;
   SEXP res, img, frame, tmp, dm, dnames, ndnames, names, nnames, dx;
 
   nprotect = 0;
 
-  ids = INTEGER(i);
-  n   = length(i);
-  typ = INTEGER(type)[0];
+  ids  = INTEGER(i);
+  n    = length(i);
+  type = INTEGER(_type)[0];
+  mode = INTEGER(_mode)[0];
   
   dx = GET_DIM(x);
   nx = INTEGER(dx)[0];
   ny = INTEGER(dx)[1];
   dnames = GET_DIMNAMES(x);
   
-  if ( typ==0 ) {  
+  if ( type==0 ) {  
     nc = 1; 
-    cm = MODE_GRAYSCALE;
+    mode = MODE_GRAYSCALE;
   } else {
-    nc = getNumberOfChannels(x);
-    cm = COLOR_MODE(x);
+    nc = getNumberOfChannels(x, mode);
   }
 
   /* allocate memory for frame list */
@@ -49,7 +49,7 @@ getFrames (SEXP x, SEXP i, SEXP type) {
   nprotect++;
 
   /* set frame dimensions */
-  nd = ( cm==MODE_COLOR && length(dx)>2 ) ? 3 : 2;
+  nd = ( mode==MODE_COLOR && length(dx)>2 ) ? 3 : 2;
   
   PROTECT ( dm = allocVector( INTSXP, nd) );
   nprotect++;
@@ -85,7 +85,7 @@ getFrames (SEXP x, SEXP i, SEXP type) {
 
   if ( isImage(x) ) {
     tmp = SET_SLOT( tmp, Image_Data, img);
-    tmp = SET_SLOT( tmp, Image_colormode, ScalarInteger(cm) );
+    tmp = SET_SLOT( tmp, Image_colormode, ScalarInteger(mode) );
   }
   else {
     tmp = img;
@@ -113,6 +113,6 @@ getFrames (SEXP x, SEXP i, SEXP type) {
   return res;
 }
 
-SEXP getFrame (SEXP x, SEXP i, SEXP type) {
-  return VECTOR_ELT(getFrames(x, i, type), 0);
+SEXP getFrame (SEXP x, SEXP i, SEXP type, SEXP mode) {
+  return VECTOR_ELT(getFrames(x, i, type, mode), 0);
 }
