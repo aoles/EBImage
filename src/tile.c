@@ -15,9 +15,9 @@ SEXP
 tile (SEXP obj, SEXP _hdr, SEXP params) {
   SEXP res, dm, ims;
   int mode =  COLOR_MODE(obj);
-  int ndy, ndx  = INTEGER(params)[0];
+  int ndy, ndx = INTEGER(params)[0];
   int lwd = INTEGER(params)[1];
-  int nc= getNumberOfChannels(obj);
+  int nc = getNumberOfChannels(obj, mode);
   int nprotect, nx, ny, nz, nxr, nyr, i, j, index, x, y;
   double *hdr, * dim, onetondx;
   int rredstride,rgreenstride,rbluestride;
@@ -61,9 +61,8 @@ tile (SEXP obj, SEXP _hdr, SEXP params) {
   PROTECT( res = Rf_duplicate(obj) );
   nprotect++;
   SET_DIMNAMES (res, R_NilValue);
-  if (strcmp( CHAR( asChar( GET_CLASS(obj) ) ), "Image") == 0) {
-    res = SET_SLOT( res, install(".Data"), ims );
-  } else res=ims;
+  
+  res = isImage(obj) ? SET_SLOT( res, install(".Data"), ims ) : ims;
   
   /* reset to BG */
   getColorStrides(res,0,&rredstride,&rgreenstride,&rbluestride);
@@ -116,9 +115,7 @@ tile (SEXP obj, SEXP _hdr, SEXP params) {
     }
   }
 
-  if (strcmp( CHAR( asChar( GET_CLASS(obj) ) ), "Image") == 0) {
-    res = SET_SLOT( res, install(".Data"), ims );
-  }
+  if ( isImage(obj) ) res = SET_SLOT( res, install(".Data"), ims );
  
   UNPROTECT( nprotect );
   return res;
@@ -136,7 +133,7 @@ untile(SEXP img, SEXP nim, SEXP linewd) {
   int nx = (sdim[0]-(nimx+1)*lwd) / nimx;
   int ny = (sdim[1]-(nimy+1)*lwd) / nimy;
   int nz = getNumberOfFrames(img,1) * nimx * nimy;
-  int nc = getNumberOfChannels(img);
+  int nc = getNumberOfChannels(img, mode);
   int nprotect=0, i, j, im, y, iim;
   SEXP res, dim, dat;
   void *src, *tgt; double *dd;
@@ -168,10 +165,14 @@ untile(SEXP img, SEXP nim, SEXP linewd) {
     INTEGER(dim)[3] = nz;
   }
   SET_DIM(dat, dim);
+  
+  /*
   if (strcmp( CHAR( asChar( GET_CLASS(img) ) ), "Image") == 0) {
     res = SET_SLOT(Rf_duplicate(img), install(".Data"), dat);
   } else res=dat;
-
+  */
+  res = isImage(img) ? SET_SLOT(Rf_duplicate(img), install(".Data"), dat) : dat;
+  
   for (im=0; im<nz; im++) {
     iim = im / (nimx*nimy);
 
@@ -199,9 +200,9 @@ untile(SEXP img, SEXP nim, SEXP linewd) {
       }
     }
   }
-  if (strcmp( CHAR( asChar( GET_CLASS(img) ) ), "Image") == 0) {
-    res = SET_SLOT(res, install(".Data"), dat);
-  }
+  //if (strcmp( CHAR( asChar( GET_CLASS(img) ) ), "Image") == 0) {
+  if ( isImage(img) ) res = SET_SLOT(res, install(".Data"), dat);
+  //}
   UNPROTECT(nprotect);
   return res;
 }

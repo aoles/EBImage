@@ -847,3 +847,80 @@ Warning messages:
 2: In hash.old(y) : NAs introduced by coercion
 3: In hash.old(y) : NAs introduced by coercion
 > 
+> ## test: Image subclass
+> ImageSubclass <- setClass ("ImageSubclass", contains = "Image", slots = c(foo = "character"))
+> x <- ImageSubclass(x, foo="bar")
+> testEBImageFunctions(x)
+new test (hash=2cd1b3ca941d0306)
+checking 'show' ............................... PASS (ce75d078eccda68c) NA
+checking 'print' .............................. PASS (e01f0947e67df522) NA
+checking 'hist' ............................... PASS (06d171c8f173fbfa) c3d0c3b2d4df7f61
+checking '>' .................................. PASS (8eb52b594f8cd22b) 1541186
+checking '+' .................................. PASS (d0da7a47899efbc4) 4466272
+checking '/' .................................. PASS (8bfccf8b88e728b0) 1116568
+checking '*' .................................. PASS (d0da7a47899efbc4) 4466272
+checking 'median' ............................. PASS (fdd3c9a35d83db2f) 0.3823529
+checking 'quantile' ........................... PASS (e26e9f3ec19dd1e9) 8.139216
+checking 'Image' .............................. PASS (b2c89c8bd2d8cfbb) 2233136
+checking 'as.Image' ........................... PASS (ea218ca35d898b4f) 2233136
+checking 'is.Image' ........................... PASS (29e1e263d8769b6f) 0.9
+checking 'imageData' .......................... PASS (85da79da2cd4332f) 2233136
+checking 'imageData<-' ........................ PASS (2cd1b3ca941d0306) 2233136
+checking 'as.raster' .......................... PASS (f7837c7682313ed7) NA
+checking 'colorMode<-' ........................ PASS (2cd1b3ca941d0306) 2233136
+checking 'numberOfFrames' ..................... PASS (ce8815ddd92a2bbb) 5.9
+checking 'getFrames' .......................... PASS (57ddf8e1c5653fa1) 578ceb264bf8c00f
+checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
+checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
+checking 'image' .............................. PASS (57f54e3531a18f4e) -0.1
+checking 'drawCircle' ......................... PASS (2a6138d3f6c7cf2b) 2502013
+checking '[' .................................. PASS (21b006dc9b230591) 41200.75
+checking 'resize' ............................. PASS (d4439ccaddffedbf) 72772706
+checking 'rotate' ............................. PASS (49bab3d36db066a3) 3978266
+checking 'flip' ............................... PASS (de3315d317526bf8) 2296325
+checking 'flop' ............................... PASS (1746b768e1919758) 2231772
+checking 'translate' .......................... PASS (eb6575b71bd228cf) 3827517
+checking 'affine' ............................. PASS (6f88949e9ca0500f) 219714.6
+checking 'transpose' .......................... PASS (cae5d3f85d9a6547) 2284582
+checking 'thresh' ............................. PASS (9b22c4c752bdbe31) 1786512
+checking 'channel' ............................ PASS (2cd1b3ca941d0306) 2233136
+checking 'otsu' ............................... PASS (73c8c3c1a7c3a7e0) 9.425391
+checking 'bwlabel' ............................ PASS (c89e2f43d8c4d058) 2016822
+checking 'colorLabels' ........................ PASS (3d06f02ad8d875a7) 16357947
+checking 'stackObjects' ....................... PASS (3dfb061836ca6d36) 2575847
+checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
+checking 'paintObjects' ....................... PASS (d0e505d3ebc1fb67) 2379341
+checking 'rmObjects' .......................... PASS (c3455fb0aad59ab3) 1934575
+checking 'reenumerate' ........................ PASS (72c36fcb451899a7) 1934575
+checking 'reenumerate' ........................ PASS (0cd3636f1086f354) 2016822
+checking 'computeFeatures' .................... PASS (5f168ac8bf99f53d) 734993.9
+checking 'computeFeatures' .................... PASS (5b0f17d23f0847ff) 9cbf0d301c547318
+checking 'ocontour' ........................... PASS (67c938cc8c8b0a94) e0b0122d0f8dbec3
+checking 'localCurvature' ..................... PASS (14e7e43044a6edce) dbbde661d27cf4d5
+checking 'normalize' .......................... PASS (c864fc347d3e1eec) 2526618
+checking 'gblur' .............................. PASS (41001e94fa243311) 2237219
+checking 'filter2' ............................ PASS (80f74953a527e782) 55995426
+checking 'medianFilter' ....................... PASS (f336aae43926dd3a) 2231438
+checking 'equalize' ........................... PASS (8aff651b4bfe1e2d) 2447139
+checking 'erode' .............................. PASS (383acb6bf84688da) 1121204
+checking 'dilate' ............................. PASS (9d7e4182ba814a7e) 2104588
+checking 'opening' ............................ PASS (ebc4fe5d528c652d) 1451050
+checking 'closing' ............................ PASS (c8becdbac9f98c79) 1569448
+checking 'distmap' ............................ PASS (fb1ca8ba680de2b3) 7464344
+checking 'watershed' .......................... PASS (e13411cbbdc66fb2) 1541186
+checking 'floodFill' .......................... PASS (54aa4548fd305300) 2234521
+checking 'fillHull' ........................... PASS (8eb52b594f8cd22b) 1541186
+checking 'propagate' .......................... PASS (50338f78f64cf3cd) 2201664
+checking 'toRGB' .............................. PASS (3e30f901f32391f1) 20279146
+checking 'rgbImage' ........................... PASS (7265edee83ee6475) 10796552
+checking 'colormap' ........................... PASS (2d850cd3a218b6b9) 22585273
+checking 'combine' ............................ PASS (8750feb29c15297c) 8992851
+checking 'combine' ............................ PASS (c97b83093836307a) 56431472
+checking 'tile' ............................... PASS (2144c4a0e85d648a) 72664167
+checking 'untile' ............................. PASS (340bd33c3fc91099) 60048605
+
+Warning messages:
+1: In hash.old(y) : NAs introduced by coercion
+2: In hash.old(y) : NAs introduced by coercion
+3: In hash.old(y) : NAs introduced by coercion
+> 

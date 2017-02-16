@@ -25,7 +25,7 @@ SEXP nativeRaster (SEXP _in) {
   if (c != MODE_COLOR)
     rgba[0] = rgba[1] = rgba[2] = REAL(_in);
   else {
-    int nc = getNumberOfChannels(_in);
+    int nc = getNumberOfChannels(_in, c);
     if (nc > 4) nc = 4;
     for(int i = 0; i < nc; i++)
       rgba[i] = &( REAL(_in)[ i * x * y ] );

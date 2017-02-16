@@ -45,17 +45,11 @@ int getNumberOfFrames(SEXP x, int type) {
   return(n);
 }
 
-int getNumberOfChannels(SEXP x) {
-  int colorMode;
-  int nbChannels;
-  colorMode=COLOR_MODE(x);
-
-  if (colorMode!=MODE_COLOR) nbChannels=1;
-  else {
-    if (LENGTH(GET_DIM(x))<3) nbChannels=1;
-    else nbChannels=INTEGER(GET_DIM(x))[2];
-  }
-  return(nbChannels);
+int getNumberOfChannels(SEXP x, int colormode) {
+  if (colormode!=MODE_COLOR)
+    return(1);
+  else
+    return(LENGTH(GET_DIM(x))<3 ? 1 : INTEGER(GET_DIM(x))[2]);
 }
 
 void getColorStrides(SEXP x,int index,int *redstride,int *greenstride,int *bluestride) {
@@ -63,7 +57,7 @@ void getColorStrides(SEXP x,int index,int *redstride,int *greenstride,int *blues
 
   width=INTEGER(GET_DIM(x))[0];
   height=INTEGER(GET_DIM(x))[1];
-  nbChannels=getNumberOfChannels(x);
+  nbChannels=getNumberOfChannels(x, COLOR_MODE(x));
   
   *redstride=index*nbChannels*width*height;
   *greenstride=-1;

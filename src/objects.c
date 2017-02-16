@@ -177,7 +177,7 @@ stackObjects (SEXP obj, SEXP ref, SEXP _bgcol, SEXP xy_list, SEXP extension) {
   int snx = 2 * ext + 1;
   int sny = 2 * ext + 1;
   int mode = COLOR_MODE(ref);
-  int nbChannels = getNumberOfChannels(ref);
+  int nbChannels = getNumberOfChannels(ref, mode);
   int stride, shift;
  
   nx = INTEGER ( GET_DIM(obj) )[0];

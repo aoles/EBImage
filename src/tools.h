@@ -26,7 +26,7 @@ typedef double numeric;
 
 int validImage (SEXP x,int test);
 int getNumberOfFrames (SEXP x, int type);
-int getNumberOfChannels (SEXP x);
+int getNumberOfChannels (SEXP x, int colormode);
 void getColorStrides(SEXP x,int index,int *redstride,int *greenstride,int *bluestride);
 
 int isImage (SEXP x);

@@ -53,8 +53,8 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(affine, 5),
     CALLDEF(medianFilter, 3),
     CALLDEF(nativeRaster, 1),
-    CALLDEF(getFrame, 3),
-    CALLDEF(getFrames, 3),
+    CALLDEF(getFrame, 4),
+    CALLDEF(getFrames, 4),
     /* add above all R-lib functions from common.h */
     {NULL, NULL, 0}
 };
