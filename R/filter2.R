@@ -49,46 +49,29 @@ filter2 = function(x, filter, boundary = c("circular", "replicate")) {
     replicate = {
       dx[1:2] = dx[1:2] + df[1:2] - 1L
       
-      duplicate = function(x, i, j, n, along) {
-        if ( !missing(i) && !missing(j) )
-          x = asub(x, list(i, j), 1:2)
-        l = vector("list", n)
-        for (k in 1:n) l[[k]] = x
-        abind(l, along = along)
+      # Small helper function that takes a slice out of array and replicates it (note: slicing is limited to first 2 dims) 
+      rep.dim <- function(x,dim,index,times) {
+        x.s <- abind::asub(x,idx=index,dims = dim,drop = FALSE)
+        dim.s <- dim(x.s)
+        dim.s[dim] <- times
+        if (dim==2) {
+          x.s <- split(x.s,ceiling(seq_along(x.s)/nrow(x)))
+          x.s <- sapply(x.s,FUN = rep,times=times)
+        } else {
+          x.s <- rep(x.s,each=times)
+        }
+        out <- array(x.s,dim = dim.s)
       }
       
-      imageData(x) = abind(
-        ## center block
-        abind(
-          x,
-          ## right column
-          duplicate(x, d[1L], 1:d[2L], cf[1L], 1L),
-          ## left column
-          duplicate(x, 1L, 1:d[2L], cf[1L], 1L),
-        along = 1L),
-        ## lower block
-        duplicate(
-          abind(
-            ## bottom row
-            asub(x, list(1:d[1L], d[2L]), 1:2),
-            ## bottom right corner
-            duplicate(x, d[1L], d[2L], cf[1L], 1L),
-            ## bottom left corner
-            duplicate(x, 1L, d[2L], cf[1L], 1L),
-          along = 1L),
-        n = cf[2L], along = 2L),
-        ## upper block
-        duplicate(
-          abind(
-            ## top row
-            asub(x, list(1:d[1L], 1L), 1:2),
-            ## top right corner
-            duplicate(x, d[1L], 1L, cf[1L], 1L),
-            ## top left corner
-            duplicate(x, 1L, 1L, cf[1L], 1L),
-          along = 1L),
-        n = cf[2L], along = 2L),
-      along = 2L)
+      # With the helper function the overal replicating of border rows/columns becomes simple
+      # Add left and right colums
+      lc = rep.dim(x,2,1,cf[2])
+      rc = rep.dim(x,2,ncol(x),cf[2])
+      imageData(x) = abind(lc,x,rc,along = 2)
+      # Add top and bottom rows
+      tr = rep.dim(x,1,1,cf[1])
+      br = rep.dim(x,1,nrow(x),cf[1])
+      imageData(x) = (tr,x,br,along = 1)
     }
   )
   
@@ -114,7 +97,7 @@ filter2 = function(x, filter, boundary = c("circular", "replicate")) {
   }
   
   if ( boundary!="circular" ) {
-    y = asub(y, list(1:d[1L], 1:d[2L]), 1:2)
+    y = asub(y, list(cf[1]+(1:d[1L]), cf[2]+(1:d[2L])), 1:2)
   }
   
   dimnames(y) = dnames
