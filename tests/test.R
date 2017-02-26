@@ -72,7 +72,8 @@ testEBImageFunctions <- function(x) {
   cat("new test (hash=", hash(x), ")\n", sep="")
   
   z <- check("show", x, capture.output=TRUE)
-  z <- check("print", x, short=TRUE, capture.output=TRUE)
+
+    z <- check("print", x, short=TRUE, capture.output=TRUE)
   if ( typeof(x)=="logical" )
     z <- check("hist", EBImage:::castImage(x), breaks = c(0, .5, 1))
   else
@@ -161,6 +162,7 @@ testEBImageFunctions <- function(x) {
   z <- check("normalize", x, suppressWarnings=TRUE)
   z <- check("gblur", x, sigma=1, expectError=min(d)<7, round=TRUE)
   z <- check("filter2", x, array(1, dim=c(5, 5)), round=TRUE)
+  z <- check("filter2", x, array(1, dim=c(3, 5)),boundary='replicate', round=TRUE)
   z <- check("medianFilter", x, 2)
   z <- check("equalize", x, suppressWarnings=TRUE)
 
