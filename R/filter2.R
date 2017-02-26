@@ -71,7 +71,7 @@ filter2 = function(x, filter, boundary = c("circular", "replicate")) {
       # Add top and bottom rows
       tr = rep.dim(x,1,1,cf[1])
       br = rep.dim(x,1,nrow(x),cf[1])
-      imageData(x) = (tr,x,br,along = 1)
+      imageData(x) = abind(tr,x,br,along = 1)
     }
   )
   
