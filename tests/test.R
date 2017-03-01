@@ -160,7 +160,8 @@ testEBImageFunctions <- function(x) {
   ## filtering
   z <- check("normalize", x, suppressWarnings=TRUE)
   z <- check("gblur", x, sigma=1, expectError=min(d)<7, round=TRUE)
-  z <- check("filter2", x, array(1, dim=c(5, 5)), round=TRUE)
+  y <- if (cls) "replicate" else if (nf>1) 0.5 else "circular"
+  z <- check("filter2", x, array(1, dim=c(5, 5)), y, round=TRUE)
   z <- check("medianFilter", x, 2)
   z <- check("equalize", x, suppressWarnings=TRUE)
 

@@ -36,60 +36,47 @@ filter2 = function(x, filter, boundary = c("circular", "replicate")) {
   
   cf = df%/%2
   
+  res = x
+  
   switch(boundary,
-    ## default mode just wraps around edges
-    circular = {},
-    ## pad with a given value
-    linear = {
-      dx[1:2] = dx[1:2] + cf[1:2]
-      xpad = array(val, dx)
-      ## is there a better way of doing this?
-      imageData(x) = do.call("[<-", c(quote(xpad), lapply(d, function(x) enquote(1:x)), quote(x)) )
-    },
-    replicate = {
-      dx[1:2] = dx[1:2] + df[1:2] - 1L
-      
-      duplicate = function(x, i, j, n, along) {
-        if ( !missing(i) && !missing(j) )
-          x = asub(x, list(i, j), 1:2)
-        l = vector("list", n)
-        for (k in 1:n) l[[k]] = x
-        abind(l, along = along)
-      }
-      
-      imageData(x) = abind(
-        ## center block
-        abind(
-          x,
-          ## right column
-          duplicate(x, d[1L], 1:d[2L], cf[1L], 1L),
-          ## left column
-          duplicate(x, 1L, 1:d[2L], cf[1L], 1L),
-        along = 1L),
-        ## lower block
-        duplicate(
-          abind(
-            ## bottom row
-            asub(x, list(1:d[1L], d[2L]), 1:2),
-            ## bottom right corner
-            duplicate(x, d[1L], d[2L], cf[1L], 1L),
-            ## bottom left corner
-            duplicate(x, 1L, d[2L], cf[1L], 1L),
-          along = 1L),
-        n = cf[2L], along = 2L),
-        ## upper block
-        duplicate(
-          abind(
-            ## top row
-            asub(x, list(1:d[1L], 1L), 1:2),
-            ## top right corner
-            duplicate(x, d[1L], 1L, cf[1L], 1L),
-            ## top left corner
-            duplicate(x, 1L, 1L, cf[1L], 1L),
-          along = 1L),
-        n = cf[2L], along = 2L),
-      along = 2L)
-    }
+         ## default mode just wraps around edges
+         circular = {
+           x = imageData(x)
+         },
+         ## pad with a given value
+         linear = {
+           dx[1:2] = dx[1:2] + cf[1:2]
+           xpad = array(val, dx)
+           ## is there a better way of doing this?
+           x = do.call("[<-", c(quote(xpad), lapply(d, function(x) enquote(1:x)), quote(x)) )
+         },
+         replicate = {
+           x = imageData(x)
+           
+           dx[1:2] = dx[1:2] + df[1:2] - 1L
+           
+           rep.dim <- function(x, dim, index, times) {
+             xs <- asub(x, idx=index, dims=dim, drop=FALSE)
+             ds <- dim(xs)
+             ds[dim] <- times
+             if ( dim==2L ) {
+               xs <- split(xs, ceiling(seq_along(xs)/ds[1L]))
+               xs <- sapply(xs, FUN=rep, times=times)
+             } else {
+               xs <- rep(xs, each=times)
+             }
+             array(xs, dim=ds)
+           }
+           
+           # Add left and right colums
+           lc <- rep.dim(x, 2L, 1L, cf[2L])
+           rc <- rep.dim(x, 2L, d[2L], cf[2L])
+           x <- abind(x, rc, lc, along=2L)
+           # Add top and bottom rows
+           tr <- rep.dim(x, 1L, 1L, cf[1L])
+           br <- rep.dim(x, 1L, d[1L], cf[1L])
+           x <- abind(x, br, tr, along=1L)
+         }
   )
   
   ## create fft filter matrix
@@ -119,6 +106,6 @@ filter2 = function(x, filter, boundary = c("circular", "replicate")) {
   
   dimnames(y) = dnames
   
-  imageData(x) <- y
-  x
+  imageData(res) <- y
+  res
 }
