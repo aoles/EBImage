@@ -39,7 +39,7 @@ thresh (SEXP x, SEXP param) {
 
     PROTECT ( res = Rf_duplicate(x) );
     nprotect++;
-
+    
     for ( i = 0; i < nz; i++ ) {
         tgt = &( REAL(res)[ i * nx * ny ] );
         src = &( REAL(x)[ i * nx * ny ] );
@@ -59,32 +59,16 @@ thresh (SEXP x, SEXP param) {
                 }
                 /* calculate threshold and update tgt data */
                 mean = sum / nFramePix + offset;
-                sx = xi;
-                ex = xi;
-                sy = yi;
-                ey = yi;
-                if ( xi == dx ) {
-                    /* left */
-                    sx = 0;
-                    ex = dx;
-                }
-                else
-                if ( xi == nx - dx - 1 ) {
-                    /* right */
-                    sx = nx - dx - 1;
-                    ex = nx - 1;
-                }
-                if ( yi == dy ) {
-                    /* top */
-                    sy = 0;
-                    ey = dy;
-                }
-                else
-                if ( yi == ny - dy - 1 ) {
-                    /* bottom */
-                    sy = ny - dy - 1;
-                    ey = ny - 1;
-                }
+                
+                /* left */
+                sx = ( xi == dx) ? 0 : xi;
+                /* right */
+                ex = ( xi == nx - dx - 1 ) ? nx - 1 : xi;
+                /* top */
+                sy = ( yi == dy ) ? 0 : yi;
+                /* bottom */
+                ey = ( yi == ny - dy - 1 ) ? ny - 1 : yi;
+                
                 if ( ex - sx > 0 || ey - sy > 0 ) {
                     for ( u = sx; u <= ex; u++ )
                         for ( v = sy; v <= ey; v++ )
