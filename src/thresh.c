@@ -19,9 +19,9 @@ See: ../LICENSE for license, LGPL
 /*----------------------------------------------------------------------- */
 SEXP
 thresh (SEXP x, SEXP param) {
-    int dx, dy, nx, ny, nz, nprotect, * dim, xi, yi, u, v, k, l, ou, nu, i;
+    int dx, dy, nx, ny, nz, nprotect, * dim, xi, yi, u, v, k, l, ou, nu, ov, nv, i;
     int sx, ex, sy, ey;
-    double offset, * tgt, * src, sum, mean, nFramePix;
+    double offset, * tgt, * src, *colsums, sum, mean, nFramePix;
     SEXP res;
     
     validImage(x,0);
@@ -40,25 +40,45 @@ thresh (SEXP x, SEXP param) {
     PROTECT ( res = Rf_duplicate(x) );
     nprotect++;
     
+    /* allocate vector of column sums */
+    colsums = (double *) malloc ( nx * sizeof(double) );
+
     for ( i = 0; i < nz; i++ ) {
         tgt = &( REAL(res)[ i * nx * ny ] );
         src = &( REAL(x)[ i * nx * ny ] );
+        
         for ( yi = 0; yi < ny; yi++ ) {
-            sum = 0.0;
+            if ( yi == 0 ) {
+            /* initialize column sums */
+                for ( k = 0; k < nx; k++ ) {
+                    colsums[k] = dy * src[k];
+                    
+                    for ( l = 0; l <= dy; l++ )
+                        colsums[k] += src[k + l * nx];
+                }
+            }
+            else {
+            /* update column sums */
+                ov = yi - dy - 1;
+                nv = yi + dy;
+                
+                if (ov < 0) ov = 0;
+                else if (nv >= ny) nv = ny - 1;
+                
+                for ( k = 0; k < nx; k++ )
+                    colsums[k] += src[k + nv * nx] - src[k + ov * nx];
+            }
+          
             for ( xi = 0; xi < nx; xi++ ) {
                 if ( xi == 0 ) {
                 /* first position in a row -- collect new sum */
+                    sum = 0.0;
                     for ( k = xi - dx; k <= xi + dx; k++ ) {
                         u = k;
                         if (u < 0) u = 0;
                         else if (u >= nx) u = nx - 1;
                         
-                        for ( l = yi - dy; l <= yi + dy; l++ ) {
-                            v = l;
-                            if (v < 0) v = 0;
-                            else if (v >= ny) v = ny - 1;
-                            sum += src [u + v * nx]; 
-                        }
+                        sum += colsums[u];
                     }
                 }
                 else {
@@ -69,13 +89,9 @@ thresh (SEXP x, SEXP param) {
                     if (ou < 0) ou = 0;
                     else if (nu >= nx) nu = nx - 1;
                     
-                    for ( l = yi - dy; l <= yi + dy; l++ ) {
-                        v = l;
-                        if (v < 0) v = 0;
-                        else if (v >= ny) v = ny - 1;
-                        sum += src [nu + v * nx] - src [ ou + v * nx];
-                    }
+                    sum += colsums[nu] - colsums[ou];
                 }
+            
                 /* calculate threshold and update tgt data */
                 mean = sum / nFramePix + offset;
                 
@@ -84,6 +100,8 @@ thresh (SEXP x, SEXP param) {
             }
         }
     }
+
+    free(colsums);
 
     UNPROTECT (nprotect);
     return res;
