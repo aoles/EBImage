@@ -19,7 +19,7 @@ See: ../LICENSE for license, LGPL
 /*----------------------------------------------------------------------- */
 SEXP
 thresh (SEXP x, SEXP param) {
-    int dx, dy, nx, ny, nz, nprotect, * dim, xi, yi, u, v, i;
+    int dx, dy, nx, ny, nz, nprotect, * dim, xi, yi, u, v, k, l, ou, nu, i;
     int sx, ex, sy, ey;
     double offset, * tgt, * src, sum, mean, nFramePix;
     SEXP res;
@@ -43,39 +43,44 @@ thresh (SEXP x, SEXP param) {
     for ( i = 0; i < nz; i++ ) {
         tgt = &( REAL(res)[ i * nx * ny ] );
         src = &( REAL(x)[ i * nx * ny ] );
-        for ( yi = dy; yi < ny - dy; yi++ ) {
+        for ( yi = 0; yi < ny; yi++ ) {
             sum = 0.0;
-            for ( xi = dx; xi < nx - dx; xi++ ) {
-                if ( xi == dx) {
+            for ( xi = 0; xi < nx; xi++ ) {
+                if ( xi == 0 ) {
                 /* first position in a row -- collect new sum */
-                    for ( u = xi - dx; u <= xi + dx; u++ )
-                        for ( v = yi - dy; v <= yi + dy; v++ )
-                            sum += src [u + v * nx];
+                    for ( k = xi - dx; k <= xi + dx; k++ ) {
+                        u = k;
+                        if (u < 0) u = 0;
+                        else if (u >= nx) u = nx - 1;
+                        
+                        for ( l = yi - dy; l <= yi + dy; l++ ) {
+                            v = l;
+                            if (v < 0) v = 0;
+                            else if (v >= ny) v = ny - 1;
+                            sum += src [u + v * nx]; 
+                        }
+                    }
                 }
                 else {
                 /* frame moved in the row, modify sum */
-                    for ( v = yi - dy; v <= yi + dy; v++ )
-                        sum += src [xi + dx + v * nx] - src [ xi - dx - 1 + v * nx];
+                    ou = xi - dx - 1;
+                    nu = xi + dx;
+                    
+                    if (ou < 0) ou = 0;
+                    else if (nu >= nx) nu = nx - 1;
+                    
+                    for ( l = yi - dy; l <= yi + dy; l++ ) {
+                        v = l;
+                        if (v < 0) v = 0;
+                        else if (v >= ny) v = ny - 1;
+                        sum += src [nu + v * nx] - src [ ou + v * nx];
+                    }
                 }
                 /* calculate threshold and update tgt data */
                 mean = sum / nFramePix + offset;
                 
-                /* left */
-                sx = ( xi == dx) ? 0 : xi;
-                /* right */
-                ex = ( xi == nx - dx - 1 ) ? nx - 1 : xi;
-                /* top */
-                sy = ( yi == dy ) ? 0 : yi;
-                /* bottom */
-                ey = ( yi == ny - dy - 1 ) ? ny - 1 : yi;
-                
-                if ( ex - sx > 0 || ey - sy > 0 ) {
-                    for ( u = sx; u <= ex; u++ )
-                        for ( v = sy; v <= ey; v++ )
-                            tgt [u + v * nx] = ( src [u + v * nx] < mean ) ? BG : FG;
-                }
-                else /* thresh current pixel only */
-                    tgt [xi + yi * nx] = ( src [xi + yi * nx] < mean ) ? BG : FG;
+                /* thresh current pixel */
+                tgt [xi + yi * nx] = ( src [xi + yi * nx] < mean ) ? BG : FG;
             }
         }
     }
