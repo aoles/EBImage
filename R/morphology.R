@@ -1,6 +1,15 @@
 thresh = function (x, w=5, h=5, offset=0.01) {
   validImage(x)
-  if (w<2 || h<2) stop ("width 'w' and height 'h' must be larger than 1")
+  if (w<1 || h<1) 
+    stop ("filter width 'w' and height 'h' must be larger than 1")
+  
+  d = dim(x)[1:2]
+  d = (d-1)/2
+  if (w > d[1L])
+    stop ("filter width exceeds picture width")
+  if (h > d[2L])
+    stop ("filter height exceeds picture height")
+  
   return ( .Call(C_thresh, castImage(x), as.numeric( c(w, h, offset) )) )
 }
 

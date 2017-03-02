@@ -131,7 +131,8 @@ testEBImageFunctions <- function(x) {
   z <- check("transpose", x)
 
   ## segmentation
-  z <- check("thresh", x)
+  fd = pmin(5, (d[1:2]-1)/2)
+  z <- check("thresh", x, w=fd[1L], h=fd[2L])
   y <- check("channel", x, "luminance")
   z <- check("otsu", y)
   y <- suppressWarnings(normalize(y, separate=FALSE))
@@ -177,7 +178,7 @@ testEBImageFunctions <- function(x) {
   z <- check('fillHull', y)
 
   ## propagate
-  y <- thresh(x, offset=0.02)
+  y <- thresh(x, w=fd[1L], h=fd[2L], offset=0.02)
   y <- fillHull(y)
   y <- bwlabel(y)
   z <- check("propagate", x, y, x>0.5)

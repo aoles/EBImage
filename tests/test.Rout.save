@@ -150,7 +150,8 @@ Type 'q()' to quit R.
 +   z <- check("transpose", x)
 + 
 +   ## segmentation
-+   z <- check("thresh", x)
++   fd = pmin(5, (d[1:2]-1)/2)
++   z <- check("thresh", x, w=fd[1L], h=fd[2L])
 +   y <- check("channel", x, "luminance")
 +   z <- check("otsu", y)
 +   y <- suppressWarnings(normalize(y, separate=FALSE))
@@ -196,7 +197,7 @@ Type 'q()' to quit R.
 +   z <- check('fillHull', y)
 + 
 +   ## propagate
-+   y <- thresh(x, offset=0.02)
++   y <- thresh(x, w=fd[1L], h=fd[2L], offset=0.02)
 +   y <- fillHull(y)
 +   y <- bwlabel(y)
 +   z <- check("propagate", x, y, x>0.5)
@@ -344,7 +345,7 @@ checking 'flop' ............................... PASS (fd2903042f6577db) 324.9
 checking 'translate' .......................... PASS (545d29ae11f62e79) 324.9
 checking 'affine' ............................. PASS (dc78180c379f20d2) 39.9
 checking 'transpose' .......................... PASS (fd2903042f6577db) 324.9
-checking 'thresh' ............................. PASS (545d29ae11f62e79) 324.9
+checking 'thresh' ............................. PASS (ca0a4f4dc9dc81ce) -0.1
 checking 'channel' ............................ PASS (fd2903042f6577db) 324.9
 checking 'otsu' ............................... PASS (f397fccddb916350) 0.8980469
 checking 'bwlabel' ............................ PASS (545d29ae11f62e79) 324.9
@@ -372,7 +373,7 @@ checking 'distmap' ............................ PASS (2690b089a32348c7) Inf
 checking 'watershed' .......................... PASS (545d29ae11f62e79) 324.9
 checking 'floodFill' .......................... PASS (9a58bf6b1ef39788) -0.1
 checking 'fillHull' ........................... PASS (57132767bf0cf5c4) 324.9
-checking 'propagate' .......................... PASS (545d29ae11f62e79) 324.9
+checking 'propagate' .......................... PASS (ca0a4f4dc9dc81ce) -0.1
 checking 'toRGB' .............................. PASS (c8f79be3016a4f30) 2849.9
 checking 'rgbImage' ........................... PASS (04e5727b08bf45cb) 1274.9
 checking 'colormap' ........................... PASS (465b64f5769d9429) 2652.253
