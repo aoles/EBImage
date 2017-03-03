@@ -34,7 +34,7 @@ filter2(x, filter, boundary = c("circular", "replicate"))
 
   The default \code{"circular"} behaviour at boundaries is to wrap the image around borders.
   In the \code{"replicate"} mode pixels outside the bounds of the image are assumed to equal the nearest border pixel value.
-  Numeric values of \code{boundary} yield linear convolution by padding the image with the given value.
+  Numeric values of \code{boundary} yield linear convolution by padding the image with the given value(s).
   
   If \code{x} contains multiple frames, the filter is applied separately to each frame.
   
@@ -59,9 +59,20 @@ filter2(x, filter, boundary = c("circular", "replicate"))
   y = filter2(x, f)
   display(y, title='Filtered image')
 
+  ## Low-pass filter with linear padded boundary
+  y = filter2(x, f, boundary=c(0,.5,1))
+  display(y, title='Filtered image with linear padded boundary')
+
   ## High-pass Laplacian filter
   la = matrix(1, nc=3, nr=3)
   la[2,2] = -8
   y = filter2(x, la)
   display(y, title='Filtered image')
+  
+  ## High-pass Laplacian filter with replicated boundary
+  la = matrix(1, nc=3, nr=3)
+  la[2,2] = -8
+  y = filter2(x, la, boundary='replicate')
+  display(y, title='Filtered image with replicated boundary')
+
 }

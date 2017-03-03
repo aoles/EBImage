@@ -18,7 +18,7 @@
 
 filter2 = function(x, filter, boundary = c("circular", "replicate")) {
   if ( is.numeric(boundary) ) {
-    val = boundary[1L]
+    val = boundary
     boundary = "linear"
   }
   else
@@ -39,44 +39,59 @@ filter2 = function(x, filter, boundary = c("circular", "replicate")) {
   res = x
   
   switch(boundary,
-         ## default mode just wraps around edges
-         circular = {
-           x = imageData(x)
-         },
-         ## pad with a given value
-         linear = {
-           dx[1:2] = dx[1:2] + cf[1:2]
-           xpad = array(val, dx)
-           ## is there a better way of doing this?
-           x = do.call("[<-", c(quote(xpad), lapply(d, function(x) enquote(1:x)), quote(x)) )
-         },
-         replicate = {
-           x = imageData(x)
-           
-           dx[1:2] = dx[1:2] + df[1:2] - 1L
-           
-           rep.dim <- function(x, dim, index, times) {
-             xs <- asub(x, idx=index, dims=dim, drop=FALSE)
-             ds <- dim(xs)
-             ds[dim] <- times
-             if ( dim==2L ) {
-               xs <- split(xs, ceiling(seq_along(xs)/ds[1L]))
-               xs <- sapply(xs, FUN=rep, times=times)
-             } else {
-               xs <- rep(xs, each=times)
-             }
-             array(xs, dim=ds)
-           }
-           
-           # Add left and right colums
-           lc <- rep.dim(x, 2L, 1L, cf[2L])
-           rc <- rep.dim(x, 2L, d[2L], cf[2L])
-           x <- abind(x, rc, lc, along=2L)
-           # Add top and bottom rows
-           tr <- rep.dim(x, 1L, 1L, cf[1L])
-           br <- rep.dim(x, 1L, d[1L], cf[1L])
-           x <- abind(x, br, tr, along=1L)
-         }
+    ## default mode just wraps around edges
+    circular = {
+      x = imageData(x)
+    },
+    ## pad with a given value
+    linear = {
+      x = imageData(x)
+      dx[1:2] = dx[1:2] + df[1:2] - 1L
+      if ( length(dx)>2 & length(val)==prod(dx[-(1:2)]) ) {
+        # Higher dim array with matching linear boundry values
+        xpad = array(rep(val, each=prod(dx[1:2])), dim = dx)
+      } else {
+        if ( length(val)>1 ) {
+          warning('The boundary value length does not match the number of frames, only the first element of boundary will be used')
+        }
+        xpad = array(val[1], dx)
+      }
+      if ( length(d)==2 ) {
+        # For matrices
+        xpad[cf[1]+(1:d[1]),cf[2]+(1:d[2])] = x
+        imageData(x) = xpad
+      } else {
+        # For higher order arrays
+        imageData(x) = do.call("[<-", c(list(xpad,cf[1]+(1:d[1]),cf[2]+(1:d[2])),lapply(d[-(1:2)],FUN = function(x) 1:x),list(x)) )
+      }
+    },
+    replicate = {
+      x = imageData(x)
+      
+      dx[1:2] = dx[1:2] + df[1:2] - 1L
+      
+      rep.dim <- function(x, dim, index, times) {
+        xs <- asub(x, idx=index, dims=dim, drop=FALSE)
+        ds <- dim(xs)
+        ds[dim] <- times
+        if ( dim==2L ) {
+          xs <- split(xs, ceiling(seq_along(xs)/ds[1L]))
+          xs <- sapply(xs, FUN=rep, times=times)
+        } else {
+          xs <- rep(xs, each=times)
+        }
+        array(xs, dim=ds)
+      }
+      
+      # Add left and right colums
+      lc <- rep.dim(x, 2L, 1L, cf[2L])
+      rc <- rep.dim(x, 2L, d[2L], cf[2L])
+      x <- abind(x, rc, lc, along=2L)
+      # Add top and bottom rows
+      tr <- rep.dim(x, 1L, 1L, cf[1L])
+      br <- rep.dim(x, 1L, d[1L], cf[1L])
+      x <- abind(x, br, tr, along=1L)
+    }
   )
   
   ## create fft filter matrix
@@ -101,7 +116,7 @@ filter2 = function(x, filter, boundary = c("circular", "replicate")) {
   }
   
   if ( boundary!="circular" ) {
-    y = asub(y, list(1:d[1L], 1:d[2L]), 1:2)
+    y = asub(y, list(cf[1]+(1:d[1L]), cf[2]+(1:d[2L])), 1:2)
   }
   
   dimnames(y) = dnames
