@@ -36,7 +36,7 @@ ocontour = function(x) {
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bwlabel = function(x) {
   validImage(x)
-  .Call(C_bwlabel, castImage(x))
+  .Call(C_bwlabel, x)
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

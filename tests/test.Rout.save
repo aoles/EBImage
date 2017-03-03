@@ -274,7 +274,7 @@ checking 'transpose' .......................... PASS (bb3d006dd4423285) -0.1
 checking 'thresh' ............................. PASS (bb3d006dd4423285) -0.1
 checking 'channel' ............................ PASS (bb3d006dd4423285) -0.1
 checking 'otsu' ............................... PASS (cbe8a6c6aa2e8245) -0.09804688
-checking 'bwlabel' ............................ PASS (bb3d006dd4423285) -0.1
+checking 'bwlabel' ............................ PASS (15bf2ee33450c598) -0.1
 checking 'colorLabels' ........................ PASS (5cb6a857d91ed0ea) -0.1
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
@@ -348,7 +348,7 @@ checking 'transpose' .......................... PASS (fd2903042f6577db) 324.9
 checking 'thresh' ............................. PASS (ca0a4f4dc9dc81ce) -0.1
 checking 'channel' ............................ PASS (fd2903042f6577db) 324.9
 checking 'otsu' ............................... PASS (f397fccddb916350) 0.8980469
-checking 'bwlabel' ............................ PASS (545d29ae11f62e79) 324.9
+checking 'bwlabel' ............................ PASS (fd2903042f6577db) 324.9
 checking 'colorLabels' ........................ PASS (5a10b69b9bb71739) 2849.9
 checking 'stackObjects' ....................... PASS (8f1472c017e2814c) 324.9
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
@@ -425,7 +425,7 @@ checking 'transpose' .......................... PASS (f39a2b54df5d5df8) 1522055
 checking 'thresh' ............................. PASS (adc2405549904ef4) 1262811
 checking 'channel' ............................ PASS (ea1a665d75817fbb) 1470072
 checking 'otsu' ............................... PASS (0c822739ccd9b674) 0.3160156
-checking 'bwlabel' ............................ PASS (39324c5f27cd19ed) 1199387
+checking 'bwlabel' ............................ PASS (d2978ac5475fd985) 1199387
 checking 'colorLabels' ........................ PASS (0505b0b4e09d05ed) 10021713
 checking 'stackObjects' ....................... PASS (f8eb9b4047e677fb) 718602.9
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
@@ -502,7 +502,7 @@ checking 'transpose' .......................... PASS (32f4e3c321435048) 652051.4
 checking 'thresh' ............................. PASS (d9e41701d47acfaf) 382924.9
 checking 'channel' ............................ PASS (288c8c2a23d7d309) 162800.7
 checking 'otsu' ............................... PASS (2634e72eb12ab864) 0.03085937
-checking 'bwlabel' ............................ PASS (ddd4e46d262a4161) 832970.9
+checking 'bwlabel' ............................ PASS (a53dfbd74180c15c) 832970.9
 checking 'colorLabels' ........................ PASS (9aea6bf69b9535b1) 5455321
 checking 'stackObjects' ....................... PASS (202a964735f173b1) 596493.9
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
@@ -578,7 +578,7 @@ checking 'transpose' .......................... PASS (2a083c731f2328d6) 1907377
 checking 'thresh' ............................. PASS (eb2e7bda92bf8884) 954376.9
 checking 'channel' ............................ PASS (628995dc542023b6) 257578.5
 checking 'otsu' ............................... PASS (a7933cc16292d271) 0.3316406
-checking 'bwlabel' ............................ PASS (caae6285da2ed6b4) 230329.9
+checking 'bwlabel' ............................ PASS (f8bd68974c926eec) 230329.9
 checking 'colorLabels' ........................ PASS (80dc35afde7d79d4) 1920855
 checking 'stackObjects' ....................... PASS (6f9fa1b0c36f14c3) 712799.6
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
@@ -656,7 +656,7 @@ checking 'transpose' .......................... PASS (9be0ad64c90eabc7) 758083.9
 checking 'thresh' ............................. PASS (db2183f83e5e3478) 824497.9
 checking 'channel' ............................ PASS (45775cc98ccde7d0) 1055560
 checking 'otsu' ............................... PASS (9966633498a5e2d8) 1.4
-checking 'bwlabel' ............................ PASS (e566d843ca35b8d8) 1597368
+checking 'bwlabel' ............................ PASS (a00294e8900f15eb) 1597368
 checking 'colorLabels' ........................ PASS (6dc0e9def8039903) 3525827
 checking 'stackObjects' ....................... PASS (8ddf2c694201cbf1) 8889538
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
@@ -733,7 +733,7 @@ checking 'transpose' .......................... PASS (f415a850f96da517) 2303263
 checking 'thresh' ............................. PASS (c2a01b4508a551ce) 1549362
 checking 'channel' ............................ PASS (d0059f4eaa729cb0) 287206.2
 checking 'otsu' ............................... PASS (18794185be6d9049) 1.370703
-checking 'bwlabel' ............................ PASS (c2cb1a4cbd2cdc5e) 360413.9
+checking 'bwlabel' ............................ PASS (cf48a1553a7ca557) 360413.9
 checking 'colorLabels' ........................ PASS (87aec3caedd0f2b2) 3039066
 checking 'stackObjects' ....................... PASS (6c9d66add9231c0b) 2472601
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
@@ -810,7 +810,7 @@ checking 'transpose' .......................... PASS (70d09e0401597e51) 2284582
 checking 'thresh' ............................. PASS (dbcd605110f1a945) 1426674
 checking 'channel' ............................ PASS (ea218ca35d898b4f) 2233136
 checking 'otsu' ............................... PASS (73c8c3c1a7c3a7e0) 9.425391
-checking 'bwlabel' ............................ PASS (3f35611c05e4ef59) 2016822
+checking 'bwlabel' ............................ PASS (48a9facb579b630f) 2016822
 checking 'colorLabels' ........................ PASS (2f81d6c90e88b2d4) 14827904
 checking 'stackObjects' ....................... PASS (28c1ffc9196cbeda) 2575847
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
@@ -887,7 +887,7 @@ checking 'transpose' .......................... PASS (cae5d3f85d9a6547) 2284582
 checking 'thresh' ............................. PASS (3a42cf17e054cf22) 1426674
 checking 'channel' ............................ PASS (2cd1b3ca941d0306) 2233136
 checking 'otsu' ............................... PASS (73c8c3c1a7c3a7e0) 9.425391
-checking 'bwlabel' ............................ PASS (c89e2f43d8c4d058) 2016822
+checking 'bwlabel' ............................ PASS (0cd3636f1086f354) 2016822
 checking 'colorLabels' ........................ PASS (3d06f02ad8d875a7) 16357947
 checking 'stackObjects' ....................... PASS (3dfb061836ca6d36) 2575847
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
