@@ -20,6 +20,7 @@ struct XYPoint {
 
 template <class T> void _floodFill(T*, XYPoint, XYPoint, T, double tol = 1e-3);
 template <class T> void _fillHullT(T *, const XYPoint &);
+template <class T> void _bwlabel(T *, int *, XYPoint);
 
 /* -------------------------------------------------------------------------- */
 SEXP
@@ -46,9 +47,16 @@ floodFill(SEXP x, SEXP point, SEXP col, SEXP tol) {
  for (i=0; i<nz; i++) {
     pt.x = INTEGER(point)[i]-1;
     pt.y = INTEGER(point)[nz+i]-1;
-    
-    if (IS_NUMERIC(res)) _floodFill<double>(&(REAL(res)[i*size.x*size.y]), size, pt, REAL(col)[i], REAL(tol)[0]);
-    if (IS_INTEGER(res)) _floodFill<int>(&(INTEGER(res)[i*size.x*size.y]), size, pt, INTEGER(col)[i], REAL(tol)[0]);
+
+    switch (TYPEOF(res)) {
+      case LGLSXP:
+      case INTSXP:
+        _floodFill<int>(&(INTEGER(res)[i*size.x*size.y]), size, pt, INTEGER(col)[i], REAL(tol)[0]);
+        break;
+      case REALSXP:
+        _floodFill<double>(&(REAL(res)[i*size.x*size.y]), size, pt, REAL(col)[i], REAL(tol)[0]);
+        break;
+    }
   }
 
   UNPROTECT (nprotect);
@@ -89,10 +97,8 @@ fillHull(SEXP x) {
 /* -------------------------------------------------------------------------- */
 SEXP
 bwlabel(SEXP x) {
-  int i, kx, ky, nz, *dim;
+  int i, nz, sizexy, offset, *dim, *tgt;
   int nprotect=0;
-  double index;
-  XYPoint pt;
   SEXP res;
 
   // check image validity
@@ -102,34 +108,55 @@ bwlabel(SEXP x) {
   XYPoint size(dim[0], dim[1]);
   if (size.x <= 0 || size.y <= 0) error("image must have positive dimensions");
   
-  // initialize result
-  PROTECT(res = Rf_duplicate(x));
-  nprotect++;  
-
-  // assuming binary images: 0 is background and everything else foreground
-  // foreground is converted here to -1.0
-  for (i=0; i<nz*size.x*size.y; i++) {
-    if (REAL(res)[i]!=0.0) REAL(res)[i]=-1.0;
-  }
+  // store results as integers
+  PROTECT( res = allocVector(INTSXP, XLENGTH(x)) );
+  nprotect++;
+  DUPLICATE_ATTRIB(res, x);
   
-  // do the job over images
-  // every pixel equals with R_PosInf is filled with an increasing index, starting from 1
-  for (i=0; i<nz; i++) {
-    index = 1.0;
-    for (ky=0; ky<size.y ; ky++) {
-      for (kx=0; kx<size.x ; kx++) {
-	if (REAL(res)[kx + ky*size.x + i*size.x*size.y]==-1.0) {
-	  pt.x = kx;
-	  pt.y = ky;
-	  _floodFill<double>(&(REAL(res)[i*size.x*size.y]), size, pt, index, 0.0);
-	  index = index + 1.0;
-	}
-      }
+  sizexy = size.x*size.y;
+  offset = 0;
+  
+  for (i=0; i<nz; i++, offset+=sizexy) {
+    tgt = &(INTEGER(res)[offset]);
+  
+    switch (TYPEOF(x)) {
+      case LGLSXP:
+      case INTSXP:
+        _bwlabel<int>( &(INTEGER(x)[offset]), tgt, size);
+        break;
+      case REALSXP:
+        _bwlabel<double>( &(REAL(x)[offset]), tgt, size);
+        break;
     }
   }
 
   UNPROTECT (nprotect);
   return res;
+}
+
+template <class T> void _bwlabel(T *src, int *res, XYPoint size) {
+  XYPoint pt;
+  int pos = 0;
+  int idx = 1;
+  
+  // assuming binary images:
+  // 0 is background and everything else (background) is converted here to -1
+  for (int i=0; i<size.x*size.y; i++) {
+    res[i] = (src[i]==0.0) ? 0 : -1;
+  }
+  
+  // do the job over images
+  // every pixel with -1 is filled with an increasing index, starting from 1
+  for (int ky=0; ky<size.y ; ky++) {
+    for (int kx=0; kx<size.x ; kx++, pos++) {
+      if (res[pos]==-1) {
+        pt.x = kx;
+        pt.y = ky;
+        _floodFill<int>(res, size, pt, idx, 0);
+        idx++;
+      }
+    }
+  }
 }
 
 /* -------------------------------------------------------------------------- */
