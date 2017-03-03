@@ -12,23 +12,22 @@ See: ../LICENSE for license, LGPL
 #include <R_ext/Error.h>
 
 /*----------------------------------------------------------------------- */
-SEXP
-getFrames (SEXP x, SEXP i, SEXP _type, SEXP _mode) {
-  int nprotect, nx, ny, nc, nd, type, n, j, d, mode;
+SEXP getFrames (SEXP x, SEXP i, SEXP _type, SEXP _mode) {
+  int n, nx, ny, nc, nd, d, type, mode;
+  int j, nprotect, isimage;
   int* ids;
-  SEXP res, img, frame, tmp, dm, dnames, ndnames, names, nnames, dx;
-
+  SEXP res, frame, dm, names, dnames;
+  
   nprotect = 0;
-
+  isimage = isImage(x);
+  
   ids  = INTEGER(i);
   n    = length(i);
   type = INTEGER(_type)[0];
   mode = INTEGER(_mode)[0];
   
-  dx = GET_DIM(x);
-  nx = INTEGER(dx)[0];
-  ny = INTEGER(dx)[1];
-  dnames = GET_DIMNAMES(x);
+  nx = INTEGER(GET_DIM(x))[0];
+  ny = INTEGER(GET_DIM(x))[1];
   
   if ( type==0 ) {  
     nc = 1; 
@@ -36,7 +35,7 @@ getFrames (SEXP x, SEXP i, SEXP _type, SEXP _mode) {
   } else {
     nc = getNumberOfChannels(x, mode);
   }
-
+  
   /* allocate memory for frame list */
   PROTECT ( res = allocVector(VECSXP, n) );
   nprotect++;
@@ -44,12 +43,8 @@ getFrames (SEXP x, SEXP i, SEXP _type, SEXP _mode) {
   /* frame length */
   d = nx * ny * nc;
   
-  /* create frame template */
-  PROTECT( tmp = shallow_duplicate(x) );
-  nprotect++;
-
   /* set frame dimensions */
-  nd = ( mode==MODE_COLOR && length(dx)>2 ) ? 3 : 2;
+  nd = ( mode==MODE_COLOR && length(GET_DIM(x))>2 ) ? 3 : 2;
   
   PROTECT ( dm = allocVector( INTSXP, nd) );
   nprotect++;
@@ -59,41 +54,34 @@ getFrames (SEXP x, SEXP i, SEXP _type, SEXP _mode) {
   if ( nd == 3 )
     INTEGER(dm)[2] = nc;
   
-  img = PROTECT(allocArray(TYPEOF(x), dm));
-  nprotect++;
-  
-  if ( dnames != R_NilValue ) {
-    PROTECT ( ndnames = allocVector(VECSXP, nd) );
+  /* set dimnames */
+  if ( GET_DIMNAMES(x) != R_NilValue ) {
+    PROTECT ( dnames = allocVector(VECSXP, nd) );
     nprotect++;   
-  
-    for (j=0; j<nd; j++)
-      SET_VECTOR_ELT(ndnames, j, VECTOR_ELT(dnames, j)); 
     
-    names = GET_NAMES(dnames);
-    if ( names != R_NilValue ) {
-      PROTECT ( nnames = allocVector(STRSXP, nd) );
+    for (j=0; j<nd; j++)
+      SET_VECTOR_ELT(dnames, j, VECTOR_ELT(GET_DIMNAMES(x), j)); 
+    
+    if ( GET_NAMES(GET_DIMNAMES(x)) != R_NilValue ) {
+      PROTECT ( names = allocVector(STRSXP, nd) );
       nprotect++;
       
       for (j=0; j<nd; j++)
-        SET_STRING_ELT(nnames, j, STRING_ELT(names, j));
+        SET_STRING_ELT(names, j, STRING_ELT(GET_NAMES(GET_DIMNAMES(x)), j));
       
-      SET_NAMES(ndnames, nnames);
+      SET_NAMES(dnames, names);
     }
-    
-    SET_DIMNAMES(img, ndnames);
-  }
-
-  if ( isImage(x) ) {
-    tmp = SET_SLOT( tmp, Image_Data, img);
-    tmp = SET_SLOT( tmp, Image_colormode, ScalarInteger(mode) );
-  }
-  else {
-    tmp = img;
   }
   
   for (j=0; j<n; j++) {
-    PROTECT( frame = shallow_duplicate(tmp) );
+    PROTECT(frame = allocArray(TYPEOF(x), dm));
     nprotect++;
+    
+    DUPLICATE_ATTRIB(frame, x);
+    SET_DIM(frame, dm);
+    SET_DIMNAMES(frame, dnames);
+    
+    if (isimage) frame = SET_SLOT( frame, Image_colormode, ScalarInteger(mode) );
     
     // copy pixel data
     switch( TYPEOF(x) ) {
@@ -108,7 +96,7 @@ getFrames (SEXP x, SEXP i, SEXP _type, SEXP _mode) {
     
     SET_VECTOR_ELT(res, j, frame);    
   }
-    
+  
   UNPROTECT (nprotect);
   return res;
 }
