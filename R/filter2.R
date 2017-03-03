@@ -18,7 +18,7 @@
 
 filter2 = function(x, filter, boundary = c("circular", "replicate")) {
   if ( is.numeric(boundary) ) {
-    val = boundary[1L]
+    val = boundary
     boundary = "linear"
   }
   else
@@ -45,10 +45,21 @@ filter2 = function(x, filter, boundary = c("circular", "replicate")) {
          },
          ## pad with a given value
          linear = {
-           dx[1:2] = dx[1:2] + cf[1:2]
-           xpad = array(val, dx)
-           ## is there a better way of doing this?
-           x = do.call("[<-", c(quote(xpad), lapply(d, function(x) enquote(1:x)), quote(x)) )
+           x = imageData(x)
+           
+           dx[1:2] = dx[1:2] + df[1:2] - 1L
+           
+           if ( length(dx)>2 & length(val)==prod(dx[-(1:2)]) ) {
+             # Higher dim array with matching linear boundry values
+             xpad = array(rep(val, each=prod(dx[1:2])), dim = dx)
+           } else {
+             if ( length(val)>1 ) {
+               warning('The boundary value length does not match the number of frames, only the first element of boundary will be used')
+             }
+             xpad = array(val[1], dx)
+           }
+           # The do.call and arguments as a list of dimension is to take are of arrays of unknown dimension
+           x = do.call("[<-", c(list(xpad),lapply(d,FUN = function(x) 1:x),list(x)) )
          },
          replicate = {
            x = imageData(x)
