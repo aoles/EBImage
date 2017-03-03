@@ -71,10 +71,12 @@ SEXP getFrames (SEXP x, SEXP i, SEXP _type, SEXP _mode) {
       
       SET_NAMES(dnames, names);
     }
+  } else {
+    dnames = R_NilValue;
   }
   
   for (j=0; j<n; j++) {
-    PROTECT(frame = allocArray(TYPEOF(x), dm));
+    PROTECT(frame = allocVector(TYPEOF(x), d));
     nprotect++;
     
     DUPLICATE_ATTRIB(frame, x);
