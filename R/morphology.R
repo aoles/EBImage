@@ -10,7 +10,7 @@ thresh = function (x, w=5, h=5, offset=0.01) {
   if (h > d[2L])
     stop ("filter height exceeds picture height")
   
-  return ( .Call(C_thresh, castImage(x), as.numeric( c(w, h, offset) )) )
+  return (.Call(C_thresh, x, as.numeric(c(w, h, offset))))
 }
 
 distmap = function (x, metric=c('euclidean', 'manhattan')) {
