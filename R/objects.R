@@ -71,33 +71,17 @@ stackObjects = function (x, ref, combine=TRUE, bg.col='black', ext) {
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-rmObjects = function (x, index, reenumerate = TRUE) {
+rmObjects = function (x, index, reenumerate=TRUE) {
   validImage(x)
+  if ( storage.mode(x)!="integer" ) stop("storage mode of object mask should be integer")
   if (!is.list(index)) index = list(index)
   index = lapply (index, as.integer)
-  .Call(C_rmObjects, castImage(x), index, as.integer(reenumerate))
+  .Call(C_rmObjects, x, index, isTRUE(reenumerate))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 reenumerate = function(x) {
   validImage(x)
-  if (any(max(x)<0)) stop("'x' contains negative values and is incorrectly formed")
-  .dim = dim(x)
-  
-  if(!is.integer(x)) storage.mode(x) = 'integer'
-  
-  # prepare 3D array for the 'apply' function
-  dim(x) = c(.dim[seq_len(2)], .numberOfFrames(x, 'total'))
-  
-  res = apply(x, 3, function(im) {
-    from = sort.int(unique.default(c(0L, as.vector(im))))
-    to = seq_along(from) - 1L
-    to[match(im, from)]
-  })
-  
-  # reconstruct Image
-  dim(res) = .dim
-  imageData(x) = res
-  
-  x
+  if ( storage.mode(x)!="integer" ) stop("storage mode of object mask should be integer")
+  .Call(C_rmObjects, x, NULL, TRUE)
 }

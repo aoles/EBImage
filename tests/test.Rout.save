@@ -279,7 +279,7 @@ checking 'colorLabels' ........................ PASS (5cb6a857d91ed0ea) -0.1
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'paintObjects' ....................... PASS (bb3d006dd4423285) -0.1
-checking 'rmObjects' .......................... PASS (bb3d006dd4423285) -0.1
+checking 'rmObjects' .......................... PASS (15bf2ee33450c598) -0.1
 checking 'reenumerate' ........................ PASS (15bf2ee33450c598) -0.1
 checking 'reenumerate' ........................ PASS (15bf2ee33450c598) -0.1
 checking 'computeFeatures' .................... PASS (57f54e3531a18f4e) -0.1
@@ -353,7 +353,7 @@ checking 'colorLabels' ........................ PASS (5a10b69b9bb71739) 2849.9
 checking 'stackObjects' ....................... PASS (8f1472c017e2814c) 324.9
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'paintObjects' ....................... PASS (51f47541d96a6ecf) 270.7333
-checking 'rmObjects' .......................... PASS (ca0a4f4dc9dc81ce) -0.1
+checking 'rmObjects' .......................... PASS (9a58bf6b1ef39788) -0.1
 checking 'reenumerate' ........................ PASS (9a58bf6b1ef39788) -0.1
 checking 'reenumerate' ........................ PASS (fd2903042f6577db) 324.9
 checking 'computeFeatures' .................... PASS (559dfc74a97494a3) 950932.9
@@ -430,9 +430,9 @@ checking 'colorLabels' ........................ PASS (0505b0b4e09d05ed) 10021713
 checking 'stackObjects' ....................... PASS (f8eb9b4047e677fb) 718602.9
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'paintObjects' ....................... PASS (f064eb914151d29d) 1447733
-checking 'rmObjects' .......................... PASS (024fa825107d90e4) -0.1
-checking 'reenumerate' ........................ PASS (1a4a77531aec10ea) -0.1
-checking 'reenumerate' ........................ PASS (4cb16e06c5138818) 1199387
+checking 'rmObjects' .......................... PASS (8f36486b7880f33a) -0.1
+checking 'reenumerate' ........................ PASS (8f36486b7880f33a) -0.1
+checking 'reenumerate' ........................ PASS (d2978ac5475fd985) 1199387
 checking 'computeFeatures' .................... PASS (9dca8bdb6fc6383c) 3634215
 checking 'computeFeatures' .................... PASS (12407c053a81599e) 5aee329f7b8a0af0
 checking 'ocontour' ........................... PASS (ddb1a61382610e29) 0dab270d98fdbdd8
@@ -507,7 +507,7 @@ checking 'colorLabels' ........................ PASS (9aea6bf69b9535b1) 5455321
 checking 'stackObjects' ....................... PASS (202a964735f173b1) 596493.9
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'paintObjects' ....................... PASS (d729a9cd58722f9f) 919069.9
-checking 'rmObjects' .......................... PASS (7bf0c1b10078e541) 565.9
+checking 'rmObjects' .......................... PASS (315db6e1904a02f2) 565.9
 checking 'reenumerate' ........................ PASS (315db6e1904a02f2) 565.9
 checking 'reenumerate' ........................ PASS (a53dfbd74180c15c) 832970.9
 checking 'computeFeatures' .................... PASS (607eae59e3423025) 3988895
@@ -583,7 +583,7 @@ checking 'colorLabels' ........................ PASS (80dc35afde7d79d4) 1920855
 checking 'stackObjects' ....................... PASS (6f9fa1b0c36f14c3) 712799.6
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'paintObjects' ....................... PASS (1812b3a1be6f2a21) 2090128
-checking 'rmObjects' .......................... PASS (63789968fea1336a) -0.1
+checking 'rmObjects' .......................... PASS (cf00ced5df055ef3) -0.1
 checking 'reenumerate' ........................ PASS (cf00ced5df055ef3) -0.1
 checking 'reenumerate' ........................ PASS (f8bd68974c926eec) 230329.9
 checking 'computeFeatures' .................... PASS (f17bea67c6db8efa) 746878.2
@@ -661,7 +661,7 @@ checking 'colorLabels' ........................ PASS (6dc0e9def8039903) 3525827
 checking 'stackObjects' ....................... PASS (8ddf2c694201cbf1) 8889538
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'paintObjects' ....................... PASS (f4107fd743a22ecf) 834266.6
-checking 'rmObjects' .......................... PASS (77c37de4bb22002a) 1303423
+checking 'rmObjects' .......................... PASS (07bc253bd936adb5) 1303423
 checking 'reenumerate' ........................ PASS (ff441c512995c200) 1244828
 checking 'reenumerate' ........................ PASS (a00294e8900f15eb) 1597368
 checking 'computeFeatures' .................... PASS (1d847743be56e5a7) 416164140
@@ -738,7 +738,7 @@ checking 'colorLabels' ........................ PASS (87aec3caedd0f2b2) 3039066
 checking 'stackObjects' ....................... PASS (6c9d66add9231c0b) 2472601
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'paintObjects' ....................... PASS (a94d303375c85afc) 2558300
-checking 'rmObjects' .......................... PASS (3185a582f3d8afe4) 261782.9
+checking 'rmObjects' .......................... PASS (3c7c32b7c14bf399) 261782.9
 checking 'reenumerate' ........................ PASS (3c7c32b7c14bf399) 261782.9
 checking 'reenumerate' ........................ PASS (cf48a1553a7ca557) 360413.9
 checking 'computeFeatures' .................... PASS (43ed64a6574660f3) 749353.1
@@ -815,7 +815,7 @@ checking 'colorLabels' ........................ PASS (2f81d6c90e88b2d4) 14827904
 checking 'stackObjects' ....................... PASS (28c1ffc9196cbeda) 2575847
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'paintObjects' ....................... PASS (ba568e37e29116fa) 2379341
-checking 'rmObjects' .......................... PASS (064ba106db72a65c) 1934575
+checking 'rmObjects' .......................... PASS (150895efa1acc9af) 1934575
 checking 'reenumerate' ........................ PASS (150895efa1acc9af) 1934575
 checking 'reenumerate' ........................ PASS (48a9facb579b630f) 2016822
 checking 'computeFeatures' .................... PASS (5f168ac8bf99f53d) 734993.9
@@ -892,7 +892,7 @@ checking 'colorLabels' ........................ PASS (3d06f02ad8d875a7) 16357947
 checking 'stackObjects' ....................... PASS (3dfb061836ca6d36) 2575847
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'paintObjects' ....................... PASS (d0e505d3ebc1fb67) 2379341
-checking 'rmObjects' .......................... PASS (c3455fb0aad59ab3) 1934575
+checking 'rmObjects' .......................... PASS (72c36fcb451899a7) 1934575
 checking 'reenumerate' ........................ PASS (72c36fcb451899a7) 1934575
 checking 'reenumerate' ........................ PASS (0cd3636f1086f354) 2016822
 checking 'computeFeatures' .................... PASS (5f168ac8bf99f53d) 734993.9
