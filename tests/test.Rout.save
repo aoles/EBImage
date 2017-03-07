@@ -271,7 +271,7 @@ checking 'flop' ............................... PASS (bb3d006dd4423285) -0.1
 checking 'translate' .......................... PASS (574e9cac8770a1fd) 1932.9
 checking 'affine' ............................. PASS (bb3d006dd4423285) -0.1
 checking 'transpose' .......................... PASS (bb3d006dd4423285) -0.1
-checking 'thresh' ............................. PASS (bb3d006dd4423285) -0.1
+checking 'thresh' ............................. PASS (15bf2ee33450c598) -0.1
 checking 'channel' ............................ PASS (bb3d006dd4423285) -0.1
 checking 'otsu' ............................... PASS (cbe8a6c6aa2e8245) -0.09804688
 checking 'bwlabel' ............................ PASS (15bf2ee33450c598) -0.1
@@ -279,7 +279,7 @@ checking 'colorLabels' ........................ PASS (5cb6a857d91ed0ea) -0.1
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'paintObjects' ....................... PASS (bb3d006dd4423285) -0.1
-checking 'rmObjects' .......................... PASS (bb3d006dd4423285) -0.1
+checking 'rmObjects' .......................... PASS (15bf2ee33450c598) -0.1
 checking 'reenumerate' ........................ PASS (15bf2ee33450c598) -0.1
 checking 'reenumerate' ........................ PASS (15bf2ee33450c598) -0.1
 checking 'computeFeatures' .................... PASS (57f54e3531a18f4e) -0.1
@@ -345,7 +345,7 @@ checking 'flop' ............................... PASS (fd2903042f6577db) 324.9
 checking 'translate' .......................... PASS (545d29ae11f62e79) 324.9
 checking 'affine' ............................. PASS (dc78180c379f20d2) 39.9
 checking 'transpose' .......................... PASS (fd2903042f6577db) 324.9
-checking 'thresh' ............................. PASS (ca0a4f4dc9dc81ce) -0.1
+checking 'thresh' ............................. PASS (9a58bf6b1ef39788) -0.1
 checking 'channel' ............................ PASS (fd2903042f6577db) 324.9
 checking 'otsu' ............................... PASS (f397fccddb916350) 0.8980469
 checking 'bwlabel' ............................ PASS (fd2903042f6577db) 324.9
@@ -353,7 +353,7 @@ checking 'colorLabels' ........................ PASS (5a10b69b9bb71739) 2849.9
 checking 'stackObjects' ....................... PASS (8f1472c017e2814c) 324.9
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'paintObjects' ....................... PASS (51f47541d96a6ecf) 270.7333
-checking 'rmObjects' .......................... PASS (ca0a4f4dc9dc81ce) -0.1
+checking 'rmObjects' .......................... PASS (9a58bf6b1ef39788) -0.1
 checking 'reenumerate' ........................ PASS (9a58bf6b1ef39788) -0.1
 checking 'reenumerate' ........................ PASS (fd2903042f6577db) 324.9
 checking 'computeFeatures' .................... PASS (559dfc74a97494a3) 950932.9
@@ -422,7 +422,7 @@ checking 'flop' ............................... PASS (7e68dec7614712d2) 1462119
 checking 'translate' .......................... PASS (21641bbeafdcbc39) 2133961
 checking 'affine' ............................. PASS (1ed86f465543429e) 54171.17
 checking 'transpose' .......................... PASS (f39a2b54df5d5df8) 1522055
-checking 'thresh' ............................. PASS (adc2405549904ef4) 1262811
+checking 'thresh' ............................. PASS (aed13a82eaa0d6f6) 1262811
 checking 'channel' ............................ PASS (ea1a665d75817fbb) 1470072
 checking 'otsu' ............................... PASS (0c822739ccd9b674) 0.3160156
 checking 'bwlabel' ............................ PASS (d2978ac5475fd985) 1199387
@@ -430,9 +430,9 @@ checking 'colorLabels' ........................ PASS (0505b0b4e09d05ed) 10021713
 checking 'stackObjects' ....................... PASS (f8eb9b4047e677fb) 718602.9
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'paintObjects' ....................... PASS (f064eb914151d29d) 1447733
-checking 'rmObjects' .......................... PASS (024fa825107d90e4) -0.1
-checking 'reenumerate' ........................ PASS (1a4a77531aec10ea) -0.1
-checking 'reenumerate' ........................ PASS (4cb16e06c5138818) 1199387
+checking 'rmObjects' .......................... PASS (8f36486b7880f33a) -0.1
+checking 'reenumerate' ........................ PASS (8f36486b7880f33a) -0.1
+checking 'reenumerate' ........................ PASS (d2978ac5475fd985) 1199387
 checking 'computeFeatures' .................... PASS (9dca8bdb6fc6383c) 3634215
 checking 'computeFeatures' .................... PASS (12407c053a81599e) 5aee329f7b8a0af0
 checking 'ocontour' ........................... PASS (ddb1a61382610e29) 0dab270d98fdbdd8
@@ -499,7 +499,7 @@ checking 'flop' ............................... PASS (edb212fe7ec01fae) 768451.1
 checking 'translate' .......................... PASS (158cc0e28f649d32) 820434.5
 checking 'affine' ............................. PASS (c22bdcc947290f4e) 22238.15
 checking 'transpose' .......................... PASS (32f4e3c321435048) 652051.4
-checking 'thresh' ............................. PASS (d9e41701d47acfaf) 382924.9
+checking 'thresh' ............................. PASS (bf6cf9e7f1b50aa0) 382924.9
 checking 'channel' ............................ PASS (288c8c2a23d7d309) 162800.7
 checking 'otsu' ............................... PASS (2634e72eb12ab864) 0.03085937
 checking 'bwlabel' ............................ PASS (a53dfbd74180c15c) 832970.9
@@ -507,7 +507,7 @@ checking 'colorLabels' ........................ PASS (9aea6bf69b9535b1) 5455321
 checking 'stackObjects' ....................... PASS (202a964735f173b1) 596493.9
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'paintObjects' ....................... PASS (d729a9cd58722f9f) 919069.9
-checking 'rmObjects' .......................... PASS (7bf0c1b10078e541) 565.9
+checking 'rmObjects' .......................... PASS (315db6e1904a02f2) 565.9
 checking 'reenumerate' ........................ PASS (315db6e1904a02f2) 565.9
 checking 'reenumerate' ........................ PASS (a53dfbd74180c15c) 832970.9
 checking 'computeFeatures' .................... PASS (607eae59e3423025) 3988895
@@ -575,7 +575,7 @@ checking 'flop' ............................... PASS (c9a027c754ade888) 2048664
 checking 'translate' .......................... PASS (98b2270654265063) 2998417
 checking 'affine' ............................. PASS (091470a40c4fba44) 226067.6
 checking 'transpose' .......................... PASS (2a083c731f2328d6) 1907377
-checking 'thresh' ............................. PASS (eb2e7bda92bf8884) 954376.9
+checking 'thresh' ............................. PASS (aeb34a5300761161) 954376.9
 checking 'channel' ............................ PASS (628995dc542023b6) 257578.5
 checking 'otsu' ............................... PASS (a7933cc16292d271) 0.3316406
 checking 'bwlabel' ............................ PASS (f8bd68974c926eec) 230329.9
@@ -583,7 +583,7 @@ checking 'colorLabels' ........................ PASS (80dc35afde7d79d4) 1920855
 checking 'stackObjects' ....................... PASS (6f9fa1b0c36f14c3) 712799.6
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'paintObjects' ....................... PASS (1812b3a1be6f2a21) 2090128
-checking 'rmObjects' .......................... PASS (63789968fea1336a) -0.1
+checking 'rmObjects' .......................... PASS (cf00ced5df055ef3) -0.1
 checking 'reenumerate' ........................ PASS (cf00ced5df055ef3) -0.1
 checking 'reenumerate' ........................ PASS (f8bd68974c926eec) 230329.9
 checking 'computeFeatures' .................... PASS (f17bea67c6db8efa) 746878.2
@@ -653,7 +653,7 @@ checking 'flop' ............................... PASS (91665fdcc5d39ce2) 1064092
 checking 'translate' .......................... PASS (6c5b0b16cf2595ee) 1105982
 checking 'affine' ............................. PASS (4a6b1cf59de37216) 133467.8
 checking 'transpose' .......................... PASS (9be0ad64c90eabc7) 758083.9
-checking 'thresh' ............................. PASS (db2183f83e5e3478) 824497.9
+checking 'thresh' ............................. PASS (cf8b639ee5c91bd5) 824497.9
 checking 'channel' ............................ PASS (45775cc98ccde7d0) 1055560
 checking 'otsu' ............................... PASS (9966633498a5e2d8) 1.4
 checking 'bwlabel' ............................ PASS (a00294e8900f15eb) 1597368
@@ -661,7 +661,7 @@ checking 'colorLabels' ........................ PASS (6dc0e9def8039903) 3525827
 checking 'stackObjects' ....................... PASS (8ddf2c694201cbf1) 8889538
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'paintObjects' ....................... PASS (f4107fd743a22ecf) 834266.6
-checking 'rmObjects' .......................... PASS (77c37de4bb22002a) 1303423
+checking 'rmObjects' .......................... PASS (07bc253bd936adb5) 1303423
 checking 'reenumerate' ........................ PASS (ff441c512995c200) 1244828
 checking 'reenumerate' ........................ PASS (a00294e8900f15eb) 1597368
 checking 'computeFeatures' .................... PASS (1d847743be56e5a7) 416164140
@@ -730,7 +730,7 @@ checking 'flop' ............................... PASS (189be924d5127b6d) 2358658
 checking 'translate' .......................... PASS (6b8b9dffcab202c5) 3393923
 checking 'affine' ............................. PASS (8490fa9d387d7f22) 301692.6
 checking 'transpose' .......................... PASS (f415a850f96da517) 2303263
-checking 'thresh' ............................. PASS (c2a01b4508a551ce) 1549362
+checking 'thresh' ............................. PASS (96c1db8a6b3c5f8f) 1549362
 checking 'channel' ............................ PASS (d0059f4eaa729cb0) 287206.2
 checking 'otsu' ............................... PASS (18794185be6d9049) 1.370703
 checking 'bwlabel' ............................ PASS (cf48a1553a7ca557) 360413.9
@@ -738,7 +738,7 @@ checking 'colorLabels' ........................ PASS (87aec3caedd0f2b2) 3039066
 checking 'stackObjects' ....................... PASS (6c9d66add9231c0b) 2472601
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'paintObjects' ....................... PASS (a94d303375c85afc) 2558300
-checking 'rmObjects' .......................... PASS (3185a582f3d8afe4) 261782.9
+checking 'rmObjects' .......................... PASS (3c7c32b7c14bf399) 261782.9
 checking 'reenumerate' ........................ PASS (3c7c32b7c14bf399) 261782.9
 checking 'reenumerate' ........................ PASS (cf48a1553a7ca557) 360413.9
 checking 'computeFeatures' .................... PASS (43ed64a6574660f3) 749353.1
@@ -807,7 +807,7 @@ checking 'flop' ............................... PASS (039d65e48af245d2) 2231772
 checking 'translate' .......................... PASS (6dc22f8c9da472fe) 3827517
 checking 'affine' ............................. PASS (987d2bf7d6243ac5) 219714.6
 checking 'transpose' .......................... PASS (70d09e0401597e51) 2284582
-checking 'thresh' ............................. PASS (dbcd605110f1a945) 1426674
+checking 'thresh' ............................. PASS (99ef268285d31156) 1426674
 checking 'channel' ............................ PASS (ea218ca35d898b4f) 2233136
 checking 'otsu' ............................... PASS (73c8c3c1a7c3a7e0) 9.425391
 checking 'bwlabel' ............................ PASS (48a9facb579b630f) 2016822
@@ -815,7 +815,7 @@ checking 'colorLabels' ........................ PASS (2f81d6c90e88b2d4) 14827904
 checking 'stackObjects' ....................... PASS (28c1ffc9196cbeda) 2575847
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'paintObjects' ....................... PASS (ba568e37e29116fa) 2379341
-checking 'rmObjects' .......................... PASS (064ba106db72a65c) 1934575
+checking 'rmObjects' .......................... PASS (150895efa1acc9af) 1934575
 checking 'reenumerate' ........................ PASS (150895efa1acc9af) 1934575
 checking 'reenumerate' ........................ PASS (48a9facb579b630f) 2016822
 checking 'computeFeatures' .................... PASS (5f168ac8bf99f53d) 734993.9
@@ -884,7 +884,7 @@ checking 'flop' ............................... PASS (1746b768e1919758) 2231772
 checking 'translate' .......................... PASS (eb6575b71bd228cf) 3827517
 checking 'affine' ............................. PASS (6f88949e9ca0500f) 219714.6
 checking 'transpose' .......................... PASS (cae5d3f85d9a6547) 2284582
-checking 'thresh' ............................. PASS (3a42cf17e054cf22) 1426674
+checking 'thresh' ............................. PASS (6907f0b8232e5a87) 1426674
 checking 'channel' ............................ PASS (2cd1b3ca941d0306) 2233136
 checking 'otsu' ............................... PASS (73c8c3c1a7c3a7e0) 9.425391
 checking 'bwlabel' ............................ PASS (0cd3636f1086f354) 2016822
@@ -892,7 +892,7 @@ checking 'colorLabels' ........................ PASS (3d06f02ad8d875a7) 16357947
 checking 'stackObjects' ....................... PASS (3dfb061836ca6d36) 2575847
 checking 'stackObjects' ....................... PASS (57f54e3531a18f4e) -0.1
 checking 'paintObjects' ....................... PASS (d0e505d3ebc1fb67) 2379341
-checking 'rmObjects' .......................... PASS (c3455fb0aad59ab3) 1934575
+checking 'rmObjects' .......................... PASS (72c36fcb451899a7) 1934575
 checking 'reenumerate' ........................ PASS (72c36fcb451899a7) 1934575
 checking 'reenumerate' ........................ PASS (0cd3636f1086f354) 2016822
 checking 'computeFeatures' .................... PASS (5f168ac8bf99f53d) 734993.9

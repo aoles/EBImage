@@ -109,59 +109,76 @@ paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col, SEXP _thick) {
 SEXP
 rmObjects (SEXP x, SEXP _index, SEXP _reenum) {
     SEXP res, index;
-    int nprotect, nx, ny, nz, i, j, im, nobj, * indexes, found;
-    double * data;
+    int nx, ny, nz, sizexy, i, j, im, nobj, * indexes, idx, val, reenum;
+    int * src, * tgt;
 
     validImage(x,0);
 
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
     nz = getNumberOfFrames(x,0);
-    nprotect = 0;
-
-
-    PROTECT ( res = Rf_duplicate(x) );
-    nprotect++;
-   
+    
+    reenum = LOGICAL(_reenum)[0];
+    
+    PROTECT( res = allocVector(INTSXP, XLENGTH(x)) );
+    DUPLICATE_ATTRIB(res, x);
+  
+    sizexy = nx * ny;
+  
     for ( im = 0; im < nz; im++ ) {
         /* get image data */
-        data = &( REAL(res)[ im * nx * ny ] );
-        index = VECTOR_ELT (_index, im);
+        src = &( INTEGER(x)[ im * sizexy ] );
+        tgt = &( INTEGER(res)[ im * sizexy ] );
+        
         /* get number of objects -- max index */
         nobj = 0;
-        for ( i = 0; i < nx * ny; i++ )
-            if ( data[i] > nobj ) nobj = data[i];
-        indexes = (int *) Calloc (nobj, int );
-        for ( i = 0; i < nobj; i++ ) {
-            found = 0;
-            for ( j = 0; j < LENGTH(index) && !found; j++ )
-                if ( i + 1 == INTEGER(index)[j] )
-                    found = 1;
-            if ( found )
-                indexes[i] = 0;
-            else
-                indexes[i] = i + 1;
+        for ( i = 0; i < sizexy; i++ )
+            if ( src[i] > nobj ) nobj = src[i]; // NA_integer_ is -2147483648
+            
+        indexes = (int *) calloc((nobj + 1), sizeof(int));
+        
+        /* reset indices of removed objects */
+        if ( _index!=R_NilValue ) {
+          index = VECTOR_ELT (_index, im);
+          
+          for ( i = 0; i <= nobj; i++ )
+            indexes[i] = i;
+          
+          for ( i = 0; i < LENGTH(index); i++ ) {
+            idx = INTEGER(index)[i];
+            if (idx > 0 && idx <= nobj)
+              indexes[idx] = 0;
+          }
         }
+        else {
+          for ( i = 0; i < sizexy; i++ ) {
+            val = src[i];
+            if ( val > 0 )
+              indexes[val] = val;
+          }
+        }
+        
         /* reenumerate object indices */
-        if ( INTEGER(_reenum)[0] ) {
+        if ( reenum ) {
           j = 1;
-          for ( i = 0; i < nobj; i++ ) {
+          for ( i = 1; i <= nobj; i++ ) {
               if ( indexes[i] > 0 ) {
                   indexes[i] = j;
                   j++;
               }
           }
         }
+        
         /* reset image */
-        for ( i = 0; i < nx * ny; i++ ) {
-            if ( data[i] < 0.9 ) continue;
-            data [i] = indexes[ (int)data[i] - 1 ];
+        for ( i = 0; i < sizexy; i++ ) {
+            val = src[i];
+            tgt[i] = ( val > 0 ) ? indexes[val] : val; // support NA's
         }
+        
         Free (indexes);
-
     }
 
-    UNPROTECT (nprotect);
+    UNPROTECT (1);
     return res;
 }
 
