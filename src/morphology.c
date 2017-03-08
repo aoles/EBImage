@@ -216,12 +216,11 @@ void free_lookup_table(numeric ***T, chordSet *set) {
 }
 
 /*----------------------------------------------------------------------- */
-SEXP erode_dilate_internal (SEXP x, int what, chordSet *set, numeric ***T) {
+void erode_dilate_internal (SEXP x, SEXP res, int what, chordSet *set, numeric ***T) {
     numeric * tgt, * src;
-    int nz, nprotect;
+    int nz;
     int * dim;
     PointXY size;
-    SEXP res;
 
     void (*compute_lookup_table_for_line)(numeric ***, numeric *, int, int, chordSet *, PointXY);
     void (*process_line)(numeric ***, numeric *, numeric *, chordSet *, int, int);
@@ -239,17 +238,14 @@ SEXP erode_dilate_internal (SEXP x, int what, chordSet *set, numeric ***T) {
     size.x = dim[0];
     size.y = dim[1];
     nz = getNumberOfFrames(x,0);
-
-    nprotect = 0;
-
-    PROTECT ( res = Rf_duplicate(x) );
-    ++nprotect;
+    
+    int val = 1 - what;
 
     for (int i = 0; i < nz; i++ ) {
         tgt = &( REAL(res)[i * size.x * size.y] );
         src = &( REAL(x)[i * size.x * size.y] );
         for (int j = 0; j < size.x * size.y; ++j) {
-            tgt[j] = 1 - what;
+            tgt[j] = val;
         }
         for (int j = set->minYoffset; j <= set->maxYoffset; ++j) {
             compute_lookup_table_for_line(T, src, j, 0, set, size);
@@ -265,93 +261,104 @@ SEXP erode_dilate_internal (SEXP x, int what, chordSet *set, numeric ***T) {
             process_line(T, src, tgt, set, j, size.x);
         }
     }
-
-    UNPROTECT (nprotect);
-    return res;
 }
 
-SEXP opening_closing_internal(SEXP x, int what, chordSet *set, numeric ***T) {
-    if (what == OPENING)
-        return erode_dilate_internal(erode_dilate_internal(x, ERODE, set, T), DILATE, set, T);
-    else
-        return erode_dilate_internal(erode_dilate_internal(x, DILATE, set, T), ERODE, set, T);
+void opening_closing_internal(SEXP x, SEXP res, int what, chordSet *set, numeric ***T) {
+    SEXP tmp;
+    PROTECT( tmp = allocVector(TYPEOF(x), XLENGTH(x)) );
+    DUPLICATE_ATTRIB(tmp, x);
+    
+    if (what == OPENING) {
+        erode_dilate_internal(x, tmp, ERODE, set, T);
+        erode_dilate_internal(tmp, res, DILATE, set, T);
+    }
+    else {
+        erode_dilate_internal(x, tmp, DILATE, set, T);
+        erode_dilate_internal(tmp, res, ERODE, set, T);
+    }
+    
+    UNPROTECT(1);
 }
 
 SEXP erode_dilate (SEXP x, SEXP kernel, SEXP what) {
+    SEXP res;
+  
     validImage(x,0);
     validImage(kernel,0);
     int operation = INTEGER(what)[0];
     chordSet set = buildChordSet(kernel);
     numeric ***T = allocate_lookup_table(&set, INTEGER ( GET_DIM(x) )[0]);
-    SEXP img = erode_dilate_internal(x, operation, &set, T);
+    
+    PROTECT( res = allocVector(TYPEOF(x), XLENGTH(x)) );
+    DUPLICATE_ATTRIB(res, x);
+    
+    erode_dilate_internal(x, res, operation, &set, T);
+    
     free_lookup_table(T, &set);
     R_Free(set.C);
-    return img;
+    UNPROTECT(1);
+    return res;
 }
 
 SEXP opening_closing (SEXP x, SEXP kernel, SEXP what) {
+    SEXP res;
     int operation = INTEGER(what)[0];
     chordSet set = buildChordSet(kernel);
     numeric ***T = allocate_lookup_table(&set, INTEGER ( GET_DIM(x) )[0]);
-    SEXP img = opening_closing_internal(x, operation, &set, T);
+    
+    PROTECT( res = allocVector(TYPEOF(x), XLENGTH(x)) );
+    DUPLICATE_ATTRIB(res, x);
+    
+    opening_closing_internal(x, res, operation, &set, T);
+    
     free_lookup_table(T, &set);
     R_Free(set.C);
-    return img;
+    UNPROTECT(1);
+    return res;
 }
 
 SEXP tophat (SEXP x, SEXP kernel, SEXP what) {
     int operation = INTEGER(what)[0];
     chordSet set = buildChordSet(kernel);
     numeric ***T = allocate_lookup_table(&set, INTEGER ( GET_DIM(x) )[0]);
-    PointXY size;
     numeric *img1, *img2, *output;
-    int *dim = INTEGER ( GET_DIM(x) );
-    size.x = dim[0];
-    size.y = dim[1];
-    int nz = getNumberOfFrames(x,0);
     int nprotect = 0;
 
     SEXP res;
-    PROTECT ( res = Rf_duplicate(x) );
+    PROTECT( res = allocVector(TYPEOF(x), XLENGTH(x)) );
     ++nprotect;
+    DUPLICATE_ATTRIB(res, x);
+    
     if (operation == TOPHAT_WHITE) {
-        SEXP img = opening_closing_internal(x, OPENING, &set, T);
-        PROTECT(img);
-        ++nprotect;
-        for (int i = 0; i < nz; ++i) {
-            img1 = &(REAL(x)[i * size.x * size.y]);
-            img2 = &(REAL(img)[i * size.x * size.y]);
-            output = &(REAL(res)[i * size.x * size.y]);
-            for (int j = 0; j < size.x * size.y; ++j) {
-                output[j] = img1[j] - img2[j];
-            }
+        opening_closing_internal(x, res, OPENING, &set, T);
+        img1 = REAL(x);
+        img2 = REAL(res);
+        output = REAL(res);
+        for (int i = 0; i < length(x); ++i) {
+            output[i] = img1[i] - img2[i];
         }
     } else if (operation == TOPHAT_BLACK) {
-        SEXP img = opening_closing_internal(x, CLOSING, &set, T);
-        PROTECT(img);
-        ++nprotect;
-        for (int i = 0; i < nz; ++i) {
-            img1 = &(REAL(x)[i * size.x * size.y]);
-            img2 = &(REAL(img)[i * size.x * size.y]);
-            output = &(REAL(res)[i * size.x * size.y]);
-            for (int j = 0; j < size.x * size.y; ++j) {
-                output[j] = img2[j] - img1[j];
-            }
+        opening_closing_internal(x, res, CLOSING, &set, T);
+        img1 = REAL(x);
+        img2 = REAL(res);
+        output = REAL(res);
+        for (int i = 0; i < length(x); ++i) {
+            output[i] = img2[i] - img1[i];
         }
     } else if (operation == TOPHAT_SELFCOMPLEMENTARY) {
-        SEXP img_open = opening_closing_internal(x, OPENING, &set, T);
-        PROTECT(img_open);
+        opening_closing_internal(x, res, OPENING, &set, T);
+        
+        SEXP img;
+        PROTECT( img = allocVector(TYPEOF(x), XLENGTH(x)) );
         ++nprotect;
-        SEXP img_close = opening_closing_internal(x, CLOSING, &set, T);
-        PROTECT(img_close);
-        ++nprotect;
-        for (int i = 0; i < nz; ++i) {
-            img1 = &(REAL(img_close)[i * size.x * size.y]);
-            img2 = &(REAL(img_open)[i * size.x * size.y]);
-            output = &(REAL(res)[i * size.x * size.y]);
-            for (int j = 0; j < size.x * size.y; ++j) {
-                output[j] = img1[j] - img2[j];
-            }
+        DUPLICATE_ATTRIB(img, x);
+        opening_closing_internal(x, img, CLOSING, &set, T);
+        
+        img1 = REAL(img);
+        img2 = REAL(res);
+        output = REAL(res);
+        for (int i = 0; i < length(x); ++i) {
+            output[i] = img1[i] + img2[i];
         }
     }
 
