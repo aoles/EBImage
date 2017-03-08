@@ -85,37 +85,37 @@ makeBrush = function(size, shape=c('box', 'disc', 'diamond', 'Gaussian', 'line')
   z
 }
 
-erode = function (x, kern=makeBrush(5, shape='diamond')) {
-  validImage(x)
-  return (.Call(C_erode_dilate, castImage(x), kern, 0L))
-}
-
 dilate = function (x, kern=makeBrush(5, shape='diamond')) {
   validImage(x)
-  return (.Call(C_erode_dilate, castImage(x), kern, 1L))
+  return (.Call(C_morphology, castImage(x), kern, 0L))
+}
+
+erode = function (x, kern=makeBrush(5, shape='diamond')) {
+  validImage(x)
+  return (.Call(C_morphology, castImage(x), kern, 1L))
 }
 
 opening = function (x, kern=makeBrush(5, shape='diamond')) {
   validImage(x)
-  return (.Call(C_opening_closing, castImage(x), kern, 0L))
+  return (.Call(C_morphology, castImage(x), kern, 2L))
 }
 
 closing = function (x, kern=makeBrush(5, shape='diamond')) {
   validImage(x)
-  return (.Call(C_opening_closing, castImage(x), kern, 1L))
+  return (.Call(C_morphology, castImage(x), kern, 3L))
 }
 
 whiteTopHat = function (x, kern=makeBrush(5, shape='diamond')) {
   validImage(x)
-  return (.Call(C_tophat, castImage(x), kern, 0L))
+  return (.Call(C_morphology, castImage(x), kern, 4L))
 }
 
 blackTopHat = function (x, kern=makeBrush(5, shape='diamond')) {
   validImage(x)
-  return (.Call(C_tophat, castImage(x), kern, 1L))
+  return (.Call(C_morphology, castImage(x), kern, 5L))
 }
 
 selfComplementaryTopHat = function (x, kern=makeBrush(5, shape='diamond')) {
   validImage(x)
-  return (.Call(C_tophat, castImage(x), kern, 2L))
+  return (.Call(C_morphology, castImage(x), kern, 6L))
 }

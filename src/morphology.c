@@ -7,13 +7,13 @@ See: ../LICENSE for license, LGPL
 #include "tools.h"
 #include <math.h>
 
-#define ERODE  0
-#define DILATE 1
-#define OPENING  0
-#define CLOSING 1
-#define TOPHAT_WHITE  0
-#define TOPHAT_BLACK 1
-#define TOPHAT_SELFCOMPLEMENTARY 2
+#define DILATE 0
+#define ERODE 1
+#define OPENING 2
+#define CLOSING 3
+#define TOPHAT_WHITE  4
+#define TOPHAT_BLACK 5
+#define TOPHAT_SELFCOMPLEMENTARY 6
 
 #define BUF_LENGTH 10
 
@@ -238,14 +238,12 @@ void erode_dilate_internal (SEXP x, SEXP res, int what, chordSet *set, numeric *
     size.x = dim[0];
     size.y = dim[1];
     nz = getNumberOfFrames(x,0);
-    
-    int val = 1 - what;
 
     for (int i = 0; i < nz; i++ ) {
         tgt = &( REAL(res)[i * size.x * size.y] );
         src = &( REAL(x)[i * size.x * size.y] );
         for (int j = 0; j < size.x * size.y; ++j) {
-            tgt[j] = val;
+            tgt[j] = what;
         }
         for (int j = set->minYoffset; j <= set->maxYoffset; ++j) {
             compute_lookup_table_for_line(T, src, j, 0, set, size);
@@ -280,56 +278,36 @@ void opening_closing_internal(SEXP x, SEXP res, int what, chordSet *set, numeric
     UNPROTECT(1);
 }
 
-SEXP erode_dilate (SEXP x, SEXP kernel, SEXP what) {
+SEXP morphology (SEXP x, SEXP kernel, SEXP what) {
     SEXP res;
-  
+    double * img1, * img2, * output;
+    
     validImage(x,0);
     validImage(kernel,0);
-    int operation = INTEGER(what)[0];
+    
     chordSet set = buildChordSet(kernel);
     numeric ***T = allocate_lookup_table(&set, INTEGER ( GET_DIM(x) )[0]);
     
-    PROTECT( res = allocVector(TYPEOF(x), XLENGTH(x)) );
-    DUPLICATE_ATTRIB(res, x);
-    
-    erode_dilate_internal(x, res, operation, &set, T);
-    
-    free_lookup_table(T, &set);
-    R_Free(set.C);
-    UNPROTECT(1);
-    return res;
-}
-
-SEXP opening_closing (SEXP x, SEXP kernel, SEXP what) {
-    SEXP res;
-    int operation = INTEGER(what)[0];
-    chordSet set = buildChordSet(kernel);
-    numeric ***T = allocate_lookup_table(&set, INTEGER ( GET_DIM(x) )[0]);
-    
-    PROTECT( res = allocVector(TYPEOF(x), XLENGTH(x)) );
-    DUPLICATE_ATTRIB(res, x);
-    
-    opening_closing_internal(x, res, operation, &set, T);
-    
-    free_lookup_table(T, &set);
-    R_Free(set.C);
-    UNPROTECT(1);
-    return res;
-}
-
-SEXP tophat (SEXP x, SEXP kernel, SEXP what) {
-    int operation = INTEGER(what)[0];
-    chordSet set = buildChordSet(kernel);
-    numeric ***T = allocate_lookup_table(&set, INTEGER ( GET_DIM(x) )[0]);
-    numeric *img1, *img2, *output;
     int nprotect = 0;
-
-    SEXP res;
+    
     PROTECT( res = allocVector(TYPEOF(x), XLENGTH(x)) );
     ++nprotect;
     DUPLICATE_ATTRIB(res, x);
     
-    if (operation == TOPHAT_WHITE) {
+    switch( INTEGER(what)[0] ) {
+    case DILATE:
+        erode_dilate_internal(x, res, DILATE, &set, T);
+        break;
+    case ERODE:
+        erode_dilate_internal(x, res, ERODE, &set, T);
+        break;
+    case OPENING:
+        opening_closing_internal(x, res, OPENING, &set, T);
+        break;
+    case CLOSING:
+        opening_closing_internal(x, res, CLOSING, &set, T);
+        break;
+    case TOPHAT_WHITE:
         opening_closing_internal(x, res, OPENING, &set, T);
         img1 = REAL(x);
         img2 = REAL(res);
@@ -337,7 +315,8 @@ SEXP tophat (SEXP x, SEXP kernel, SEXP what) {
         for (int i = 0; i < length(x); ++i) {
             output[i] = img1[i] - img2[i];
         }
-    } else if (operation == TOPHAT_BLACK) {
+        break;
+    case TOPHAT_BLACK:
         opening_closing_internal(x, res, CLOSING, &set, T);
         img1 = REAL(x);
         img2 = REAL(res);
@@ -345,7 +324,8 @@ SEXP tophat (SEXP x, SEXP kernel, SEXP what) {
         for (int i = 0; i < length(x); ++i) {
             output[i] = img2[i] - img1[i];
         }
-    } else if (operation == TOPHAT_SELFCOMPLEMENTARY) {
+        break;
+    case TOPHAT_SELFCOMPLEMENTARY:
         opening_closing_internal(x, res, OPENING, &set, T);
         
         SEXP img;
@@ -360,6 +340,7 @@ SEXP tophat (SEXP x, SEXP kernel, SEXP what) {
         for (int i = 0; i < length(x); ++i) {
             output[i] = img1[i] + img2[i];
         }
+        break;
     }
 
     free_lookup_table(T, &set);
