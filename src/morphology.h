@@ -8,9 +8,7 @@
 extern "C" {
 #endif
   
-  SEXP erode_dilate (SEXP, SEXP, SEXP);
-  SEXP opening_closing (SEXP, SEXP, SEXP);
-  SEXP tophat (SEXP, SEXP, SEXP);
+SEXP morphology (SEXP, SEXP, SEXP);
   
 #ifdef __cplusplus
 };

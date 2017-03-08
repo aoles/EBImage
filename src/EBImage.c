@@ -30,9 +30,7 @@ See: ../LICENSE for license, LGPL
 #define CALLDEF(name, n)  {#name, (DL_FUNC) &name, n}
 
 static R_CallMethodDef CallEntries[] = {
-    CALLDEF(erode_dilate, 3),
-    CALLDEF(opening_closing, 3),
-    CALLDEF(tophat, 3),
+    CALLDEF(morphology, 3),
     CALLDEF(thresh, 2),
     CALLDEF(floodFill, 4),
     CALLDEF(fillHull, 1),
