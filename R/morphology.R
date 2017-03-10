@@ -29,7 +29,7 @@ makeBrush = function(size, shape=c('box', 'disc', 'diamond', 'Gaussian', 'line')
     warning(paste("'size' was rounded to the next odd number: ", size))
   }
   
-  if (shape=='box') z = array(1,dim=c(size,size))
+  if (shape=='box') z = matrix(1L, size, size)
   else if (shape == 'line') {
     angle = angle %% 180
     angle.radians = angle * pi / 180;
@@ -43,7 +43,7 @@ makeBrush = function(size, shape=c('box', 'disc', 'diamond', 'Gaussian', 'line')
       z.y = sizeh
       z.x = round(sizeh/tg)
     }
-    z = array(0, dim=2*c(z.x, z.y)+1);
+    z = array(0L, dim=2*c(z.x, z.y)+1);
     for (i in -sizeh:sizeh) {
       if ( angle < 45 || angle > 135) {
         ## scan horizontally
@@ -55,12 +55,12 @@ makeBrush = function(size, shape=c('box', 'disc', 'diamond', 'Gaussian', 'line')
         i.y = i
         i.x = round(i/tg) 
       }
-      z[i.x+z.x+1, i.y+z.y+1] = 1
+      z[i.x+z.x+1, i.y+z.y+1] = 1L
     }
   }
   else if (shape=='gaussian') {
     x = seq(-(size-1)/2, (size-1)/2, length=size)
-    x = matrix(x, nrow=size, ncol=size)
+    x = matrix(x, size, size)
     z = exp(- (x^2 + t(x)^2) / (2*sigma^2))
     z = z / sum(z)
   } else {
@@ -80,7 +80,7 @@ makeBrush = function(size, shape=c('box', 'disc', 'diamond', 'Gaussian', 'line')
       z = ifelse(z>0, z, 0)
     }
 
-    if (step) z = ifelse(z>0, 1, 0)
+    if (step) z = ifelse(z>0, 1L, 0L)
   }
   z
 }
