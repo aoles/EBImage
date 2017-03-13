@@ -473,43 +473,7 @@ setMethod ("[", "Image",
            })
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# convert linear index to array indices
-ind2sub = function(x, y) {
-  if(x > prod(y)) 
-    stop("Index out of bounds")
-  if ( (len=length(y)) == 0 )
-    return(NULL)
-  
-  res = div = 1
-  for(i in seq_len(len-1))
-    div[i+1] = div[i] * y[i] 
-  
-  for(i in rev(seq_len(len))){
-    res[i] = ceiling(x/div[i])
-    x = x - (res[i]-1) * div[i]
-  }
-  
-  res
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 getFrame = function(y, i, type = c('total', 'render')) .getFrame(y, i, match.arg(type))
-
-getFrames.old = function(y, i, type = c('total', 'render')) {
-  type = match.arg(type)
-  colormode = colorMode(y)
-  
-  n = .numberOfFrames(y, type, colormode)
-  
-  if ( missing(i) ) 
-    i = seq_len(n)
-  else {
-    i = as.integer(i)
-    if ( any( i<1L || i>n ) ) stop("'i' must be a vector of numbers ranging from 1 to ", n)
-  }
-  
-  lapply(i, function(i) .getFrame(y, i, type, colormode))
-}
 
 getFrames = function(y, i, type = c('total', 'render')) {
   type = match.arg(type)
@@ -534,33 +498,6 @@ getFrames = function(y, i, type = c('total', 'render')) {
 ## with transpose(..., coerce=TRUE) this approach is significantly faster
 ## compared to doing these operations on Image objects and is exploited by the
 ## writeImage function
-
-.getFrame.old = function(y, i, type, colormode) {
-  if(missing(colormode)) colormode = colorMode(y)
-  
-  n = .numberOfFrames(y, type, colormode)
-  if (i<1 || i>n) stop("'i' must belong between 1 and ", n)
-  
-  ## frame dimensions
-  ld = length( (d = dim(y)) )
-  fd = if (colormode==Color && type=='render' && ld>2L) 3L else 2L
-  if (ld==fd) return(y)
-  
-  # preserve spatial dimensions
-  # for Image class this is already taken care by the "]" method itself ..
-  x = asub(y, as.list(ind2sub(i, d[-seq_len(fd)])), (fd+1):ld, drop = is(y, 'Image'))
-  
-  # .. we only need to take care of plain arrays
-  if(length( (d = dim(x)) ) > fd){
-    dims = which(d==1L)
-    x = adrop(x, drop = dims[dims>fd]) 
-  }
-  
-  ## return single channels as Greyscale
-  if ( colormode==Color && type=='total' ) colorMode(x) = Grayscale
-  return(x)
-}
-
 
 .getFrame = function(y, i, type, mode) {
   if(missing(mode)) mode = colorMode(y)
