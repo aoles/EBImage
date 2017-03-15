@@ -16,8 +16,8 @@ thresh = function (x, w=5, h=5, offset=0.01) {
 distmap = function (x, metric=c('euclidean', 'manhattan')) {
   validImage(x)
   if (any(is.na(x))) stop("'x' shouldn't contain any NAs")
-  metric = match.arg(metric)
-  return (.Call(C_distmap, castImage(x), switch(metric, euclidean=0L, manhattan=1L)))
+  metric = switch(match.arg(metric), euclidean=0L, manhattan=1L) 
+  return (.Call(C_distmap, x, metric))
 }
 
 makeBrush = function(size, shape=c('box', 'disc', 'diamond', 'Gaussian', 'line'), step=TRUE, sigma=0.3, angle=45) {

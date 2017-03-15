@@ -301,7 +301,7 @@ checking 'whiteTopHat' ........................ PASS (bb3d006dd4423285) -0.1
 checking 'blackTopHat' ........................ PASS (bb3d006dd4423285) -0.1
 checking 'selfComplementaryTopHat' ............ PASS (bb3d006dd4423285) -0.1
 checking 'distmap' ............................ PASS (bb3d006dd4423285) -0.1
-checking 'watershed' .......................... PASS (bb3d006dd4423285) -0.1
+checking 'watershed' .......................... PASS (15bf2ee33450c598) -0.1
 checking 'floodFill' .......................... PASS (02f684c8d407c0f3) 1039.9
 checking 'fillHull' ........................... PASS (1b5285e59ce84fa0) -0.1
 checking 'propagate' .......................... PASS (bb3d006dd4423285) -0.1
@@ -379,7 +379,7 @@ checking 'whiteTopHat' ........................ PASS (9a58bf6b1ef39788) -0.1
 checking 'blackTopHat' ........................ PASS (9a58bf6b1ef39788) -0.1
 checking 'selfComplementaryTopHat' ............ PASS (78a44d6226d9747a) 649.9
 checking 'distmap' ............................ PASS (2690b089a32348c7) Inf
-checking 'watershed' .......................... PASS (545d29ae11f62e79) 324.9
+checking 'watershed' .......................... PASS (fd2903042f6577db) 324.9
 checking 'floodFill' .......................... PASS (9a58bf6b1ef39788) -0.1
 checking 'fillHull' ........................... PASS (57132767bf0cf5c4) 324.9
 checking 'propagate' .......................... PASS (ca0a4f4dc9dc81ce) -0.1
@@ -459,7 +459,7 @@ checking 'whiteTopHat' ........................ PASS (0461dfe452491caf) 18730.15
 checking 'blackTopHat' ........................ PASS (8f53c6a02fcc449b) 27716.23
 checking 'selfComplementaryTopHat' ............ PASS (53e3b78d71635465) 2929436
 checking 'distmap' ............................ PASS (66da40cd47ec8762) 3826969
-checking 'watershed' .......................... PASS (e56c10b1b455d1ee) 2762113
+checking 'watershed' .......................... PASS (fe4e99c1bb5f9562) 2762113
 checking 'floodFill' .......................... PASS (e508f01acf50e00d) 1470197
 checking 'fillHull' ........................... PASS (b630618a382dd149) 1217568
 checking 'propagate' .......................... PASS (ea07a68078b349d0) 3464201
@@ -539,7 +539,7 @@ checking 'whiteTopHat' ........................ PASS (9db3096e14961ab7) 3572.998
 checking 'blackTopHat' ........................ PASS (bf87d7286ea29ad9) 7139.473
 checking 'selfComplementaryTopHat' ............ PASS (b77a4b378692f404) 1533178
 checking 'distmap' ............................ PASS (f6300a4f340ae60a) 12740449
-checking 'watershed' .......................... PASS (416bf360cd763da1) 988518.9
+checking 'watershed' .......................... PASS (8a9f971d0fd151b0) 988518.9
 checking 'floodFill' .......................... PASS (58b50ac20366b30b) 765755.4
 checking 'fillHull' ........................... PASS (c843a337bba9a51b) 988518.9
 checking 'propagate' .......................... PASS (6a0ed6ab84f20423) 26630579
@@ -618,7 +618,7 @@ checking 'whiteTopHat' ........................ PASS (ab977dc4ab166626) 16585.63
 checking 'blackTopHat' ........................ PASS (e1f6d9987bffb784) 22039.05
 checking 'selfComplementaryTopHat' ............ PASS (37e1c11a042ce219) 4071763
 checking 'distmap' ............................ PASS (046048efe2665db2) 6038778
-checking 'watershed' .......................... PASS (c63512eb33f79e77) 1058553
+checking 'watershed' .......................... PASS (5810b16b06c7a236) 1058553
 checking 'floodFill' .......................... PASS (87ccae676293e02d) 2036854
 checking 'fillHull' ........................... PASS (53e61ab2bda88b20) 1058553
 checking 'propagate' .......................... PASS (b5124023470f54c6) 7755487
@@ -699,7 +699,7 @@ checking 'whiteTopHat' ........................ PASS (0a2dbcdbb9e396a8) 148131.9
 checking 'blackTopHat' ........................ PASS (af7e8fad58a0f587) 202411.9
 checking 'selfComplementaryTopHat' ............ PASS (729954d933215c8d) 2151192
 checking 'distmap' ............................ PASS (8ba0b0fb6770e8a3) 3856630
-checking 'watershed' .......................... PASS (72d368ef2922b662) 1443978
+checking 'watershed' .......................... PASS (0bd6a31bc6197067) 1443978
 checking 'floodFill' .......................... PASS (45775cc98ccde7d0) 1055560
 checking 'fillHull' ........................... PASS (45775cc98ccde7d0) 1055560
 checking 'propagate' .......................... PASS (260e26ccbfe28881) 1613920
@@ -779,7 +779,7 @@ checking 'whiteTopHat' ........................ PASS (248102e12cde390f) 12437.36
 checking 'blackTopHat' ........................ PASS (2769c6f876a888b2) 19780.97
 checking 'selfComplementaryTopHat' ............ PASS (535e331642e8affe) 4711722
 checking 'distmap' ............................ PASS (e9f6f8a5899a40fd) 10836360
-checking 'watershed' .......................... PASS (7f9231558b202abf) 2013322
+checking 'watershed' .......................... PASS (355196749445c942) 2013322
 checking 'floodFill' .......................... PASS (a23cce6e67e088ae) 2355706
 checking 'fillHull' ........................... PASS (5a6494dd882e20ae) 2013322
 checking 'propagate' .......................... PASS (7347dfb0ab917010) 11618104
@@ -859,7 +859,7 @@ checking 'whiteTopHat' ........................ PASS (2545dff4d9a67f18) 12004.54
 checking 'blackTopHat' ........................ PASS (0bc09ee83c3b7e6b) 20296.87
 checking 'selfComplementaryTopHat' ............ PASS (7271dd2d24a8b8fa) 4469404
 checking 'distmap' ............................ PASS (fd74d28ff7a40bc8) 7464344
-checking 'watershed' .......................... PASS (2705781a5e93a0a5) 1541186
+checking 'watershed' .......................... PASS (aec9e7c80b500f8a) 1541186
 checking 'floodFill' .......................... PASS (c8f6a63ecc5faeb2) 2234521
 checking 'fillHull' ........................... PASS (cdeb2538f3cc7adf) 1541186
 checking 'propagate' .......................... PASS (6e0a41acecc5c2d9) 8948876
@@ -939,7 +939,7 @@ checking 'whiteTopHat' ........................ PASS (2dfa04a48724ec36) 12004.54
 checking 'blackTopHat' ........................ PASS (70ff24813042529a) 20296.87
 checking 'selfComplementaryTopHat' ............ PASS (4e93f72a43638575) 4469404
 checking 'distmap' ............................ PASS (fb1ca8ba680de2b3) 7464344
-checking 'watershed' .......................... PASS (e13411cbbdc66fb2) 1541186
+checking 'watershed' .......................... PASS (29d5027b84535806) 1541186
 checking 'floodFill' .......................... PASS (54aa4548fd305300) 2234521
 checking 'fillHull' ........................... PASS (8eb52b594f8cd22b) 1541186
 checking 'propagate' .......................... PASS (f4a67728de7a8f9d) 8948876

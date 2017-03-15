@@ -27,7 +27,7 @@ double check_multiple( double *, double *, int &, IntList &, SeedList &, double 
 SEXP
 watershed (SEXP x, SEXP _tolerance, SEXP _ext) {
     SEXP res;
-    int im, i, j, nx, ny, nz, ext, nprotect = 0;
+    int im, i, j, nx, ny, nz, ext;
     double tolerance;
 
     nx = INTEGER ( GET_DIM(x) )[0];
@@ -36,27 +36,28 @@ watershed (SEXP x, SEXP _tolerance, SEXP _ext) {
     tolerance = REAL( _tolerance )[0];
     ext = INTEGER( _ext )[0];
 
-    PROTECT ( res = Rf_duplicate(x) );
-    nprotect++;
-  
+    PROTECT( res = allocVector(INTSXP, XLENGTH(x)) );
+    DUPLICATE_ATTRIB(res, x);
+    
     int * index = new int[ nx * ny ];
+    double * frame = new double[ nx * ny ];
 
     for ( im = 0; im < nz; im++ ) {
 
         double * src = &( REAL(x)[ im * nx * ny ] );
-        double * tgt = &( REAL(res)[ im * nx * ny ] );
+        int * tgt = &( INTEGER(res)[ im * nx * ny ] );
 
         /* generate pixel index and negate the image -- filling wells */
         for ( i = 0; i < nx * ny; i++ ) {
-	  tgt[ i ] = -src[ i ];
-	  index[ i ] = i;
+        	  frame[ i ] = -src[ i ];
+        	  index[ i ] = i;
         }
         /* from R includes R_ext/Utils.h */
-        /* will resort tgt as well */
-        rsort_with_index( tgt, index, nx * ny );
-        /* reassign tgt as it was reset above but keep new index */
+        /* will resort frame as well */
+        rsort_with_index( frame, index, nx * ny );
+        /* reassign frame as it was reset above but keep new index */
         for ( i = 0; i < nx * ny; i++ )
-            tgt[ i ] = ( src[i]==0 ? 0 : -src[i] ); // avoid turning +0 into -0
+            frame[ i ] = ( src[i]==0 ? 0 : -src[i] ); // avoid turning +0 into -0
 
         SeedList seeds;  /* indexes of all seed starting points, i.e. lowest values */
 
@@ -97,7 +98,7 @@ watershed (SEXP x, SEXP _tolerance, SEXP _ext) {
                         for ( y = pt.y - ext; y <= pt.y + ext; y++ ) {
                             if ( x < 0 || y < 0 || x >= nx || y >= ny || (x == pt.x && y == pt.y) ) continue;
                             indxy = x + y * nx;
-                            nbseed = (int) tgt[ indxy ];
+                            nbseed = (int) frame[ indxy ];
                             if ( nbseed < 1 ) continue;
                             isin = false;
                             for ( it = nb.begin(); it != nb.end() && !isin; it++ )
@@ -110,7 +111,7 @@ watershed (SEXP x, SEXP _tolerance, SEXP _ext) {
                         j++;
                         continue;
                     }
-                    tgt[ ind ] = check_multiple(tgt, src, ind, nb, seeds, tolerance, nx, ny );
+                    frame[ ind ] = check_multiple(frame, src, ind, nb, seeds, tolerance, nx, ny );
                     /* we assigned the pixel, reset j to restart neighbours detection */
                     j = 0;
                 }
@@ -121,7 +122,7 @@ watershed (SEXP x, SEXP _tolerance, SEXP _ext) {
                     newseed.index = equals.front();
                     newseed.seed = topseed;
                     equals.pop_front();
-                    tgt[ newseed.index ] = topseed;
+                    frame[ newseed.index ] = topseed;
                     seeds.push_back( newseed );
                 }
             } // assigning equals
@@ -139,17 +140,17 @@ watershed (SEXP x, SEXP _tolerance, SEXP _ext) {
             i++;
         }
         for ( i = 0; i < nx * ny; i++ ) {
-            j = (int) tgt[ i ];
-            if ( 0 < j && j <= topseed )
-                tgt[ i ] = finseed[ j - 1 ];
+            j = (int) frame[ i ];
+            tgt[ i ] = ( 0 < j && j <= topseed ) ? finseed[ j - 1 ] : 0;
         }
         delete[] finseed;
 
     } // loop through images
 
     delete[] index;
+    delete[] frame;
 
-    UNPROTECT (nprotect);
+    UNPROTECT (1);
     return res;
 }
 
@@ -171,7 +172,7 @@ check_multiple( double * tgt, double * src, int & ind, IntList & nb, SeedList & 
     SeedList::iterator sit;
     PointXY ptsit, pt;
     POINT_FROM_INDEX(pt, ind, nx)
-    double distx, dist = FLT_MAX;
+    double distx, dist = DBL_MAX;
 
     /* maxdiff */
     for ( it = nb.begin(); it != nb.end(); it++ ) {
@@ -180,7 +181,7 @@ check_multiple( double * tgt, double * src, int & ind, IntList & nb, SeedList & 
         if ( diff > maxdiff ) {
             maxdiff = diff;
             /* assign result to the steepest until and if it not assigned to closest over the tolerance */
-            if ( dist == FLT_MAX )
+            if ( dist == DBL_MAX )
                 res = *it;
         }
         /* we assign to the closest centre which is above tolerance, if none than to maxdiff */
