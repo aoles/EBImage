@@ -9,6 +9,7 @@ See: ../LICENSE for license, LGPL
 #include "tools.h"
 #include <R_ext/Error.h>
 #include <stdio.h>
+#include "EBImage.h"
 
 /*----------------------------------------------------------------------- */
 SEXP

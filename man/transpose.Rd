@@ -5,20 +5,19 @@
 \title{Image Transposition}
 
 \description{
-  Transposes an image by swapping its first two, i.e., spatial dimensions.
+  Transposes an image by swapping its spatial dimensions.
 }
 
 \usage{
-transpose(x, coerce = FALSE)
+transpose(x)
 }
 
 \arguments{
   \item{x}{an \code{Image} object or an array.}
-  \item{coerce}{controls the coercion of \code{x}. By default the output is of the same class as the input. If \code{coerce = TRUE} then \code{x} becomes coerced to an array.}
 }
 
 \value{
-  An \code{Image} object or an array, containing \code{x} with its XY dimensions transposed. When \code{coerce = TRUE} the output is coerced to an array.
+  A transformed version of \code{x} with its first two dimensions transposed.
 }
 
 \details{
@@ -26,11 +25,11 @@ The transposition of an image is performed by swapping the X and Y indices of it
 }
 
 \note{
-\code{transpose} is particularly useful when converting between different representations of image data in which the X and Y dimensions are swapped. Typically, in such context only the actual pixel data matters. For performance reasons it is best practice to issue the function directly on an \code{Image} object with \code{coerce = TRUE} rather than to extract its image data first and only then perform the transposition, or to transpose the \code{Image} object and coerce it to an array afterwards.
+The function is implemented using an efficient cash-oblivious algorithm which is typically faster than R's \code{aperm} and \code{t} functions.
 }
 
 \author{
-  Andrzej Oles, \email{andrzej.oles@embl.de}, 2012
+  Andrzej Oles, \email{andrzej.oles@embl.de}, 2012-2017
 }
 
 \seealso{

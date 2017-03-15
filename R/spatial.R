@@ -138,36 +138,7 @@ resize <- function(x, w, h, output.dim = c(w, h), output.origin = c(0, 0), antia
   affine(x = x, m = m, output.dim = output.dim, antialias = antialias, ...)
 }
 
-## transposes the XY dimensions
-transpose <- function(x, coerce = FALSE) {
-  validImage(x)
-  dims = seq_along(dim(x))
-  dims[1:2] = c(2:1)
-  y = aperm(x, dims)
-  if ( (!coerce) && is.Image(x) ) {
-    x@.Data = y
-    x
-  }
-  else y
+## transpose spatial dimensions
+transpose <- function(x) {
+    .Call(C_transpose, x)
 }
-
-# transposeImage = function(x, coerce = FALSE) {
-#   validImage(x)
-#   dims = seq_along(dim(x))
-#   dims[1:2] = c(2:1)
-#   y = aperm(x, dims)
-#   if ( (!coerce) && is.Image(x) ) {
-#     x@.Data = y
-#     x
-#   }
-#   else y
-# }
-# 
-# transpose <- function(x, coerce = FALSE) {
-#   .Deprecated("t")
-#   transposeImage(x, coerce)
-# }
-# 
-# t.Image  <- function(x) transposeImage(x)
-# t.array  <- function(x) transposeImage(x)
-# t.matrix <- function(x) t.default(x)

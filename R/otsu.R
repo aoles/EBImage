@@ -9,7 +9,7 @@ otsu <- function(x, range = c(0, 1), levels = 256){
   x = castImage(x)  # converts logical to numeric
   
 # prepare 3D array for the 'apply' function
-  dim(x) = c(dim(x)[seq_len(2)], .numberOfFrames(x, 'total', Grayscale))
+  dim(x) = c(dim(x)[seq_len(2)], numberOfFrames(x, 'total'))
   
 # threshold each frame separately
   apply(x, 3, function(y) {

@@ -17,7 +17,7 @@ paintObjects = function (x, tgt, opac=c(1, 1), col=c('red', NA), thick=FALSE, cl
   validImage(x)
   if (colorMode(x)!=Grayscale) stop("'", deparse(substitute(x), width.cutoff = 500L, nlines = 1L), "' must be in 'Grayscale' color mode")
   if (any(dim(x)[1:2] != dim(tgt)[1:2])) stop( "'x' and 'tgt' must have the same size" )
-  if (.numberOfFrames(x,'render') != .numberOfFrames(tgt,'render')) stop( "'x' and 'tgt' must have the same number of render frames" )                           
+  if (numberOfFrames(x,'render') != numberOfFrames(tgt,'render')) stop( "'x' and 'tgt' must have the same number of render frames" )                           
   
   if ((l=length(col))>2L) col[1:2] else col = switch(l+1L, c(NA, NA), c(col, NA), col)
   if ((l=length(opac))>2L) opac[1:2] else opac = switch(l+1L, c(1, 1), c(opac, 1), opac)
@@ -48,7 +48,7 @@ stackObjects = function (x, ref, combine=TRUE, bg.col='black', ext) {
   ## check arguments
   if (colorMode(x) != Grayscale) stop("'x' must be an image in 'Grayscale' color mode or an array")
   checkCompatibleImages(x, ref, 'render')
-  nz = .numberOfFrames(x, 'total')
+  nz = numberOfFrames(x, 'total')
   
   ## uses 'computeFeatures.moment' to get centers and theta
   hf = lapply(getFrames(x), computeFeatures.moment)

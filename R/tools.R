@@ -15,7 +15,7 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 ## checks whether 'x' is a suitable image
-validImage=function(x) {
+validImage = function(x) {
   z = validImageObject(x)
   if (isTRUE(z))
     TRUE
@@ -41,7 +41,7 @@ checkCompatibleImages=function(x, ref, type='total') {
   validImage(x)
   if (!missing(ref)) {
     validImage(ref)
-    if ( .numberOfFrames(x, type) != .numberOfFrames(ref, type) ) stop(sprintf("'%s' and '%s' must have the same number of '%s' frames", xn, refn, type))
+    if ( numberOfFrames(x, type) != numberOfFrames(ref, type) ) stop(sprintf("'%s' and '%s' must have the same number of '%s' frames", xn, refn, type))
     if ( any(dim(x)[1:2] != dim(ref)[1:2]) ) stop(sprintf("'%s' and '%s' must have the same spatial 2D dimensions", xn, refn, type))
   }
 }

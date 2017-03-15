@@ -285,7 +285,7 @@ gblob = function(x0=15, n=49, alpha=0.8, beta=1.2) {
 convertRef = function(ref, refnames) {
   if (!is.array(ref) && !is.list(ref)) stop("'ref' must be an array or a list containing the reference images")
   if (is.array(ref)) {
-    nref = .numberOfFrames(ref, 'total')
+    nref = numberOfFrames(ref, 'total')
     if (class(ref)=="Image") ref = imageData(ref)
     ndim = length(dim(ref))
     if (ndim==2) ref = list(ref)

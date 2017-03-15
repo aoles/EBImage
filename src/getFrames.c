@@ -2,6 +2,8 @@
 #include "getFrames.h"
 #include "tools.h"
 
+#include "EBImage.h"
+
 /* -------------------------------------------------------------------------
 Extract frames from image stack
 
@@ -12,7 +14,7 @@ See: ../LICENSE for license, LGPL
 #include <R_ext/Error.h>
 
 /*----------------------------------------------------------------------- */
-SEXP getFrames (SEXP x, SEXP i, SEXP _type, SEXP _mode) {
+SEXP getFrames (SEXP x, SEXP i, SEXP _type) {
   int n, nx, ny, nc, nd, d, type, mode;
   int j, nprotect, isimage;
   int* ids;
@@ -24,7 +26,7 @@ SEXP getFrames (SEXP x, SEXP i, SEXP _type, SEXP _mode) {
   ids  = INTEGER(i);
   n    = length(i);
   type = INTEGER(_type)[0];
-  mode = INTEGER(_mode)[0];
+  mode = COLOR_MODE(x);
   
   nx = INTEGER(GET_DIM(x))[0];
   ny = INTEGER(GET_DIM(x))[1];
@@ -103,6 +105,6 @@ SEXP getFrames (SEXP x, SEXP i, SEXP _type, SEXP _mode) {
   return res;
 }
 
-SEXP getFrame (SEXP x, SEXP i, SEXP type, SEXP mode) {
-  return VECTOR_ELT(getFrames(x, i, type, mode), 0);
+SEXP getFrame (SEXP x, SEXP i, SEXP type) {
+  return VECTOR_ELT(getFrames(x, i, type), 0);
 }

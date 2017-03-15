@@ -19,7 +19,7 @@ displayRaster = function(image, frame, all = FALSE, drawGrid = isTRUE(spacing==0
                          nx, spacing = 0, margin = 0, interpolate = TRUE,
                          title, ...) {
   all = isTRUE(all)
-  nf = .numberOfFrames(image, type="render")
+  nf = numberOfFrames(image, type="render")
   
   ## display all frames in a grid-like environment
   if ( all ) {
@@ -145,7 +145,7 @@ displayInBrowser = function(x, title, ...) {
   ## get image parameters
   d = dim(x)
   if ( length(d)==2L ) d = c(d, 1L)
-  nf = .numberOfFrames(x, "render")
+  nf = numberOfFrames(x, "render")
 
   ## fill-in in the template
   a = sub("HEIGHT",d[2L], sub("WIDTH",d[1L], sub("FRAMES",nf, sub("IMAGE",basename(imageFile), sub("TITLE", title, a)))))
