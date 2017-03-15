@@ -21,6 +21,7 @@ See: ../LICENSE for license, LGPL
 #include "tile.h"
 #include "nativeRaster.h"
 #include "getFrames.h"
+#include "transpose.h"
 
 #include <R.h>
 #include <Rdefines.h>
@@ -30,6 +31,9 @@ See: ../LICENSE for license, LGPL
 #define CALLDEF(name, n)  {#name, (DL_FUNC) &name, n}
 
 static R_CallMethodDef CallEntries[] = {
+    CALLDEF(transpose, 1),
+    CALLDEF(numberOfFrames, 2),
+    CALLDEF(validImageObject, 1),
     CALLDEF(morphology, 3),
     CALLDEF(thresh, 2),
     CALLDEF(floodFill, 4),
@@ -51,8 +55,8 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(affine, 5),
     CALLDEF(medianFilter, 3),
     CALLDEF(nativeRaster, 1),
-    CALLDEF(getFrame, 4),
-    CALLDEF(getFrames, 4),
+    CALLDEF(getFrame, 3),
+    CALLDEF(getFrames, 3),
     /* add above all R-lib functions from common.h */
     {NULL, NULL, 0}
 };
