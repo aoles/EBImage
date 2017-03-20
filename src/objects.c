@@ -109,8 +109,9 @@ paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col, SEXP _thick) {
 SEXP
 rmObjects (SEXP x, SEXP _index, SEXP _reenum) {
     SEXP res, index;
-    int nx, ny, nz, sizexy, i, j, im, nobj, * indexes, idx, val, reenum;
+    int nx, ny, nz, sizexy, i, j, im, nobj, * indexes, idx, val;
     int * src, * tgt;
+    bool reenum;
 
     validImage(x,0);
 
