@@ -20,13 +20,13 @@ tile (SEXP obj, SEXP _hdr, SEXP params) {
   int lwd = INTEGER(params)[1];
   int nc = getNumberOfChannels(obj, mode);
   int nprotect, nx, ny, nz, nxr, nyr, i, j, index, x, y;
-  double *hdr, * dim, onetondx;
+  double *hdr, *src, *tgt;
   int rredstride,rgreenstride,rbluestride;
   int oredstride,ogreenstride,obluestride;
 
   nx = INTEGER ( GET_DIM(obj) )[0];
   ny = INTEGER ( GET_DIM(obj) )[1];
-  nz = getNumberOfFrames(obj,1);
+  nz = getNumberOfFrames(obj, 1);
   nprotect = 0;
 
   if ( nz < 1 ) error("no images in stack to tile");
@@ -34,17 +34,16 @@ tile (SEXP obj, SEXP _hdr, SEXP params) {
   hdr = REAL(_hdr);
 
   /* calculate size of the resulting image */
-  onetondx = 1.0 / (double)ndx;
-  ndy = ceil( nz * onetondx ); // number of tiles in y-dir
+  ndy = ceil( nz / (double) ndx ); // number of tiles in y-dir
   nxr = lwd + (nx + lwd) * ndx;
   nyr = lwd + (ny + lwd) * ndy;
 
   /* allocate memory for the image */
-  PROTECT( ims = allocVector(REALSXP, nc*nxr * nyr) );
+  PROTECT( res = allocVector(REALSXP, nc * nxr * nyr) );
   nprotect++;
-  dim = REAL(ims);
+  DUPLICATE_ATTRIB(res, obj);
   
-  // make res final object
+  // set dimensions
   if (mode!=MODE_COLOR) {
     PROTECT ( dm = allocVector( INTSXP, 2) );
     nprotect++;
@@ -56,39 +55,37 @@ tile (SEXP obj, SEXP _hdr, SEXP params) {
   INTEGER (dm)[0] = nxr;
   INTEGER (dm)[1] = nyr;
   
-  SET_DIM ( ims, dm ) ;  
-
-  /* create resulting image from header */
-  PROTECT( res = Rf_duplicate(obj) );
-  nprotect++;
+  SET_DIM(res, dm);
   SET_DIMNAMES (res, R_NilValue);
-  
-  res = isImage(obj) ? SET_SLOT( res, install(".Data"), ims ) : ims;
-  
-  /* reset to BG */
+
+  src = REAL(obj);  
+  tgt = REAL(res);
+
   getColorStrides(res,0,&rredstride,&rgreenstride,&rbluestride);
-  for ( i = 0; i < nxr * nyr; i++ ){
-    if (rredstride!=-1) dim[rredstride + i] = hdr[1];
-    if (rgreenstride!=-1) dim[rgreenstride + i] = hdr[3];
-    if (rbluestride!=-1) dim[rbluestride + i] = hdr[5];
-  }
   
-  /* loop through stack image and copy them to ims */  
-  for ( index = 0; index < nz; index++ ) {
-    getColorStrides(obj,index,&oredstride,&ogreenstride,&obluestride);
-  
-    /* loop through lines and copy by line */
-    for ( j = 0; j < ny; j++ ) {
-      y = lwd + floor(index * onetondx) * (ny + lwd) + j;
-      x = lwd + (index - floor(index * onetondx) * ndx) * (nx + lwd);
+  /* loop through image stack and copy them to res */  
+  for ( index = 0; index < ndx * ndy; index++ ) {
+    y = lwd + (index / ndx) * (ny + lwd);
+    x = lwd + (index % ndx) * (nx + lwd);
+    
+    /* loop through lines */  
+    for ( j = 0; j < ny; j++, y++ ) {
       i = x + y * nxr;
-      if ( i + nx >= nxr * nyr ) {
-        warning("BAD THING HAPPEND -- WRONG INDEX CALCULATION");
-        continue;
+      /*  copy line by line */
+      if (index < nz) {
+        getColorStrides(obj,index,&oredstride,&ogreenstride,&obluestride);
+        if (oredstride!=-1)   memcpy( &(tgt[i+rredstride]), &(src[j* nx+oredstride]), nx * sizeof(double));
+        if (ogreenstride!=-1) memcpy( &(tgt[i+rgreenstride]), &(src[j* nx+ogreenstride]), nx * sizeof(double));
+        if (obluestride!=-1)  memcpy( &(tgt[i+rbluestride]), &(src[j* nx+obluestride]), nx * sizeof(double));
       }
-      if (oredstride!=-1)   memcpy( &(dim[i+rredstride]), &(REAL(obj)[j* nx+oredstride]), nx * sizeof(double));
-      if (ogreenstride!=-1) memcpy( &(dim[i+rgreenstride]), &(REAL(obj)[j* nx+ogreenstride]), nx * sizeof(double));
-      if (obluestride!=-1)  memcpy( &(dim[i+rbluestride]), &(REAL(obj)[j* nx+obluestride]), nx * sizeof(double));
+      /* reset remaining empty tiles to BG */
+      else {
+        for (int k = 0; k < nx; k++, i++){
+          if (rredstride!=-1) tgt[rredstride + i] = hdr[1];
+          if (rgreenstride!=-1) tgt[rgreenstride + i] = hdr[3];
+          if (rbluestride!=-1) tgt[rbluestride + i] = hdr[5];
+        }
+      }
     }
   }
   
@@ -98,9 +95,9 @@ tile (SEXP obj, SEXP _hdr, SEXP params) {
     for (i = 0; i <= ndx; i++ ) {
       for ( x = i * (nx + lwd); x < lwd + i * (nx + lwd); x++ ) {
 	      for ( y = 0; y < nyr; y++ ) {
-          if (rredstride!=-1) dim[rredstride + x + y * nxr] = hdr[0];
-          if (rgreenstride!=-1) dim[rgreenstride + x + y * nxr] = hdr[2];
-          if (rbluestride!=-1) dim[rbluestride + x + y * nxr] = hdr[4];
+          if (rredstride!=-1) tgt[rredstride + x + y * nxr] = hdr[0];
+          if (rgreenstride!=-1) tgt[rgreenstride + x + y * nxr] = hdr[2];
+          if (rbluestride!=-1) tgt[rbluestride + x + y * nxr] = hdr[4];
 	      }        
       }
     }
@@ -108,16 +105,14 @@ tile (SEXP obj, SEXP _hdr, SEXP params) {
     for (j = 0; j <= ndy; j++ ) {
       for ( y = j * (ny + lwd); y < lwd + j * (ny + lwd); y++ ) {
 	      for ( x = 0; x < nxr; x++ ) {
-          if (rredstride!=-1) dim[rredstride + x + y * nxr] = hdr[0];
-          if (rgreenstride!=-1) dim[rgreenstride + x + y * nxr] = hdr[2];
-          if (rbluestride!=-1) dim[rbluestride + x + y * nxr] = hdr[4];
+          if (rredstride!=-1) tgt[rredstride + x + y * nxr] = hdr[0];
+          if (rgreenstride!=-1) tgt[rgreenstride + x + y * nxr] = hdr[2];
+          if (rbluestride!=-1) tgt[rbluestride + x + y * nxr] = hdr[4];
 	      }
       }
     }
   }
 
-  if ( isImage(obj) ) res = SET_SLOT( res, install(".Data"), ims );
- 
   UNPROTECT( nprotect );
   return res;
 }
@@ -137,7 +132,7 @@ untile(SEXP img, SEXP nim, SEXP linewd) {
   int nc = getNumberOfChannels(img, mode);
   int nprotect=0, i, j, im, y, iim;
   SEXP res, dim, dat;
-  void *src, *tgt; double *dd;
+  double *src, *tgt;
 
   int rredstride,rgreenstride,rbluestride;
   int oredstride,ogreenstride,obluestride;
@@ -148,11 +143,11 @@ untile(SEXP img, SEXP nim, SEXP linewd) {
     error("invalid nx, ny or nz values: negative or too large values");
   }
 
-  PROTECT(dat = allocVector(REALSXP, nc*nx*ny*nz)); 
+  PROTECT(res = allocVector(REALSXP, nc*nx*ny*nz)); 
   nprotect++;
-  dd = REAL(dat);
-  for (i=0; i<nc*nx*ny*nz; i++) dd[i] = 0.0;
-
+  DUPLICATE_ATTRIB(res, img);
+  
+  // set dimensions
   if (mode!=MODE_COLOR) {
     PROTECT(dim = allocVector(INTSXP, 3)); nprotect++;
     INTEGER(dim)[0] = nx;
@@ -165,14 +160,8 @@ untile(SEXP img, SEXP nim, SEXP linewd) {
     INTEGER(dim)[2] = nc;
     INTEGER(dim)[3] = nz;
   }
-  SET_DIM(dat, dim);
-  
-  /*
-  if (strcmp( CHAR( asChar( GET_CLASS(img) ) ), "Image") == 0) {
-    res = SET_SLOT(Rf_duplicate(img), install(".Data"), dat);
-  } else res=dat;
-  */
-  res = isImage(img) ? SET_SLOT(Rf_duplicate(img), install(".Data"), dat) : dat;
+  SET_DIM(res, dim);
+  SET_DIMNAMES (res, R_NilValue);
   
   for (im=0; im<nz; im++) {
     iim = im / (nimx*nimy);
@@ -183,27 +172,16 @@ untile(SEXP img, SEXP nim, SEXP linewd) {
     i = im % nimx;
     j = (im-iim*nimx*nimy) / nimx;
 
+    src = REAL(img);
+    tgt = REAL(res);
+    
     for (y=0; y<ny; y++) {
-      if (oredstride!=-1) {
-	src = &(REAL(img)[oredstride + (j*ny+lwd*(j+1) + y)*sdim[0] + (i*nx+lwd*(i+1))]);
-	tgt=&(REAL(dat)[rredstride + y*nx]);
-	memcpy(tgt, src, nx*sizeof(double));
-      }
-      if (ogreenstride!=-1) {
-	src = &(REAL(img)[ogreenstride + (j*ny+lwd*(j+1) + y)*sdim[0] + (i*nx+lwd*(i+1))]);
-	tgt=&(REAL(dat)[rgreenstride + y*nx]);
-	memcpy(tgt, src, nx*sizeof(double));
-      }
-      if (obluestride!=-1) {
-	src = &(REAL(img)[obluestride+ (j*ny+lwd*(j+1) + y)*sdim[0] + (i*nx+lwd*(i+1))]);
-	tgt=&(REAL(dat)[rbluestride + y*nx]);
-	memcpy(tgt, src, nx*sizeof(double));
-      }
+      if (oredstride!=-1) memcpy(&(tgt[rredstride + y*nx]), &(src[oredstride + (j*ny+lwd*(j+1) + y)*sdim[0] + (i*nx+lwd*(i+1))]), nx*sizeof(double));
+      if (ogreenstride!=-1) memcpy(&(tgt[rgreenstride + y*nx]), &(src[ogreenstride + (j*ny+lwd*(j+1) + y)*sdim[0] + (i*nx+lwd*(i+1))]), nx*sizeof(double));
+      if (obluestride!=-1) memcpy(&(tgt[rbluestride + y*nx]), &(src[obluestride+ (j*ny+lwd*(j+1) + y)*sdim[0] + (i*nx+lwd*(i+1))]), nx*sizeof(double));
     }
   }
-  //if (strcmp( CHAR( asChar( GET_CLASS(img) ) ), "Image") == 0) {
-  if ( isImage(img) ) res = SET_SLOT(res, install(".Data"), dat);
-  //}
+  
   UNPROTECT(nprotect);
   return res;
 }
