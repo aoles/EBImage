@@ -118,7 +118,7 @@ rmObjects (SEXP x, SEXP _index, SEXP _reenum) {
     ny = INTEGER ( GET_DIM(x) )[1];
     nz = getNumberOfFrames(x,0);
     
-    reenum = LOGICAL(_reenum)[0];
+    reenum = asLogical(_reenum);
     
     PROTECT( res = allocVector(INTSXP, XLENGTH(x)) );
     DUPLICATE_ATTRIB(res, x);

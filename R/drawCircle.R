@@ -9,7 +9,7 @@ drawCircle <- function(img, x, y, radius, col, fill=FALSE, z=1) {
   if ( !isTRUE(r>0L) ) stop("'radius' must be a positive integer")
   
   z = toScalarInteger(z)
-  if ( !isTRUE(z>0L) || isTRUE(z>.numberOfFrames(img, 'render')) ) stop("'z' must be a positive integer lower than the number of image frames")
+  if ( !isTRUE(z>0L) || isTRUE(z>numberOfFrames(img, 'render')) ) stop("'z' must be a positive integer lower than the number of image frames")
   
   xy = c(toScalarInteger(x), toScalarInteger(y))
   if ( any(is.na(xy)) ) stop("'x', 'y' must be numeric scalars")

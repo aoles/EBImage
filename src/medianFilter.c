@@ -459,46 +459,48 @@ void ctmf(
 //updated by Andrzej Oles, 2015
 
 SEXP medianFilter (SEXP _in, SEXP _r, SEXP _memsize) {
-  const double max_uint16 = 65535.0;
-  int nprotect = 0, x, y, z, r, memsize, i, j, imagesize, framesize;
-  SEXP res;
-  
-  x = INTEGER(GET_DIM(_in))[0];
-  y = INTEGER(GET_DIM(_in))[1];
-  framesize = x*y;
-  z = getNumberOfFrames(_in, 0);
-  imagesize = x*y*z;
-  r = INTEGER(_r)[0];
-  memsize = INTEGER(_memsize)[0] * 1024;
+    const double max_uint16 = 65535.0;
+    int x, y, z, r, memsize, i, j, imagesize, framesize;
+    SEXP res;
     
-  PROTECT ( res = duplicate(_in) );
-  nprotect++;
-  
-  double *out = REAL(res);
-  
-  uint16_t *px, *py;
-  px = (uint16_t *) R_alloc(imagesize, sizeof(uint16_t));
-  py = (uint16_t *) R_alloc(imagesize, sizeof(uint16_t));
-  
-  for (i = 0; i < imagesize; i++) {
-    double el = out[i];
-    // clip
-    if (el < 0.0) el = 0;
-    else if (el > 1.0) el = 1.0;
-    // convert to int
-    px[i] = (uint16_t) round(el * max_uint16);
-  }
-  
-  // process channels separately
-  for(j = 0; j < z; j++)
-    ctmf(&px[framesize*j], &py[framesize*j], x, y, x, x, r, 1, memsize);
-  
-  // convert back to [0:1] range
-  for (i = 0; i < imagesize; i++)
-    out[i] = (double) py[i] / max_uint16;
-  
-  UNPROTECT(nprotect);
- 
-  return res;
+    x = INTEGER(GET_DIM(_in))[0];
+    y = INTEGER(GET_DIM(_in))[1];
+    framesize = x*y;
+    z = getNumberOfFrames(_in, 0);
+    imagesize = length(_in);
+    r = INTEGER(_r)[0];
+    memsize = INTEGER(_memsize)[0] * 1024;
+    
+    uint16_t *px, *py;
+    px = R_Calloc(imagesize, uint16_t);
+    py = R_Calloc(imagesize, uint16_t);
+    
+    double *src = REAL(_in);
+    for (i = 0; i < imagesize; i++) {
+        double el = src[i];
+        // clip
+        if (el < 0.0) el = 0;
+        else if (el > 1.0) el = 1.0;
+        // convert to int
+        px[i] = (uint16_t) round(el * max_uint16);
+    }
+    
+    // process channels separately
+    for(j = 0; j < z; j++)
+        ctmf(&px[framesize*j], &py[framesize*j], x, y, x, x, r, 1, memsize);
+    
+    PROTECT( res = allocVector(REALSXP, imagesize) );
+    DUPLICATE_ATTRIB(res, _in);
+    
+    // convert back to [0:1] range
+    double *tgt = REAL(res);
+    for (i = 0; i < imagesize; i++)
+        tgt[i] = (double) py[i] / max_uint16;
+    
+    R_Free(px);
+    R_Free(py);
+    
+    UNPROTECT(1);
+    
+    return res;
 }
-

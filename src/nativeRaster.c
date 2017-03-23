@@ -1,5 +1,6 @@
 #include "normalize.h"
 #include "tools.h"
+#include "EBImage.h"
 
 #include <stdint.h>
 #include <R_ext/Error.h>

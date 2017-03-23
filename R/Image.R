@@ -146,19 +146,7 @@ imageData = function (y) {
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 validImageObject = function(object) {
-  ## check colormode
-  colormode = colorMode(object)
-  if (!is.integer(colormode)) return('colormode must be an integer')
-  if (colormode!=0 && colormode!=2) return('invalid colormode')
-
-  ## check array
-  if (!is.array(object)) return('object must be an array')
-
-  ## check dim
-  if (length(dim(object))<2) return('object must have at least two dimensions')
-  if (.numberOfFrames(object, 'total', colormode)<1) return('Image must contain at least one frame')
-
-  TRUE
+  .Call(C_validImageObject, object) 
 }
 setValidity("Image", validImageObject)
 
@@ -397,9 +385,8 @@ writeImage = function (x, files, type, quality=100L, bits.per.sample, compressio
   if ((quality<1L) || (quality>100L))
     stop("'quality' must be a value between 1 and 100.")
   
-  nf = .numberOfFrames(x, type='render')
+  nf = numberOfFrames(x, type='render')
   lf = length(files)
-  colormode = colorMode(x)
   
   if ( (lf!=1) && (lf!=nf) )
     stop(sprintf("Image contains %g frame(s) which is different from the length of the file name list: %g. The number of files must be 1 or equal to the size of the image stack.", nf, lf))
@@ -408,14 +395,14 @@ writeImage = function (x, files, type, quality=100L, bits.per.sample, compressio
     frames = seq_len(nf)
     
     x = clipImage(x) ## clip the image and change storage mode to double
-    x = transpose(x, coerce=TRUE)    
+    x = transpose(x)    
     
     if ( lf==1 && nf>1 ) {
       ## store all frames into a single TIFF file
       if (type=='tiff') {
         
         ## create list of image frames
-        la = lapply(frames, function(i) .getFrame(x, i, 'render', colormode))
+        la = lapply(frames, function(i) getFrame(x, i, 'render'))
         
         if (nf==writeFun(la, files, ...))
           return(invisible(files))
@@ -434,7 +421,7 @@ writeImage = function (x, files, type, quality=100L, bits.per.sample, compressio
     
     ## store image frames into individual files
     for (i in frames)
-      writeFun(.getFrame(x, i, 'render', colormode), files[i], ...)
+      writeFun(getFrame(x, i, 'render'), files[i], ...)
     return(invisible(files))
   }
 }
@@ -473,49 +460,26 @@ setMethod ("[", "Image",
            })
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# convert linear index to array indices
-ind2sub = function(x, y) {
-  if(x > prod(y)) 
-    stop("Index out of bounds")
-  if ( (len=length(y)) == 0 )
-    return(NULL)
-  
-  res = div = 1
-  for(i in seq_len(len-1))
-    div[i+1] = div[i] * y[i] 
-  
-  for(i in rev(seq_len(len))){
-    res[i] = ceiling(x/div[i])
-    x = x - (res[i]-1) * div[i]
-  }
-  
-  res
-}
-
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-getFrame = function(y, i, type = c('total', 'render')) .getFrame(y, i, match.arg(type))
-
-getFrames.old = function(y, i, type = c('total', 'render')) {
-  type = match.arg(type)
-  colormode = colorMode(y)
-  
-  n = .numberOfFrames(y, type, colormode)
-  
-  if ( missing(i) ) 
-    i = seq_len(n)
-  else {
-    i = as.integer(i)
-    if ( any( i<1L || i>n ) ) stop("'i' must be a vector of numbers ranging from 1 to ", n)
-  }
-  
-  lapply(i, function(i) .getFrame(y, i, type, colormode))
+getFrame = function(y, i, type = c('total', 'render')) {
+    type = match.arg(type)
+    
+    n = numberOfFrames(y, type)
+    if (i<1 || i>n) stop("'i' must belong between 1 and ", n)
+    
+    # return the argument if no subsetting neccessary
+    ld = length(dim(y))
+    fd = if (colorMode(y)==Color && type=='render' && ld>2L) 3L else 2L
+    if (ld==fd) return(y)
+    
+    type = switch(type, total = 0L, render = 1L)
+    
+    .Call(C_getFrame, y, as.integer(i), type)
 }
 
 getFrames = function(y, i, type = c('total', 'render')) {
   type = match.arg(type)
-  mode = colorMode(y)
   
-  n = .numberOfFrames(y, type, mode)
+  n = numberOfFrames(y, type)
   
   if ( missing(i) ) 
     i = seq_len(n)
@@ -526,76 +490,18 @@ getFrames = function(y, i, type = c('total', 'render')) {
   
   type = switch(type, total = 0L, render = 1L)
   
-  .Call(C_getFrames, y, i, type, mode)
+  .Call(C_getFrames, y, i, type)
 }
 
-## It is useful to have the internal function for getFrame which can be called
-## on arrays directly by specifying the apriopriate colormode. In combination
-## with transpose(..., coerce=TRUE) this approach is significantly faster
-## compared to doing these operations on Image objects and is exploited by the
-## writeImage function
-
-.getFrame.old = function(y, i, type, colormode) {
-  if(missing(colormode)) colormode = colorMode(y)
-  
-  n = .numberOfFrames(y, type, colormode)
-  if (i<1 || i>n) stop("'i' must belong between 1 and ", n)
-  
-  ## frame dimensions
-  ld = length( (d = dim(y)) )
-  fd = if (colormode==Color && type=='render' && ld>2L) 3L else 2L
-  if (ld==fd) return(y)
-  
-  # preserve spatial dimensions
-  # for Image class this is already taken care by the "]" method itself ..
-  x = asub(y, as.list(ind2sub(i, d[-seq_len(fd)])), (fd+1):ld, drop = is(y, 'Image'))
-  
-  # .. we only need to take care of plain arrays
-  if(length( (d = dim(x)) ) > fd){
-    dims = which(d==1L)
-    x = adrop(x, drop = dims[dims>fd]) 
-  }
-  
-  ## return single channels as Greyscale
-  if ( colormode==Color && type=='total' ) colorMode(x) = Grayscale
-  return(x)
-}
-
-
-.getFrame = function(y, i, type, mode) {
-  if(missing(mode)) mode = colorMode(y)
-  
-  n = .numberOfFrames(y, type, mode)
-  if (i<1 || i>n) stop("'i' must belong between 1 and ", n)
-  
-  # return the argument if no subsetting neccessary
-  ld = length( (d = dim(y)) )
-  fd = if (mode==Color && type=='render' && ld>2L) 3L else 2L
-  if (ld==fd) return(y)
-  
-  type = switch(type, total = 0L, render = 1L)
-  
-  .Call(C_getFrame, y, as.integer(i), type, mode)
-}
 
 ## numberOfFrames
 ## If type='total', returns the total number of frames
 ## If type='render', return the number of frames to be rendered after color channel merging
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-numberOfFrames = function(y, type = c('total', 'render')) .numberOfFrames(y, match.arg(type))
-
-## have internal function .numberOfFrames for compatibility with .getFrame which
-## can be called on arrays directly by specifying the apriopriate colormode.
-
-.numberOfFrames = function(y, type, colormode) {
-  if(missing(colormode)) colormode = colorMode(y)
-  
-  d = dim(y)
-  if (type=='render' && colormode==Color) {
-    if (length(d)< 3L) 1L
-    else as.integer(prod(d[-seq_len(3)]))
-  }
-  else as.integer(prod(d[-seq_len(2)]))
+numberOfFrames = function(y, type = c('total', 'render')) {
+    type = match.arg(type)
+    type = switch(type, total = 0L, render = 1L)
+    .Call(C_numberOfFrames, y, type)
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -636,7 +542,7 @@ print.Image <- function(x, ...) showImage(x, ...)
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 setMethod ("image", signature(x="Image"),
   function(x, i, xlab = "", ylab = "", axes = FALSE, col = gray((0:255) / 255), useRaster = TRUE, ...) {
-    nf = .numberOfFrames(x, type="total")
+    nf = numberOfFrames(x, type="total")
     
     if ( missing(i) ) {
       i = 1L
@@ -650,7 +556,7 @@ setMethod ("image", signature(x="Image"),
     d <- dim(x)
     X <- 1:d[1L]
     Y <- 1:d[2L]
-    Z <- .getFrame(x, i, "total")
+    Z <- getFrame(x, i, "total")
     image.default(x=X, y=Y, z=Z, asp=1, col=col, axes=axes, xlab=xlab, ylab=ylab, useRaster=useRaster, ...)
   }
 )
@@ -874,14 +780,13 @@ parseColorMode = function(colormode) {
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## returns the raster representation of an image (by default the first frame)
 as.raster.Image = function(x, max = 1, i = 1L, ...) {
-  colormode = colorMode(x)
-  y = .getFrame(x, i, type = 'render', colormode)
+  y = getFrame(x, i, type = 'render')
   y = clipImage(y, range = c(0, max))
   y = imageData(y)
   d = dim(y)
   
   ## grayscale
-  r <- if (colormode == Grayscale)
+  r <- if (colorMode(x) == Grayscale)
     rgb(y, y, y, maxColorValue = max)
   ## color
   else {

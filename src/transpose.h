@@ -1,5 +1,5 @@
-#ifndef EBIMAGE_MORPH_H
-#define EBIMAGE_MORPH_H
+#ifndef EBIMAGE_TRANSPOSE_H
+#define EBIMAGE_TRANSPOSE_H
 
 #include <R.h>
 #include <Rdefines.h>
@@ -7,9 +7,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-  
-SEXP morphology (SEXP, SEXP, SEXP);
-  
+
+SEXP transpose (SEXP);
+
 #ifdef __cplusplus
 };
 #endif

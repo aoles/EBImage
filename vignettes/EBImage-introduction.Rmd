@@ -2,8 +2,7 @@
 title: "Introduction to *EBImage*"
 author: Andrzej Oleś, Gregoire Pau, Oleg Sklyar, Wolfgang Huber
 email: andrzej.oles@embl.de
-date: "`r doc_date()`"
-package: "`r pkg_ver('EBImage')`"
+package: EBImage
 abstract: >
   `r Biocpkg("EBImage")` provides general purpose functionality for image processing and analysis. In the context of (high-throughput) microscopy-based cellular assays, EBImage offers tools to segment cells and extract quantitative cellular descriptors. This allows the automation of such tasks using the R programming language and facilitates the use of other tools in the R environment for signal processing, statistical modeling, machine learning and visualization with image data.
 output: 
@@ -18,15 +17,12 @@ vignette: >
   %\VignetteEncoding{UTF-8}  
 ---
 
-```{r style, echo = FALSE, results = 'asis'}
-BiocStyle::markdown()
-```
-
 ```{r setup, echo=FALSE}
 library(knitr)
 .dpi = 100
 set.seed(0)
 opts_chunk$set(comment=NA, fig.align="center", dpi=.dpi)
+knit_hooks$set(crop=NULL)
 .output = output()
 switch(.output,
         html = opts_chunk$set(fig.retina=1),
@@ -37,6 +33,7 @@ switch(.output,
 options(EBImage.display = "raster")
 ```
 
+<p>![](logo.png){width=128 style="padding: 0px; margin: auto;"}</p>
 
 # Getting started
 
