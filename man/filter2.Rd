@@ -70,8 +70,6 @@ filter2(x, filter, boundary = c("circular", "replicate"))
   display(y, title='Filtered image')
   
   ## High-pass Laplacian filter with replicated boundary
-  la = matrix(1, nc=3, nr=3)
-  la[2,2] = -8
   y = filter2(x, la, boundary='replicate')
   display(y, title='Filtered image with replicated boundary')
 }
