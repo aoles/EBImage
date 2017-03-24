@@ -45,7 +45,7 @@ filter2 = function(x, filter, boundary = c("circular", "replicate")) {
          },
          ## pad with a given value
          linear = {
-           dx[1:2] = dx[1:2] + df[1:2] - 1L
+           dx[1:2] = dx[1:2] + cf[1:2]
            
            if ( length(dx)>2 && length(val)==prod(dx[-(1:2)]) ) {
              # Higher dim array with matching linear boundry values
@@ -57,7 +57,7 @@ filter2 = function(x, filter, boundary = c("circular", "replicate")) {
              xpad = array(val[1], dx)
            }
            # The do.call and arguments as a list of dimensions is to take are of arrays of unknown dimension
-           x = do.call("[<-", c(list(xpad),lapply(d,FUN = function(x) 1:x),list(x)) )
+           x = do.call("[<-", c(quote(xpad), lapply(d, function(x) enquote(1:x)), quote(x)) )
          },
          replicate = {
            x = imageData(x)
