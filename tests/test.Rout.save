@@ -304,7 +304,7 @@ checking 'distmap' ............................ PASS (bb3d006dd4423285) -0.1
 checking 'watershed' .......................... PASS (15bf2ee33450c598) -0.1
 checking 'floodFill' .......................... PASS (02f684c8d407c0f3) 1039.9
 checking 'fillHull' ........................... PASS (1b5285e59ce84fa0) -0.1
-checking 'propagate' .......................... PASS (bb3d006dd4423285) -0.1
+checking 'propagate' .......................... PASS (15bf2ee33450c598) -0.1
 checking 'toRGB' .............................. PASS (5cb6a857d91ed0ea) -0.1
 checking 'rgbImage' ........................... PASS (5cb6a857d91ed0ea) -0.1
 checking 'colormap' ........................... PASS (4fc03a2c05330d87) 2079.9
@@ -382,7 +382,7 @@ checking 'distmap' ............................ PASS (2690b089a32348c7) Inf
 checking 'watershed' .......................... PASS (fd2903042f6577db) 324.9
 checking 'floodFill' .......................... PASS (9a58bf6b1ef39788) -0.1
 checking 'fillHull' ........................... PASS (57132767bf0cf5c4) 324.9
-checking 'propagate' .......................... PASS (ca0a4f4dc9dc81ce) -0.1
+checking 'propagate' .......................... PASS (9a58bf6b1ef39788) -0.1
 checking 'toRGB' .............................. PASS (c8f79be3016a4f30) 2849.9
 checking 'rgbImage' ........................... PASS (04e5727b08bf45cb) 1274.9
 checking 'colormap' ........................... PASS (465b64f5769d9429) 2652.253
@@ -462,7 +462,7 @@ checking 'distmap' ............................ PASS (66da40cd47ec8762) 3826969
 checking 'watershed' .......................... PASS (fe4e99c1bb5f9562) 2762113
 checking 'floodFill' .......................... PASS (e508f01acf50e00d) 1470197
 checking 'fillHull' ........................... PASS (b630618a382dd149) 1217568
-checking 'propagate' .......................... PASS (ea07a68078b349d0) 3464201
+checking 'propagate' .......................... PASS (9e56846cb0e2b112) 3464201
 checking 'toRGB' .............................. PASS (7b33402954c29951) 12381911
 checking 'rgbImage' ........................... PASS (c44ead1803e628d9) 4859544
 checking 'colormap' ........................... PASS (fbcba322d3f5c951) 11126039
@@ -542,7 +542,7 @@ checking 'distmap' ............................ PASS (f6300a4f340ae60a) 12740449
 checking 'watershed' .......................... PASS (8a9f971d0fd151b0) 988518.9
 checking 'floodFill' .......................... PASS (58b50ac20366b30b) 765755.4
 checking 'fillHull' ........................... PASS (c843a337bba9a51b) 988518.9
-checking 'propagate' .......................... PASS (6a0ed6ab84f20423) 26630579
+checking 'propagate' .......................... PASS (c9ccd5b308eb7ef1) 26630579
 checking 'toRGB' .............................. PASS (42e4a51e3404811e) 765760.9
 checking 'rgbImage' ........................... PASS (3e4ef74fd42ad9d7) 3520680
 checking 'colormap' ........................... PASS (d2139029833173d7) 1816912
@@ -621,7 +621,7 @@ checking 'distmap' ............................ PASS (046048efe2665db2) 6038778
 checking 'watershed' .......................... PASS (5810b16b06c7a236) 1058553
 checking 'floodFill' .......................... PASS (87ccae676293e02d) 2036854
 checking 'fillHull' ........................... PASS (53e61ab2bda88b20) 1058553
-checking 'propagate' .......................... PASS (b5124023470f54c6) 7755487
+checking 'propagate' .......................... PASS (50fd5efe0e56a631) 7755487
 checking 'toRGB' .............................. PASS (de81d0d989193946) 2036151
 checking 'rgbImage' ........................... PASS (cab54e5b08f3aae8) 7617867
 checking 'colormap' ........................... PASS (1844757fe6d6692b) 1657338
@@ -702,7 +702,7 @@ checking 'distmap' ............................ PASS (8ba0b0fb6770e8a3) 3856630
 checking 'watershed' .......................... PASS (0bd6a31bc6197067) 1443978
 checking 'floodFill' .......................... PASS (45775cc98ccde7d0) 1055560
 checking 'fillHull' ........................... PASS (45775cc98ccde7d0) 1055560
-checking 'propagate' .......................... PASS (260e26ccbfe28881) 1613920
+checking 'propagate' .......................... PASS (6c610fe4376714f6) 1613920
 checking 'toRGB' .............................. PASS (57b9a77f5a12af4f) 8499672
 checking 'rgbImage' ........................... PASS (82e9189e21600e37) 4777616
 checking 'colormap' ........................... PASS (244a6e10e928fb5e) 10283526
@@ -782,7 +782,7 @@ checking 'distmap' ............................ PASS (e9f6f8a5899a40fd) 10836360
 checking 'watershed' .......................... PASS (355196749445c942) 2013322
 checking 'floodFill' .......................... PASS (a23cce6e67e088ae) 2355706
 checking 'fillHull' ........................... PASS (5a6494dd882e20ae) 2013322
-checking 'propagate' .......................... PASS (7347dfb0ab917010) 11618104
+checking 'propagate' .......................... PASS (6a54d058269b4352) 11618104
 checking 'toRGB' .............................. PASS (7b41d26d4354fed1) 2354709
 checking 'rgbImage' ........................... PASS (05d03bf83df83dbf) 12071186
 checking 'colormap' ........................... PASS (40f159a4fec5a5e4) 2273276
@@ -862,7 +862,7 @@ checking 'distmap' ............................ PASS (fd74d28ff7a40bc8) 7464344
 checking 'watershed' .......................... PASS (aec9e7c80b500f8a) 1541186
 checking 'floodFill' .......................... PASS (c8f6a63ecc5faeb2) 2234521
 checking 'fillHull' ........................... PASS (cdeb2538f3cc7adf) 1541186
-checking 'propagate' .......................... PASS (6e0a41acecc5c2d9) 8948876
+checking 'propagate' .......................... PASS (2fa32c86f0afbbe9) 8948876
 checking 'toRGB' .............................. PASS (7ac5c5945e1aa8b4) 20279146
 checking 'rgbImage' ........................... PASS (6c13f1c0649a1b02) 10796552
 checking 'colormap' ........................... PASS (fffb8d91ccca5f12) 22585273
@@ -942,7 +942,7 @@ checking 'distmap' ............................ PASS (fb1ca8ba680de2b3) 7464344
 checking 'watershed' .......................... PASS (29d5027b84535806) 1541186
 checking 'floodFill' .......................... PASS (54aa4548fd305300) 2234521
 checking 'fillHull' ........................... PASS (8eb52b594f8cd22b) 1541186
-checking 'propagate' .......................... PASS (f4a67728de7a8f9d) 8948876
+checking 'propagate' .......................... PASS (0d73b4f196a75014) 8948876
 checking 'toRGB' .............................. PASS (3e30f901f32391f1) 20279146
 checking 'rgbImage' ........................... PASS (7265edee83ee6475) 10796552
 checking 'colormap' ........................... PASS (2d850cd3a218b6b9) 22585273

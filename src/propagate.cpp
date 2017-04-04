@@ -40,8 +40,8 @@ class Pixel {
 public:
   double distance;
   unsigned int i, j;
-  double label;
-  Pixel (double ds, unsigned int ini, unsigned int inj, double l) : 
+  int label;
+  Pixel (double ds, unsigned int ini, unsigned int inj, int l) : 
     distance(ds), i(ini), j(inj), label(l) {}
 };
 
@@ -92,8 +92,8 @@ push_neighbors_on_queue(PixelQueue &pq, double dist,
                         double *image,
                         unsigned int i, unsigned int j,
                         unsigned int m, unsigned int n,
-                        double lambda, double label,
-                        double *labels_out)
+                        double lambda, int label,
+                        int *labels_out)
 {
   /* TODO: Check if the neighbor is already labelled. If so, skip pushing. 
    */    
@@ -136,8 +136,8 @@ push_neighbors_on_queue(PixelQueue &pq, double dist,
   
 }
 
-static void _propagate(double *labels_in, double *im_in,
-                      int *mask_in, double *labels_out,
+static void _propagate(int *labels_in, double *im_in,
+                      int *mask_in, int *labels_out,
                       double *dists,
                       unsigned int m, unsigned int n,
                       double lambda)
@@ -160,7 +160,7 @@ static void _propagate(double *labels_in, double *im_in,
    * then set dist to 0 and push its neighbors for propagation */
   for (j = 0; j < n; j++) {
     for (i = 0; i < m; i++) {        
-      double label = labels_in[IJ(i,j)];
+      int label = labels_in[IJ(i,j)];
       if ((label > 0) && (mask_in[IJ(i,j)])) {
         dists[IJ(i,j)] = 0.0;
         push_neighbors_on_queue(pixel_queue, 0.0, im_in, i, j, m, n, lambda, label, labels_out);
@@ -189,27 +189,27 @@ SEXP propagate(SEXP _x, SEXP _seeds, SEXP _mask, SEXP _lambda) {
   double lambda = REAL(_lambda)[0];
   int nprotect = 0;
 
-  PROTECT ( res = Rf_duplicate(_x) );
+  PROTECT( res = allocVector(INTSXP, XLENGTH(_x)) );
   nprotect++;
+  DUPLICATE_ATTRIB(res, _x);
 
   double *dists = (double *)R_Calloc(nx*ny, double);
-  int *imask = (int *)R_Calloc(nx*ny, int);
-
-  for (int im=0; im<nz; im++) {
-    double *x = &( REAL(_x)[im*nx*ny]);
-    double *tgt = &( REAL(res)[im*nx*ny]);
-    double *seeds = &( REAL(_seeds)[im*nx*ny]);
-
-    for (int i=0; i<nx*ny; i++) imask[i] = TRUE;
-    if (_mask != R_NilValue) {
-      double *mask = &( REAL(_mask)[im*nx*ny]);
-      for (int i=0; i<nx*ny; i++) if (mask[i]==0.0) imask[i] = FALSE;
-    }
-
-    _propagate(seeds, x, imask, tgt, dists, nx, ny, lambda); 
+  int *mask;
+  if (_mask == R_NilValue) {
+    mask = (int *) R_Calloc(nx*ny, int);
+    for (int i=0; i<nx*ny; mask[i++]=1);
   }
   
-  R_Free(imask);
+  for (int im=0; im<nz; im++) {
+    double *x = &( REAL(_x)[im*nx*ny]);
+    int *tgt = &( INTEGER(res)[im*nx*ny]);
+    int *seeds = &( INTEGER(_seeds)[im*nx*ny]);
+    if (_mask != R_NilValue) mask = &( INTEGER(_mask)[im*nx*ny]);
+
+    _propagate(seeds, x, mask, tgt, dists, nx, ny, lambda); 
+  }
+  
+  if (_mask == R_NilValue) R_Free(mask);
   R_Free(dists);
   UNPROTECT( nprotect );
   return res;
