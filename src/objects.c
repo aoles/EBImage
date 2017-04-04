@@ -135,7 +135,7 @@ rmObjects (SEXP x, SEXP _index, SEXP _reenum) {
         for ( i = 0; i < sizexy; i++ )
             if ( src[i] > nobj ) nobj = src[i]; // NA_integer_ is -2147483648
             
-        indexes = (int *) calloc((nobj + 1), sizeof(int));
+        indexes = (int *) R_Calloc((nobj + 1), int);
         
         /* reset indices of removed objects */
         if ( _index!=R_NilValue ) {
