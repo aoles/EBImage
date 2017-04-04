@@ -186,7 +186,7 @@ rmObjects (SEXP x, SEXP _index, SEXP _reenum) {
 /*----------------------------------------------------------------------- */
 SEXP
 stackObjects (SEXP obj, SEXP ref, SEXP _bgcol, SEXP xy_list, SEXP extension) {
-  SEXP res, st=NULL, dim, xys, img;
+  SEXP res, dim, xys, img;
   int nx, ny, nz, nc, nprotect, im, x, y, i, j, pxi, nobj, index;
   double *dobj, *dref, *xy, xx, yy,  *bgcol;
   double * dst;
@@ -222,9 +222,11 @@ stackObjects (SEXP obj, SEXP ref, SEXP _bgcol, SEXP xy_list, SEXP extension) {
 
     if (nobj>0) {
       // create stack
-      PROTECT(st = allocVector(REALSXP, nobj * snx * sny * nbChannels));
+      PROTECT(img = allocVector(REALSXP, nobj * snx * sny * nbChannels));
       nprotect++;
-      dst = REAL(st);
+      DUPLICATE_ATTRIB(img, ref);
+      
+      dst = REAL(img);
       
       // bg color initialization
       for (j=0; j<nobj; j++) {
@@ -249,20 +251,7 @@ stackObjects (SEXP obj, SEXP ref, SEXP _bgcol, SEXP xy_list, SEXP extension) {
       	INTEGER (dim)[2] = nbChannels;
       	INTEGER (dim)[3] = nobj;
       }
-      SET_DIM (st, dim);
-      
-      PROTECT(img = Rf_duplicate(_bgcol));
-      nprotect++;
-      
-      // set slot
-      if (isImage(_bgcol)) {
-        PROTECT(img = Rf_duplicate(_bgcol));
-        nprotect++;
-        img = SET_SLOT(img, Image_Data, st);
-      }
-      else {
-        img = st;
-      }
+      SET_DIM (img, dim);
       
       // get xy
       if (nz == 1) xys = xy_list;
@@ -270,7 +259,6 @@ stackObjects (SEXP obj, SEXP ref, SEXP _bgcol, SEXP xy_list, SEXP extension) {
       if (xys == R_NilValue || INTEGER(GET_DIM(xys))[0] != nobj || INTEGER(GET_DIM(xys))[1] < 2) continue;
       xy = REAL(xys);
 
-      dst = REAL(img);
       // copy ref
       for (x = 0; x < nx; x++) {
       	for (y = 0; y < ny; y++) {

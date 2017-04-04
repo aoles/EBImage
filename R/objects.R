@@ -60,12 +60,9 @@ stackObjects = function (x, ref, combine=TRUE, bg.col='black', ext) {
   xy = lapply(hf, function(h) h[,c('m.cx', 'm.cy'), drop=FALSE])
   if (nz==1L) xy = xy[[1L]]
   
-  ## clone from ref to retain object class
-  bg.img = ref
-  dimnames(bg.img) = NULL
-  imageData(bg.img) <- bgImage(bg.col, dim(bg.img)[1:2], colorMode(bg.img))
+  bg.img = Image(bg.col, colormode=colorMode(ref))
   
-  res = .Call(C_stackObjects, castImage(x), castImage(ref), bg.img, xy, as.numeric(ext))
+  res = .Call(C_stackObjects, castImage(x), castImage(ref), castImage(bg.img), xy, as.numeric(ext))
   if (!combine || !is.list(res)) res
   else combine(res)
 }
