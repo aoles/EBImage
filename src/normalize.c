@@ -42,7 +42,7 @@ normalize (SEXP x, SEXP separate, SEXP outrange, SEXP inrange) {
 
   nprotect = 0;
 
-  sep = asLogical(separate);
+  sep = LOGICAL(separate)[0];
   
   nx = INTEGER (GET_DIM(x))[0];
   ny = INTEGER (GET_DIM(x))[1];

@@ -32,7 +32,7 @@ paintObjects (SEXP x, SEXP ref, SEXP _opac, SEXP _col, SEXP _thick) {
 
     opac = REAL(_opac);
     col = REAL(_col);
-    thick = asLogical(_thick);
+    thick = LOGICAL(_thick)[0];
 
     PROTECT( res = allocVector(REALSXP, XLENGTH(ref)) );
     DUPLICATE_ATTRIB(res, ref);
@@ -123,7 +123,7 @@ rmObjects (SEXP x, SEXP _index, SEXP _reenum) {
     ny = INTEGER ( GET_DIM(x) )[1];
     nz = getNumberOfFrames(x,0);
     
-    reenum = asLogical(_reenum);
+    reenum = LOGICAL(_reenum)[0];
     
     PROTECT( res = allocVector(INTSXP, XLENGTH(x)) );
     DUPLICATE_ATTRIB(res, x);

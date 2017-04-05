@@ -324,8 +324,6 @@ template <typename type> void _morphology(type *x, type *res, PointXY size, int 
     chordSet set;
     switch (TYPEOF(kernel)) {
     case LGLSXP:
-        set = buildChordSet<int>(LOGICAL(kernel), ksize);
-        break;
     case INTSXP:
         set = buildChordSet<int>(INTEGER(kernel), ksize);
         break;
@@ -372,8 +370,6 @@ SEXP morphology (SEXP x, SEXP kernel, SEXP what) {
     
     switch (TYPEOF(x)) {
     case LGLSXP:
-        _morphology<int>(LOGICAL(x), LOGICAL(res), size, nz, kernel, operation);
-        break;
     case INTSXP:
         _morphology<int>(INTEGER(x), INTEGER(res), size, nz, kernel, operation);
         break;

@@ -51,10 +51,10 @@ floodFill(SEXP x, SEXP point, SEXP col, SEXP tol) {
     switch (TYPEOF(res)) {
       case LGLSXP:
       case INTSXP:
-        _floodFill<int>(&(INTEGER(res)[i*size.x*size.y]), size, pt, INTEGER(col)[i], asReal(tol));
+        _floodFill<int>(&(INTEGER(res)[i*size.x*size.y]), size, pt, INTEGER(col)[i], REAL(tol)[0]);
         break;
       case REALSXP:
-        _floodFill<double>(&(REAL(res)[i*size.x*size.y]), size, pt, REAL(col)[i], asReal(tol));
+        _floodFill<double>(&(REAL(res)[i*size.x*size.y]), size, pt, REAL(col)[i], REAL(tol)[0]);
         break;
     }
   }

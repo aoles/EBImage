@@ -46,8 +46,6 @@ thresh (SEXP x, SEXP param) {
         
         switch (TYPEOF(x)) {
           case LGLSXP:
-            _thresh<int>( &(LOGICAL(x)[shift]), tgt, nx, ny, dx, dy, offset);
-            break;
           case INTSXP:
             _thresh<int>( &(INTEGER(x)[shift]), tgt, nx, ny, dx, dy, offset);
             break;

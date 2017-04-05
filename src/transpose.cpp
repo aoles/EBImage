@@ -86,8 +86,6 @@ SEXP transpose (SEXP x) {
   for (int i = 0; i < nz; i++, offset+=sizexy) {
     switch (TYPEOF(x)) {
     case LGLSXP:
-      _transpose<int>( &(LOGICAL(x)[offset]), &(LOGICAL(res)[offset]), 0, size.x, 0, size.y, size);
-      break;
     case INTSXP:
       _transpose<int>( &(INTEGER(x)[offset]), &(INTEGER(res)[offset]), 0, size.x, 0, size.y, size);
       break;

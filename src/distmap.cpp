@@ -126,8 +126,6 @@ SEXP distmap(SEXP _a, SEXP _metric) {
     
     switch (TYPEOF(_a)) {
     case LGLSXP:
-      _distmap<int>( &(LOGICAL(_a)[offset]) );
-      break;
     case INTSXP:
       _distmap<int>( &(INTEGER(_a)[offset]) );
       break;
