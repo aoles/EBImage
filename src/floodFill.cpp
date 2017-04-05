@@ -25,11 +25,10 @@ template <class T> void _bwlabel(T *, int *, XYPoint);
 /* -------------------------------------------------------------------------- */
 SEXP
 floodFill(SEXP x, SEXP point, SEXP col, SEXP tol) {
-  int i, nz, *dim;
-  int nprotect=0;
+  int i, nz, *dim, *pts;
   XYPoint pt;
   SEXP res;
-
+  
   // check image validity
   validImage(x,0);
   nz = getNumberOfFrames(x, 0);
@@ -41,25 +40,26 @@ floodFill(SEXP x, SEXP point, SEXP col, SEXP tol) {
   
   // initialize result
   PROTECT(res = Rf_duplicate(x));
-  nprotect++;
+  
+  pts = INTEGER(point);
   
   // do the job over images
- for (i=0; i<nz; i++) {
-    pt.x = INTEGER(point)[i]-1;
-    pt.y = INTEGER(point)[nz+i]-1;
-
+  for (i=0; i<nz; i++) {
+    pt.x = pts[i]-1;
+    pt.y = pts[nz+i]-1;
+    
     switch (TYPEOF(res)) {
       case LGLSXP:
       case INTSXP:
-        _floodFill<int>(&(INTEGER(res)[i*size.x*size.y]), size, pt, INTEGER(col)[i], REAL(tol)[0]);
+        _floodFill<int>(&(INTEGER(res)[i*size.x*size.y]), size, pt, INTEGER(col)[i], asReal(tol));
         break;
       case REALSXP:
-        _floodFill<double>(&(REAL(res)[i*size.x*size.y]), size, pt, REAL(col)[i], REAL(tol)[0]);
+        _floodFill<double>(&(REAL(res)[i*size.x*size.y]), size, pt, REAL(col)[i], asReal(tol));
         break;
     }
   }
-
-  UNPROTECT (nprotect);
+  
+  UNPROTECT(1);
   return res;
 }
 
@@ -67,7 +67,6 @@ floodFill(SEXP x, SEXP point, SEXP col, SEXP tol) {
 SEXP
 fillHull(SEXP x) {
   SEXP res;
-  int nprotect = 0;
   int nz;
 
   // check image validity
@@ -80,17 +79,22 @@ fillHull(SEXP x) {
   // return itself if nothing to do
   if (size.x <= 0 || size.y <= 0 || nz < 1) return x;
  
-  // do fillHull
   PROTECT(res = Rf_duplicate(x));
-  nprotect++;
-  if (IS_INTEGER(res)) {
-    for (int i=0; i < nz; i++) _fillHullT<int>(&(INTEGER(res)[i*size.x*size.y]), size);
-  }
-  else if (IS_NUMERIC(res)) {
-    for (int i=0; i < nz; i++) _fillHullT<double>(&(REAL(res)[i*size.x*size.y]), size);
+  
+  // apply fillHull over frames
+  for (int i=0; i<nz; i++) {
+    switch (TYPEOF(res)) {
+    case LGLSXP:
+    case INTSXP:
+      _fillHullT<int>(&(INTEGER(res)[i*size.x*size.y]), size);
+      break;
+    case REALSXP:
+      _fillHullT<double>(&(REAL(res)[i*size.x*size.y]), size);
+      break;
+    }
   }
   
-  UNPROTECT (nprotect);
+  UNPROTECT(1);
   return res;
 }
 
@@ -98,7 +102,6 @@ fillHull(SEXP x) {
 SEXP
 bwlabel(SEXP x) {
   int i, nz, sizexy, offset, *dim, *tgt;
-  int nprotect=0;
   SEXP res;
 
   // check image validity
@@ -110,7 +113,6 @@ bwlabel(SEXP x) {
   
   // store results as integers
   PROTECT( res = allocVector(INTSXP, XLENGTH(x)) );
-  nprotect++;
   DUPLICATE_ATTRIB(res, x);
   
   sizexy = size.x*size.y;
@@ -130,7 +132,7 @@ bwlabel(SEXP x) {
     }
   }
 
-  UNPROTECT (nprotect);
+  UNPROTECT(1);
   return res;
 }
 
