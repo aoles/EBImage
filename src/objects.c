@@ -14,53 +14,52 @@ See: ../LICENSE for license, LGPL
 /*----------------------------------------------------------------------- */
 /* paints features on the target image with given colors and opacs    */
 SEXP
-paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col, SEXP _thick) {
+paintObjects (SEXP x, SEXP ref, SEXP _opac, SEXP _col, SEXP _thick) {
     SEXP res;
-    int nprotect, nx, ny, nz, im, index, thick;
+    int nx, ny, nz, im, index, thick;
     int i, j;
     double *opac, *col;
-    double *dx, *dres, dp, val;
-    int redstride, greenstride, bluestride;
-    int xcolormode;
+    double *obj, *src, *tgt, dp, val;
+    int src_rstride, src_gstride, src_bstride;
+    int tgt_rstride, tgt_gstride, tgt_bstride;
 
     validImage(x,0);
-    validImage(tgt,0);
+    validImage(ref,0);
 
     nx = INTEGER(GET_DIM(x))[0];
     ny = INTEGER(GET_DIM(x))[1];
     nz = getNumberOfFrames(x, 0);
-    nprotect = 0;
-    xcolormode = COLOR_MODE(x);
-    if (xcolormode != MODE_GRAYSCALE) error("'x' must be in 'Grayscale' color mode");
 
-    PROTECT ( res = Rf_duplicate(tgt) );
-    nprotect++;
-
-    opac = REAL (_opac);
+    opac = REAL(_opac);
     col = REAL(_col);
-    thick = INTEGER(_thick)[0];
-    
+    thick = asLogical(_thick);
 
+    PROTECT( res = allocVector(REALSXP, XLENGTH(ref)) );
+    DUPLICATE_ATTRIB(res, ref);
+    
+    src = REAL(ref);
+    tgt = REAL(res);
+    
     for (im = 0; im < nz; im++) {
-      dx = &( REAL(x)[ im * nx * ny ] );
-      dres = REAL(res);
-      getColorStrides(tgt, im, &redstride, &greenstride, &bluestride);
+      obj = &( REAL(x)[ im * nx * ny ] );
+      getColorStrides(ref, im, &src_rstride, &src_gstride, &src_bstride);
+      getColorStrides(res, im, &tgt_rstride, &tgt_gstride, &tgt_bstride);
       
       for ( j = 0; j < ny; j++ ) {
         for ( i = 0; i < nx; i++ ) {      
-          val = dx[j*nx + i];
+          val = obj[j*nx + i];
           
           if (thick) {
             /* object border */
-            if (  ( i > 0       && dx[j*nx + i-1] != val ) ||
-                  ( i < nx - 1  && dx[j*nx + i+1] != val ) ||
-                  ( j > 0       && dx[(j-1)*nx + i] != val ) ||
-                  ( j < ny - 1  && dx[(j+1)*nx + i] != val ) ) 
+            if (  ( i > 0       && obj[j*nx + i-1] != val ) ||
+                  ( i < nx - 1  && obj[j*nx + i+1] != val ) ||
+                  ( j > 0       && obj[(j-1)*nx + i] != val ) ||
+                  ( j < ny - 1  && obj[(j+1)*nx + i] != val ) ) 
               index = 0;
             else {
               /* background */
               if ( val <= 0 )
-                continue;
+                index = -1;
               /* if image edge index=2, if object body index=1 */
               else
                 index = (i==0 || i==nx-1 || j==0 || j==ny-1 || val < 1) ? 2 : 1;
@@ -70,13 +69,13 @@ paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col, SEXP _thick) {
           else {
             /* background */
             if ( val <= 0 )
-              continue;
+              index = -1;
             else {
               /* object border */
-              if (  ( i > 0       && dx[j*nx + i-1] != val ) ||
-                    ( i < nx - 1  && dx[j*nx + i+1] != val ) ||
-                    ( j > 0       && dx[(j-1)*nx + i] != val ) ||
-                    ( j < ny - 1  && dx[(j+1)*nx + i] != val ) ) 
+              if (  ( i > 0       && obj[j*nx + i-1] != val ) ||
+                    ( i < nx - 1  && obj[j*nx + i+1] != val ) ||
+                    ( j > 0       && obj[(j-1)*nx + i] != val ) ||
+                    ( j < ny - 1  && obj[(j+1)*nx + i] != val ) ) 
                 index = 0;
               /* if image edge index=2, if object body index=1 */
               else
@@ -84,23 +83,29 @@ paintObjects (SEXP x, SEXP tgt, SEXP _opac, SEXP _col, SEXP _thick) {
             }
           }
           
-          if (redstride!=-1) {
-            dp=dres[redstride+j*nx + i]*(1-opac[index]) + col[index]*opac[index];		
-        	  dres[redstride+j*nx + i]=dp;
-        	}
-        	if (greenstride!=-1) {
-        	  dp=dres[greenstride+j*nx + i]*(1-opac[index]) + col[index+3]*opac[index];
-        	  dres[greenstride+j*nx + i]=dp;
-        	}
-        	if (bluestride!=-1) {
-        	  dp=dres[bluestride+j*nx + i]*(1-opac[index]) + col[index+3*2]*opac[index];	
-        	  dres[bluestride+j*nx + i]=dp;
-        	}
+          // duplicate pixels
+          if ( index == -1 ) {
+            if ( src_rstride!=-1 )
+              tgt[tgt_rstride+j*nx + i] = src[src_rstride+j*nx + i];
+            if ( src_gstride!=-1 )
+              tgt[tgt_gstride+j*nx + i] = src[src_gstride+j*nx + i];
+            if ( src_bstride!=-1 ) 
+              tgt[tgt_bstride+j*nx + i] = src[src_bstride+j*nx + i];
+          }
+          else {
+            if ( src_rstride!=-1 )
+              tgt[tgt_rstride+j*nx + i] = src[src_rstride+j*nx + i]*(1-opac[index]) + col[index]*opac[index];
+            if ( src_gstride!=-1 )
+              tgt[tgt_gstride+j*nx + i] = src[src_gstride+j*nx + i]*(1-opac[index]) + col[index+3]*opac[index];
+            if ( src_bstride!=-1 )
+              tgt[tgt_bstride+j*nx + i] = src[src_bstride+j*nx + i]*(1-opac[index]) + col[index+6]*opac[index];	
+          }
+          
         }
       }
     }
 
-    UNPROTECT (nprotect);
+    UNPROTECT (1);
     return res;
 }
 
