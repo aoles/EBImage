@@ -16,8 +16,11 @@ propagate = function (x, seeds, mask=NULL, lambda=1e-4) {
   if (!is.integer(seeds))
     storage.mode(seeds) = 'integer'
 
-  if (!is.null(mask))
+  if (!is.null(mask)) {
     checkCompatibleImages(x, mask)
+    if (!is.integer(mask))
+      storage.mode(mask) = 'integer'
+  }
 
   lambda = as.numeric(lambda)
   if (lambda<0.0) stop("'lambda' must be positive" )
