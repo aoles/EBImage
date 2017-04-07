@@ -5,11 +5,12 @@
 
 #define PEEKPIXEL(x, y, w, h, a, bg) ((x)<0 || (x)>=w || (y)<0 || (y)>=h) ? (bg) : a[INDEX_FROM_XY(x, y, w)]
 
-SEXP affine(SEXP _a, SEXP _b, SEXP _m, SEXP _filter, SEXP _antialias) {
+SEXP affine(SEXP _a, SEXP _d, SEXP _b, SEXP _m, SEXP _filter, SEXP _antialias) {
+  SEXP res;
   int width, height, nz, framesize;
   int owidth, oheight;
   int filter, antialias;
-  double *a, *m, *b;
+  double *a, *b, *m, *tgt;
   
   // check image validity
   validImage(_a, 0); 
@@ -24,22 +25,26 @@ SEXP affine(SEXP _a, SEXP _b, SEXP _m, SEXP _filter, SEXP _antialias) {
   
   // initialize a, m, filter
   a = REAL(_a);
+  b = REAL(_b);
   m = REAL(_m);
   
   filter = INTEGER(_filter)[0];
-  antialias = INTEGER(_antialias)[0];
-  // get output image b data
-  PROTECT(_b = Rf_duplicate(_b));
+  antialias = LOGICAL(_antialias)[0];
   
-  owidth = INTEGER(GET_DIM(_b))[0];
-  oheight = INTEGER(GET_DIM(_b))[1];
-  b = REAL(_b);
+  res = PROTECT( allocArray(REALSXP, _d) );
+  DUPLICATE_ATTRIB(res, _a);
+  SET_DIM(res, _d); //restore proper dimensions overwritten in the previous line
+  
+  owidth = INTEGER(_d)[0];
+  oheight = INTEGER(_d)[1];
+  tgt = REAL(res);
   
   // apply transform
   for (int z=0, i=0; z<nz; z++, a += framesize) {
+    double bg = b[z];
     for (int y=0; y<oheight; y++) { 
       for (int x=0; x<owidth; x++) {
-        double res, bg = b[i];
+        double val;
         double tx = m[0]*(x+.5) + m[1]*(y+.5) + m[2];
         double ty = m[3]*(x+.5) + m[4]*(y+.5) + m[5];
         
@@ -59,60 +64,60 @@ SEXP affine(SEXP _a, SEXP _b, SEXP _m, SEXP _filter, SEXP _antialias) {
               double pb = PEEKPIXEL(ftx+1, fty, width, height, a, bg);
               double pc = PEEKPIXEL(ftx, fty+1, width, height, a, bg);
               double pd = PEEKPIXEL(ftx+1, fty+1, width, height, a, bg);
-              res = (1-dy)*(pa*(1-dx) + pb*dx) + dy*(pc*(1-dx) + pd*dx);
+              val = (1-dy)*(pa*(1-dx) + pb*dx) + dy*(pc*(1-dx) + pd*dx);
             }
             else {
               if (ftx==minx) {
                 // upper left corner
                 if (fty==miny) {
-                  res = a[INDEX_FROM_XY(ftx+1, fty+1, width)];
+                  val = a[INDEX_FROM_XY(ftx+1, fty+1, width)];
                 }
                 // lower left corner
                 else if (fty==maxy) {
-                  res = a[INDEX_FROM_XY(ftx+1, fty, width)];
+                  val = a[INDEX_FROM_XY(ftx+1, fty, width)];
                 }
                 // left border
                 else {
-                  res = (1-dy) * a[INDEX_FROM_XY(ftx+1, fty, width)] + dy * a[INDEX_FROM_XY(ftx+1, fty+1, width)];
+                  val = (1-dy) * a[INDEX_FROM_XY(ftx+1, fty, width)] + dy * a[INDEX_FROM_XY(ftx+1, fty+1, width)];
                 }
               }
               else if (ftx==maxx) {
                 // upper right corner
                 if (fty==miny) {
-                  res = a[INDEX_FROM_XY(ftx, fty+1, width)];
+                  val = a[INDEX_FROM_XY(ftx, fty+1, width)];
                 }
                 // lower right corner
                 else if (fty==maxy) {
-                  res = a[INDEX_FROM_XY(ftx, fty, width)];
+                  val = a[INDEX_FROM_XY(ftx, fty, width)];
                 }
                 // right border
                 else {
-                  res = (1-dy) * a[INDEX_FROM_XY(ftx, fty, width)] + dy * a[INDEX_FROM_XY(ftx, fty+1, width)];
+                  val = (1-dy) * a[INDEX_FROM_XY(ftx, fty, width)] + dy * a[INDEX_FROM_XY(ftx, fty+1, width)];
                 }
               } else {
                 // top border
                 if (fty==miny) {
-                  res = (1-dx) * a[INDEX_FROM_XY(ftx, fty+1, width)] + dx * a[INDEX_FROM_XY(ftx+1, fty+1, width)];
+                  val = (1-dx) * a[INDEX_FROM_XY(ftx, fty+1, width)] + dx * a[INDEX_FROM_XY(ftx+1, fty+1, width)];
                 }
                 // bootom border
                 else {
-                  res = (1-dx) * a[INDEX_FROM_XY(ftx, fty, width)] + dx * a[INDEX_FROM_XY(ftx+1, fty, width)];
+                  val = (1-dx) * a[INDEX_FROM_XY(ftx, fty, width)] + dx * a[INDEX_FROM_XY(ftx+1, fty, width)];
                 }
               }
             }
           }
-          else res = bg;
+          else val = bg;
         }
         else {
           int ftx = floor(tx);
           int fty = floor(ty);
-          res = PEEKPIXEL(ftx, fty, width, height, a, bg);
+          val = PEEKPIXEL(ftx, fty, width, height, a, bg);
         }
-        b[i++] = res;
+        tgt[i++] = val;
       }
     }
   }
   
   UNPROTECT(1);
-  return _b;
+  return res;
 }

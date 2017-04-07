@@ -52,7 +52,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(haralickMatrix, 3),
     CALLDEF(haralickFeatures, 1),
     CALLDEF(drawCircle, 4),
-    CALLDEF(affine, 5),
+    CALLDEF(affine, 6),
     CALLDEF(medianFilter, 3),
     CALLDEF(nativeRaster, 1),
     CALLDEF(getFrame, 3),

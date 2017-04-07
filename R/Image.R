@@ -34,7 +34,7 @@ Image = function(data = array(0, dim=c(1,1)), dim, colormode) {
     if (is.array(data))
       base::dim(data)
     else 
-      c(1, length(data))
+      c(1L, length(data))
   }
   
   ## special character case
@@ -49,14 +49,17 @@ Image = function(data = array(0, dim=c(1,1)), dim, colormode) {
       dim = setdim(data)
       
       if ( colormode==Color )
-        dim = c(dim[1:2], 3, if((ld=length(dim))>2) dim[3:ld] else NULL)
+        dim = c(dim[1:2], 3L, dim[-(1:2)])
     }
     
     dimnames = dimnames(data)
     data = col2rgb(data)/255
     
     if ( colormode==Color ) {
-      data = abind(array(data[1,,drop=FALSE], dim[-3], dimnames), array(data[2,,drop=FALSE], dim[-3], dimnames), array(data[3,,drop=FALSE], dim[-3], dimnames), along = 2.5)
+      channels = if (length(dim)<3L) 1L else seq_len(dim[3L])
+      data = abind(lapply(channels, function(ch) {
+        array( if (ch>3L) 0 else data[ch,,drop=FALSE], dim[-3L], dimnames)
+      }), along = 2.5)
       # replace a list of NULLs by the original NULL
       if(is.null(dimnames)) dimnames(data) = NULL
     }
@@ -77,12 +80,12 @@ Image = function(data = array(0, dim=c(1,1)), dim, colormode) {
       else 
         parseColorMode(colormode)
   }
-     
+  
   return( new("Image", 
     .Data = 
       ## improve performance by not calling array constructor on well formed arrays
       if( is.array(data) && prod(dim)==length(data) ) {
-        if(any(dim(data) != dim))
+        if( length(dim(data)) != length(dim) || any(dim(data) != dim))
           dim(data) = dim
         data
       }

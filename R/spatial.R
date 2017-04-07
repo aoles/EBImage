@@ -21,41 +21,19 @@ affine <- function (x, m, filter = c("bilinear", "none"), output.dim, bg.col = "
   d = dim(x)  
   if (!missing(output.dim)) {
     if( length(output.dim)!=2L || !is.numeric(output.dim) ) stop("'output.dim' must be a numeric vector of length 2")
-    d[1:2] = round(output.dim)
+    d[1:2] = as.integer(round(output.dim))
   }
   
   ## inverse of the transformation matrix
   ## this is needed because in C we iterate over (x',y') for which we calculate (x,y)
   m <- solve(cbind(m, c(0, 0, 1)))
   
-  ## create output image
-  y <- x
-  imageData(y) <- bgImage(bg.col, d, colorMode(x))
+  ## image background
+  nf = numberOfFrames(x, "render")
   
-  .Call(C_affine, castImage(x), castImage(y), m, filter, as.integer(antialias))
-}
-
-bgImage = function(col, dim, colormode) {
+  bg <- Image(rep_len(bg.col, nf), c(1L, 1L, d[-c(1,2)]), colorMode(x))
   
-  ## character color description
-  if ( is.character(col) ) {
-    col = col2rgb(col, alpha = isTRUE(dim[3L]==4L)) / 255
-    
-    if ( colormode==Color ) {
-      res = do.call(abind, c(
-        lapply(seq_along(col[,1L]), function(i) array(col[i,,drop=FALSE], dim[-3])),
-        along = 2.5)
-      )
-      dimnames(res) = NULL
-    }
-    else
-      res = array(data = colSums(col) / 3, dim = dim)
-  }
-  ## numeric case
-  else {
-    res = array(col, dim = dim)
-  }
-  res
+  .Call(C_affine, castImage(x), d, castImage(bg), m, filter, isTRUE(antialias))
 }
 
 # images are represented in a cooridinate system with the y-axis oriented

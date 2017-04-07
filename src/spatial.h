@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-SEXP affine (SEXP, SEXP, SEXP, SEXP, SEXP);
+SEXP affine (SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus
 };

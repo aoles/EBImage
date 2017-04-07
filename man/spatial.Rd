@@ -42,7 +42,7 @@ affine(x, m, filter = c("bilinear", "none"), output.dim, bg.col = "black", antia
   \item{output.origin}{A vector of 2 numbers indicating the output coordinates of the origin in pixels.}
   
   \item{m}{A 3x2 matrix describing the affine transformation. See Details.}
-  \item{bg.col}{Color used to fill the background pixels. The default is "black".}
+  \item{bg.col}{Color used to fill the background pixels, defaults to "black". In the case of multi-frame images the value is recycled, and individual background for each frame can be specified by providing a vector.}
   \item{antialias}{If \code{TRUE}, perform bilinear sampling at image edges using \code{bg.col}.}
   \item{...}{Arguments to be passed to \code{affine}, such as \code{filter}, \code{output.dim}, \code{bg.col} or \code{antialias}.}  
 }
