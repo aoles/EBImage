@@ -14,7 +14,7 @@ Copyright (c) 2015 Andrzej Oles
 SEXP nativeRaster (SEXP _in) {
   int nprotect = 0, x, y, c, i, j;
   uint32_t *out;
-  SEXP res;
+  SEXP res, nch;
   
   x = INTEGER (GET_DIM(_in))[0];
   y = INTEGER (GET_DIM(_in))[1];
@@ -64,7 +64,8 @@ SEXP nativeRaster (SEXP _in) {
   
   //set class
   setAttrib(res, R_ClassSymbol, mkString("nativeRaster"));
-  setAttrib(res, install("channels"), ScalarInteger(4));
+  nch = PROTECT( ScalarInteger(4) ); nprotect++;
+  setAttrib(res, install("channels"), nch);
   
   UNPROTECT (nprotect);
   
