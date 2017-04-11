@@ -69,19 +69,15 @@ int getNumberOfChannels(SEXP x, int colormode) {
     return(LENGTH(GET_DIM(x))<3 ? 1 : INTEGER(GET_DIM(x))[2]);
 }
 
-void getColorStrides(SEXP x,int index,int *redstride,int *greenstride,int *bluestride) {
-  int width, height, nbChannels;
+void getColorStrides(SEXP x, int index, ColorStrides *strides) {
+  int xysize, nch;
   
-  width=INTEGER(GET_DIM(x))[0];
-  height=INTEGER(GET_DIM(x))[1];
-  nbChannels=getNumberOfChannels(x, COLOR_MODE(x));
+  xysize = INTEGER(GET_DIM(x))[0] * INTEGER(GET_DIM(x))[1];
+  nch = getNumberOfChannels(x, COLOR_MODE(x));
   
-  *redstride=index*nbChannels*width*height;
-  *greenstride=-1;
-  *bluestride=-1;
-  
-  if (nbChannels>1) *greenstride=index*nbChannels*width*height+width*height;
-  if (nbChannels>2) *bluestride=index*nbChannels*width*height+2*width*height;
+  (*strides).r = index * nch * xysize;
+  (*strides).g = (nch>1) ? (*strides).r + xysize : -1;
+  (*strides).b = (nch>2) ? (*strides).g + xysize : -1;
 }
 
 int isImage(SEXP x) {

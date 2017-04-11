@@ -20,8 +20,7 @@ paintObjects (SEXP x, SEXP ref, SEXP _opac, SEXP _col, SEXP _thick) {
     int i, j;
     double *opac, *col;
     double *obj, *src, *tgt, dp, val;
-    int src_rstride, src_gstride, src_bstride;
-    int tgt_rstride, tgt_gstride, tgt_bstride;
+    ColorStrides src_strides, tgt_strides;
 
     validImage(x,0);
     validImage(ref,0);
@@ -42,8 +41,8 @@ paintObjects (SEXP x, SEXP ref, SEXP _opac, SEXP _col, SEXP _thick) {
     
     for (im = 0; im < nz; im++) {
       obj = &( REAL(x)[ im * nx * ny ] );
-      getColorStrides(ref, im, &src_rstride, &src_gstride, &src_bstride);
-      getColorStrides(res, im, &tgt_rstride, &tgt_gstride, &tgt_bstride);
+      getColorStrides(ref, im, &src_strides);
+      getColorStrides(res, im, &tgt_strides);
       
       for ( j = 0; j < ny; j++ ) {
         for ( i = 0; i < nx; i++ ) {      
@@ -85,20 +84,20 @@ paintObjects (SEXP x, SEXP ref, SEXP _opac, SEXP _col, SEXP _thick) {
           
           // duplicate pixels
           if ( index == -1 ) {
-            if ( src_rstride!=-1 )
-              tgt[tgt_rstride+j*nx + i] = src[src_rstride+j*nx + i];
-            if ( src_gstride!=-1 )
-              tgt[tgt_gstride+j*nx + i] = src[src_gstride+j*nx + i];
-            if ( src_bstride!=-1 ) 
-              tgt[tgt_bstride+j*nx + i] = src[src_bstride+j*nx + i];
+            if ( src_strides.r!=-1 )
+              tgt[tgt_strides.r+j*nx + i] = src[src_strides.r+j*nx + i];
+            if ( src_strides.g!=-1 )
+              tgt[tgt_strides.g+j*nx + i] = src[src_strides.g+j*nx + i];
+            if ( src_strides.b!=-1 ) 
+              tgt[tgt_strides.b+j*nx + i] = src[src_strides.b+j*nx + i];
           }
           else {
-            if ( src_rstride!=-1 )
-              tgt[tgt_rstride+j*nx + i] = src[src_rstride+j*nx + i]*(1-opac[index]) + col[index]*opac[index];
-            if ( src_gstride!=-1 )
-              tgt[tgt_gstride+j*nx + i] = src[src_gstride+j*nx + i]*(1-opac[index]) + col[index+3]*opac[index];
-            if ( src_bstride!=-1 )
-              tgt[tgt_bstride+j*nx + i] = src[src_bstride+j*nx + i]*(1-opac[index]) + col[index+6]*opac[index];	
+            if ( src_strides.r!=-1 )
+              tgt[tgt_strides.r+j*nx + i] = src[src_strides.r+j*nx + i]*(1-opac[index]) + col[index]*opac[index];
+            if ( src_strides.g!=-1 )
+              tgt[tgt_strides.g+j*nx + i] = src[src_strides.g+j*nx + i]*(1-opac[index]) + col[index+3]*opac[index];
+            if ( src_strides.b!=-1 )
+              tgt[tgt_strides.b+j*nx + i] = src[src_strides.b+j*nx + i]*(1-opac[index]) + col[index+6]*opac[index];	
           }
           
         }

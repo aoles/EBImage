@@ -56,7 +56,7 @@ SEXP drawCircle(SEXP _a, SEXP _xyzr, SEXP _rgb, SEXP _fill) {
   int nprotect = 0;
   int width, height;
   int x, y, z, radius;
-  int redstride, greenstride, bluestride;
+  ColorStrides strides;
   double *res;
   int fill;
 
@@ -74,13 +74,13 @@ SEXP drawCircle(SEXP _a, SEXP _xyzr, SEXP _rgb, SEXP _fill) {
   z = INTEGER(_xyzr)[2];
   radius = INTEGER(_xyzr)[3];
   fill = INTEGER(_fill)[0];
-  getColorStrides(_res, z, &redstride, &greenstride, &bluestride);
+  getColorStrides(_res, z, &strides);
   res = REAL(_res);
 
   // draw circle
-  if (redstride!=-1) rasterCircle(&res[redstride], width, height, x, y, radius, REAL(_rgb)[0], fill);
-  if (greenstride!=-1) rasterCircle(&res[greenstride], width, height, x, y, radius, REAL(_rgb)[1], fill);
-  if (bluestride!=-1)  rasterCircle(&res[bluestride], width, height, x, y, radius, REAL(_rgb)[2], fill);
+  if (strides.r!=-1) rasterCircle(&res[strides.r], width, height, x, y, radius, REAL(_rgb)[0], fill);
+  if (strides.g!=-1) rasterCircle(&res[strides.g], width, height, x, y, radius, REAL(_rgb)[1], fill);
+  if (strides.b!=-1) rasterCircle(&res[strides.b], width, height, x, y, radius, REAL(_rgb)[2], fill);
   
   UNPROTECT (nprotect);
   return _res;

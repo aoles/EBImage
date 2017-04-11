@@ -21,8 +21,7 @@ tile (SEXP obj, SEXP _hdr, SEXP params) {
   int nc = getNumberOfChannels(obj, mode);
   int nprotect, nx, ny, nz, nxr, nyr, i, j, index, x, y;
   double *hdr, *src, *tgt;
-  int rredstride,rgreenstride,rbluestride;
-  int oredstride,ogreenstride,obluestride;
+  ColorStrides src_strides, res_strides;
 
   nx = INTEGER ( GET_DIM(obj) )[0];
   ny = INTEGER ( GET_DIM(obj) )[1];
@@ -61,7 +60,7 @@ tile (SEXP obj, SEXP _hdr, SEXP params) {
   src = REAL(obj);  
   tgt = REAL(res);
 
-  getColorStrides(res,0,&rredstride,&rgreenstride,&rbluestride);
+  getColorStrides(res, 0, &res_strides);
   
   /* loop through image stack and copy them to res */  
   for ( index = 0; index < ndx * ndy; index++ ) {
@@ -73,17 +72,17 @@ tile (SEXP obj, SEXP _hdr, SEXP params) {
       i = x + y * nxr;
       /*  copy line by line */
       if (index < nz) {
-        getColorStrides(obj,index,&oredstride,&ogreenstride,&obluestride);
-        if (oredstride!=-1)   memcpy( &(tgt[i+rredstride]), &(src[j* nx+oredstride]), nx * sizeof(double));
-        if (ogreenstride!=-1) memcpy( &(tgt[i+rgreenstride]), &(src[j* nx+ogreenstride]), nx * sizeof(double));
-        if (obluestride!=-1)  memcpy( &(tgt[i+rbluestride]), &(src[j* nx+obluestride]), nx * sizeof(double));
+        getColorStrides(obj, index, &src_strides);
+        if (src_strides.r!=-1) memcpy( &(tgt[i+res_strides.r]), &(src[j* nx+src_strides.r]), nx * sizeof(double));
+        if (src_strides.g!=-1) memcpy( &(tgt[i+res_strides.g]), &(src[j* nx+src_strides.g]), nx * sizeof(double));
+        if (src_strides.b!=-1) memcpy( &(tgt[i+res_strides.b]), &(src[j* nx+src_strides.b]), nx * sizeof(double));
       }
       /* reset remaining empty tiles to BG */
       else {
         for (int k = 0; k < nx; k++, i++){
-          if (rredstride!=-1) tgt[rredstride + i] = hdr[1];
-          if (rgreenstride!=-1) tgt[rgreenstride + i] = hdr[3];
-          if (rbluestride!=-1) tgt[rbluestride + i] = hdr[5];
+          if (res_strides.r!=-1) tgt[res_strides.r + i] = hdr[1];
+          if (res_strides.g!=-1) tgt[res_strides.g + i] = hdr[3];
+          if (res_strides.b!=-1) tgt[res_strides.b + i] = hdr[5];
         }
       }
     }
@@ -95,9 +94,9 @@ tile (SEXP obj, SEXP _hdr, SEXP params) {
     for (i = 0; i <= ndx; i++ ) {
       for ( x = i * (nx + lwd); x < lwd + i * (nx + lwd); x++ ) {
 	      for ( y = 0; y < nyr; y++ ) {
-          if (rredstride!=-1) tgt[rredstride + x + y * nxr] = hdr[0];
-          if (rgreenstride!=-1) tgt[rgreenstride + x + y * nxr] = hdr[2];
-          if (rbluestride!=-1) tgt[rbluestride + x + y * nxr] = hdr[4];
+          if (res_strides.r!=-1) tgt[res_strides.r + x + y * nxr] = hdr[0];
+          if (res_strides.g!=-1) tgt[res_strides.g + x + y * nxr] = hdr[2];
+          if (res_strides.b!=-1) tgt[res_strides.b + x + y * nxr] = hdr[4];
 	      }        
       }
     }
@@ -105,9 +104,9 @@ tile (SEXP obj, SEXP _hdr, SEXP params) {
     for (j = 0; j <= ndy; j++ ) {
       for ( y = j * (ny + lwd); y < lwd + j * (ny + lwd); y++ ) {
 	      for ( x = 0; x < nxr; x++ ) {
-          if (rredstride!=-1) tgt[rredstride + x + y * nxr] = hdr[0];
-          if (rgreenstride!=-1) tgt[rgreenstride + x + y * nxr] = hdr[2];
-          if (rbluestride!=-1) tgt[rbluestride + x + y * nxr] = hdr[4];
+          if (res_strides.r!=-1) tgt[res_strides.r + x + y * nxr] = hdr[0];
+          if (res_strides.g!=-1) tgt[res_strides.g + x + y * nxr] = hdr[2];
+          if (res_strides.b!=-1) tgt[res_strides.b + x + y * nxr] = hdr[4];
 	      }
       }
     }
@@ -134,8 +133,7 @@ untile(SEXP img, SEXP nim, SEXP linewd) {
   SEXP res, dim, dat;
   double *src, *tgt;
 
-  int rredstride,rgreenstride,rbluestride;
-  int oredstride,ogreenstride,obluestride;
+  ColorStrides src_strides, res_strides;
 
   if (nx<1 || ny<1 || nz <1 || ((nx*ny*nz*nc)>(1024*1024*1024))) {
     if (nc==1) Rprintf("size of the resulting image will be (nx=%d,ny=%d,nz=%d)\n",nx,ny,nz);
@@ -166,8 +164,8 @@ untile(SEXP img, SEXP nim, SEXP linewd) {
   for (im=0; im<nz; im++) {
     iim = im / (nimx*nimy);
 
-    getColorStrides(img,iim,&oredstride,&ogreenstride,&obluestride);
-    getColorStrides(res,im,&rredstride,&rgreenstride,&rbluestride);
+    getColorStrides(img, iim, &src_strides);
+    getColorStrides(res, im,  &res_strides);
    
     i = im % nimx;
     j = (im-iim*nimx*nimy) / nimx;
@@ -176,9 +174,9 @@ untile(SEXP img, SEXP nim, SEXP linewd) {
     tgt = REAL(res);
     
     for (y=0; y<ny; y++) {
-      if (oredstride!=-1) memcpy(&(tgt[rredstride + y*nx]), &(src[oredstride + (j*ny+lwd*(j+1) + y)*sdim[0] + (i*nx+lwd*(i+1))]), nx*sizeof(double));
-      if (ogreenstride!=-1) memcpy(&(tgt[rgreenstride + y*nx]), &(src[ogreenstride + (j*ny+lwd*(j+1) + y)*sdim[0] + (i*nx+lwd*(i+1))]), nx*sizeof(double));
-      if (obluestride!=-1) memcpy(&(tgt[rbluestride + y*nx]), &(src[obluestride+ (j*ny+lwd*(j+1) + y)*sdim[0] + (i*nx+lwd*(i+1))]), nx*sizeof(double));
+      if (src_strides.r!=-1) memcpy(&(tgt[res_strides.r + y*nx]), &(src[src_strides.r + (j*ny+lwd*(j+1) + y)*sdim[0] + (i*nx+lwd*(i+1))]), nx*sizeof(double));
+      if (src_strides.g!=-1) memcpy(&(tgt[res_strides.g + y*nx]), &(src[src_strides.g + (j*ny+lwd*(j+1) + y)*sdim[0] + (i*nx+lwd*(i+1))]), nx*sizeof(double));
+      if (src_strides.b!=-1) memcpy(&(tgt[res_strides.b + y*nx]), &(src[src_strides.b+ (j*ny+lwd*(j+1) + y)*sdim[0] + (i*nx+lwd*(i+1))]), nx*sizeof(double));
     }
   }
   

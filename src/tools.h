@@ -21,7 +21,11 @@ extern "C" {
 typedef struct {
     int x, y;
 } PointXY;
-  
+
+typedef struct {
+  int r, g, b;
+} ColorStrides;
+
 typedef double numeric;
 
 SEXP numberOfFrames (SEXP, SEXP);
@@ -29,7 +33,7 @@ SEXP validImageObject (SEXP x);
 int validImage (SEXP x,int test);
 int getNumberOfFrames (SEXP x, int type);
 int getNumberOfChannels (SEXP x, int colormode);
-void getColorStrides(SEXP x,int index,int *redstride,int *greenstride,int *bluestride);
+void getColorStrides(SEXP x, int index, ColorStrides *strides);
 
 int isImage (SEXP x);
 
