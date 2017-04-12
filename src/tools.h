@@ -18,6 +18,8 @@ extern "C" {
 
 #define DISTANCE_XY(pt1, pt2) sqrt( (long double) ( (pt1.x - pt2.x) * (pt1.x - pt2.x) + (pt1.y - pt2.y) * (pt1.y - pt2.y) ) )
 
+extern SEXP Image_colormode;
+
 typedef struct {
     int x, y;
 } PointXY;

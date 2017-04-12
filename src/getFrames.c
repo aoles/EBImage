@@ -1,8 +1,5 @@
-#include "EBImage.h"
 #include "getFrames.h"
 #include "tools.h"
-
-#include "EBImage.h"
 
 /* -------------------------------------------------------------------------
 Extract frames from image stack

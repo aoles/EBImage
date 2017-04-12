@@ -1,5 +1,4 @@
 #include "transpose.h"
-#include "EBImage.h"
 #include "tools.h"
 
 /* -------------------------------------------------------------------------

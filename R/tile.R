@@ -21,7 +21,7 @@ tile = function (x, nx=10, lwd=1, fg.col="#E4AF2B", bg.col="gray") {
     
     hdr = Image(c(fg.col,bg.col), colormode = colorMode(x))
     
-    .Call(C_tile, castImage(x), hdr, as.integer(c(nx, lwd)))
+    .Call(C_tile, x, hdr, as.integer(c(nx, lwd)))
   }
 }
 

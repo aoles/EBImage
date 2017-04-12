@@ -3,7 +3,6 @@ Package initialization
 Copyright (c) 2006 Oleg Sklyar
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
-#include "EBImage.h"
 #include "tools.h"
 #include "distmap.h"
 #include "morphology.h"
@@ -29,6 +28,8 @@ See: ../LICENSE for license, LGPL
 #include <R_ext/Error.h>
 
 #define CALLDEF(name, n)  {#name, (DL_FUNC) &name, n}
+
+SEXP Image_colormode;
 
 static R_CallMethodDef CallEntries[] = {
     CALLDEF(transpose, 1),
@@ -66,5 +67,4 @@ void R_init_EBImage (DllInfo *dll) {
     R_useDynamicSymbols (dll, FALSE);
     
     Image_colormode = install("colormode");
-    Image_Data      = install(".Data");
 }

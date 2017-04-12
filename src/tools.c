@@ -1,7 +1,6 @@
 #include <R.h>
 #include <Rdefines.h>
 #include "tools.h"
-#include "EBImage.h"
 
 SEXP numberOfFrames(SEXP x, SEXP type) {
   SEXP res = PROTECT( ScalarInteger(getNumberOfFrames(x, INTEGER(type)[0])) );

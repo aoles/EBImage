@@ -6,7 +6,6 @@ Copyright (c) 2006 Oleg Sklyar
 See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
 
-#include "EBImage.h"
 #include "tools.h"
 #include <R_ext/Error.h>
 #include <stdio.h>
