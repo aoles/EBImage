@@ -33,6 +33,10 @@ equalize(x, range = c(0, 1), levels = 256)
  Individual channels of \code{Color} images and frames of image stacks are equalized separately.
 }
 
+\seealso{
+  \code{\link{clahe}}
+}
+
 \author{
   Andrzej Oles, \email{andrzej.oles@embl.de}, 2014
 }

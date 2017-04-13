@@ -57,6 +57,7 @@ export(filter2)
 export(gblur)
 export(medianFilter)
 export(equalize)
+export(clahe)
 
 ## morphological operations
 export(makeBrush)

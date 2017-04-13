@@ -21,6 +21,7 @@ See: ../LICENSE for license, LGPL
 #include "nativeRaster.h"
 #include "getFrames.h"
 #include "transpose.h"
+#include "clahe.h"
 
 #include <R.h>
 #include <Rdefines.h>
@@ -58,6 +59,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(nativeRaster, 1),
     CALLDEF(getFrame, 3),
     CALLDEF(getFrames, 3),
+    CALLDEF(clahe, 6),
     /* add above all R-lib functions from common.h */
     {NULL, NULL, 0}
 };

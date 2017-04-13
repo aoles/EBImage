@@ -32,5 +32,5 @@ untile = function (x, nim, lwd=1) {
   lwd = as.integer(lwd)
   if (length(nim)<2) stop("'nim' must contain two values for the number of images in x and y directions")
   if (lwd<0) stop("wrong line width")
-  .Call(C_untile, castImage(x), nim, lwd)
+  .Call(C_untile, x, nim, lwd)
 }

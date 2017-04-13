@@ -35,3 +35,8 @@ equalize <- function(x, range = c(0, 1), levels = 256){
   }
   x
 }
+
+clahe = function(x, nx = 8, ny = 8, bins = 256, limit = 2, keep.range = TRUE) {
+  validImage(x)
+  .Call(C_clahe, castImage(x), as.integer(nx), as.integer(ny), as.integer(bins), as.double(limit), isTRUE(keep.range))
+}
