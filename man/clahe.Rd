@@ -9,7 +9,7 @@
 }
 
 \usage{
-clahe(x, nx = 8, ny = 8, bins = 256, limit = 2, keep.range = TRUE) 
+clahe(x, nx = 8, ny = 8, bins = 256, limit = 2, keep.range = FALSE) 
 }
 
 \arguments{
