@@ -1,6 +1,44 @@
 \name{EBImage-NEWS}
 \title{News for Package 'EBImage'}
 
+\section{Changes in version 4.18.0}{
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item new arguments to 'display()' enabling control over layout and appearance of image grid in "raster" mode: 'nx' (number of frames in a row), 'drawGrid' (draw lines between frames), 'spacing' (separation between frames) and 'margin' (outer margin around the image)
+      \item new function 'clahe()' for improving local contrast in images by performing Contrast Limited Adaptive Histogram Equalization
+      \item re-introduced 'output.origin' argument to 'rotate()'
+    }
+  }
+  \subsection{SIGNIFICANT USER-VISIBLE CHANGES}{
+    \itemize{
+      \item object masks returned by `bwlabel()`, `propagate()`, and `watershed()`, as well as the result of thresh() are now of storage mode integer rather than double
+      \item binary kernels constructed by 'makeBrush()' have storage mode integer (previously double)
+      \item 'rmObjects()' and 'reenumerate()' now require input of storage mode integer
+      \item 'untile()' and morphology operations preserve data storage mode
+      \item modified boundary behaviour of 'thresh()' to reduce artifacts at image borders and to match the output of a corresponding call to 'filter2()'
+      \item added the ability for different boundary values for different frames in 'filter2()' linear mode (https://github.com/aoles/EBImage/pull/11) 
+      \item removed defunct '...GreyScale' family morphological functions
+    }
+  }
+  \subsection{PERFORMANCE IMPROVEMENTS}{
+    \itemize{
+      \item significantly improved performance of 'transpose()', 'getFrame()' and 'getFrames()' by using C implementation
+      \item numerous small improvements to execution time and memory consumption across the whole package, mostly by avoiding storage mode conversion and object duplication in C
+    }
+  }
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item proper origin handling in 'resize()'
+      \item import 'methods::slot' (fixes https://github.com/rstudio/blogdown/issues/17)
+      \item fixed a bug in 'filter2()' (https://github.com/aoles/EBImage/issues/8)
+      \item proper check of filter size in 'thresh()' and rectified behavior when filter dimensions are equal to image dimensions
+      \item correct computation of 'selfComplementaryTopHat()'
+      \item address PROTECT errors reported by Tomas Kalibera's 'maacheck' tool (https://stat.ethz.ch/pipermail/bioc-devel/2017-April/010771.html)
+      \item fixed class retention in 'colorLabels()', 'colormap()', 'rgbImage()', 'stackObjects()', 'tile() and untile()'
+    }
+  }
+}
+
 \section{Changes in version 4.16.0}{
   \subsection{SIGNIFICANT USER-VISIBLE CHANGES}{
     \itemize{

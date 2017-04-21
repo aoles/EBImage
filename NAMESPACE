@@ -88,6 +88,3 @@ exportMethods(normalize, combine)
 importFrom("methods", "Math2")
 exportMethods(Math2)
 exportMethods(log)
-
-## defunct
-export(erodeGreyScale, dilateGreyScale, openingGreyScale, closingGreyScale, whiteTopHatGreyScale, blackTopHatGreyScale, selfcomplementaryTopHatGreyScale)
