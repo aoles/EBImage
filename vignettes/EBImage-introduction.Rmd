@@ -108,7 +108,7 @@ display(imgcol)
 or images containing several frames. If an image consists of multiple frames, they can be displayed all at once in a grid
 arrangement by specifying the function argument `all = TRUE`,
 
-```{r readImageMulti-pre, echo=FALSE}
+```{r readImageMulti-pre, include=FALSE}
 nuc = readImage(system.file("images", "nuclei.tif", package="EBImage"))
 ```{r readImageMulti, eval=FALSE}
 nuc = readImage(system.file("images", "nuclei.tif", package="EBImage"))
@@ -684,7 +684,7 @@ We conclude our vignette by applying the functions described before to the task 
 
 We start by loading the images of nuclei and cell bodies. To visualize the cells we overlay these images as the green and the blue channel of a false-color image.
 
-```{r load, fig.width=dim(nuc)[1L]/.dpi, fig.height=dim(nuc)[2L]/.dpi, dpi=.dpi}
+```{r load, fig.height=dim(nuc)[2L]/.dpi, fig.width=dim(nuc)[1L]/.dpi, warning=FALSE, dpi=.dpi}
 nuc = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
 cel = readImage(system.file('images', 'cells.tif', package='EBImage'))
 
