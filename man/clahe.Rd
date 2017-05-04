@@ -9,7 +9,7 @@
 }
 
 \usage{
-clahe(x, nx = 8, ny = 8, bins = 256, limit = 2, keep.range = FALSE) 
+clahe(x, nx = 8, ny = nx, bins = 256, limit = 2, keep.range = FALSE) 
 }
 
 \arguments{
@@ -35,14 +35,22 @@ clahe(x, nx = 8, ny = 8, bins = 256, limit = 2, keep.range = FALSE)
   However, AHE has a tendency to overamplify noise in relatively homogeneous 
   regions of an image. Contrast limited adaptive histogram equalization (CLAHE) prevents this by limiting the amplification.
   
-  The function uses the implementation by Karel Zuiderveld [1].
+  The function is based on the implementation by Karel Zuiderveld [1].
   This implementation assumes that the X- and Y image dimensions are an integer
   multiple of the X- and Y sizes of the contextual regions.
   The input image \code{x} should contain pixel values in the range from 0 to 1, 
   inclusive; values lower than 0 or higher than 1 are clipped before applying 
-  the filter. Internal processing is performed using 8-bit precision.
+  the filter. Internal processing is performed in 16-bit precision.
   If the image contains multiple channels or frames, 
   the filter is applied to each one of them separately.
+}
+
+\note{
+  The interpolation step of the original implementation by Karel Zuiderveld [1] 
+  was modified to use double precision arithmetic in order to make the filter 
+  rotationally invariant for even-sized contextual regions, and the result is 
+  properly rounded rather than truncated towards 0 in order to avoid a 
+  systematic shift of pixel values.
 }
 
 \seealso{
