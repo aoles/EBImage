@@ -14,6 +14,8 @@ SEXP clahe (SEXP x, SEXP _uiNrX, SEXP _uiNrY, SEXP _uiNrBins, SEXP _fCliplimit, 
   kz_pixel_t min = 0, max = uiNR_OF_GREY-1;
   kz_pixel_t *img;
   
+  double maxPixelValue = uiNR_OF_GREY-1;
+  
   PROTECT( res = allocVector(REALSXP, XLENGTH(x)) );
   DUPLICATE_ATTRIB(res, x);
   
@@ -47,7 +49,7 @@ SEXP clahe (SEXP x, SEXP _uiNrX, SEXP _uiNrY, SEXP _uiNrBins, SEXP _fCliplimit, 
       if (el < 0.0) el = 0;
       else if (el > 1.0) el = 1.0;
       // convert to int
-      kz_pixel_t nel = (kz_pixel_t) round(el * (uiNR_OF_GREY-1));
+      kz_pixel_t nel = (kz_pixel_t) round(el * maxPixelValue);
       
       if (keepRange) {
         if (nel < min) min = nel;
@@ -90,7 +92,7 @@ SEXP clahe (SEXP x, SEXP _uiNrX, SEXP _uiNrY, SEXP _uiNrBins, SEXP _fCliplimit, 
     
     // convert back to [0:1] range
     for (i = 0; i < nx*ny; i++) {
-      tgt[i] = (double) img[i] / (double) (uiNR_OF_GREY-1);
+      tgt[i] = (double) img[i] / maxPixelValue;
     }
   }
   
@@ -128,19 +130,6 @@ SEXP clahe (SEXP x, SEXP _uiNrX, SEXP _uiNrY, SEXP _uiNrBins, SEXP _fCliplimit, 
  *	     Utrecht, The Netherlands (karel@cv.ruu.nl)
  */
 
-#ifdef BYTE_IMAGE
-typedef unsigned char kz_pixel_t;	 /* for 8 bit-per-pixel images */
-#define uiNR_OF_GREY (256)
-#else
-typedef unsigned short kz_pixel_t;	 /* for 12 bit-per-pixel images (default) */
-# define uiNR_OF_GREY (4096)
-#endif
-
-/******** Prototype of CLAHE function. Put this in a separate include file. *****/
-int CLAHE(kz_pixel_t* pImage, unsigned int uiXRes, unsigned int uiYRes, kz_pixel_t Min,
-	  kz_pixel_t Max, unsigned int uiNrX, unsigned int uiNrY,
-	  unsigned int uiNrBins, float fCliplimit);
-
 /*********************** Local prototypes ************************/
 static void ClipHistogram (unsigned long*, unsigned int, unsigned long);
 static void MakeHistogram (kz_pixel_t*, unsigned int, unsigned int, unsigned int,
@@ -154,8 +143,8 @@ static void Interpolate (kz_pixel_t*, int, unsigned long*, unsigned long*,
 /**************	 Start of actual code **************/
 #include <stdlib.h>			 /* To get prototypes of malloc() and free() */
 
-const unsigned int uiMAX_REG_X = 16;	  /* max. # contextual regions in x-direction */
-const unsigned int uiMAX_REG_Y = 16;	  /* max. # contextual regions in y-direction */
+const unsigned int uiMAX_REG_X = 256;	  /* max. # contextual regions in x-direction */
+const unsigned int uiMAX_REG_Y = 256;	  /* max. # contextual regions in y-direction */
 
 
 
@@ -227,7 +216,7 @@ int CLAHE (kz_pixel_t* pImage, unsigned int uiXRes, unsigned int uiYRes,
 	}
 	else {
 	    if (uiY == uiNrY) {				  /* special case: bottom row */
-		uiSubY = uiYSize >> 1;	uiYU = uiNrY-1;	 uiYB = uiYU;
+		uiSubY = uiYSize+1 >> 1;	uiYU = uiNrY-1;	 uiYB = uiYU;
 	    }
 	    else {					  /* default values */
 		uiSubY = uiYSize; uiYU = uiY - 1; uiYB = uiYU + 1;
@@ -239,7 +228,7 @@ int CLAHE (kz_pixel_t* pImage, unsigned int uiXRes, unsigned int uiYRes,
 	    }
 	    else {
 		if (uiX == uiNrX) {			  /* special case: right column */
-		    uiSubX = uiXSize >> 1;  uiXL = uiNrX - 1; uiXR = uiXL;
+		    uiSubX = uiXSize+1 >> 1;  uiXL = uiNrX - 1; uiXR = uiXL;
 		}
 		else {					  /* default values */
 		    uiSubX = uiXSize; uiXL = uiX - 1; uiXR = uiXL + 1;
@@ -372,37 +361,31 @@ void Interpolate (kz_pixel_t * pImage, int uiXRes, unsigned long * pulMapLU,
  * between four different mappings in order to eliminate boundary artifacts.
  * It uses a division; since division is often an expensive operation, I added code to
  * perform a logical shift instead when feasible.
+ *
+ * modification by Andrzej Oleś
+ * Use double arithmetic and stratify interpolation between odd and even region
+ * sizes in order to make the filter rotationally invariant. Use proper rounding to 
+ * avoid systematic shift by truncation towards 0.
  */
 {
-    const unsigned int uiIncr = uiXRes-uiXSize; /* Pointer increment after processing row */
-    kz_pixel_t GreyValue; unsigned int uiNum = uiXSize*uiYSize; /* Normalization factor */
-
-    unsigned int uiXCoef, uiYCoef, uiXInvCoef, uiYInvCoef, uiShift = 0;
-
-    if (uiNum & (uiNum - 1))   /* If uiNum is not a power of two, use division */
-    for (uiYCoef = 0, uiYInvCoef = uiYSize; uiYCoef < uiYSize;
-	 uiYCoef++, uiYInvCoef--,pImage+=uiIncr) {
-	for (uiXCoef = 0, uiXInvCoef = uiXSize; uiXCoef < uiXSize;
-	     uiXCoef++, uiXInvCoef--) {
-	    GreyValue = pLUT[*pImage];		   /* get histogram bin value */
-	    *pImage++ = (kz_pixel_t ) ((uiYInvCoef * (uiXInvCoef*pulMapLU[GreyValue]
-				      + uiXCoef * pulMapRU[GreyValue])
-				+ uiYCoef * (uiXInvCoef * pulMapLB[GreyValue]
-				      + uiXCoef * pulMapRB[GreyValue])) / uiNum);
-	}
+    const unsigned int uiIncr = uiXRes-uiXSize;
+    kz_pixel_t GreyValue; 
+    
+    double dNum = uiXSize*uiYSize;
+    double dXCoef, dYCoef, dXInvCoef, dYInvCoef;
+    double dXCoef0 = (uiXSize % 2) ? 0.0 : 0.5;
+    double dYCoef0 = (uiYSize % 2) ? 0.0 : 0.5;
+    
+    for (dYCoef = dYCoef0, dYInvCoef = uiYSize - dYCoef;
+         dYCoef < uiYSize;
+         dYCoef++, dYInvCoef--,pImage+=uiIncr) {
+        for (dXCoef = dXCoef0, dXInvCoef = uiXSize - dXCoef;
+             dXCoef < uiXSize;
+             dXCoef++, dXInvCoef--) {
+            GreyValue = pLUT[*pImage];
+            *pImage++ = (kz_pixel_t ) round((dYInvCoef * (dXInvCoef*pulMapLU[GreyValue] + dXCoef * pulMapRU[GreyValue])
+                                                 + dYCoef * (dXInvCoef * pulMapLB[GreyValue] + dXCoef * pulMapRB[GreyValue])) / dNum);
+        }
     }
-    else {			   /* avoid the division and use a right shift instead */
-	while (uiNum >>= 1) uiShift++;		   /* Calculate 2log of uiNum */
-	for (uiYCoef = 0, uiYInvCoef = uiYSize; uiYCoef < uiYSize;
-	     uiYCoef++, uiYInvCoef--,pImage+=uiIncr) {
-	     for (uiXCoef = 0, uiXInvCoef = uiXSize; uiXCoef < uiXSize;
-	       uiXCoef++, uiXInvCoef--) {
-	       GreyValue = pLUT[*pImage];	  /* get histogram bin value */
-	       *pImage++ = (kz_pixel_t)((uiYInvCoef* (uiXInvCoef * pulMapLU[GreyValue]
-				      + uiXCoef * pulMapRU[GreyValue])
-				+ uiYCoef * (uiXInvCoef * pulMapLB[GreyValue]
-				      + uiXCoef * pulMapRB[GreyValue])) >> uiShift);
-	    }
-	}
-    }
+    
 }

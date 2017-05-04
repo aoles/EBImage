@@ -9,15 +9,13 @@ extern "C" {
 #endif
 
 SEXP clahe (SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-  
-#define BYTE_IMAGE
 
 #ifdef BYTE_IMAGE
 typedef unsigned char kz_pixel_t;	 /* for 8 bit-per-pixel images */
 #define uiNR_OF_GREY (256)
 #else
-typedef unsigned short kz_pixel_t;	 /* for 12 bit-per-pixel images (default) */
-# define uiNR_OF_GREY (4096)
+typedef unsigned short kz_pixel_t;	 /* for 16 bit-per-pixel images (default) */
+# define uiNR_OF_GREY (65536)
 #endif
 
 /******** Prototype of CLAHE function. Put this in a separate include file. *****/
