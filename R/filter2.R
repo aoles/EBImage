@@ -31,10 +31,15 @@ filter2 = function(x, filter, boundary = c("circular", "replicate")) {
   df = dim(filter)
   dnames = dimnames(x)
   
-  if (any(df%%2==0)) stop("dimensions of 'filter' matrix must be odd")
-  if (any(dx[1:2]<df)) stop("dimensions of 'x' must be bigger than 'filter'")
+  ## do not enforce odd filter dimensions in the special case when filter size
+  ## equals image size
+  if ( any(dx[1:2]!=df) || boundary!="circular" ) {
+    if (any(df%%2==0)) stop("dimensions of 'filter' matrix must be odd")
+    if (any(dx[1:2]<df)) stop("'filter' dimensions cannot exceed dimensions of 'x'")
+  }
   
   cf = df%/%2
+  of = df%%2
   
   res = x
   
@@ -91,8 +96,8 @@ filter2 = function(x, filter, boundary = c("circular", "replicate")) {
   ## create fft filter matrix
   wf = matrix(0.0, nrow=dx[1L], ncol=dx[2L])
   
-  wf[c(if (cf[1L]>0L) (dx[1L]-cf[1L]+1L):dx[1L] else NULL, 1L:(cf[1L]+1L)), 
-     c(if (cf[2L]>0L) (dx[2L]-cf[2L]+1L):dx[2L] else NULL, 1L:(cf[2L]+1L))] = filter
+  wf[c(if (cf[1L]>0L) (dx[1L]-cf[1L]+1L):dx[1L] else NULL, 1L:(cf[1L]+of[1L])), 
+     c(if (cf[2L]>0L) (dx[2L]-cf[2L]+1L):dx[2L] else NULL, 1L:(cf[2L]+of[2L]))] = filter
   
   wf = fftw2d(wf)
   
