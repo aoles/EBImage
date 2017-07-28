@@ -1,0 +1,96 @@
+.displayWidget {
+ margin: 0;
+ padding: 0;
+ border: 0;
+ background-color: #dddddd;
+ overflow: hidden;
+}
+.ebimage {
+ display: block;
+ margin: 0;
+ padding: 0;
+ border: 0;
+ overflow: hidden;
+}
+.ebimage-toolbar {
+ overflow: inherit;
+ min-width: 128px;
+}
+.ebimage-buttons-nav, .ebimage-buttons-zoom {
+ float: left;
+ width: 50%;
+ min-width: 128px;
+}
+.ebimage-buttons-zoom {
+ text-align: right;
+ margin-right: -1px;
+}
+.ebimage-button {
+ font-size: 20px;
+ font-family: Arial,sans-serif;
+ width: 32px;
+ height: 32px;
+ line-height: 100%;
+ vertical-align: top;
+}
+.btn-org {
+ font-size: 14px;
+}
+.ebimage-canvas {
+ position: relative;
+ z-index: 1;
+ background-color: #222222;
+}
+.ebimage-image {
+ max-width: none;
+ position: absolute;
+ z-index: 2;
+ cursor: crosshair;
+ image-rendering:optimizeSpeed;             /* Legal fallback                 */
+ image-rendering:-moz-crisp-edges;          /* Firefox                        */
+ image-rendering:-o-crisp-edges;            /* Opera                          */
+ image-rendering:-webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+ image-rendering:optimize-contrast;         /* CSS3 Proposed                  */
+ -ms-interpolation-mode:nearest-neighbor;   /* IE8+                           */
+}
+.ebimage-status {
+ font-size: 14px;
+ font-family: "Lucida Console", Monaco, monospace;
+ margin-right: 10px;
+ padding: 1px;
+ float: left;
+}
+.ebimage-help {
+ position: relative;
+ margin: auto;
+ top: 50px;
+ width: 360px;
+ border-radius: 10px;
+ overflow: auto;
+ border: 1px solid #eeeeee;
+ z-index: 3;
+ display: none;
+}
+.ebimage-help-key {
+ font-family: "Lucida Console", Monaco, monospace;
+ font-weight: bold;
+}
+.ebimage-help-topic {
+ font-size: 14px;
+ font-weight: bold;
+ padding-top: 5px;
+}
+.ebimage-help-close {
+ text-align: center;
+ font-weight: bold;
+ padding: 5px;
+}
+.ebimage-help-table {
+ background-color: white;
+ opacity: 0.8;
+ border-radius: 8px;
+ padding-left: 5px;
+ padding-right: 5px;
+ font-size: 12px;
+ font-family: Tahoma, Geneva, sans-serif;
+}

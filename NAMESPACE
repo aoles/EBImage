@@ -12,6 +12,9 @@ importFrom("jpeg", "readJPEG", "writeJPEG")
 importFrom("png", "readPNG", "writePNG")
 importFrom("fftwtools", "fftw2d")
 importFrom("utils", "browseURL")
+importFrom("RCurl", "base64Encode")
+importFrom("htmltools", "htmlDependency")
+importFrom("htmlwidgets", "createWidget", "sizingPolicy")
 
 ## classes
 exportClasses(Image)
@@ -31,8 +34,13 @@ S3method(as.Image, default)
 ## image IO, display
 exportMethods(show, image)
 export(readImage, writeImage)
+
+## image display
 export(display)
 S3method(plot, Image)
+
+# shiny bindings
+export(displayOutput, renderDisplay)
 
 ## spatial transform
 export(resize, rotate)

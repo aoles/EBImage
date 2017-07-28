@@ -1,5 +1,5 @@
 
-R version 3.4.0 alpha (2017-04-04 r72488)
+R version 3.4.1 (2017-06-30) -- "Single Candle"
 Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -115,7 +115,7 @@ Type 'q()' to quit R.
 +   z <- check("colorMode<-", x, Grayscale, suppressWarnings=TRUE)
 +   y <- check("numberOfFrames", x, type="render")
 +   z <- if ( y==1L ) check("getFrames", x, 1L, "render") else check("getFrames", x)
-+   z <- check("display", x, method = "browser", browser = "false")
++   z <- check("display", x, method = "browser", tempDir = file.path(dirname(tempdir()), "EBImage_tmp"))
 +   if ( y>2L ) {
 +     z <- check("display", x, method = "raster", all = TRUE)
 +     z <- check("image", x, i = 3L)
@@ -262,7 +262,7 @@ checking 'as.raster' .......................... PASS (1675cda1d5c380fa) NA
 checking 'colorMode<-' ........................ PASS (bb3d006dd4423285) -0.1
 checking 'numberOfFrames' ..................... PASS (96180b4a6b132e65) 0.9
 checking 'getFrames' .......................... PASS (d6919177c682b8b7) 14ff3acc3c64b912
-checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
+checking 'display' ............................ PASS (8c4f07b8386609ca) 9a746e3b1818a41e
 checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
 checking 'image' .............................. PASS (57f54e3531a18f4e) -0.1
 checking 'drawCircle' ......................... PASS (f78ee95d7e176d93) 447.9
@@ -339,7 +339,7 @@ checking 'as.raster' .......................... PASS (f789919d8c93fb15) NA
 checking 'colorMode<-' ........................ PASS (fd2903042f6577db) 324.9
 checking 'numberOfFrames' ..................... PASS (96180b4a6b132e65) 0.9
 checking 'getFrames' .......................... PASS (5fc2af241f80dfe3) 792ca128c76659ed
-checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
+checking 'display' ............................ PASS (19741a401daf92e2) e4e805547bbe7024
 checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
 checking 'image' .............................. PASS (57f54e3531a18f4e) -0.1
 checking 'drawCircle' ......................... PASS (545d29ae11f62e79) 324.9
@@ -367,7 +367,7 @@ checking 'computeFeatures' .................... PASS (6dc4c63dde7e7828) 32d95b14
 checking 'ocontour' ........................... PASS (2663ed016907f460) 2cd2b9ad99f98fd3
 checking 'localCurvature' ..................... PASS (80236128c43c5c64) aa70763bde359b48
 checking 'normalize' .......................... PASS (545d29ae11f62e79) 324.9
-checking 'gblur' .............................. PASS (c551b7f0f07ddbb1) NA
+checking 'gblur' .............................. PASS (19cc14ba61b7caea) NA
 checking 'filter2' ............................ PASS (a98d049f987b512a) 8124.9
 checking 'medianFilter' ....................... PASS (545d29ae11f62e79) 324.9
 checking 'equalize' ........................... PASS (fd2903042f6577db) 324.9
@@ -419,7 +419,7 @@ checking 'as.raster' .......................... PASS (92e268a98a202d0d) NA
 checking 'colorMode<-' ........................ PASS (2f347dbc7d4df203) NA
 checking 'numberOfFrames' ..................... PASS (96180b4a6b132e65) 0.9
 checking 'getFrames' .......................... PASS (c8a1bed0f342ba9c) f9df249b9d461561
-checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
+checking 'display' ............................ PASS (e5abc9317013ef0f) 4597ff5701547c38
 checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
 checking 'image' .............................. PASS (57f54e3531a18f4e) -0.1
 checking 'drawCircle' ......................... PASS (d3ac30a887c990f0) 1607165
@@ -499,7 +499,7 @@ checking 'as.raster' .......................... PASS (b2474ac70f11c65b) NA
 checking 'colorMode<-' ........................ PASS (659e2fc3253b48a5) 765760.9
 checking 'numberOfFrames' ..................... PASS (96180b4a6b132e65) 0.9
 checking 'getFrames' .......................... PASS (0db71a429380e045) 2ce69e3965ee85bb
-checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
+checking 'display' ............................ PASS (e02c3fc0d11fe3dd) ece292adeae37a84
 checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
 checking 'image' .............................. PASS (57f54e3531a18f4e) -0.1
 checking 'drawCircle' ......................... PASS (db43b8c94523e893) 782100.7
@@ -578,7 +578,7 @@ checking 'as.raster' .......................... PASS (9f57220e155de221) NA
 checking 'colorMode<-' ........................ PASS (908b90694e179a06) 2036151
 checking 'numberOfFrames' ..................... PASS (96180b4a6b132e65) 0.9
 checking 'getFrames' .......................... PASS (1d27d730987b7a26) 8e44d4ba87d4aa02
-checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
+checking 'display' ............................ PASS (0a11225efa5072ae) df8baf2e444e61aa
 checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
 checking 'image' .............................. PASS (57f54e3531a18f4e) -0.1
 checking 'drawCircle' ......................... PASS (7dca62c4ac89e623) 2049936
@@ -659,7 +659,7 @@ checking 'as.raster' .......................... PASS (35debdd5bd091cf6) NA
 checking 'colorMode<-' ........................ PASS (45775cc98ccde7d0) 1055560
 checking 'numberOfFrames' ..................... PASS (0cd27cfa5ab0714e) 1.9
 checking 'getFrames' .......................... PASS (8c50f91fce805fce) df388a91608fa45d
-checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
+checking 'display' ............................ PASS (a69f9d95f70d6b4f) 2ed798e15d730f30
 checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
 checking 'image' .............................. PASS (57f54e3531a18f4e) -0.1
 checking 'drawCircle' ......................... PASS (a54d00e6ec30cdaa) 1656514
@@ -739,7 +739,7 @@ checking 'as.raster' .......................... PASS (b47cd18dd737d179) NA
 checking 'colorMode<-' ........................ PASS (739b8cc774a94061) 2354709
 checking 'numberOfFrames' ..................... PASS (0cd27cfa5ab0714e) 1.9
 checking 'getFrames' .......................... PASS (dfada18bf7486f49) 6bccd3af078885b1
-checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
+checking 'display' ............................ PASS (713161e915733541) bcf32094ce1d3dd4
 checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
 checking 'image' .............................. PASS (57f54e3531a18f4e) -0.1
 checking 'drawCircle' ......................... PASS (516ff89688aa090a) 2650006
@@ -819,7 +819,7 @@ checking 'as.raster' .......................... PASS (f7837c7682313ed7) NA
 checking 'colorMode<-' ........................ PASS (ea218ca35d898b4f) 2233136
 checking 'numberOfFrames' ..................... PASS (ce8815ddd92a2bbb) 5.9
 checking 'getFrames' .......................... PASS (e193a8c072f9729f) feb32c3d20c02193
-checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
+checking 'display' ............................ PASS (c99fb2dbf3f4f099) 8222a6379bd22cd5
 checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
 checking 'image' .............................. PASS (57f54e3531a18f4e) -0.1
 checking 'drawCircle' ......................... PASS (2eeddc22da537d19) 2502013
@@ -899,7 +899,7 @@ checking 'as.raster' .......................... PASS (f7837c7682313ed7) NA
 checking 'colorMode<-' ........................ PASS (2cd1b3ca941d0306) 2233136
 checking 'numberOfFrames' ..................... PASS (ce8815ddd92a2bbb) 5.9
 checking 'getFrames' .......................... PASS (57ddf8e1c5653fa1) 578ceb264bf8c00f
-checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
+checking 'display' ............................ PASS (c99fb2dbf3f4f099) 8222a6379bd22cd5
 checking 'display' ............................ PASS (57f54e3531a18f4e) -0.1
 checking 'image' .............................. PASS (57f54e3531a18f4e) -0.1
 checking 'drawCircle' ......................... PASS (2a6138d3f6c7cf2b) 2502013

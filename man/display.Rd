@@ -20,7 +20,7 @@ display(x, method, ...)
 \arguments{
   \item{x}{an \code{Image} object or an array.}
   \item{method}{the way of displaying images. Defaults to \code{"browser"} when R is used interactively, and to \code{"raster"} otherwise. The default behavior can be overridden by setting \code{options("EBImage.display")}. See Details.}
-  \item{\dots}{arguments to be passed to display functions; for details see the sections on individual display methods.}
+  \item{\dots}{arguments to be passed to the specialized display functions; for details see the sections on individual display methods.}
 }
 
 \details{
@@ -30,9 +30,13 @@ The default \code{method} used for displaying images depends on whether called f
 }
 
 \section{"browser" method}{
-The \code{"browser"} method runs an interactive JavaScript image viewer in the default web browser. Multiple windows or tabs can be opened this way. A list of available features along with corresponding mouse and keyboard actions is shown by pressing 'h'. This method takes the following additional argument.
+The \code{"browser"} method runs an interactive JavaScript image viewer. A list of available features along with corresponding mouse and keyboard actions is shown by pressing 'h'. This method takes the following additional arguments.
 \describe{
-  \item{\code{title}}{a character string used as window title. Defaults to object name if not provided.}
+  \item{\code{embed}}{logical(1), include images in the document as data URIs. Defaults to \code{TRUE} in non-interactive context (e.g. static R Markdown documents), otherwise to \code{FALSE}.}
+  
+  \item{\code{tempDir}}{character(1), file path for storing any temporary image files. Defaults to \code{tempfile("")}}
+  
+  \item{\code{\dots}}{arguments passed to \code{\link{createWidget}}, such as fixed \code{width} and \code{height} (in CSS units), \code{elementId}, or \code{preRenderHook}.}
   }
 }
 
@@ -54,20 +58,18 @@ This method provides to following additional arguments to \code{display}.
   }
 }
 
-\note{For the \code{"browser"} method a compatible web browser with JavaScript enabled is required (e.g. Mozilla Firefox).}
-
 \author{
-  Andrzej Oles, \email{andrzej.oles@embl.de}, 2012-2016
+  Andrzej Oles, \email{andrzej.oles@embl.de}, 2012-2017
 }
 
-\references{
-  \href{http://www.firefox.com}{Mozilla Firefox}
+\seealso{
+  \code{\link{display-shiny}}
 }
 
 \examples{
 ## Display a single image
 x = readImage(system.file("images", "sample-color.png", package="EBImage"))[257:768,,]
-display(x, title="Sample")
+display(x)
 
 ## Display a thresholded sequence ...
 y = readImage(system.file("images", "sample.png", package="EBImage"))[366:749, 58:441]
@@ -76,8 +78,8 @@ z = lapply(seq(from=0.5, to=5, length=6),
 )
 z = combine(z)
 
-## ... using the browser viewer ...
-display(z, title="Blurred images")
+## ... using the interactive viewer ...
+display(z)
 
 ## ... or using R's build-in raster device
 display(z, method = "raster", all = TRUE)
@@ -85,7 +87,7 @@ display(z, method = "raster", all = TRUE)
 ## Display the last frame 
 display(z, method = "raster", frame = numberOfFrames(z, type = "render"))
 
-## Customizing grid appearance
+## Customize grid appearance
 display(z, method = "raster", all = TRUE,
         nx = 2, spacing = 0.05, margin = 20, bg = "black")
 }

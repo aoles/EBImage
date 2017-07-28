@@ -96,7 +96,7 @@ testEBImageFunctions <- function(x) {
   z <- check("colorMode<-", x, Grayscale, suppressWarnings=TRUE)
   y <- check("numberOfFrames", x, type="render")
   z <- if ( y==1L ) check("getFrames", x, 1L, "render") else check("getFrames", x)
-  z <- check("display", x, method = "browser", browser = "false")
+  z <- check("display", x, method = "browser", tempDir = file.path(dirname(tempdir()), "EBImage_tmp"))
   if ( y>2L ) {
     z <- check("display", x, method = "raster", all = TRUE)
     z <- check("image", x, i = 3L)

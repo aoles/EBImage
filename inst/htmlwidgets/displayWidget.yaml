@@ -1,0 +1,6 @@
+dependencies:
+  - name: viewer
+    version: 1.0.0
+    src: htmlwidgets/lib/viewer
+    script: viewer.js
+    stylesheet: display.css

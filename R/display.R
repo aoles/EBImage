@@ -5,12 +5,11 @@ display = function(x, method, ...) {
   if ( missing(method) )
     method = getOption("EBImage.display", if ( interactive() ) "browser" else "raster")
   method = match.arg(method, c("browser", "raster"))
-
+  
   switch(method,
-    browser = displayInBrowser(x, ...),
-    raster  = displayRaster(x, ...) ) 
-
-  invisible()
+         browser = displayWidget(x, ...),
+         raster  = displayRaster(x, ...)
+  ) 
 }
 
 ## displays an image using R graphics
@@ -118,6 +117,8 @@ displayRaster = function(image, frame, all = FALSE, drawGrid = isTRUE(spacing==0
     abline(h = seq_len(nrow-1)*(ydim + ysep) - ysep/2 + .5,
            v = seq_len(ncol-1)*(xdim + xsep) - xsep/2 + .5)
   }
+  
+  invisible()
 }
 
 ## displays an image using JavaScript
@@ -175,3 +176,89 @@ displayInBrowser = function(x, title, ...) {
 plot.Image = function(x, ...) displayRaster(x, ...)
 
 as.nativeRaster = function(x) .Call(C_nativeRaster, castImage(x))
+
+## Display Widget
+
+displayWidget <- function(x, embed = !interactive(), tempDir = tempfile(""), ...) {
+  
+  ## get image parameters
+  d = dim(x)
+  if ( length(d)==2L ) d = c(d, 1L)
+  
+  ## fill missing channels
+  if ( isTRUE(colorMode(x) == Color && d[3L] < 3L) ) {
+    fd = d
+    fd[3L] = 3L - d[3L]
+    imageData(x) = abind(x, Image(0, fd), along = 3L)
+  }
+  
+  nf = numberOfFrames(x, type='render')
+  colormode = colorMode(x)
+  
+  x = clipImage(x) ## clip the image and change storage mode to double
+  x = transpose(x)
+  
+  frames = seq_len(nf)
+  dependencies = NULL
+  
+  if ( isTRUE(embed) ) {
+    
+    data <- sapply(frames, function(i) base64Encode(writePNG(getFrame(x, i, 'render'))))
+    data <- sprintf("data:image/png;base64,%s", data)
+    
+  } else {
+    if ( !dir.exists(tempDir) && !dir.create(tempDir, recursive=TRUE) )
+        stop("Error creating temporary directory.")
+    
+    files = file.path(tempDir, sprintf("frame%.3d.png", frames, ".png"))
+    
+    ## store image frames into individual files
+    for (i in frames)
+      writePNG(getFrame(x, i, 'render'), files[i])
+    
+    dependencies = htmlDependency(
+      name = basename(tempDir),
+      version = "0",
+      src = list(tempDir)
+    )
+    
+    filePath = file.path(sprintf("%s-%s", dependencies$name, dependencies$version), basename(files))
+    
+    ## set libdir unless run in shiny
+
+    if ( !isNamespaceLoaded("shiny") || is.null(shiny::getDefaultReactiveDomain()))
+      filePath = file.path("lib", filePath)
+    
+    data = filePath
+  }
+  
+  # widget options
+  opts = list(
+    data = data,
+    width = d[1L],
+    height = d[2L]
+  )
+  
+  # create widget
+  createWidget(
+    name = 'displayWidget',
+    package = 'EBImage',
+    x = opts,
+    sizingPolicy = sizingPolicy(padding = 0, browser.fill = TRUE),
+    dependencies = dependencies,
+    ...
+  )
+  
+}
+
+## Shiny bindings for displayWidget
+
+displayOutput <- function(outputId, width = '100%', height = '500px'){
+  htmlwidgets::shinyWidgetOutput(outputId, 'displayWidget', width, height, package = 'EBImage')
+}
+
+renderDisplay <- function(expr, env = parent.frame(), quoted = FALSE) {
+  if (!quoted) { expr <- substitute(expr) } # force quoted
+  htmlwidgets::shinyRenderWidget(expr, displayOutput, env, quoted = TRUE)
+}
+
