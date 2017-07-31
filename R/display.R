@@ -3,7 +3,7 @@ display = function(x, method, ...) {
   validImage(x)
   
   if ( missing(method) )
-    method = getOption("EBImage.display", if ( interactive() ) "browser" else "raster")
+    method = getOption("EBImage.display", if ( interactiveMode() ) "browser" else "raster")
   method = match.arg(method, c("browser", "raster"))
   
   switch(method,
@@ -11,6 +11,10 @@ display = function(x, method, ...) {
          raster  = displayRaster(x, ...)
   ) 
 }
+
+## test whether run interactively and not in `rmarkdown::render`
+## https://github.com/yihui/knitr/issues/926#issuecomment-68503962
+interactiveMode = function() interactive() && !isTRUE(getOption('knitr.in.progress', FALSE))
 
 ## displays an image using R graphics
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -179,8 +183,7 @@ as.nativeRaster = function(x) .Call(C_nativeRaster, castImage(x))
 
 ## Display Widget
 
-displayWidget <- function(x, embed = !interactive(), tempDir = tempfile(""), ...) {
-  
+displayWidget <- function(x, embed = !interactiveMode(), tempDir = tempfile(""), all, ...) {
   ## get image parameters
   d = dim(x)
   if ( length(d)==2L ) d = c(d, 1L)

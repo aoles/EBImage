@@ -64,8 +64,8 @@ img = readImage(f)
 
 The image which we just loaded can be visualized by the function `display`.
 
-```{r display, fig.width=dim(img)[1L]/.dpi, fig.height=dim(img)[2L]/.dpi, dpi=.dpi/2}
-display(img)
+```{r display}
+display(img, method="browser")
 ```
 
 When called from an interactive R session, `display` opens the image in a JavaScript viewer in your web browser. Using the mouse or keyboard shortcuts, you can zoom in and out of the image, pan, and cycle through multiple image frames. Alternatively, the image can be displayed using R's build-in plotting facilities by calling `display` with the argument `method = "raster"`. The image is then drawn on the current device.  This allows to easily combine image data with other plotting functionality, for instance, add text labels.
@@ -710,7 +710,7 @@ Next, we use the segmented nuclei as seeds in the Voronoi segmentation of the cy
 ctmask = opening(cel>0.1, makeBrush(5, shape='disc'))
 cmask = propagate(cel, seeds=nmask, mask=ctmask)
 
-display(ctmask)
+display(ctmask, all=TRUE)
 ```
 
 To visualize our segmentation on the we use `paintObject`.
