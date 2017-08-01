@@ -16,11 +16,20 @@ display = function(x, method, ...) {
 ## https://github.com/yihui/knitr/issues/926#issuecomment-68503962
 interactiveMode = function() interactive() && !isTRUE(getOption('knitr.in.progress', FALSE))
 
+## remove any args to fun
+filterDotsArgs = function(fun, ...) {
+  dotsArgs <- list(...)
+  dotsArgs[which(names(dotsArgs) %in% names(formals(fun)))] <- NULL
+  dotsArgs
+}
+
 ## displays an image using R graphics
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 displayRaster = function(image, frame, all = FALSE, drawGrid = isTRUE(spacing==0),
-                         nx, spacing = 0, margin = 0, interpolate = TRUE,
-                         title, ...) {
+                         nx, spacing = 0, margin = 0, interpolate = TRUE, ...) {
+  ## remove any args to "browser" method
+  dotsArgs <- filterDotsArgs(displayWidget, ...)
+  
   all = isTRUE(all)
   nf = numberOfFrames(image, type="render")
   
@@ -96,7 +105,7 @@ displayRaster = function(image, frame, all = FALSE, drawGrid = isTRUE(spacing==0
   yranm = yran + c(-ymar, ymar)
   
   ## set graphical parameters
-  user <- par(bty="n", mai=c(0,0,0,0), xaxs="i", yaxs="i", xaxt="n", yaxt="n", col = "white", ...)
+  user <- do.call(par, c(list(bty="n", mai=c(0,0,0,0), xaxs="i", yaxs="i", xaxt="n", yaxt="n", col = "white"), dotsArgs))
   on.exit(par(user))
   plot(xranm, yranm, type="n", xlab="", ylab="", asp=1, ylim=rev(yranm))
       
@@ -183,7 +192,10 @@ as.nativeRaster = function(x) .Call(C_nativeRaster, castImage(x))
 
 ## Display Widget
 
-displayWidget <- function(x, embed = !interactiveMode(), tempDir = tempfile(""), all, ...) {
+displayWidget <- function(x, title, embed = !interactiveMode(), tempDir = tempfile(""), ...) {
+  ## remove any args to "raster" method
+  dotsArgs <- filterDotsArgs(displayRaster, ...)
+
   ## get image parameters
   d = dim(x)
   if ( length(d)==2L ) d = c(d, 1L)
@@ -243,15 +255,14 @@ displayWidget <- function(x, embed = !interactiveMode(), tempDir = tempfile(""),
   )
   
   # create widget
-  createWidget(
+  do.call(createWidget, c(list(
     name = 'displayWidget',
     package = 'EBImage',
     x = opts,
     sizingPolicy = sizingPolicy(padding = 0, browser.fill = TRUE),
-    dependencies = dependencies,
-    ...
+    dependencies = dependencies),
+    dotsArgs)
   )
-  
 }
 
 ## Shiny bindings for displayWidget

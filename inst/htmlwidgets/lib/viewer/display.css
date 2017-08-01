@@ -26,15 +26,17 @@
  margin-right: -1px;
 }
 .ebimage-button {
- font-size: 20px;
  font-family: Arial,sans-serif;
+ font-weight: bold;
+ font-size: 16px;
  width: 32px;
  height: 32px;
- line-height: 100%;
+ line-height: 0px;
+ padding: 0;
  vertical-align: top;
 }
 .btn-org {
- font-size: 14px;
+ font-size: 12px;
 }
 .ebimage-canvas {
  position: relative;
