@@ -25,18 +25,26 @@
  text-align: right;
  margin-right: -1px;
 }
+.ebimage-buttons-nav {
+ font-size: 20px;
+}
+.ebimage-buttons-zoom {
+ font-size: 16px;
+}
 .ebimage-button {
  font-family: Arial,sans-serif;
+ font-size: inherit;
  font-weight: bold;
- font-size: 16px;
  width: 32px;
  height: 32px;
- line-height: 0px;
  padding: 0;
  vertical-align: top;
 }
 .btn-org {
  font-size: 12px;
+}
+.btn-fit {
+ line-height: 0px;
 }
 .ebimage-canvas {
  position: relative;

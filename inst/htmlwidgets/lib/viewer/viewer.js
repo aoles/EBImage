@@ -531,10 +531,10 @@ function Viewer(parent){
 		zoombuttons = createElement('div', 'buttons-zoom ebimage', toolbar);
 
 		// create navigation buttons
-		createButton('first','&#171;<br/>&nbsp;','First frame [HOME]/[m] ',viewer.firstFrame, navbuttons);
-		createButton('prev','&lt;','Previous frame [PAGE DOWN]/[<]',viewer.prevFrame, navbuttons);
-		createButton('next','&gt;','Next frame [PAGE UP]/[>]',viewer.nextFrame, navbuttons);
-		createButton('last','&#187;<br/>&nbsp;','Last frame [END]/[?]',viewer.lastFrame, navbuttons);
+		createButton('first','&#x23ee;<br/>&nbsp;','First frame [HOME]/[m] ',viewer.firstFrame, navbuttons);
+		createButton('prev','&#x23f5;','Previous frame [PAGE DOWN]/[<]',viewer.prevFrame, navbuttons);
+		createButton('next','&#x23f4;','Next frame [PAGE UP]/[>]',viewer.nextFrame, navbuttons);
+		createButton('last','&#x23ed;<br/>&nbsp;','Last frame [END]/[?]',viewer.lastFrame, navbuttons);
 
 		// create zoom buttons
 		createButton('in','+','Zoom in [+]/[x]', viewer.zoomIn, zoombuttons);

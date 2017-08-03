@@ -36,6 +36,8 @@ applications and interactive R Markdown documents.
 \examples{
 # Only run this example in interactive R sessions
 if (interactive()) {
+  options(device.ask.default = FALSE)
+
   require("shiny")
   
   ui <- fluidPage(
