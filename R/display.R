@@ -207,13 +207,10 @@ displayWidget <- function(x, title, embed = !interactiveMode(), tempDir = tempfi
     imageData(x) = abind(x, Image(0, fd), along = 3L)
   }
   
-  nf = numberOfFrames(x, type='render')
-  colormode = colorMode(x)
-  
   x = clipImage(x) ## clip the image and change storage mode to double
   x = transpose(x)
   
-  frames = seq_len(nf)
+  frames = seq_len(numberOfFrames(x, type='render'))
   dependencies = NULL
   
   if ( isTRUE(embed) ) {

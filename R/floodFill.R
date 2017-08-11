@@ -17,15 +17,44 @@
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 floodFill = function(x, pt, col, tolerance=0) {
   validImage(x)
-
-  n = numberOfFrames(x, 'total')
-  if ( is.list(pt) ) pt = unlist(pt, use.names=FALSE)
-  pt = as.integer(pt)
-  if ( is.character(col) ) col = as.numeric(col2rgb(col)/255)
-  col = if ( typeof(x)=="double" ) as.double(col) else as.integer(col)
-  if ( any( pt<1L || pt>dim(x)[1:2] ) ) stop("coordinates 'pt' of the starting point(s) must be inside the image boundaries")
-
-  return( .Call(C_floodFill, x, matrix(pt, nrow=n, ncol=2L, byrow=TRUE), matrix(col, nrow=n, ncol=1L), as.numeric(tolerance)))
+  nf = numberOfFrames(x, 'render')
+  nc = numberOfChannels(x)
+  
+  ## make sure that `pt` and `col` are lists of length matching the number of frames
+  if ( is.list(pt) ) {
+    if ( length(pt) != nf ) stop("length of 'pt' must match the number of 'render' frames")
+  } else {
+    pt = rep(list(pt), nf)
+  }
+  if ( is.list(col) ) {
+    if ( length(col) != nf ) stop("length of 'col' must match the number of 'render' frames")
+  } else {
+    col = rep(list(col), nf)
+  }
+  
+  for (i in seq_len(nf) ) {
+    pti = pt[[i]]
+    if ( is.list(pti) )
+      pti = unlist(pti, use.names=FALSE)
+    storage.mode(pti) = "integer"
+    if ( any(pti<1L) || any(pti>dim(x)[1:2]) )
+      stop("coordinates of starting point(s) 'pt' must be inside image boundaries")
+    if ( !is.matrix(pti) || dim(pti)[2L]!=2L )
+      pti = matrix(pti, nrow=length(pti)/2, ncol=2L, byrow=TRUE)
+    np = dim(pti)[1L]
+    pt[[i]] = pti
+    
+    cli = col[[i]]
+    cli = if ( is.character(cli) )
+      unlist(lapply(cli, function(col) rep_len(col2rgb(col, alpha=TRUE)/255, nc)))
+    else 
+      rep(cli, each=nc)
+    storage.mode(cli) = storage.mode(x) 
+    cli = matrix(rep_len(cli, np * nc), nrow=np, ncol=nc, byrow=TRUE)
+    col[[i]] = cli
+  }
+  
+  return( .Call(C_floodFill, x, pt, col, as.numeric(tolerance)))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

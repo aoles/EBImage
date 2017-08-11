@@ -45,12 +45,11 @@ Image = function(data = array(0, dim=c(1,1)), dim, colormode) {
       else
         parseColorMode(colormode)
     
-    if (missing(dim)) {
+    if (missing(dim))
       dim = setdim(data)
       
-      if ( colormode==Color )
-        dim = c(dim[1:2], 3L, dim[-(1:2)])
-    }
+    if ( colormode==Color )
+      dim = c(dim[1:2], 3L, dim[-(1:2)])  
     
     dimnames = dimnames(data)
     data = col2rgb(data)/255
@@ -505,6 +504,10 @@ numberOfFrames = function(y, type = c('total', 'render')) {
     type = match.arg(type)
     type = switch(type, total = 0L, render = 1L)
     .Call(C_numberOfFrames, y, type)
+}
+
+numberOfChannels = function(y, d = dim(y), cm = colorMode(y)) {
+  if ( cm==Grayscale || is.na(d[3L]) ) 1L else d[3L]
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

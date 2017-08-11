@@ -60,7 +60,7 @@ bwlabel(x)
   nbnuclei = apply(z, 3, max)
   cat('Number of nuclei=', paste(nbnuclei, collapse=','),'\n')
 
-  ## recolor nuclei in colors
+  ## paint nuclei in color
   cols = c('black', sample(rainbow(max(z))))
   zrainbow = Image(cols[1+z], dim=dim(z))
   display(zrainbow, title='Cell nuclei (recolored)')

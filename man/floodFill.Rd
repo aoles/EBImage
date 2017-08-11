@@ -15,10 +15,10 @@ floodFill(x, pt, col, tolerance=0)
 \arguments{
   \item{x}{An \code{Image} object or an array.}
 
-  \item{pt}{Coordinates of the start filling point.}
+  \item{pt}{Coordinates of the start filling points provided as a matrix where rows represent points and columns are the x and y cordinates. For image stacks different points for each frame can be specified by providing a list whose length matches the number of 'render' frames.}
 
   \item{col}{Fill color. This argument should be a numeric for Grayscale images
-    and an R color for Color images.}
+    and an R color for Color images. Values are recycled such that their length matches the number of points in `pt`. Can be a list similarly as `pt`.}
 
   \item{tolerance}{Color tolerance used during the fill.}
 }
@@ -41,15 +41,33 @@ floodFill(x, pt, col, tolerance=0)
 
 \examples{
   x = readImage(system.file("images", "shapes.png", package="EBImage"))
+
+  ## fill a shape with 50% shade of gray
   y = floodFill(x, c(67, 146), 0.5)
   display(y)
-
-  y = channel(y, 'rgb')
-  y = floodFill(y, c(48, 78), 'red')
-  y = floodFill(y, c(156, 52), 'orange')	
+  
+  ## fill with color
+  y = toRGB(y)
+  y = floodFill(y, c(48, 78), 'orange')	
   display(y)
-
+  
+  ## fill multiple shapes with different colors
+  y = y[110:512,1:130,]
+  points = rbind(c(50, 50), c(100, 50), c(150, 50))
+  colors = c("red", "green", "blue")
+  y = floodFill(y, points, colors)
+  display(y)
+  
+  ## area fill
   x = readImage(system.file("images", "sample.png", package="EBImage"))
-  y = floodFill(x, c(226, 121), 1, tolerance=0.1)
+  y = floodFill(x, rbind(c(200, 400), c(200, 325)), 1, tolerance=0.1)
+  display(y)
+  
+  ## application to image stacks
+  f = system.file("images", "nuclei.tif", package="EBImage")
+  x = readImage(f)[1:250,1:250,]
+  x = opening(thresh(x, 12, 12), makeBrush(5, shape='disc'))
+  xy = lapply(getFrames(bwlabel(x)), function(x) computeFeatures.moment(x)[,1:2])
+  y = floodFill(toRGB(x), xy, c("red", "green", "blue"))
   display(y)
 }

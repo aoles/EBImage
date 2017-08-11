@@ -24,38 +24,46 @@ template <class T> void _bwlabel(T *, int *, XYPoint);
 
 /* -------------------------------------------------------------------------- */
 SEXP
-floodFill(SEXP x, SEXP point, SEXP col, SEXP tol) {
-  int i, nz, *dim, *pts;
+floodFill(SEXP x, SEXP _pts, SEXP _col, SEXP _tol) {
+  int i, p, c, nf, np, nc, *dim, *pts;
+  double tol = REAL(_tol)[0];
   XYPoint pt;
-  SEXP res;
-  
+  SEXP res, points, colors;
   // check image validity
-  validImage(x,0);
-  nz = getNumberOfFrames(x, 0);
+  validImage(x, 0);
+  nf = getNumberOfFrames(x, 1);
+  nc = getNumberOfChannels(x, COLOR_MODE(x));
   dim = INTEGER(GET_DIM(x));
   XYPoint size(dim[0], dim[1]);
   if (size.x <= 0 || size.y <= 0) error("image must have positive dimensions");
-  if (LENGTH(point) != 2*nz) error("point must have a size of two times the number of frames");
-  if (LENGTH(col) != nz) error("color must have the same size as the number of frames");
+  if (LENGTH(_pts) != nf) error("length of points list must match the number of 'render' frames");
+  if (LENGTH(_col) != nf) error("length of color list must match the number of 'render' frames");
   
   // initialize result
   PROTECT(res = Rf_duplicate(x));
   
-  pts = INTEGER(point);
-  
-  // do the job over images
-  for (i=0; i<nz; i++) {
-    pt.x = pts[i]-1;
-    pt.y = pts[nz+i]-1;
-    
-    switch (TYPEOF(res)) {
-      case LGLSXP:
-      case INTSXP:
-        _floodFill<int>(&(INTEGER(res)[i*size.x*size.y]), size, pt, INTEGER(col)[i], REAL(tol)[0]);
-        break;
-      case REALSXP:
-        _floodFill<double>(&(REAL(res)[i*size.x*size.y]), size, pt, REAL(col)[i], REAL(tol)[0]);
-        break;
+  // iterate over images
+  for (i=0; i<nf; i++) {
+    points = VECTOR_ELT(_pts, i);
+    colors = VECTOR_ELT(_col, i);
+    np = INTEGER(GET_DIM(points))[0];
+    pts = INTEGER(points);
+    // iterate over points
+    for (p=0; p<np; p++) {
+      pt.x = pts[p]-1;
+      pt.y = pts[np+p]-1;
+      // iterate over channels
+      for (c=0; c<nc; c++) {
+        switch (TYPEOF(res)) {
+        case LGLSXP:
+        case INTSXP:
+          _floodFill<int>(&(INTEGER(res)[(i*nc+c)*size.x*size.y]), size, pt, INTEGER(colors)[c*np+p], tol);
+          break;
+        case REALSXP:
+          _floodFill<double>(&(REAL(res)[(i*nc+c)*size.x*size.y]), size, pt, REAL(colors)[c*np+p], tol);
+          break;
+        }
+      }
     }
   }
   
@@ -386,4 +394,3 @@ _fillHullT(T *_m, const XYPoint &srcsize) {
   delete[] canvas;
   delete[] bbox;
 }
-

@@ -646,12 +646,12 @@ display(filled_logo)
 
 ```{r floodFill-logo, fig.width=dim(logo)[1L]/.dpi, fig.height=dim(logo)[2L]/.dpi, dpi=.dpi}
 rgblogo = toRGB(logo)
-rgblogo = floodFill(rgblogo, c(50, 50), "red")
-rgblogo = floodFill(rgblogo, c(100, 50), "green")
-rgblogo = floodFill(rgblogo, c(150, 50), "blue")
+points = rbind(c(50, 50), c(100, 50), c(150, 50))
+colors = c("red", "green", "blue")
+rgblogo = floodFill(rgblogo, points, colors)
 display( rgblogo )
 ```{r floodFill-img, fig.width=dim(img)[1L]/.dpi, fig.height=dim(img)[2L]/.dpi, dpi=.dpi/2}
-display( floodFill(img, c(444, 222), col=0.2, tolerance=0.2) )
+display(floodFill(img, rbind(c(200, 300), c(444, 222)), col=0.2, tolerance=0.2))
 ```
 
 ## Highlighting objects

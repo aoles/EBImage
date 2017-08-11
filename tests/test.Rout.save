@@ -700,7 +700,7 @@ checking 'blackTopHat' ........................ PASS (af7e8fad58a0f587) 202411.9
 checking 'selfComplementaryTopHat' ............ PASS (729954d933215c8d) 2151192
 checking 'distmap' ............................ PASS (8ba0b0fb6770e8a3) 3856630
 checking 'watershed' .......................... PASS (0bd6a31bc6197067) 1443978
-checking 'floodFill' .......................... PASS (45775cc98ccde7d0) 1055560
+checking 'floodFill' .......................... PASS (7a8a06c4be73e522) 2057384
 checking 'fillHull' ........................... PASS (d3904950b8acdb73) 1096352
 checking 'propagate' .......................... PASS (6c610fe4376714f6) 1613920
 checking 'toRGB' .............................. PASS (57b9a77f5a12af4f) 8499672
