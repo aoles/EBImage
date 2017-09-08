@@ -15,34 +15,37 @@
 # LGPL license wording: http://www.gnu.org/licenses/lgpl.html
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-floodFill = function(x, pt, col, tolerance=0) {
+floodFill = function(x, pts, col, tolerance=0) {
   validImage(x)
   nf = numberOfFrames(x, 'render')
   nc = numberOfChannels(x)
   
   ## make sure that `pt` and `col` are lists of length matching the number of frames
-  if ( is.list(pt) ) {
-    if ( length(pt) != nf ) stop("length of 'pt' must match the number of 'render' frames")
-  } else {
-    pt = rep(list(pt), nf)
+  format_as_list = function(x, nf) {
+    if ( is.list(x) )
+      if ( length(x)==nf )
+        return(x)
+      else if ( nf > 1L)
+        stop(sprintf("length of '%s' must match the number of 'render' frames"), deparse(substitute(x)))
+    rep(list(x), nf) 
   }
-  if ( is.list(col) ) {
-    if ( length(col) != nf ) stop("length of 'col' must match the number of 'render' frames")
-  } else {
-    col = rep(list(col), nf)
-  }
+  pts = format_as_list(pts, nf)
+  col = format_as_list(col, nf)
   
   for (i in seq_len(nf) ) {
-    pti = pt[[i]]
+    pti = pts[[i]]
     if ( is.list(pti) )
-      pti = unlist(pti, use.names=FALSE)
+      if ( is.data.frame(pti) ) 
+        pti = as.matrix(pti)
+      else 
+        pti = unlist(pti, use.names=FALSE)
     storage.mode(pti) = "integer"
-    if ( any(pti<1L) || any(pti>dim(x)[1:2]) )
-      stop("coordinates of starting point(s) 'pt' must be inside image boundaries")
     if ( !is.matrix(pti) || dim(pti)[2L]!=2L )
       pti = matrix(pti, nrow=length(pti)/2, ncol=2L, byrow=TRUE)
     np = dim(pti)[1L]
-    pt[[i]] = pti
+    if ( any( pti<1L ) || any( pti>rep(dim(x)[1:2], each=np) ) )
+      stop("coordinates of starting point(s) 'pts' must be inside image boundaries")
+    pts[[i]] = pti
     
     cli = col[[i]]
     cli = if ( is.character(cli) )
@@ -54,7 +57,7 @@ floodFill = function(x, pt, col, tolerance=0) {
     col[[i]] = cli
   }
   
-  return( .Call(C_floodFill, x, pt, col, as.numeric(tolerance)))
+  return( .Call(C_floodFill, x, pts, col, as.numeric(tolerance)))
 }
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

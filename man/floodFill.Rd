@@ -9,16 +9,15 @@
 }
 
 \usage{
-floodFill(x, pt, col, tolerance=0)
+floodFill(x, pts, col, tolerance=0)
 }
 
 \arguments{
   \item{x}{An \code{Image} object or an array.}
 
-  \item{pt}{Coordinates of the start filling points provided as a matrix where rows represent points and columns are the x and y cordinates. For image stacks different points for each frame can be specified by providing a list whose length matches the number of 'render' frames.}
+  \item{pts}{Coordinates of the start filling points given as either of the following: a vector of the form \code{c(x1, y1, x2, y2, ...)}, a list of points, a matrix or data frame where rows represent points and columns are the x and y coordinates. For image stacks different points for each frame can be specified by providing them in a list of length matching the number of 'render' frames.}
 
-  \item{col}{Fill color. This argument should be a numeric for Grayscale images
-    and an R color for Color images. Values are recycled such that their length matches the number of points in `pt`. Can be a list similarly as `pt`.}
+  \item{col}{Fill color. This argument should be a numeric for Grayscale images and an R color for Color images. Values are recycled such that their length matches the number of points in \code{pts}. Can be a list of length matching the number of 'render' frames similarly as \code{pts}.}
 
   \item{tolerance}{Color tolerance used during the fill.}
 }
@@ -30,7 +29,7 @@ floodFill(x, pt, col, tolerance=0)
 
 \details{
   Flood fill is performed using the fast scan line algorithm. Filling
-  starts at \code{pt} and grows in connected areas where the absolute
+  starts at \code{pts} and grows in connected areas where the absolute
   difference of the pixels intensities (or colors) remains below
   \code{tolerance}.
 }
