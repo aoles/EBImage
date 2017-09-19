@@ -25,8 +25,21 @@ function Viewer(parent){
 	var help = null;
 	var buttons = [];
 	var status = [];
-
-
+	
+	var navEnabled = {
+	  first: "<img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2Ij4NCiAgPHBvbHlnb24gcG9pbnRzPSIxNiw0IDksOCAxNiwxMiIgc3R5bGU9ImZpbGw6YmxhY2s7Ii8+DQogIDxwb2x5Z29uIHBvaW50cz0iOSw0IDIsOCA5LDEyIiBzdHlsZT0iZmlsbDpibGFjazsiLz4NCiAgPHBvbHlnb24gcG9pbnRzPSIyLDQgMSw0IDEsMTIgMiwxMiIgc3R5bGU9ImZpbGw6YmxhY2s7Ii8+DQo8L3N2Zz4='>",
+	  prev: "<img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2Ij4NCiAgPHBvbHlnb24gcG9pbnRzPSIxMSw0IDQsOCAxMSwxMiIgc3R5bGU9ImZpbGw6YmxhY2s7Ii8+DQo8L3N2Zz4='>",
+	  next: "<img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2Ij4NCiAgPHBvbHlnb24gcG9pbnRzPSI1LDQgMTIsOCA1LDEyIiBzdHlsZT0iZmlsbDpibGFjazsiLz4NCjwvc3ZnPg=='>",
+	  last: "<img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2Ij4NCiAgPHBvbHlnb24gcG9pbnRzPSIwLDQgNyw4IDAsMTIiIHN0eWxlPSJmaWxsOmJsYWNrOyIvPg0KICA8cG9seWdvbiBwb2ludHM9IjcsNCAxNCw4IDcsMTIiIHN0eWxlPSJmaWxsOmJsYWNrOyIvPg0KICA8cG9seWdvbiBwb2ludHM9IjE0LDQgMTUsNCAxNSwxMiAxNCwxMiIgc3R5bGU9ImZpbGw6YmxhY2s7Ii8+DQo8L3N2Zz4='>"
+	};
+	var navDisabled = {
+	  first:
+	"<img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2Ij4NCiAgPHBvbHlnb24gcG9pbnRzPSIxNiw0IDksOCAxNiwxMiIgc3R5bGU9ImZpbGw6IzgwODA4MDsiLz4NCiAgPHBvbHlnb24gcG9pbnRzPSI5LDQgMiw4IDksMTIiIHN0eWxlPSJmaWxsOiM4MDgwODA7Ii8+DQogIDxwb2x5Z29uIHBvaW50cz0iMiw0IDEsNCAxLDEyIDIsMTIiIHN0eWxlPSJmaWxsOiM4MDgwODA7Ii8+DQo8L3N2Zz4='>",
+	  prev: "<img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2Ij4NCiAgPHBvbHlnb24gcG9pbnRzPSIxMSw0IDQsOCAxMSwxMiIgc3R5bGU9ImZpbGw6IzgwODA4MDsiLz4NCjwvc3ZnPg=='>",
+	  next: "<img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2Ij4NCiAgPHBvbHlnb24gcG9pbnRzPSI1LDQgMTIsOCA1LDEyIiBzdHlsZT0iZmlsbDojODA4MDgwOyIvPg0KPC9zdmc+'>",
+	  last: "<img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2Ij4NCiAgPHBvbHlnb24gcG9pbnRzPSIwLDQgNyw4IDAsMTIiIHN0eWxlPSJmaWxsOiM4MDgwODA7Ii8+DQogIDxwb2x5Z29uIHBvaW50cz0iNyw0IDE0LDggNywxMiIgc3R5bGU9ImZpbGw6IzgwODA4MDsiLz4NCiAgPHBvbHlnb24gcG9pbnRzPSIxNCw0IDE1LDQgMTUsMTIgMTQsMTIiIHN0eWxlPSJmaWxsOiM4MDgwODA7Ii8+DQo8L3N2Zz4='>"
+	};
+	
 /* Internal functions */
 
 	this.setImagePosition = function(x, y) {
@@ -495,6 +508,20 @@ function Viewer(parent){
 		return (buttons[name] = button);
 	}
 
+  createNavButton = function(name, title, onclick) {
+		var button = createElement('button', "button", navbuttons);
+		button.className += " btn-" + name;
+		button.title = title;
+		button.onclick = onclick;
+		button.disable = function(disable) {
+		  this.disabled = disable;
+		  this.innerHTML = disable ? navDisabled[name] : navEnabled[name];
+		  this.blur();
+		  return this;
+		};
+		return (buttons[name] = button);
+	}
+
 	createStatusField = function(name) {
 	  var statusField = createElement('div', 'status ebimage', statusbar)
 	  statusField.className += " sts-" + name;
@@ -531,10 +558,10 @@ function Viewer(parent){
 		zoombuttons = createElement('div', 'buttons-zoom ebimage', toolbar);
 
 		// create navigation buttons
-		createButton('first','&#x23ee;<br/>&nbsp;','First frame [HOME]/[m] ',viewer.firstFrame, navbuttons);
-		createButton('prev','&#x23f5;','Previous frame [PAGE DOWN]/[<]',viewer.prevFrame, navbuttons);
-		createButton('next','&#x23f4;','Next frame [PAGE UP]/[>]',viewer.nextFrame, navbuttons);
-		createButton('last','&#x23ed;<br/>&nbsp;','Last frame [END]/[?]',viewer.lastFrame, navbuttons);
+		createNavButton('first','First frame [HOME]/[m] ',viewer.firstFrame);
+		createNavButton('prev','Previous frame [PAGE DOWN]/[<]',viewer.prevFrame);
+		createNavButton('next','Next frame [PAGE UP]/[>]',viewer.nextFrame);
+		createNavButton('last','Last frame [END]/[?]',viewer.lastFrame);
 
 		// create zoom buttons
 		createButton('in','+','Zoom in [+]/[x]', viewer.zoomIn, zoombuttons);
