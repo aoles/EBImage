@@ -12,7 +12,7 @@ See: ../LICENSE for license, LGPL
 
 /*----------------------------------------------------------------------- */
 
-double min, max, diff = 0;
+double min, max, diff;
 
 void range (double *src, double *tgt, int n, int frame) {
   int i;
@@ -37,7 +37,7 @@ void range (double *src, double *tgt, int n, int frame) {
 SEXP
 normalize (SEXP x, SEXP separate, SEXP outrange, SEXP inrange) {
   int nprotect, nx, ny, nz, im, i, sep;
-  double *src, *tgt, from, to;
+  double *src, *tgt, from, to, val;
   SEXP res;
 
   nprotect = 0;
@@ -57,14 +57,19 @@ normalize (SEXP x, SEXP separate, SEXP outrange, SEXP inrange) {
   
   from = to = 0;
   
+  // clip and set min/max values to input range 
   if ( inrange != R_NilValue ) {
     min  = REAL(inrange)[0];
     max  = REAL(inrange)[1];
+    diff = max - min;
     for ( i = 0; i < nx * ny * nz; i++ ) {
-      tgt[i] = ( src[i] < min ) ? min : src[i];
-      tgt[i] = ( src[i] > max ) ? max : src[i];
+      val = src[i];
+      if ( val < min ) val = min;
+      if ( val > max ) val = max;
+      tgt[i] = val;
     }
   }
+  // calculate global range
   else if ( !sep ) {
     range(src, tgt, nx*ny*nz, -1);
   }
@@ -75,8 +80,12 @@ normalize (SEXP x, SEXP separate, SEXP outrange, SEXP inrange) {
     to   = REAL(outrange)[1];
   
     for ( im = 0; im < nz; im++ ) {
-      src = &( REAL(x)[ im * nx * ny ] );
       tgt = &( REAL(res)[ im * nx * ny ] );
+      if ( inrange==R_NilValue ) 
+        src = &( REAL(x)[ im * nx * ny ] );
+      else // use pre-initialized tgt as src
+        src = tgt;
+      
       if ( sep ) 
         range(src, tgt, nx * ny, im+1);
       if ( diff != 0 ) {
@@ -85,6 +94,7 @@ normalize (SEXP x, SEXP separate, SEXP outrange, SEXP inrange) {
       }
     }
   }
+  
   UNPROTECT (nprotect);
   return res;
 }

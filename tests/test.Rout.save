@@ -179,6 +179,7 @@ Type 'q()' to quit R.
 + 
 +   ## filtering
 +   z <- check("normalize", x, suppressWarnings=TRUE)
++   z <- check("normalize", x, inputRange=c(0.1, 0.9), suppressWarnings=TRUE)
 +   z <- check("gblur", x, sigma=1, expectError=min(d)<7, round=TRUE)
 +   y <- if (cls) "replicate" else if (nf>1) 0.5 else "circular"
 +   z <- check("filter2", x, array(1, dim=c(5, 5)), y, round=TRUE)
@@ -289,6 +290,7 @@ checking 'computeFeatures' .................... PASS (57f54e3531a18f4e) -0.1
 checking 'computeFeatures' .................... PASS (6dc4c63dde7e7828) 32d95b1456f80f68
 checking 'ocontour' ........................... PASS (236bd4454cc8e13c) 236bd4454cc8e13c
 checking 'normalize' .......................... PASS (bb3d006dd4423285) -0.1
+checking 'normalize' .......................... PASS (bb3d006dd4423285) -0.1
 checking 'gblur' .............................. PASS (bb3d006dd4423285) -0.1
 checking 'filter2' ............................ PASS (bb3d006dd4423285) -0.1
 checking 'medianFilter' ....................... PASS (bb3d006dd4423285) -0.1
@@ -368,6 +370,7 @@ checking 'ocontour' ........................... PASS (2663ed016907f460) 2cd2b9ad
 checking 'localCurvature' ..................... PASS (80236128c43c5c64) aa70763bde359b48
 checking 'normalize' .......................... PASS (545d29ae11f62e79) 324.9
 checking 'gblur' .............................. PASS (c551b7f0f07ddbb1) NA
+checking 'normalize' .......................... PASS (545d29ae11f62e79) 324.9
 checking 'filter2' ............................ PASS (a98d049f987b512a) 8124.9
 checking 'medianFilter' ....................... PASS (545d29ae11f62e79) 324.9
 checking 'equalize' ........................... PASS (fd2903042f6577db) 324.9
@@ -447,6 +450,7 @@ checking 'computeFeatures' .................... PASS (3a766122214a21a8) cf1b0ac9
 checking 'ocontour' ........................... PASS (ddb1a61382610e29) 0dab270d98fdbdd8
 checking 'localCurvature' ..................... PASS (48edb77f99eb5e0a) a351f1682141f4de
 checking 'normalize' .......................... PASS (dd024957ed9be970) 1431381
+checking 'normalize' .......................... PASS (327914cc2a95292d) 1266798
 checking 'gblur' .............................. PASS (ba634c0d6cb869f5) 1466231
 checking 'filter2' ............................ PASS (b1783e1383b0d429) 36592176
 checking 'medianFilter' ....................... PASS (f73f9cb355632e37) 1454712
@@ -527,6 +531,7 @@ checking 'computeFeatures' .................... PASS (3a766122214a21a8) cf1b0ac9
 checking 'ocontour' ........................... PASS (da840dfc876b827d) 90e46e616d6ca694
 checking 'localCurvature' ..................... PASS (744209c192ca349a) 97da7b3a7c2ec717
 checking 'normalize' .......................... PASS (fd0fb40ffb018169) 747801.4
+checking 'normalize' .......................... PASS (4b1f8e1c8e2f7bf3) 809649.2
 checking 'gblur' .............................. PASS (850f1053006670c6) 761679.3
 checking 'filter2' ............................ PASS (c6d3b7ddd80521f9) 19130329
 checking 'medianFilter' ....................... PASS (07a157a471910361) 765141.6
@@ -606,6 +611,7 @@ checking 'computeFeatures' .................... PASS (6dc4c63dde7e7828) 32d95b14
 checking 'ocontour' ........................... PASS (62edd8045dda1043) 91bbaa639ef2cb55
 checking 'localCurvature' ..................... PASS (9ddeedd40b4e5c7b) a2c60afaa6d43988
 checking 'normalize' .......................... PASS (0b70467017a902ca) 1788995
+checking 'normalize' .......................... PASS (95a2f0d3d09f9593) 1858155
 checking 'gblur' .............................. PASS (220352a03dba8eda) 2029979
 checking 'filter2' ............................ PASS (4ca91f0d9cb2a1e9) 50878763
 checking 'medianFilter' ....................... PASS (afb4863b9d632271) 2034604
@@ -687,6 +693,7 @@ checking 'computeFeatures' .................... PASS (3a766122214a21a8) cf1b0ac9
 checking 'ocontour' ........................... PASS (cdb0d0c07c1e0775) b86c6546ddbffb2d
 checking 'localCurvature' ..................... PASS (4c13330f1d7fcbd6) 4805cb6e9d47da01
 checking 'normalize' .......................... PASS (a34cd51357995e04) 1055560
+checking 'normalize' .......................... PASS (a34cd51357995e04) 1055560
 checking 'gblur' .............................. PASS (f499c36c42da96ae) 1037581
 checking 'filter2' ............................ PASS (e5a3d2e924e050fe) 26149148
 checking 'medianFilter' ....................... PASS (ff54de12f77d64e5) 1030730
@@ -767,6 +774,7 @@ checking 'computeFeatures' .................... PASS (6dc4c63dde7e7828) 32d95b14
 checking 'ocontour' ........................... PASS (0cc37fb8be6a9150) a8ef8364446f767a
 checking 'localCurvature' ..................... PASS (91ac6bafe7f8c008) feedc85342708fe9
 checking 'normalize' .......................... PASS (6f82aae3b180c153) 2693244
+checking 'normalize' .......................... PASS (27441d4baba7c727) 2315924
 checking 'gblur' .............................. PASS (6317c51db4b2e332) 2349701
 checking 'filter2' ............................ PASS (ff5a03c8be20359c) 58841710
 checking 'medianFilter' ....................... PASS (08a067834027edb5) 2352447
@@ -847,6 +855,7 @@ checking 'computeFeatures' .................... PASS (6dc4c63dde7e7828) 32d95b14
 checking 'ocontour' ........................... PASS (67c938cc8c8b0a94) e0b0122d0f8dbec3
 checking 'localCurvature' ..................... PASS (14e7e43044a6edce) dbbde661d27cf4d5
 checking 'normalize' .......................... PASS (c6700c53a770f4dc) 2526618
+checking 'normalize' .......................... PASS (321165d27d376355) 2163958
 checking 'gblur' .............................. PASS (167add1590f90b31) 2237219
 checking 'filter2' ............................ PASS (288a7b9238221d38) 56904871
 checking 'medianFilter' ....................... PASS (12259cca79cae7e1) 2231438
@@ -927,6 +936,7 @@ checking 'computeFeatures' .................... PASS (6dc4c63dde7e7828) 32d95b14
 checking 'ocontour' ........................... PASS (67c938cc8c8b0a94) e0b0122d0f8dbec3
 checking 'localCurvature' ..................... PASS (14e7e43044a6edce) dbbde661d27cf4d5
 checking 'normalize' .......................... PASS (c864fc347d3e1eec) 2526618
+checking 'normalize' .......................... PASS (b924aa1ced88d0b0) 2163958
 checking 'gblur' .............................. PASS (41001e94fa243311) 2237219
 checking 'filter2' ............................ PASS (c4dde73f4cd08626) 56904871
 checking 'medianFilter' ....................... PASS (f336aae43926dd3a) 2231438
