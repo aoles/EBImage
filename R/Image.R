@@ -56,7 +56,7 @@ Image = function(data = array(0, dim=c(1,1)), dim, colormode) {
     
     if ( colormode==Color ) {
       channels = if (length(dim)<3L) 1L else seq_len(dim[3L])
-      data = abind(lapply(channels, function(ch) {
+      data = abind::abind(lapply(channels, function(ch) {
         array( if (ch>3L) 0 else data[ch,,drop=FALSE], dim[-3L], dimnames)
       }), along = 2.5)
       # replace a list of NULLs by the original NULL
@@ -682,7 +682,8 @@ combineImages = function (x, y, ...) {
     if (length(dx)==2L) dim(x) = c(dx, 1)
     if (length(dy)==2L) dim(y) = c(dy, 1)
   }
-  z = abind(x, y, along = along)
+  
+  z = abind::abind(x, y, along = along)
   ## don't introduce unnecessary dimnames
   if ( is.null(dimnames(x)) && is.null(dimnames(y)) ) dimnames(z) = NULL
   imageData(x) = z
@@ -755,7 +756,7 @@ rgbImage = function(red=NULL, green=NULL, blue=NULL) {
   if (is.null(green)) green = array(0, dim=prop$dim)
   if (is.null(blue)) blue = array(0, dim=prop$dim)
   
-  x = abind(red, green, blue, along=2.5)
+  x = abind::abind(red, green, blue, along=2.5)
   ## don't introduce unnecessary dimnames
   if ( !prop$dns ) dimnames(x) = NULL
   

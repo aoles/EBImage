@@ -92,6 +92,9 @@ export(localCurvature)
 ## methods extending S4 generics from the BiocGenerics package
 exportMethods(normalize, combine)
 
+## enable abind for Image objects
+exportMethods(abind)
+
 ## legacy code because of broken R 3.1.2
 importFrom("methods", "Math2")
 exportMethods(Math2)

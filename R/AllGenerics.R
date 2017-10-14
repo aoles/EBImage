@@ -21,3 +21,6 @@ setGeneric ("image", function (x, ...) standardGeneric("image") )
 
 ## statistics
 setGeneric ("hist", function (x, ...) standardGeneric("hist") )
+
+# explicit signature definition to avoid dispatching on arguments other than `...`
+setGeneric("abind", signature="...")

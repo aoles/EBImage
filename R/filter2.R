@@ -85,11 +85,11 @@ filter2 = function(x, filter, boundary = c("circular", "replicate")) {
            # Add left and right colums
            lc <- rep.dim(x, 2L, 1L, cf[2L])
            rc <- rep.dim(x, 2L, d[2L], cf[2L])
-           x <- abind(x, rc, lc, along=2L)
+           x <- abind::abind(x, rc, lc, along=2L)
            # Add top and bottom rows
            tr <- rep.dim(x, 1L, 1L, cf[1L])
            br <- rep.dim(x, 1L, d[1L], cf[1L])
-           x <- abind(x, br, tr, along=1L)
+           x <- abind::abind(x, br, tr, along=1L)
          }
   )
   

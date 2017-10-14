@@ -170,8 +170,8 @@ displayInBrowser = function(x, title, ...) {
   ## fill missing channels
   if ( isTRUE(colorMode(x) == Color && d[3L] < 3L) ) {
     fd = d
-    fd[3L] = 3L - d[3L] 
-    imageData(x) = abind(x, Image(0, fd), along = 3L)
+    fd[3L] = 3L - d[3L]
+    imageData(x) = abind::abind(x, array(0, fd), along = 3L)
   }
   
   writeImage(x, imageFile)
@@ -204,7 +204,7 @@ displayWidget <- function(x, title, embed = !interactiveMode(), tempDir = tempfi
   if ( isTRUE(colorMode(x) == Color && d[3L] < 3L) ) {
     fd = d
     fd[3L] = 3L - d[3L]
-    imageData(x) = abind(x, Image(0, fd), along = 3L)
+    imageData(x) = abind::abind(x, array(0, fd), along = 3L)
   }
   
   x = clipImage(x) ## clip the image and change storage mode to double
