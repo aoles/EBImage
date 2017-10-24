@@ -1,6 +1,27 @@
 \name{EBImage-NEWS}
 \title{News for Package 'EBImage'}
 
+\section{Changes in version 4.20.0}{
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item 'abind()' method for combining Image arrays
+      \item 'floodFill()' has been vectorized over its arguments 'pt' and 'col' allowing to specify multiple start points and different fill colors
+    }
+  }
+  \subsection{SIGNIFICANT USER-VISIBLE CHANGES}{
+    \itemize{
+      \item 'display()' "browser" mode has been updated to use the htmlwidgets infrastructure
+      \item 'filter2()' does not require filter dimensions to be odd numbers when filter size equals image size
+    }
+  }
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item fixed issues with 'normalize()' (https://github.com/aoles/EBImage/issues/25)
+      \item various improvements to the 'clahe()' function
+    }
+  }
+}
+
 \section{Changes in version 4.18.0}{
   \subsection{NEW FEATURES}{
     \itemize{
