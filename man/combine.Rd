@@ -9,7 +9,7 @@
 \alias{combine,NULL,ANY-method}
 \alias{combine,NULL,NULL-method}
 
-\title{Combining images}
+\title{Combine images}
 
 \description{
   Merges images to create image sequences.
@@ -31,16 +31,16 @@ combine(x, y, ...)
 }
 
 \details{
-  The function \code{combine} uses \code{abind} to merge multi-dimensional
+  The function \code{combine} uses \code{\link[abind]{abind}} to merge multi-dimensional
   arrays along the dimension depending on the
   color mode of \code{x}. If \code{x} is a \code{Grayscale} image or an array,
   image objects are combined along the third dimension, whereas when
-  \code{x} is a \code{Color} image they are combined along the forth dimension, leaving room on the third dimension for color
+  \code{x} is a \code{Color} image they are combined along the fourth dimension, leaving room on the third dimension for color
   channels.
 }
 
 \seealso{
-  \code{\link{Image}}
+  The method \code{\link{abind}} provides a more flexible interface which allows to specify the dimension along which to combine the images.
 }
 
 \author{

@@ -6,6 +6,7 @@
 \alias{abind-methods}
 \alias{abind,ANY-method}
 \alias{abind,Image-method}
+\alias{abind,list-method}
 
 \title{Combine Image Arrays}
 
@@ -38,7 +39,7 @@
 }
 
 \seealso{
-   \code{\link{combine}} provides a more convenient interface to concatenating multiple images into an image sequence. Use \code{\link{tile}} to lay out images next to each other in a regular grid.
+   \code{\link{combine}} provides a more convenient interface to merging images into an image sequence. Use \code{\link{tile}} to lay out images next to each other in a regular grid.
 }
 
 \author{

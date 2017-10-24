@@ -197,7 +197,7 @@ testEBImageFunctions <- function(x) {
   z <- check("combine", x, y, y)
   y <- check("tile", z, nx=3)
   z <- check("untile", y, c(3, 2))
-
+  y <- check("abind", list(x, x), along=length(d)+1L)
   cat("\n")
 }
 

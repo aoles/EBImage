@@ -1,5 +1,5 @@
 
-R version 3.4.1 (2017-06-30) -- "Single Candle"
+R version 3.4.2 (2017-09-28) -- "Short Summer"
 Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -216,7 +216,7 @@ Type 'q()' to quit R.
 +   z <- check("combine", x, y, y)
 +   y <- check("tile", z, nx=3)
 +   z <- check("untile", y, c(3, 2))
-+ 
++   y <- check("abind", list(x, x), along=length(d)+1L)
 +   cat("\n")
 + }
 > 
@@ -314,6 +314,7 @@ checking 'combine' ............................ PASS (7587cd4863b3f3d0) -0.1
 checking 'combine' ............................ PASS (8cc517353533c670) -0.1
 checking 'tile' ............................... PASS (9c28fe28dabc9dc0) 42140.88
 checking 'untile' ............................. PASS (f57349ddce21e8e1) 16809.31
+checking 'abind' .............................. PASS (7587cd4863b3f3d0) -0.1
 
 Warning messages:
 1: In hash.old(y) : NAs introduced by coercion
@@ -393,6 +394,7 @@ checking 'combine' ............................ PASS (4d32f0cd424c46ed) 1274.9
 checking 'combine' ............................ PASS (d235aa9dfa5f7f28) 7874.9
 checking 'tile' ............................... PASS (d78128e72e9c8cfb) 24420.64
 checking 'untile' ............................. PASS (2f982bd94f9d06ba) 10445.49
+checking 'abind' .............................. PASS (4d32f0cd424c46ed) 1274.9
 
 Warning messages:
 1: In hash.old(y) : NAs introduced by coercion
@@ -474,6 +476,7 @@ checking 'combine' ............................ PASS (3f46a10efaaab318) 5597376
 checking 'combine' ............................ PASS (c2857e1a820b6b96) 33922678
 checking 'tile' ............................... PASS (78eab32eac869231) 78718054
 checking 'untile' ............................. PASS (59f8bb36c4481a79) 72597772
+checking 'abind' .............................. PASS (3f46a10efaaab318) 5597376
 
 Warning messages:
 1: In hash.old(y) : NAs introduced by coercion
@@ -555,6 +558,7 @@ checking 'combine' ............................ PASS (475166958acc7172) 2960568
 checking 'combine' ............................ PASS (dcd2456fbb97967f) 18119267
 checking 'tile' ............................... PASS (da0d33a63c42b563) 33061491
 checking 'untile' ............................. PASS (3268a8970f502c72) 27788327
+checking 'abind' .............................. PASS (6fd94295b094e0dd) 2960568
 
 Warning messages:
 1: In hash.old(y) : NAs introduced by coercion
@@ -635,6 +639,7 @@ checking 'combine' ............................ PASS (07952012d019c893) 8350133
 checking 'combine' ............................ PASS (8cb162a59398a20b) 52959073
 checking 'tile' ............................... PASS (498539964fb48dd4) 107188639
 checking 'untile' ............................. PASS (9fb04cc414930cc6) 97994583
+checking 'abind' .............................. PASS (07952012d019c893) 8350133
 
 Warning messages:
 1: In hash.old(y) : NAs introduced by coercion
@@ -717,6 +722,7 @@ checking 'combine' ............................ PASS (fbb690c6993fed59) 3888784
 checking 'combine' ............................ PASS (db4c289138cad595) 23054440
 checking 'tile' ............................... PASS (b5d61ba1e08ccf53) 48846817
 checking 'untile' ............................. PASS (f740856c06d69a15) 41221063
+checking 'abind' .............................. PASS (dca1271130f49d13) 3888784
 
 Warning messages:
 1: In hash.old(y) : NAs introduced by coercion
@@ -798,6 +804,7 @@ checking 'combine' ............................ PASS (943e696dd062479b) 9516503
 checking 'combine' ............................ PASS (5b2b6f0a51b05e18) 59844403
 checking 'tile' ............................... PASS (853d179912a1e6b9) 114300809
 checking 'untile' ............................. PASS (92a5de5886618db5) 105862114
+checking 'abind' .............................. PASS (26faa8168a99c898) 9516503
 
 Warning messages:
 1: In hash.old(y) : NAs introduced by coercion
@@ -879,6 +886,7 @@ checking 'combine' ............................ PASS (61a6f7f5c6357973) 8992851
 checking 'combine' ............................ PASS (e3af2b87e81b577e) 56431472
 checking 'tile' ............................... PASS (22c39d5bf0a57b26) 72664167
 checking 'untile' ............................. PASS (f3dd10e639f40c64) 60048605
+checking 'abind' .............................. PASS (f28d70bcf3781d08) 9273358
 
 Warning messages:
 1: In hash.old(y) : NAs introduced by coercion
@@ -960,6 +968,7 @@ checking 'combine' ............................ PASS (8750feb29c15297c) 8992851
 checking 'combine' ............................ PASS (c97b83093836307a) 56431472
 checking 'tile' ............................... PASS (2144c4a0e85d648a) 72664167
 checking 'untile' ............................. PASS (340bd33c3fc91099) 60048605
+checking 'abind' .............................. PASS (0fe154b843d8fc58) 9273358
 
 Warning messages:
 1: In hash.old(y) : NAs introduced by coercion
