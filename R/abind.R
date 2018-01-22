@@ -46,6 +46,8 @@
   }
 }
 
+# avoid "Undefined global functions or variables" NOTE during R CMD check
+N <- NULL
 
 # have the same formal arguments as the original function
 formals(.abind.Image) <- formals(abind::abind)
