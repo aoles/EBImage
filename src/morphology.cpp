@@ -75,7 +75,7 @@ template <typename type> chordSet buildChordSet(type * kern, PointXY ksize) {
     korigin.x = (int) ceil((float)ksize.x / 2) - 1; // -1 due to 0-based indices
     korigin.y = (int) ceil((float)ksize.y / 2) - 1;
     
-    chordSet set = (chordSet) {C: NULL, CLength: 0, minYoffset: korigin.y, maxYoffset: -korigin.y, minXoffset: korigin.x, maxXoffset: -korigin.x, maxN: 0};
+    chordSet set = {NULL, 0, korigin.y, -korigin.y, korigin.x, -korigin.x, 0};
     
     int CBufLength = 0;
     set.C = R_Calloc(BUF_LENGTH, chord);
@@ -92,7 +92,7 @@ template <typename type> chordSet buildChordSet(type * kern, PointXY ksize) {
                 c.n = 0;
                 int length = j - beginChord;
                 if (length > 1) c.n = (int) floor(log2(length-1));
-                c.xOffset2 = j - korigin.x - (int) pow(2, c.n);
+                c.xOffset2 = j - korigin.x - (int) pow(2.0, c.n);
                 int xEnd = j - korigin.x - 1;
                 
                 set.C[set.CLength++] = c;
