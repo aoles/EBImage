@@ -217,7 +217,7 @@ _floodFill(T *m, XYPoint size, XYPoint xy, T rc, double tol) {
    * stack is not used then.
    */
   T resetc = rc;
-  if (fabs(tc-rc) <= tol) {
+  if (fabs((double)(tc-rc)) <= tol) {
     offset=true;
     resetc = (T)(rc+tol+1);
   }
@@ -227,7 +227,7 @@ _floodFill(T *m, XYPoint size, XYPoint xy, T rc, double tol) {
     
   while(s.pop(pt)) {    
     // climbs up along the column x as far as possible
-    while(pt.y>=0 && fabs(m[pt.x+pt.y*size.x]-tc) <= tol) pt.y--;
+    while(pt.y>=0 && fabs((double)(m[pt.x+pt.y*size.x]-tc)) <= tol) pt.y--;
     pt.y++;
     spanLeft=false;
     spanRight=false;
@@ -235,19 +235,19 @@ _floodFill(T *m, XYPoint size, XYPoint xy, T rc, double tol) {
     R_CheckUserInterrupt();
 
     // processes the column x
-    while(pt.y<size.y && fabs(m[pt.x+pt.y*size.x]-tc) <= tol) {
+    while(pt.y<size.y && fabs((double)(m[pt.x+pt.y*size.x]-tc)) <= tol) {
       m[pt.x+pt.y*size.x]=resetc;
       if (offset) offsets.push(pt);
-      if(!spanLeft && pt.x>0 && fabs(m[pt.x-1+pt.y*size.x]-tc) <= tol) {
+      if(!spanLeft && pt.x>0 && fabs((double)(m[pt.x-1+pt.y*size.x]-tc)) <= tol) {
     	  s.push(XYPoint(pt.x-1,pt.y));
     	  spanLeft=true;
     	}
-      else if(spanLeft && pt.x>0 && fabs(m[pt.x-1+pt.y*size.x]-tc) > tol) spanLeft=false;
-      if(!spanRight && pt.x<size.x-1 && fabs(m[pt.x+1+pt.y*size.x]-tc) <= tol) {
+      else if(spanLeft && pt.x>0 && fabs((double)(m[pt.x-1+pt.y*size.x]-tc)) > tol) spanLeft=false;
+      if(!spanRight && pt.x<size.x-1 && fabs((double)(m[pt.x+1+pt.y*size.x]-tc)) <= tol) {
     	  s.push(XYPoint(pt.x+1,pt.y));
     	  spanRight=true;
     	}
-      else if(spanRight && pt.x<size.x-1 && fabs(m[pt.x+1+pt.y*size.x]-tc) > tol) spanRight=false;
+      else if(spanRight && pt.x<size.x-1 && fabs((double)(m[pt.x+1+pt.y*size.x]-tc)) > tol) spanRight=false;
       pt.y++;
     }
   }
