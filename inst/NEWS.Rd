@@ -1,6 +1,14 @@
 \name{EBImage-NEWS}
 \title{News for Package 'EBImage'}
 
+\section{Changes in version 4.22.0}{
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item fixed compilation errors on Solaris
+    }
+  }
+}
+
 \section{Changes in version 4.20.0}{
   \subsection{NEW FEATURES}{
     \itemize{
