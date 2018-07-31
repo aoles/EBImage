@@ -4,8 +4,8 @@ The package is distributed as part of the [Bioconductor](http://bioconductor.org
 To install this package, start R and enter:
 
 ```
-source("https://bioconductor.org/biocLite.R")
-biocLite("EBImage")
+install.packages("BiocManager")
+BiocManager::install("EBImage")
 ```
 
 ## Documentation

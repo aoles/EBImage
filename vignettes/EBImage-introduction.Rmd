@@ -40,8 +40,8 @@ options(EBImage.display = "raster")
 `r Biocpkg("EBImage")` is an R package distributed as part of the [Bioconductor](http://bioconductor.org) project. To install the package, start R and enter:
 
 ```{r installation, eval=FALSE}
-source("http://bioconductor.org/biocLite.R")
-biocLite("EBImage")
+install.packages("BiocManager")
+BiocManager::install("EBImage")
 ```
 
 Once `r Rpackage("EBImage")` is installed, it can be loaded by the following command.
