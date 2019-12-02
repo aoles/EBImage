@@ -12,7 +12,7 @@ flop <- function (x) {
 affine <- function (x, m, filter = c("bilinear", "none"), output.dim, bg.col = "black", antialias = TRUE) {
   ## check arguments
   validImage(x)
-  if ( !is.matrix(m) || dim(m)!=c(3L, 2L) ) stop("'m' must be a 3x2 matrix")
+  if ( !is.matrix(m) || !identical(dim(m), c(3L, 2L)) ) stop("'m' must be a 3x2 matrix")
   if ( any(is.na(m)) ) stop("'m' shouldn't contain any NAs")
   
   filter <- switch(match.arg(filter), none=0L, bilinear=1L)

@@ -4,7 +4,7 @@ localCurvature = function(x, h=100, maxk=10000) {
  # if data frame convert to matrix to standardize processing
  if (is.data.frame(x)) x = as.matrix(x)
  # check that x has proper dimensions
- if (length(dim(x)) != 2 | dim(x)[2] !=2) stop("'x' should have dimensions of N x 2")
+ if (length(dim(x))!=2L || dim(x)[2L]!=2L) stop("'x' should have dimensions of N x 2")
 
  # compute arc length
  px = c(0, cumsum(sqrt(rowSums(diff(x)^2))))
