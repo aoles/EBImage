@@ -84,7 +84,7 @@ Image = function(data = array(0, dim=c(1,1)), dim, colormode) {
     .Data = 
       ## improve performance by not calling array constructor on well formed arrays
       if( is.array(data) && prod(dim)==length(data) ) {
-        if( length(dim(data)) != length(dim) || any(dim(data) != dim))
+        if( !identical(dim(data), dim) )
           dim(data) = dim
         data
       }
