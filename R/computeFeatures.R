@@ -286,7 +286,7 @@ convertRef = function(ref, refnames) {
   if (!is.array(ref) && !is.list(ref)) stop("'ref' must be an array or a list containing the reference images")
   if (is.array(ref)) {
     nref = numberOfFrames(ref, 'total')
-    if (class(ref)=="Image") ref = imageData(ref)
+    if (inherits(ref, "Image")) ref = imageData(ref)
     ndim = length(dim(ref))
     if (ndim==2) ref = list(ref)
     else if (ndim==3) ref = lapply(1:nref, function(i) ref[,,i])
@@ -298,7 +298,7 @@ convertRef = function(ref, refnames) {
     ## sanity check
     ref = lapply(ref, function(r) {
       ndim = length(dim(r))
-      if (class(r)=="Image") r = imageData(r)
+      if (inherits(r, "Image")) r = imageData(r)
       if (ndim<2 || ndim>3) stop ("'ref' must contain only 2D arrays")
       else if (ndim==3) {
         if (dim(r)[3]>1) stop ("'ref' must contain only 2D arrays")
@@ -316,7 +316,7 @@ convertRef = function(ref, refnames) {
 ## check x
 checkx = function(x) {
   if (!is.array(x))  stop("'x' must be a 2D array")
-  if (class(x)=="Image") x = imageData(x)
+  if (inherits(x, "Image")) x = imageData(x)
   ndim = length(dim(x))
   if (ndim<2||ndim>3)  stop("'x' must be a 2D array")
   if (ndim==3) {
