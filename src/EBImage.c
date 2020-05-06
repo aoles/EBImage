@@ -43,7 +43,7 @@ static R_CallMethodDef CallEntries[] = {
     CALLDEF(bwlabel, 1),
     CALLDEF(normalize, 4),
     CALLDEF(distmap, 2),
-    CALLDEF(watershed, 3),
+    CALLDEF(watershed, 4),
     CALLDEF(propagate, 4),
     CALLDEF(paintObjects, 5),
     CALLDEF(rmObjects, 3),

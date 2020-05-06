@@ -12,8 +12,6 @@ See: ../LICENSE for license, LGPL
 /* list of STL, C++ */
 #include <list>
 
-#define BG 0.0
-
 struct TheSeed {
     int index, seed;
 };
@@ -25,15 +23,16 @@ double check_multiple( double *, double *, int &, IntList &, SeedList &, double 
 
 /*----------------------------------------------------------------------- */
 SEXP
-watershed (SEXP x, SEXP _tolerance, SEXP _ext) {
+watershed (SEXP x, SEXP _tolerance, SEXP _ext, SEXP _bg) {
     SEXP res;
     int im, i, j, nx, ny, nz, ext;
-    double tolerance;
+    double tolerance, bg;
 
     nx = INTEGER ( GET_DIM(x) )[0];
     ny = INTEGER ( GET_DIM(x) )[1];
     nz = getNumberOfFrames(x,0);
     tolerance = REAL( _tolerance )[0];
+    bg = REAL( _bg )[0];
     ext = INTEGER( _ext )[0];
 
     PROTECT( res = allocVector(INTSXP, XLENGTH(x)) );
@@ -49,15 +48,15 @@ watershed (SEXP x, SEXP _tolerance, SEXP _ext) {
 
         /* generate pixel index and negate the image -- filling wells */
         for ( i = 0; i < nx * ny; i++ ) {
-        	  frame[ i ] = -src[ i ];
-        	  index[ i ] = i;
+            frame[ i ] = (src[i] > bg ? -src[i] : 0);
+            index[ i ] = i;
         }
         /* from R includes R_ext/Utils.h */
         /* will resort frame as well */
         rsort_with_index( frame, index, nx * ny );
         /* reassign frame as it was reset above but keep new index */
         for ( i = 0; i < nx * ny; i++ )
-            frame[ i ] = ( src[i]==0 ? 0 : -src[i] ); // avoid turning +0 into -0
+            frame[ i ] = (src[i] > bg ? -src[i] : 0);
 
         SeedList seeds;  /* indexes of all seed starting points, i.e. lowest values */
 
@@ -69,7 +68,7 @@ watershed (SEXP x, SEXP _tolerance, SEXP _ext) {
         PointXY pt;
         bool isin;
         /* loop through the sorted index */
-        for ( i = 0; i < nx * ny && src[ index[i] ] > BG; ) {
+        for ( i = 0; i < nx * ny && src[ index[i] ] > bg; ) {
             /* pool a queue of equally lowest values */
             ind = index[ i ];
             equals.push_back( ind );

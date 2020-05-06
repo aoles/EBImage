@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-SEXP watershed(SEXP, SEXP, SEXP);
+SEXP watershed(SEXP, SEXP, SEXP, SEXP);
 
 #ifdef __cplusplus
 }

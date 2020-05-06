@@ -12,7 +12,7 @@
 }
 
 \usage{
-watershed(x, tolerance=1, ext=1)
+watershed(x, tolerance=1, ext=1, bg=0)
 }
 
 \arguments{
@@ -29,6 +29,9 @@ watershed(x, tolerance=1, ext=1)
 
   \item{ext}{Radius of the neighborhood in pixels for the detection
     of neighboring objects. Higher value smoothes out small objects. }
+
+  \item{bg}{Background value under which pixels are not considered
+    anymore for watersheding.}
 }
 
 \value{
