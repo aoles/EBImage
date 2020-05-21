@@ -203,7 +203,8 @@ function Viewer(parent){
 
 		currentFrame = frame;
 		viewer.updateStatusField("Frame", currentFrame+'/'+numberOfFrames);
-
+	        Shiny.setInputValue("currentFrame", currentFrame);
+	    
 		// button locking
 		buttons['first'].disable(currentFrame==1);
 		buttons['prev'].disable(currentFrame==1);
@@ -232,7 +233,8 @@ function Viewer(parent){
 		event = preProcessEvent(event);
 
 		var pixelPos = viewer.getPixelPosition(event);
-		(pixelPos[0]<1 || pixelPos[1]<1 || pixelPos[0]>originalWidth || pixelPos[1]>originalHeight) ? viewer.clearStatusField("Position") : viewer.updateStatusField("Position", '('+pixelPos+')');
+	    (pixelPos[0]<1 || pixelPos[1]<1 || pixelPos[0]>originalWidth || pixelPos[1]>originalHeight) ? viewer.clearStatusField("Position") : viewer.updateStatusField("Position", '('+pixelPos+')');
+	    //Shiny.setInputValue("pixelPosition", pixelPos);
 	}
 
 	this.clearPixelPosition = function(event) {
@@ -374,9 +376,10 @@ function Viewer(parent){
 		else if(imageSize[1]>canvasSize[1])
 			cursor = 'n-resize';
 
-		image.style.cursor = cursor;
-		previousMousePosition = getMouseXY(event);
-		image.onmousemove = viewer.dragImage;
+	    image.style.cursor = cursor;
+	    previousMousePosition = getMouseXY(event);
+	    Shiny.setInputValue("pixelPosition", viewer.getPixelPosition(event));
+	    image.onmousemove = viewer.dragImage;
 	}
 
 	this.releaseImage = function(event) {
@@ -529,23 +532,26 @@ function Viewer(parent){
 	}
 
 /* Set image */
-  this.reset = function(img, width, height) {
-    if (!(img instanceof Array)) {
-        data = [img];
-      } else {
-        data = img;
-      }
+    this.reset = function(img, width, height) {
+	if (!(img instanceof Array)) {
+            data = [img];
+	} else {
+            data = img;
+	}
+	
+	numberOfFrames = data.length;
 
-    numberOfFrames = data.length;
-
-    originalWidth 	= width;
+	originalWidth 	= width;
   	originalHeight	= height;
 
   	// set up image
-		viewer.setFrame();
-		image.onload = viewer.resetCanvas();
+	viewer.setFrame();
+	image.onload = viewer.resetCanvas();
 
-		viewer.updateStatusField("Image", originalWidth+'x'+originalHeight);
+	Shiny.setInputValue("imgWidth", originalWidth);
+	Shiny.setInputValue("imgHeight", originalHeight);
+	viewer.updateStatusField("Image", originalWidth+'x'+originalHeight);
+      
   }
 
 /* Viewer initialization */
