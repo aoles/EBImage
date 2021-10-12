@@ -30,13 +30,13 @@ check <- function(fun, x, ..., capture.output=FALSE, suppressWarnings=FALSE, sup
   
   y <- try(eval(expr), silent=TRUE)
   
-  if ( (class(y)=="try-error" && !isTRUE(expectError) ) || ( is.Image(y) && !validObject(y)) ) {
+  if ( (inherits(y, "try-error") && !isTRUE(expectError)) || (is.Image(y) && !validObject(y)) ) {
     y <- NULL
     passed <- FALSE
   }
 
   if (passed) {
-    if ( isTRUE(round) && class(y)!="try-error")
+    if (isTRUE(round) && !inherits(y, "try-error"))
       y = if ( is.list(y) ) lapply(y, round, digits=.digits) else round(y, digits = .digits)
     cat("PASS (", hash(y), ") ", hash.old(y), "\n", sep="") 
   }
