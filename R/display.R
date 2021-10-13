@@ -222,7 +222,7 @@ displayWidget <- function(x, title, embed = !interactiveMode(), tempDir = tempfi
     if ( !dir.exists(tempDir) && !dir.create(tempDir, recursive=TRUE) )
         stop("Error creating temporary directory.")
     
-    files = file.path(tempDir, sprintf("frame%.3d.png", frames, ".png"))
+    files = file.path(tempDir, sprintf("frame%.3d.png", frames))
     
     ## store image frames into individual files
     for (i in frames)

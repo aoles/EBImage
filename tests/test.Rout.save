@@ -27,12 +27,17 @@ Type 'q()' to quit R.
 > hash = function (x) .Call(digest:::digest_impl, serialize(x, connection=NULL, ascii=FALSE, xdr=FALSE), 7L, -1L, 14L, 0L, 0L, PACKAGE="digest")
 > 
 > hash.old <- function(x) {
-+   if (is.list(x)) hash(sapply(x,hash))
++   if (is.list(x) && length(x)>0) {
++     hash.old(sapply(x, hash.old, USE.NAMES=FALSE))
++   }
 +   else {
-+     xd <- as.numeric(x)
-+     xd <- xd[!is.nan(xd)]
-+     if (is.matrix(xd)) sum(xd*(1:length(xd))) + 0.7*hash(dim(xd))
-+     else sum(xd*(1:length(xd))) - 0.1
++     xd <- suppressWarnings(as.numeric(x))
++     xd <- xd[!(is.nan(xd)|is.na(xd))]
++     sx <- sum(xd*(1:length(xd)))
++     if (is.matrix(xd))
++       sx + 0.7 * hash.old(dim(xd))
++     else
++       sx - 0.1
 +   }
 + }
 > 
@@ -248,9 +253,9 @@ In readTIFF(x, all = all, ...) :
 > ## test: black image
 > testEBImageFunctions(Image(0, c(8, 8)))
 new test (hash=03724aaea0cf64b4)
-checking 'show' ............................... PASS (5a93d2a87828912b) NA
-checking 'print' .............................. PASS (0007ac6dee6a14da) NA
-checking 'hist' ............................... PASS (8ef6dc298b72d591) 544b329c50204069
+checking 'show' ............................... PASS (5a93d2a87828912b) -0.1
+checking 'print' .............................. PASS (0007ac6dee6a14da) -0.1
+checking 'hist' ............................... PASS (8ef6dc298b72d591) Inf
 checking '>' .................................. PASS (91517a74c2895221) -0.1
 checking '+' .................................. PASS (03724aaea0cf64b4) -0.1
 checking '/' .................................. PASS (03724aaea0cf64b4) -0.1
@@ -262,11 +267,11 @@ checking 'as.Image' ........................... PASS (03724aaea0cf64b4) -0.1
 checking 'is.Image' ........................... PASS (e3aef3409e870c0e) 0.9
 checking 'imageData' .......................... PASS (1ba6fa2bac2e6157) -0.1
 checking 'imageData<-' ........................ PASS (03724aaea0cf64b4) -0.1
-checking 'as.raster' .......................... PASS (e8f1c1057deba532) NA
+checking 'as.raster' .......................... PASS (e8f1c1057deba532) -0.1
 checking 'colorMode<-' ........................ PASS (03724aaea0cf64b4) -0.1
 checking 'numberOfFrames' ..................... PASS (7c79dea3bfc1415b) 0.9
-checking 'getFrames' .......................... PASS (437d348905e7edea) 83048ee9a100740d
-checking 'display' ............................ PASS (4c9befc7a9f9f22e) 8b45ca00d2ff9b26
+checking 'getFrames' .......................... PASS (437d348905e7edea) -0.2
+checking 'display' ............................ PASS (4c9befc7a9f9f22e) 165.3
 checking 'display' ............................ PASS (d956c282ac7180e4) -0.1
 checking 'image' .............................. PASS (d956c282ac7180e4) -0.1
 checking 'drawCircle' ......................... PASS (76ab1bcd040f633c) 447.9
@@ -290,8 +295,8 @@ checking 'rmObjects' .......................... PASS (c13bdaf3a3ddff95) -0.1
 checking 'reenumerate' ........................ PASS (c13bdaf3a3ddff95) -0.1
 checking 'reenumerate' ........................ PASS (c13bdaf3a3ddff95) -0.1
 checking 'computeFeatures' .................... PASS (d956c282ac7180e4) -0.1
-checking 'computeFeatures' .................... PASS (8cd691a663f460c1) 9bc95f30143c0aa0
-checking 'ocontour' ........................... PASS (0cbbfbd6c2b5057a) 0cbbfbd6c2b5057a
+checking 'computeFeatures' .................... PASS (8cd691a663f460c1) 19422.3
+checking 'ocontour' ........................... PASS (0cbbfbd6c2b5057a) -0.1
 checking 'normalize' .......................... PASS (03724aaea0cf64b4) -0.1
 checking 'normalize' .......................... PASS (03724aaea0cf64b4) -0.1
 checking 'gblur' .............................. PASS (03724aaea0cf64b4) -0.1
@@ -319,17 +324,13 @@ checking 'tile' ............................... PASS (63b8539b976f10f9) 42140.88
 checking 'untile' ............................. PASS (fc2ab5092822346e) 16809.31
 checking 'abind' .............................. PASS (7d8cabf23a7147bf) -0.1
 
-Warning messages:
-1: In hash.old(y) : NAs introduced by coercion
-2: In hash.old(y) : NAs introduced by coercion
-3: In hash.old(y) : NAs introduced by coercion
 > 
 > ## test: white image
 > testEBImageFunctions(Image(1L, c(5, 5)))
 new test (hash=5e369a5a8c06ea6e)
-checking 'show' ............................... PASS (d7ff39dcf34291a7) NA
-checking 'print' .............................. PASS (423045c171032825) NA
-checking 'hist' ............................... PASS (c32dc2571db86a0f) da29db1ad663925e
+checking 'show' ............................... PASS (d7ff39dcf34291a7) -0.1
+checking 'print' .............................. PASS (423045c171032825) -0.1
+checking 'hist' ............................... PASS (c32dc2571db86a0f) Inf
 checking '>' .................................. PASS (ab60d77d8694845c) 324.9
 checking '+' .................................. PASS (ccb4c957b356b423) 649.9
 checking '/' .................................. PASS (e68dd3c4bf42ae06) 162.4
@@ -341,11 +342,11 @@ checking 'as.Image' ........................... PASS (5e369a5a8c06ea6e) 324.9
 checking 'is.Image' ........................... PASS (e3aef3409e870c0e) 0.9
 checking 'imageData' .......................... PASS (a72e950dc2c633c4) 324.9
 checking 'imageData<-' ........................ PASS (5e369a5a8c06ea6e) 324.9
-checking 'as.raster' .......................... PASS (76158aebe747f7e1) NA
+checking 'as.raster' .......................... PASS (76158aebe747f7e1) -0.1
 checking 'colorMode<-' ........................ PASS (5e369a5a8c06ea6e) 324.9
 checking 'numberOfFrames' ..................... PASS (7c79dea3bfc1415b) 0.9
-checking 'getFrames' .......................... PASS (5be9802bf124fe9c) 0793da5ae058772e
-checking 'display' ............................ PASS (174250a6d96dee60) 5fa8470e1b05b374
+checking 'getFrames' .......................... PASS (5be9802bf124fe9c) 324.8
+checking 'display' ............................ PASS (174250a6d96dee60) 150.3
 checking 'display' ............................ PASS (d956c282ac7180e4) -0.1
 checking 'image' .............................. PASS (d956c282ac7180e4) -0.1
 checking 'drawCircle' ......................... PASS (a3847050dd15905c) 324.9
@@ -369,12 +370,12 @@ checking 'rmObjects' .......................... PASS (dafc92132d191221) -0.1
 checking 'reenumerate' ........................ PASS (dafc92132d191221) -0.1
 checking 'reenumerate' ........................ PASS (5e369a5a8c06ea6e) 324.9
 checking 'computeFeatures' .................... PASS (1e197f38fe3db7df) 950932.9
-checking 'computeFeatures' .................... PASS (8cd691a663f460c1) 9bc95f30143c0aa0
-checking 'ocontour' ........................... PASS (1ad47b9dc5e279b9) 5742434f54ead73b
-checking 'localCurvature' ..................... PASS (07aef8b9d0c42e30) a52d22f2e3bb2222
+checking 'computeFeatures' .................... PASS (8cd691a663f460c1) 19422.3
+checking 'ocontour' ........................... PASS (1ad47b9dc5e279b9) 1087.8
+checking 'localCurvature' ..................... PASS (07aef8b9d0c42e30) 1008.955
 checking 'normalize' .......................... PASS (a3847050dd15905c) 324.9
 checking 'normalize' .......................... PASS (a3847050dd15905c) 324.9
-checking 'gblur' .............................. PASS (34be5e3328df689f) NA
+checking 'gblur' .............................. PASS (34be5e3328df689f) -0.1
 checking 'filter2' ............................ PASS (046936d9c22a44d3) 8124.9
 checking 'medianFilter' ....................... PASS (a3847050dd15905c) 324.9
 checking 'equalize' ........................... PASS (5e369a5a8c06ea6e) 324.9
@@ -399,19 +400,14 @@ checking 'tile' ............................... PASS (16eb65ee8bbcb932) 24420.64
 checking 'untile' ............................. PASS (8bcebbd606485233) 10445.49
 checking 'abind' .............................. PASS (8c39678924e12a09) 1274.9
 
-Warning messages:
-1: In hash.old(y) : NAs introduced by coercion
-2: In hash.old(y) : NAs introduced by coercion
-3: In hash.old(y) : NAs introduced by coercion
-4: In hash.old(y) : NAs introduced by coercion
 > 
 > ## test: 2D Grayscale 64x48
 > x <- nuclei[50:113,208:255,2]
 > testEBImageFunctions(as.array(x))
 new test (hash=3e469356855e6210)
-checking 'show' ............................... PASS (0c6212669ee6288d) NA
-checking 'print' .............................. PASS (0c6212669ee6288d) NA
-checking 'hist' ............................... PASS (e7a708b4f96f88dc) bb3d9d4fe47f137d
+checking 'show' ............................... PASS (0c6212669ee6288d) -0.1
+checking 'print' .............................. PASS (0c6212669ee6288d) -0.1
+checking 'hist' ............................... PASS (e7a708b4f96f88dc) 20513.55
 checking '>' .................................. PASS (0a927a877b0b85eb) 1217568
 checking '+' .................................. PASS (2c51607a58b46974) 2940144
 checking '/' .................................. PASS (a872fc97379d58f5) 735035.9
@@ -423,11 +419,11 @@ checking 'as.Image' ........................... PASS (b7ae9a016c5a19ec) 1470072
 checking 'is.Image' ........................... PASS (69f0cf1cfd5cd8ed) -0.1
 checking 'imageData' .......................... PASS (3e469356855e6210) 1470072
 checking 'imageData<-' ........................ PASS (3e469356855e6210) 1470072
-checking 'as.raster' .......................... PASS (42efa6b3b04694cf) NA
-checking 'colorMode<-' ........................ PASS (b8d002268bfac3eb) NA
+checking 'as.raster' .......................... PASS (42efa6b3b04694cf) -0.1
+checking 'colorMode<-' ........................ PASS (b8d002268bfac3eb) -0.1
 checking 'numberOfFrames' ..................... PASS (7c79dea3bfc1415b) 0.9
-checking 'getFrames' .......................... PASS (d38b8f6c1a1504a8) 31b837e1233e61ed
-checking 'display' ............................ PASS (dada341199e50c3d) e71f191dd8006bab
+checking 'getFrames' .......................... PASS (d38b8f6c1a1504a8) 1470072
+checking 'display' ............................ PASS (dada341199e50c3d) 397.3
 checking 'display' ............................ PASS (d956c282ac7180e4) -0.1
 checking 'image' .............................. PASS (d956c282ac7180e4) -0.1
 checking 'drawCircle' ......................... PASS (872845fa91c628a6) 1607165
@@ -451,9 +447,9 @@ checking 'rmObjects' .......................... PASS (365ace8a4657cb08) -0.1
 checking 'reenumerate' ........................ PASS (365ace8a4657cb08) -0.1
 checking 'reenumerate' ........................ PASS (5055cb94d5293a15) 1199387
 checking 'computeFeatures' .................... PASS (f59aa3f08e782acf) 3634215
-checking 'computeFeatures' .................... PASS (4e7e75f941531854) 162981db75daaae7
-checking 'ocontour' ........................... PASS (790a5f5b45092d41) 57adc3055202768b
-checking 'localCurvature' ..................... PASS (fb6d4b13b08dcac4) be6c48fc7c8a3c8a
+checking 'computeFeatures' .................... PASS (4e7e75f941531854) 145634.3
+checking 'ocontour' ........................... PASS (790a5f5b45092d41) 1050552
+checking 'localCurvature' ..................... PASS (fb6d4b13b08dcac4) 1049392
 checking 'normalize' .......................... PASS (1f79956b7887dd73) 1431381
 checking 'normalize' .......................... PASS (13a2d37d997199f9) 1266798
 checking 'gblur' .............................. PASS (203a6d72b1fd5eba) 1466231
@@ -481,19 +477,14 @@ checking 'tile' ............................... PASS (870e7501fa1f3338) 78718054
 checking 'untile' ............................. PASS (868893e062dea032) 72597772
 checking 'abind' .............................. PASS (5bda9f75cbc23401) 5597376
 
-Warning messages:
-1: In hash.old(y) : NAs introduced by coercion
-2: In hash.old(y) : NAs introduced by coercion
-3: In hash.old(y) : NAs introduced by coercion
-4: In hash.old(y) : NAs introduced by coercion
 > 
 > ## test: 2D Color 32x48x1
 > x <- sample[1:32, 1:48]
 > testEBImageFunctions(Image(as.vector(x), dim(x), Color))
 new test (hash=7718e616f411c340)
-checking 'show' ............................... PASS (1a2c30323dd5a8ee) NA
-checking 'print' .............................. PASS (e9fad67b70709e2b) NA
-checking 'hist' ............................... PASS (596b544e7cd6f458) e99389080830c142
+checking 'show' ............................... PASS (1a2c30323dd5a8ee) -0.1
+checking 'print' .............................. PASS (e9fad67b70709e2b) -0.1
+checking 'hist' ............................... PASS (596b544e7cd6f458) 130241.3
 checking '>' .................................. PASS (e72c38d763e5fabf) 988518.9
 checking '+' .................................. PASS (e38cf73f1c0c88a2) 1531522
 checking '/' .................................. PASS (df4e8bf818fc26fe) 382880.4
@@ -505,11 +496,11 @@ checking 'as.Image' ........................... PASS (7718e616f411c340) 765760.9
 checking 'is.Image' ........................... PASS (e3aef3409e870c0e) 0.9
 checking 'imageData' .......................... PASS (19c51d4d9d30d60c) 765760.9
 checking 'imageData<-' ........................ PASS (7718e616f411c340) 765760.9
-checking 'as.raster' .......................... PASS (05c68b3f51ec838b) NA
+checking 'as.raster' .......................... PASS (05c68b3f51ec838b) -0.1
 checking 'colorMode<-' ........................ PASS (733871e596e328df) 765760.9
 checking 'numberOfFrames' ..................... PASS (7c79dea3bfc1415b) 0.9
-checking 'getFrames' .......................... PASS (681aab4c8a24c6c5) e6dc356666b6251c
-checking 'display' ............................ PASS (bb2b4586191eb980) 46a272316ccb58ef
+checking 'getFrames' .......................... PASS (681aab4c8a24c6c5) 765760.8
+checking 'display' ............................ PASS (bb2b4586191eb980) 333.3
 checking 'display' ............................ PASS (d956c282ac7180e4) -0.1
 checking 'image' .............................. PASS (d956c282ac7180e4) -0.1
 checking 'drawCircle' ......................... PASS (a6757bb66994b1f7) 782100.7
@@ -533,9 +524,9 @@ checking 'rmObjects' .......................... PASS (e0ab50f8e544290a) 565.9
 checking 'reenumerate' ........................ PASS (e0ab50f8e544290a) 565.9
 checking 'reenumerate' ........................ PASS (498723eb57bcca48) 832970.9
 checking 'computeFeatures' .................... PASS (c1ff2e62e7bb8eee) 3989786
-checking 'computeFeatures' .................... PASS (4e7e75f941531854) 162981db75daaae7
-checking 'ocontour' ........................... PASS (ced9c409ca879dc9) 307e5271f94742ce
-checking 'localCurvature' ..................... PASS (25e900bf67a8cdb0) 7faa95a1a5954a9d
+checking 'computeFeatures' .................... PASS (4e7e75f941531854) 145634.3
+checking 'ocontour' ........................... PASS (ced9c409ca879dc9) 848253.8
+checking 'localCurvature' ..................... PASS (25e900bf67a8cdb0) 847428.3
 checking 'normalize' .......................... PASS (b8b2cfe4f431fc83) 747801.4
 checking 'normalize' .......................... PASS (3ee0aade2890ed53) 809649.2
 checking 'gblur' .............................. PASS (0c28ab262af637d1) 761679.3
@@ -563,18 +554,14 @@ checking 'tile' ............................... PASS (3f8e8f9b949597b4) 33061491
 checking 'untile' ............................. PASS (9f839c04542fa7e4) 27788327
 checking 'abind' .............................. PASS (a65f1e1e2d249be6) 2960568
 
-Warning messages:
-1: In hash.old(y) : NAs introduced by coercion
-2: In hash.old(y) : NAs introduced by coercion
-3: In hash.old(y) : NAs introduced by coercion
 > 
 > ## test: 3D Color 65x17x3
 > x <- sample.color[1:65, 1:17,]
 > testEBImageFunctions(x)
 new test (hash=3884fe38962577a7)
-checking 'show' ............................... PASS (8331bd653405c3be) NA
-checking 'print' .............................. PASS (de22d3dc188680fd) NA
-checking 'hist' ............................... PASS (10b008981f19c77a) 3ba2c54847ff49ff
+checking 'show' ............................... PASS (8331bd653405c3be) -0.1
+checking 'print' .............................. PASS (de22d3dc188680fd) -0.1
+checking 'hist' ............................... PASS (10b008981f19c77a) 348464.1
 checking '>' .................................. PASS (e6c8a64e9fff6055) 1058553
 checking '+' .................................. PASS (5bb860f09b56b4d9) 4072301
 checking '/' .................................. PASS (17b2c344ff60cf34) 1018075
@@ -586,11 +573,11 @@ checking 'as.Image' ........................... PASS (3884fe38962577a7) 2036151
 checking 'is.Image' ........................... PASS (e3aef3409e870c0e) 0.9
 checking 'imageData' .......................... PASS (1456dcb0ab2d690b) 2036151
 checking 'imageData<-' ........................ PASS (3884fe38962577a7) 2036151
-checking 'as.raster' .......................... PASS (abd1d3d0d6329777) NA
+checking 'as.raster' .......................... PASS (abd1d3d0d6329777) -0.1
 checking 'colorMode<-' ........................ PASS (0aa63faa9d4e0838) 2036151
 checking 'numberOfFrames' ..................... PASS (7c79dea3bfc1415b) 0.9
-checking 'getFrames' .......................... PASS (2ed277d7e69a05d2) 1750981548e81a00
-checking 'display' ............................ PASS (3d646d4f07d194ba) e7aad486cf864763
+checking 'getFrames' .......................... PASS (2ed277d7e69a05d2) 2036151
+checking 'display' ............................ PASS (3d646d4f07d194ba) 306.3
 checking 'display' ............................ PASS (d956c282ac7180e4) -0.1
 checking 'image' .............................. PASS (d956c282ac7180e4) -0.1
 checking 'drawCircle' ......................... PASS (5175a6622762681a) 2049936
@@ -614,9 +601,9 @@ checking 'rmObjects' .......................... PASS (3705fc84a07dd0cd) -0.1
 checking 'reenumerate' ........................ PASS (3705fc84a07dd0cd) -0.1
 checking 'reenumerate' ........................ PASS (2fa4cf414bbb7787) 230329.9
 checking 'computeFeatures' .................... PASS (a33c53edd3cf8a46) 746878.2
-checking 'computeFeatures' .................... PASS (8cd691a663f460c1) 9bc95f30143c0aa0
-checking 'ocontour' ........................... PASS (1be2808a87ee437f) 8a1eb9f0654f5114
-checking 'localCurvature' ..................... PASS (ad1fddb421e46506) 63cee8a66ce4e24c
+checking 'computeFeatures' .................... PASS (8cd691a663f460c1) 19422.3
+checking 'ocontour' ........................... PASS (1be2808a87ee437f) 117866.8
+checking 'localCurvature' ..................... PASS (ad1fddb421e46506) 116636.2
 checking 'normalize' .......................... PASS (edb5f31f14cd540d) 1788995
 checking 'normalize' .......................... PASS (6a1005a2ed478c1e) 1858155
 checking 'gblur' .............................. PASS (c61849c1f4dc6d25) 2029979
@@ -644,10 +631,6 @@ checking 'tile' ............................... PASS (4f60a4ae167b4e6e) 10718863
 checking 'untile' ............................. PASS (05afb65e638c5769) 97994583
 checking 'abind' .............................. PASS (d56bf3140c7cd055) 8350133
 
-Warning messages:
-1: In hash.old(y) : NAs introduced by coercion
-2: In hash.old(y) : NAs introduced by coercion
-3: In hash.old(y) : NAs introduced by coercion
 > 
 > ## test: 3D Grayscale logical 32x32x2
 > x <- sample[32:63, 32:63]
@@ -655,9 +638,9 @@ Warning messages:
 > x <- combine(x, x)
 > testEBImageFunctions(x)
 new test (hash=db12fa8044d98567)
-checking 'show' ............................... PASS (75018abdcca926f0) NA
-checking 'print' .............................. PASS (9bacee8faec96053) NA
-checking 'hist' ............................... PASS (f0f3640c0aa89c38) 8a0ff1615bea3b3b
+checking 'show' ............................... PASS (75018abdcca926f0) -0.1
+checking 'print' .............................. PASS (9bacee8faec96053) -0.1
+checking 'hist' ............................... PASS (f0f3640c0aa89c38) 5855.343
 checking '>' .................................. PASS (db12fa8044d98567) 1055560
 checking '+' .................................. PASS (0b5a21f5cc627e62) 2111120
 checking '/' .................................. PASS (bf2545eee0c6aa3e) 527779.9
@@ -669,11 +652,11 @@ checking 'as.Image' ........................... PASS (db12fa8044d98567) 1055560
 checking 'is.Image' ........................... PASS (e3aef3409e870c0e) 0.9
 checking 'imageData' .......................... PASS (6b02d87cd459ac19) 1055560
 checking 'imageData<-' ........................ PASS (db12fa8044d98567) 1055560
-checking 'as.raster' .......................... PASS (26cf978328d1a712) NA
+checking 'as.raster' .......................... PASS (26cf978328d1a712) -0.1
 checking 'colorMode<-' ........................ PASS (db12fa8044d98567) 1055560
 checking 'numberOfFrames' ..................... PASS (161e41d6aa749739) 1.9
-checking 'getFrames' .......................... PASS (ce29246f73d959c3) 34b1f972b2556640
-checking 'display' ............................ PASS (2fb2fcab54a4ea5a) a59a5509e2da96ec
+checking 'getFrames' .......................... PASS (ce29246f73d959c3) 916715.6
+checking 'display' ............................ PASS (2fb2fcab54a4ea5a) 285.3
 checking 'display' ............................ PASS (d956c282ac7180e4) -0.1
 checking 'image' .............................. PASS (d956c282ac7180e4) -0.1
 checking 'drawCircle' ......................... PASS (1180c20b46fdaf4e) 1656514
@@ -697,9 +680,9 @@ checking 'rmObjects' .......................... PASS (0a1cd72f8d3c03e8) 1303423
 checking 'reenumerate' ........................ PASS (df75276eeec5813d) 1244828
 checking 'reenumerate' ........................ PASS (10092f8e4256496b) 1597368
 checking 'computeFeatures' .................... PASS (1bf064e6a11f2410) 416164140
-checking 'computeFeatures' .................... PASS (4e7e75f941531854) 162981db75daaae7
-checking 'ocontour' ........................... PASS (9f7d90d6312e32f3) 520feefec500ade4
-checking 'localCurvature' ..................... PASS (477746e4fee34aeb) 173b754e552dc94a
+checking 'computeFeatures' .................... PASS (4e7e75f941531854) 145634.3
+checking 'ocontour' ........................... PASS (9f7d90d6312e32f3) 836958.8
+checking 'localCurvature' ..................... PASS (477746e4fee34aeb) 835041.5
 checking 'normalize' .......................... PASS (eea76285d45436f7) 1055560
 checking 'normalize' .......................... PASS (eea76285d45436f7) 1055560
 checking 'gblur' .............................. PASS (9224b720f9d00006) 1037581
@@ -727,19 +710,15 @@ checking 'tile' ............................... PASS (4c3d7086d0c2c786) 48846817
 checking 'untile' ............................. PASS (65365043e983ec58) 41221063
 checking 'abind' .............................. PASS (af0697002f77c709) 3888784
 
-Warning messages:
-1: In hash.old(y) : NAs introduced by coercion
-2: In hash.old(y) : NAs introduced by coercion
-3: In hash.old(y) : NAs introduced by coercion
 > 
 > ## test: 4D Color 33x16x3x2
 > x <- sample.color[1:33, 1:16,]
 > x <- combine(x, x)
 > testEBImageFunctions(x)
 new test (hash=290d7a45d7468e5f)
-checking 'show' ............................... PASS (78a7303aa046067b) NA
-checking 'print' .............................. PASS (9aaf686697ac72be) NA
-checking 'hist' ............................... PASS (b01a7d139c82f457) c7b6d9da8efb0d2a
+checking 'show' ............................... PASS (78a7303aa046067b) -0.1
+checking 'print' .............................. PASS (9aaf686697ac72be) -0.1
+checking 'hist' ............................... PASS (b01a7d139c82f457) 492113.2
 checking '>' .................................. PASS (1f65757da86f51b3) 2013322
 checking '+' .................................. PASS (86bdea7870f6d0cc) 4709417
 checking '/' .................................. PASS (c3533150260f42c4) 1177354
@@ -751,11 +730,11 @@ checking 'as.Image' ........................... PASS (290d7a45d7468e5f) 2354709
 checking 'is.Image' ........................... PASS (e3aef3409e870c0e) 0.9
 checking 'imageData' .......................... PASS (1936bbf08b457bab) 2354709
 checking 'imageData<-' ........................ PASS (290d7a45d7468e5f) 2354709
-checking 'as.raster' .......................... PASS (da1c028f359bf00b) NA
+checking 'as.raster' .......................... PASS (da1c028f359bf00b) -0.1
 checking 'colorMode<-' ........................ PASS (7856ef3bde7528ce) 2354709
 checking 'numberOfFrames' ..................... PASS (161e41d6aa749739) 1.9
-checking 'getFrames' .......................... PASS (f0d9427233f46fbb) 925d92c4efbf7653
-checking 'display' ............................ PASS (bc877f5317c575b2) 9f608546948d6759
+checking 'getFrames' .......................... PASS (f0d9427233f46fbb) 1440422
+checking 'display' ............................ PASS (bc877f5317c575b2) 239.3
 checking 'display' ............................ PASS (d956c282ac7180e4) -0.1
 checking 'image' .............................. PASS (d956c282ac7180e4) -0.1
 checking 'drawCircle' ......................... PASS (ad8f0dc0cad6885c) 2650006
@@ -779,9 +758,9 @@ checking 'rmObjects' .......................... PASS (ea36bf2e51776461) 261782.9
 checking 'reenumerate' ........................ PASS (ea36bf2e51776461) 261782.9
 checking 'reenumerate' ........................ PASS (404699231a09f479) 360413.9
 checking 'computeFeatures' .................... PASS (151a0d98d309d0b1) 749353.1
-checking 'computeFeatures' .................... PASS (8cd691a663f460c1) 9bc95f30143c0aa0
-checking 'ocontour' ........................... PASS (20fad83d539e2372) 9d7964011e11a9be
-checking 'localCurvature' ..................... PASS (469cd750daa03946) 88419614c38ea083
+checking 'computeFeatures' .................... PASS (8cd691a663f460c1) 19422.3
+checking 'ocontour' ........................... PASS (20fad83d539e2372) 107408.8
+checking 'localCurvature' ..................... PASS (469cd750daa03946) 106275.7
 checking 'normalize' .......................... PASS (4484b1dbbf34c675) 2693244
 checking 'normalize' .......................... PASS (27680837000f1ded) 2315924
 checking 'gblur' .............................. PASS (fc2147343f5faed5) 2349701
@@ -809,19 +788,15 @@ checking 'tile' ............................... PASS (e594265685cdf3aa) 11430080
 checking 'untile' ............................. PASS (5b25f3b7fc0df1b3) 105862114
 checking 'abind' .............................. PASS (a413703585d2e713) 9516503
 
-Warning messages:
-1: In hash.old(y) : NAs introduced by coercion
-2: In hash.old(y) : NAs introduced by coercion
-3: In hash.old(y) : NAs introduced by coercion
 > 
 > ## test: 4D Grayscale 16x33x2x3
 > colorMode(x) <- Grayscale
 > imageData(x) <- aperm(x, c(2L, 1L, 4L, 3L))
 > testEBImageFunctions(x)
 new test (hash=2a321f78219fa026)
-checking 'show' ............................... PASS (3de182583a8c2cf2) NA
-checking 'print' .............................. PASS (05d1cebf84274f35) NA
-checking 'hist' ............................... PASS (885aba01ae2954f5) c984b74f904ca3b0
+checking 'show' ............................... PASS (3de182583a8c2cf2) -0.1
+checking 'print' .............................. PASS (05d1cebf84274f35) -0.1
+checking 'hist' ............................... PASS (885aba01ae2954f5) 229030.4
 checking '>' .................................. PASS (c15b137f0122c2ee) 1541186
 checking '+' .................................. PASS (2951b29fcfadda51) 4466272
 checking '/' .................................. PASS (b0a06579c4ef390d) 1116568
@@ -833,11 +808,11 @@ checking 'as.Image' ........................... PASS (2a321f78219fa026) 2233136
 checking 'is.Image' ........................... PASS (e3aef3409e870c0e) 0.9
 checking 'imageData' .......................... PASS (6a221a6a2cec815a) 2233136
 checking 'imageData<-' ........................ PASS (2a321f78219fa026) 2233136
-checking 'as.raster' .......................... PASS (73a5fd711e0edd14) NA
+checking 'as.raster' .......................... PASS (73a5fd711e0edd14) -0.1
 checking 'colorMode<-' ........................ PASS (2a321f78219fa026) 2233136
 checking 'numberOfFrames' ..................... PASS (d9914b6bdfe88a1d) 5.9
-checking 'getFrames' .......................... PASS (c2a08dc890b333e2) f6e9a5d38142a455
-checking 'display' ............................ PASS (d28e3e75eed04056) c204a94517b6e86e
+checking 'getFrames' .......................... PASS (c2a08dc890b333e2) 1229859
+checking 'display' ............................ PASS (d28e3e75eed04056) 256.3
 checking 'display' ............................ PASS (d956c282ac7180e4) -0.1
 checking 'image' .............................. PASS (d956c282ac7180e4) -0.1
 checking 'drawCircle' ......................... PASS (d4dbcf7b516a28b0) 2502013
@@ -861,9 +836,9 @@ checking 'rmObjects' .......................... PASS (056669f72385f506) 1934575
 checking 'reenumerate' ........................ PASS (056669f72385f506) 1934575
 checking 'reenumerate' ........................ PASS (f698416417dde49c) 2016822
 checking 'computeFeatures' .................... PASS (53798e843cdbfa9f) 734993.9
-checking 'computeFeatures' .................... PASS (8cd691a663f460c1) 9bc95f30143c0aa0
-checking 'ocontour' ........................... PASS (3a230e30e8d15bee) bd10c4b443e2c5c0
-checking 'localCurvature' ..................... PASS (a1d19191deda947d) 315e34c611de2b7d
+checking 'computeFeatures' .................... PASS (8cd691a663f460c1) 19422.3
+checking 'ocontour' ........................... PASS (3a230e30e8d15bee) 118072.8
+checking 'localCurvature' ..................... PASS (a1d19191deda947d) 117246.2
 checking 'normalize' .......................... PASS (85d2a91256ddfdaa) 2526618
 checking 'normalize' .......................... PASS (4accf817a36301dc) 2163958
 checking 'gblur' .............................. PASS (c2c22f114f9ac87d) 2237219
@@ -891,19 +866,15 @@ checking 'tile' ............................... PASS (0581a6216e8e50e0) 72664167
 checking 'untile' ............................. PASS (4e208afef7f298bd) 60048605
 checking 'abind' .............................. PASS (e3feb875241cebc2) 9273358
 
-Warning messages:
-1: In hash.old(y) : NAs introduced by coercion
-2: In hash.old(y) : NAs introduced by coercion
-3: In hash.old(y) : NAs introduced by coercion
 > 
 > ## test: Image subclass
 > ImageSubclass <- setClass ("ImageSubclass", contains = "Image", slots = c(foo = "character"))
 > x <- ImageSubclass(x, foo="bar")
 > testEBImageFunctions(x)
 new test (hash=9b67f57c77f74d34)
-checking 'show' ............................... PASS (63597c3473b56977) NA
-checking 'print' .............................. PASS (1cd88fa9e1ff084e) NA
-checking 'hist' ............................... PASS (885aba01ae2954f5) c984b74f904ca3b0
+checking 'show' ............................... PASS (63597c3473b56977) -0.1
+checking 'print' .............................. PASS (1cd88fa9e1ff084e) -0.1
+checking 'hist' ............................... PASS (885aba01ae2954f5) 229030.4
 checking '>' .................................. PASS (8213f4f8b30b3c46) 1541186
 checking '+' .................................. PASS (d9da0200176ead52) 4466272
 checking '/' .................................. PASS (c5360d5612508ba0) 1116568
@@ -915,11 +886,11 @@ checking 'as.Image' ........................... PASS (2a321f78219fa026) 2233136
 checking 'is.Image' ........................... PASS (e3aef3409e870c0e) 0.9
 checking 'imageData' .......................... PASS (6a221a6a2cec815a) 2233136
 checking 'imageData<-' ........................ PASS (9b67f57c77f74d34) 2233136
-checking 'as.raster' .......................... PASS (73a5fd711e0edd14) NA
+checking 'as.raster' .......................... PASS (73a5fd711e0edd14) -0.1
 checking 'colorMode<-' ........................ PASS (9b67f57c77f74d34) 2233136
 checking 'numberOfFrames' ..................... PASS (d9914b6bdfe88a1d) 5.9
-checking 'getFrames' .......................... PASS (e9438bf3afe19fef) 5aadb4894eade0a0
-checking 'display' ............................ PASS (d28e3e75eed04056) c204a94517b6e86e
+checking 'getFrames' .......................... PASS (e9438bf3afe19fef) 1229859
+checking 'display' ............................ PASS (d28e3e75eed04056) 256.3
 checking 'display' ............................ PASS (d956c282ac7180e4) -0.1
 checking 'image' .............................. PASS (d956c282ac7180e4) -0.1
 checking 'drawCircle' ......................... PASS (88969323fe4011cb) 2502013
@@ -943,9 +914,9 @@ checking 'rmObjects' .......................... PASS (1ed59ae8eb61aef6) 1934575
 checking 'reenumerate' ........................ PASS (1ed59ae8eb61aef6) 1934575
 checking 'reenumerate' ........................ PASS (edce7604823b90a7) 2016822
 checking 'computeFeatures' .................... PASS (53798e843cdbfa9f) 734993.9
-checking 'computeFeatures' .................... PASS (8cd691a663f460c1) 9bc95f30143c0aa0
-checking 'ocontour' ........................... PASS (3a230e30e8d15bee) bd10c4b443e2c5c0
-checking 'localCurvature' ..................... PASS (a1d19191deda947d) 315e34c611de2b7d
+checking 'computeFeatures' .................... PASS (8cd691a663f460c1) 19422.3
+checking 'ocontour' ........................... PASS (3a230e30e8d15bee) 118072.8
+checking 'localCurvature' ..................... PASS (a1d19191deda947d) 117246.2
 checking 'normalize' .......................... PASS (9ace81a69fc88c37) 2526618
 checking 'normalize' .......................... PASS (2a78b599de5c2ae9) 2163958
 checking 'gblur' .............................. PASS (0d226d91f7036796) 2237219
@@ -973,8 +944,4 @@ checking 'tile' ............................... PASS (db685d6eb3480813) 72664167
 checking 'untile' ............................. PASS (0e362c45443a3ec0) 60048605
 checking 'abind' .............................. PASS (add8d4baab35a5f9) 9273358
 
-Warning messages:
-1: In hash.old(y) : NAs introduced by coercion
-2: In hash.old(y) : NAs introduced by coercion
-3: In hash.old(y) : NAs introduced by coercion
 > 

@@ -8,12 +8,17 @@ set.seed(0) # make random color permutations in 'colorLabels' reproducible
 hash = function (x) .Call(digest:::digest_impl, serialize(x, connection=NULL, ascii=FALSE, xdr=FALSE), 7L, -1L, 14L, 0L, 0L, PACKAGE="digest")
 
 hash.old <- function(x) {
-  if (is.list(x)) hash(sapply(x,hash))
+  if (is.list(x) && length(x)>0) {
+    hash.old(sapply(x, hash.old, USE.NAMES=FALSE))
+  }
   else {
-    xd <- as.numeric(x)
-    xd <- xd[!is.nan(xd)]
-    if (is.matrix(xd)) sum(xd*(1:length(xd))) + 0.7*hash(dim(xd))
-    else sum(xd*(1:length(xd))) - 0.1
+    xd <- suppressWarnings(as.numeric(x))
+    xd <- xd[!(is.nan(xd)|is.na(xd))]
+    sx <- sum(xd*(1:length(xd)))
+    if (is.matrix(xd))
+      sx + 0.7 * hash.old(dim(xd))
+    else
+      sx - 0.1
   }
 }
 
