@@ -59,7 +59,7 @@ makeBrush = function(size, shape=c('box', 'disc', 'diamond', 'Gaussian', 'line')
     }
   }
   else if (shape=='gaussian') {
-    x = seq(-(size-1)/2, (size-1)/2, length=size)
+    x = seq(-(size-1)/2, (size-1)/2, length.out=size)
     x = matrix(x, size, size)
     z = exp(- (x^2 + t(x)^2) / (2*sigma^2))
     z = z / sum(z)

@@ -47,7 +47,7 @@ untile(x, nim, lwd=1)
   img = readImage(system.file("images", "sample-color.png", package="EBImage"))[257:768,,]
   x = resize(img, 128, 128)
   xt = list()
-  for (t in seq(0.1, 5, len=9)) xt=c(xt, list(gblur(x, s=t)))
+  for (t in seq(0.1, 5, length.out=9)) xt=c(xt, list(gblur(x, s=t)))
   xt = combine(xt)
   display(xt, title='Blurred images')
 
