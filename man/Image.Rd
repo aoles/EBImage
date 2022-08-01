@@ -136,7 +136,7 @@ numberOfFrames(y, type = c('total', 'render'))
   x = Image(rnorm(300*300*3),dim=c(300,300,3), colormode='Color')
   display(x)
 
-  w = matrix(seq(0, 1, len=300), nc=300, nr=300)
+  w = matrix(seq(0, 1, length.out=300), nc=300, nr=300)
   m = abind::abind(w, t(w), along=3)
   z = Image(m, colormode='Color')
   display(normalize(z))

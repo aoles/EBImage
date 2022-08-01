@@ -646,7 +646,7 @@ setMethod ("hist", signature(x="Image"),
 
     if(length(breaks)==1L) {
       bins = breaks
-      breaks = seq(rg[1], rg[2], length=breaks+1L)
+      breaks = seq(rg[1], rg[2], length.out=breaks+1L)
     } else {
       bins = length(breaks) - 1L
     }
