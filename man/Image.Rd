@@ -129,7 +129,7 @@ numberOfFrames(y, type = c('total', 'render'))
 }
 
 \examples{
-  s1 = exp(12i*pi*seq(-1, 1, length=300)^2)
+  s1 = exp(12i*pi*seq(-1, 1, length.out=300)^2)
   y = Image(outer(Im(s1), Re(s1)))
   display(normalize(y))
 

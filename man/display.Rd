@@ -73,7 +73,7 @@ display(x)
 
 ## Display a thresholded sequence ...
 y = readImage(system.file("images", "sample.png", package="EBImage"))[366:749, 58:441]
-z = lapply(seq(from=0.5, to=5, length=6),
+z = lapply(seq(from=0.5, to=5, length.out=6),
   function(s) gblur(y, s, boundary="replicate")
 )
 z = combine(z)

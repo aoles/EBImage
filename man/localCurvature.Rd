@@ -43,7 +43,7 @@ localCurvature(x, h, maxk)
 \examples{
   ## curvature goes as the inverse of the radius of a circle
   range=seq(3.5,33.5,by=2)
-  plotRange=seq(0.5,33.5,length=100)
+  plotRange=seq(0.5,33.5,length.out=100)
   circleRes=array(dim=length(range))
   names(circleRes)=range
   for (i in  seq_along(1:length(range))) {
