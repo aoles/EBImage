@@ -35,7 +35,7 @@ SEXP nativeRaster (SEXP _in) {
   nprotect++;
   
   // initialize
-  out = INTEGER(res);
+  out = (uint32_t *) INTEGER(res);
   memset (out, 0, x*y*sizeof(uint32_t) );
   
   for(j=0; j<4; j++) {
