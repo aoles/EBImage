@@ -62,12 +62,12 @@ standardExpandRef(ref, refnames, filter = gblob())
 }
 
 \value{
-  If \code{properties} if \code{FALSE} (by default), \code{computeFeatures}
+  If \code{properties} is \code{FALSE} (by default), \code{computeFeatures}
   returns a matrix of n cells times p features, where p depends of
   the options given to the function. Returns \code{NULL} if no object is
   present.
 
-  If \code{properties} if \code{TRUE}, \code{computeFeatures}
+  If \code{properties} is \code{TRUE}, \code{computeFeatures}
   returns a matrix of p features times 2 properties (translation and
   rotation invariance). Feature properties are useful to filter out
   features that may not be needed for specific tasks, e.g. cell
