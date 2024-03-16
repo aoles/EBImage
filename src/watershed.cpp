@@ -1,16 +1,13 @@
+/* -------------------------------------------------------------------------
+ Watershed transform for Image
+ Copyright (c) 2006 Oleg Sklyar
+ See: ../LICENSE for license, LGPL
+ ------------------------------------------------------------------------- */
+
 #include <list>
 #include "watershed.h"
-
-/* -------------------------------------------------------------------------
-Watershed transform for Image
-Copyright (c) 2006 Oleg Sklyar
-See: ../LICENSE for license, LGPL
-------------------------------------------------------------------------- */
-
 #include "tools.h"
 #include <R_ext/Error.h>
-
-/* list of STL, C++ */
 
 #define BG 0.0
 

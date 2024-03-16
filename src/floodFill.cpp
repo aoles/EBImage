@@ -1,14 +1,13 @@
+/* -------------------------------------------------------------------------
+ Flood fill for images and flood-fill-based hull filling for objects
+ Copyright (c) 2007 Gregoire Pau; templated code by Oleg Sklyar
+ 
+ See: ../LICENSE for license, LGPL
+ ------------------------------------------------------------------------- */
+
 #include <stack>
 #include "floodFill.h"
 #include "tools.h"
-
-/* -------------------------------------------------------------------------
-Flood fill for images and flood-fill-based hull filling for objects
-Copyright (c) 2007 Gregoire Pau; templated code by Oleg Sklyar
-
-See: ../LICENSE for license, LGPL
-------------------------------------------------------------------------- */
-
 #include <R_ext/Error.h>
 
 /* -------------------------------------------------------------------------- */
