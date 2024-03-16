@@ -34,7 +34,7 @@ char * _validImageObject (SEXP x) {
 int validImage (SEXP x,int test) {
   char *msg = _validImageObject(x);
   
-  if (test==0 && msg!=NULL) error(msg);
+  if (test==0 && msg!=NULL) error("%s", msg);
   if (msg!=NULL) return(0);
   else return(1);
 }
