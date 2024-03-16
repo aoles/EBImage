@@ -1,3 +1,4 @@
+#include <list>
 #include "watershed.h"
 
 /* -------------------------------------------------------------------------
@@ -10,7 +11,6 @@ See: ../LICENSE for license, LGPL
 #include <R_ext/Error.h>
 
 /* list of STL, C++ */
-#include <list>
 
 #define BG 0.0
 

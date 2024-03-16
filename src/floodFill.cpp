@@ -1,3 +1,4 @@
+#include <stack>
 #include "floodFill.h"
 #include "tools.h"
 
@@ -9,7 +10,6 @@ See: ../LICENSE for license, LGPL
 ------------------------------------------------------------------------- */
 
 #include <R_ext/Error.h>
-#include <stack>
 
 /* -------------------------------------------------------------------------- */
 struct XYPoint {
